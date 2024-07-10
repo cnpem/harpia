@@ -115,18 +115,23 @@ for root, _, files in os.walk('src'):
         if file.endswith('.cu'):
             cuda_sources.append(os.path.join(root, file))
 
+print(cuda_sources)
+
+filters = ["harpia-model/filters/filters.pyx"]
+morphology = ["harpia-model/morphology/morphology.pyx"]
+
 ext_modules = [
     Extension(
         "src.Wrapper.wrapper",
-        sources=["src/Wrapper/wrapper.pyx"] + cuda_sources,
+        sources=cuda_sources + filters + morphology,
         libraries=['cudart'],
         language='c++',
-        include_dirs=[numpy.get_include(), CUDA['include']],
+        include_dirs=[numpy.get_include(), CUDA['include'], "src"],
         library_dirs=[CUDA['lib64']],
         runtime_library_dirs=[CUDA['lib64']],
         extra_compile_args={
             'gcc': [],
-            'nvcc': ['--ptxas-options=-v', '-c', '--compiler-options', "'-fPIC'"]
+            'nvcc': ['--ptxas-options=-v', '-c','-dc', '--compiler-options', "'-fPIC'"]
         },
     )
 ]
