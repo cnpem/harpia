@@ -444,13 +444,11 @@ void prewitt_filtering(dtype* image, float* output, int rows, int cols, int slic
 }
 
 
-// Explicit instantiation for float
+// Explicit instantiation 
 template void prewitt_filtering<float>(float* image, float* output, int rows, int cols, int slices, bool type);
+template void prewitt_filtering<int>(int* image, float* output, int rows, int cols, int slices, bool type);
+template void prewitt_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, bool type);
 
-//extern "C" void prewitt_filtering_float(float* image, float* output, int rows, int cols, int slices, bool type)
-//{
-//    prewitt_filtering(image, output, rows, cols, slices, type);
-//}
 
 /*
 

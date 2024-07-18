@@ -142,6 +142,8 @@ void gaussian_filtering(dtype* image, float* output, int rows, int cols, int sli
 
 // Explicit instantiation
 template void gaussian_filtering<float>(float* image, float* output, int rows, int cols, int slices, float sigma, bool type);
+template void gaussian_filtering<int>(int* image, float* output, int rows, int cols, int slices, float sigma, bool type);
+template void gaussian_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, float sigma, bool type);
 
 /*
 int main()

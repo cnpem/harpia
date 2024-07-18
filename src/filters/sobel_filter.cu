@@ -440,9 +440,10 @@ void sobel_filtering(dtype* image, float* output, int rows, int cols, int slices
     cudaFree(dev_output);
 }
 
-// Explicit instantiation for float
+// Explicit instantiation
 template void sobel_filtering<float>(float* image, float* output, int rows, int cols, int slices, bool type);
 template void sobel_filtering<int>(int* image, float* output, int rows, int cols, int slices, bool type);
+template void sobel_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, bool type);
 
 
 

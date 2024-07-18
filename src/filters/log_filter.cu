@@ -223,5 +223,8 @@ void log_filtering(dtype* image, float* output, int rows, int cols, int slices, 
     cudaFree(dev_output);
 }
 
-// Explicit instantiation for float
+// Explicit instantiation
 template void log_filtering<float>(float* image, float* output, int rows, int cols, int slices, bool type);
+template void log_filtering<int>(int* image, float* output, int rows, int cols, int slices, bool type);
+template void log_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, bool type);
+

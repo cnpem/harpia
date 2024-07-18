@@ -404,7 +404,18 @@ void deriche_filtering(dtype* image, float* output,
 
 }
 
+
 template void deriche_filtering<float>(float* image, float* output,
+                     int rows, int cols , int depth,
+                     int rows_kernel, int cols_kernel, 
+                     float alpha, float low_threshold, float high_threshold);
+
+template void deriche_filtering<int>(int* image, float* output,
+                     int rows, int cols , int depth,
+                     int rows_kernel, int cols_kernel, 
+                     float alpha, float low_threshold, float high_threshold);
+
+template void deriche_filtering<unsigned int>(unsigned int* image, float* output,
                      int rows, int cols , int depth,
                      int rows_kernel, int cols_kernel, 
                      float alpha, float low_threshold, float high_threshold);

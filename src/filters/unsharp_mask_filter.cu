@@ -51,5 +51,7 @@ void unsharp_mask_filtering(dtype* image, float* output, int rows, int cols, int
     
 }
 
-// Explicit instantiation for float
+// Explicit instantiation
 template void unsharp_mask_filtering<float>(float* image, float* output, int rows, int cols, int depth, float sigma, float ammount, float threshold, bool type);
+template void unsharp_mask_filtering<int>(int* image, float* output, int rows, int cols, int depth, float sigma, float ammount, float threshold, bool type);
+template void unsharp_mask_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int depth, float sigma, float ammount, float threshold, bool type);

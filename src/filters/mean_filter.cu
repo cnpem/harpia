@@ -130,3 +130,5 @@ void mean_filtering(dtype* image, float* output, int rows, int cols, int depth, 
 
 // Explicit instantiation for float
 template void mean_filtering<float>(float* image, float* output, int rows, int cols, int depth, int rows_kernel, int cols_kernel, int depth_kernel);
+template void mean_filtering<int>(int* image, float* output, int rows, int cols, int depth, int rows_kernel, int cols_kernel, int depth_kernel);
+template void mean_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int depth, int rows_kernel, int cols_kernel, int depth_kernel);

@@ -434,8 +434,16 @@ void canny_filtering(dtype* image, float* output,
 
 }
 
-// Explicit instantiation for float
+// Explicit instantiation
 template void canny_filtering<float>(float* image, float* output,
+                                    int rows, int cols , int depth,
+                                    float sigma, float low_threshold, float high_threshold);
+
+template void canny_filtering<int>(int* image, float* output,
+                                    int rows, int cols , int depth,
+                                    float sigma, float low_threshold, float high_threshold);
+
+template void canny_filtering<unsigned int>(unsigned int* image, float* output,
                                     int rows, int cols , int depth,
                                     float sigma, float low_threshold, float high_threshold);
 
