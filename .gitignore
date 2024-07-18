@@ -10,7 +10,6 @@ obj/
 Test
 build/
 **.so
-**.cpp
 **/__pycache__
 
 #ignore CMakeLists
