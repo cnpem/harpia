@@ -7,7 +7,6 @@ ctypedef fused numeric:
     float
     int
     unsigned int
-
 # Declare the external C functions using the fused type
 
 # Gaussian filter
@@ -90,23 +89,6 @@ def prewitt(np.ndarray[numeric, ndim=3] image,
                              &output[0,0,0],
                              rows, cols, depth, type)
 
-# Deriche filter
-cdef extern from "../../include/filters/deriche_filter.h":
-    void deriche_filtering (float* image, float* output,
-                                     int rows, int cols, int depth,
-                                     int rows_kernel, int cols_kernel,
-                                     float alpha, float low_threshold, float high_threshold)
-
-def deriche(np.ndarray[np.float32_t, ndim=3] image,
-            np.ndarray[np.float32_t, ndim=3] output,
-            int rows, int cols, int depth,
-            int rows_kernel, int cols_kernel,
-            float alpha, float low_threshold, float high_threshold):
-    return deriche_filtering(&image[0,0,0],
-                             &output[0,0,0],
-                             rows, cols, depth,
-                             rows_kernel, cols_kernel,
-                             alpha, low_threshold, high_threshold)
 
 # Canny filter
 cdef extern from "../../include/filters/canny_filter.h":
