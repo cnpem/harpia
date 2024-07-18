@@ -1,4 +1,4 @@
-#include "../../include/morphology/test_imageProcessing.h"
+#include "../../include/morphology/test_image_processing.h"
 #include "../../include/morphology/morphology.h"
 
 #include <fstream>

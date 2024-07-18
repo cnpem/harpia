@@ -2,7 +2,7 @@ from libc.stdint cimport uint16_t, uint32_t
 cimport numpy
 import numpy
 
-cdef extern from "../../include/morphology/operationsBinary.h":
+cdef extern from "../../include/morphology/operations_binary.h":
     void erosionBinary[dtype] (dtype *, dtype *, int *, int, int, int, int, int, int, int, int, int, int)
     void dilationBinary[dtype] (dtype *, dtype *, int *, int, int, int, int, int, int, int, int, int, int)
     void closingBinary[dtype] (dtype *, dtype *, int *, int, int, int, int, int, int, int, int, int, int)

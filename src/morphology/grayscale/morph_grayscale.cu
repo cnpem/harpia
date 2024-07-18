@@ -1,4 +1,4 @@
-#include "../../../include/morphology/morphGrayscale.h"
+#include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/cuda_helper.h"
 #include <stdio.h>
 

@@ -1,6 +1,6 @@
-#include "../../../include/morphology/morphBinary.h"
-#include "../../../include/morphology/morphChainBinary.h"
-#include "../../../include/morphology/operationsBinary.h"
+#include "../../../include/morphology/morph_binary.h"
+#include "../../../include/morphology/morph_chain_binary.h"
+#include "../../../include/morphology/operations_binary.h"
 
 template<typename dtype>
 void erosionBinary(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 

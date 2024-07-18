@@ -4,7 +4,7 @@
 
 #include "../../../include/morphology/test_subtraction.h"
 #include "../../../include/morphology/subtraction.h"
-#include "../../../include/morphology/test_imageProcessing.h"
+#include "../../../include/morphology/test_image_processing.h"
 #include "../../../include/morphology/test_util.h"
 
 void test_subtractionOnDevice(const std::string& filename, const std::string& filename2, const int xsize, const int ysize, const int zsize,

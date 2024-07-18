@@ -14,7 +14,7 @@ CXXFLAGS = -Iinclude -Wall $(OPENCV_CFLAGS)
 TARGET = Test
 
 # Directories
-SRC_DIR = src
+SRC_DIR = src/morphology
 TESTS_DIR = tests_cuda
 OBJ_DIR = obj
 

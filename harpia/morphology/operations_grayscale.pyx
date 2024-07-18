@@ -1,6 +1,6 @@
 from libc.stdint cimport uint32_t
 
-cdef extern from "../../include/morphology/operationsGrayscale.h":
+cdef extern from "../../include/morphology/operations_grayscale.h":
     void erosionGrayscale[T] (T *, T *, int *, int, int, int, int, int, int, int, int, int, int)
     void dilationGrayscale[T] (T *, T *, int *, int, int, int, int, int, int, int, int, int, int)
     void closingGrayscale[T] (T *, T *, int *, int, int, int, int, int, int, int, int, int, int)

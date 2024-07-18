@@ -1,7 +1,7 @@
 #include "../../../include/morphology/morphology.h"
 #include "../../../include/morphology/cuda_helper.h"
-#include "../../../include/morphology/morphGrayscale.h"
-#include "../../../include/morphology/morphChainGrayscale.h"
+#include "../../../include/morphology/morph_grayscale.h"
+#include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/subtraction.h"
 #include <stdio.h>
 

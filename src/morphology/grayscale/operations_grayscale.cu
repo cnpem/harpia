@@ -1,6 +1,6 @@
-#include "../../../include/morphology/morphGrayscale.h"
-#include "../../../include/morphology/morphChainGrayscale.h"
-#include "../../../include/morphology/operationsGrayscale.h"
+#include "../../../include/morphology/morph_grayscale.h"
+#include "../../../include/morphology/morph_chain_grayscale.h"
+#include "../../../include/morphology/operations_grayscale.h"
 
 template<typename dtype>
 void erosionGrayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 

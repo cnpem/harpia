@@ -1,4 +1,4 @@
-#include "../../../include/morphology/morphBinary.h"
+#include "../../../include/morphology/morph_binary.h"
 #include "../../../include/morphology/cuda_helper.h"
 #include <stdio.h>
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../include/morphology/structuringElements.h"
+#include "../../include/morphology/structuring_elements.h"
 
 // Create a structuring element of any rectangular size given
 void getStructuringElement3D(int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize)
