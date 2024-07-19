@@ -91,7 +91,7 @@ void bottomHatOnHost(dtype *hostImage, dtype *hostOutput, int *kernel, int kerne
     size_t nBytes = size * sizeof(dtype);
 
     // allocate temporary memory
-    // TODO: testar se n~ao precisa de tmp
+    // TODO: testar se não precisa de tmp
     dtype *host_tmp;
     host_tmp = (dtype *)malloc(nBytes);
 
