@@ -3,13 +3,13 @@
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/subtraction.h"
+#include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
 
 
 template<typename dtype>
 void topHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                 const int xsize, const int ysize, const int zsize, const int block_xsize, const int block_ysize, const int block_zsize, 
-                 const int flag_verbose)
+                 const int xsize, const int ysize, const int zsize, const int flag_verbose)
 {
 
     // set input dimension
@@ -33,7 +33,8 @@ void topHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, 
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
     //set up execution configuratio
-    dim3 block(block_xsize,block_ysize,block_zsize);
+    dim3 block(BLOCK_3D,BLOCK_3D,BLOCK_3D);
+    if(zsize == 1) dim3 block(BLOCK_2D,BLOCK_2D,1);
     dim3 grid((xsize+block.x-1)/block.x, (ysize+block.y-1)/block.y, (zsize+block.z-1)/block.z);
 
     // check grid and block dimension from host side
@@ -52,8 +53,8 @@ void topHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, 
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
     //set up execution configuratio
-    dim3 block2(block_xsize);
-    dim3 grid2((size+block.x-1)/block.x);
+    dim3 block2(BLOCK_1D);
+    dim3 grid2((size+block2.x-1)/block2.x);
 
     // check grid and block dimension from host side
     if(flag_verbose){
@@ -75,12 +76,9 @@ void topHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, 
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void topHat<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int, const int, const int, 
-                                const int);
-template void topHat<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int, const int, 
-                                        const int, const int);
-template void topHat<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int, const int, 
-                                        const int, const int);
+template void topHat<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void topHat<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void topHat<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
 
 template<typename dtype>

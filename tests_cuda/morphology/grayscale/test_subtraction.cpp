@@ -8,7 +8,7 @@
 #include "../../../include/morphology/test_util.h"
 
 void test_subtractionOnDevice(const std::string& filename, const std::string& filename2, const int xsize, const int ysize, const int zsize,
-                         const int block_size, const int flag_check, const int flag_verbose)
+                              const int flag_check, const int flag_verbose)
 {
     int size = xsize*ysize*zsize;
     // set input dimension
@@ -30,7 +30,7 @@ void test_subtractionOnDevice(const std::string& filename, const std::string& fi
     readInput(host_B,filename2, size, flag_verbose);
 
     // device erosion 
-    subtraction(host_A, host_B, device_ref, size, block_size, flag_verbose);
+    subtraction(host_A, host_B, device_ref, size, flag_verbose);
 
     if(flag_check){
         int *host_ref;

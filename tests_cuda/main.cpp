@@ -8,13 +8,15 @@
 
 int main(int argc, char **argv){
 
-    // printf("%s Starting... \n", argv[0]);
-    
-    printf("######################################################\n");
-    printf("# TEST 1: basic morphological operations consistency #\n");
-    printf("######################################################\n\n");
-    test_script1(EROSION);
-    test_script1(DILATION);
+    // // printf("%s Starting... \n", argv[0]);
+
+    test_check_device_info();
+
+    // printf("######################################################\n");
+    // printf("# TEST 1: basic morphological operations consistency #\n");
+    // printf("######################################################\n\n");
+    // test_script1(EROSION);
+    // test_script1(DILATION);
 
     // printf("#########################################################\n");
     // printf("# TEST 2: basic morphological operations execution time #\n");
@@ -30,9 +32,8 @@ int main(int argc, char **argv){
     // test_script3(opening);
     // test_script3(closing);
     
-    test_check_device_info();
 
-    //test_script4();
+    // test_script4();
     test_script5();
 
     return 0;

@@ -1,5 +1,6 @@
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/cuda_helper.h"
+#include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
 
 // Perform erosin operation for one pixel
@@ -86,8 +87,7 @@ template __global__ void morphGrayscaleKernel<float>(float*, float*, int*, int, 
 template<typename dtype>
 void morphGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput, 
                             int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                            const int xsize, const int ysize, const int zsize, const int block_xsize, 
-                            const int block_ysize, const int block_zsize, MorphOp operation, const int flag_verbose)
+                            const int xsize, const int ysize, const int zsize, MorphOp operation, const int flag_verbose)
 {
     // set input dimension
     int size = xsize*ysize*zsize;    
@@ -109,7 +109,8 @@ void morphGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput,
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
     //set up execution configuratio
-    dim3 block (block_xsize,block_ysize,block_zsize);
+    dim3 block(BLOCK_3D,BLOCK_3D,BLOCK_3D);
+    if(zsize == 1) dim3 block(BLOCK_2D,BLOCK_2D,1);
     dim3 grid((xsize+block.x-1)/block.x, (ysize+block.y-1)/block.y, (zsize+block.z-1)/block.z);
 
     // check grid and block dimension from host side
@@ -131,9 +132,9 @@ void morphGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput,
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void morphGrayscaleOnDevice<u_int32_t>(u_int32_t*, u_int32_t*, int*, int, int, int, const int, const int, const int, const int, const int, const int, MorphOp, const int);
-template void morphGrayscaleOnDevice<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int, const int, const int, MorphOp, const int);
-template void morphGrayscaleOnDevice<float>(float*, float*, int*, int, int, int, const int, const int, const int, const int, const int, const int, MorphOp, const int);
+template void morphGrayscaleOnDevice<u_int32_t>(u_int32_t*, u_int32_t*, int*, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morphGrayscaleOnDevice<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morphGrayscaleOnDevice<float>(float*, float*, int*, int, int, int, const int, const int, const int, MorphOp, const int);
 
 // Slide kernel and erosion operation over all input image pixels
 template<typename dtype>

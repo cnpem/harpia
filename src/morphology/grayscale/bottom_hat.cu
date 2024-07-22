@@ -3,13 +3,13 @@
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/subtraction.h"
+#include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
 
 
 template<typename dtype>
 void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                 const int xsize, const int ysize, const int zsize, const int block_xsize, const int block_ysize, const int block_zsize, 
-                 const int flag_verbose)
+                 const int xsize, const int ysize, const int zsize, const int flag_verbose)
 {
 
     // set input dimension
@@ -33,7 +33,8 @@ void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsiz
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
     //set up execution configuratio
-    dim3 block(block_xsize,block_ysize,block_zsize);
+    dim3 block(BLOCK_3D,BLOCK_3D,BLOCK_3D);
+    if(zsize == 1) dim3 block(BLOCK_2D,BLOCK_2D,1);
     dim3 grid((xsize+block.x-1)/block.x, (ysize+block.y-1)/block.y, (zsize+block.z-1)/block.z);
 
     // check grid and block dimension from host side
@@ -52,12 +53,12 @@ void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsiz
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
     //set up execution configuratio
-    dim3 block2(block_xsize);
-    dim3 grid2((size+block.x-1)/block.x);
+    dim3 block2(BLOCK_1D);
+    dim3 grid2((size+block2.x-1)/block2.x);
 
     // check grid and block dimension from host side
     if(flag_verbose){
-        printf("\nSubtraction operation configuration");
+        printf("\nSubtraction operation configuration\n");
         printf("grid.x %d grid.y %d grid.z %d\n", grid2.x, grid2.y, grid2.z);
         printf("block.x %d block.y %d block.z %d\n", block2.x, block2.y, block2.z);
     }
@@ -75,11 +76,9 @@ void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsiz
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void bottomHat<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int, const int, const int, const int);
-template void bottomHat<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int, const int, 
-                                   const int, const int);
-template void bottomHat<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int, const int, 
-                               const int, const int);
+template void bottomHat<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void bottomHat<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void bottomHat<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
 
 template<typename dtype>
@@ -92,21 +91,21 @@ void bottomHatOnHost(dtype *hostImage, dtype *hostOutput, int *kernel, int kerne
 
     // allocate temporary memory
     // TODO: testar se não precisa de tmp
-    dtype *host_tmp;
-    host_tmp = (dtype *)malloc(nBytes);
+    dtype *hostTmp;
+    hostTmp = (dtype *)malloc(nBytes);
 
     // set input data
-    memset(host_tmp, 0, nBytes); 
+    memset(hostTmp, 0, nBytes); 
 
     // opening operation
     MorphChain closing = {DILATION, EROSION};
-    morphChainGrayscaleOnHost(hostImage, host_tmp, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, closing);
+    morphChainGrayscaleOnHost(hostImage, hostTmp, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, closing);
 
     //B_hat = closimg - f
-    subtractionOnHost(host_tmp, hostImage, hostOutput, size);
+    subtractionOnHost(hostTmp, hostImage, hostOutput, size);
 
     //free temporary memory
-    free(host_tmp);
+    free(hostTmp);
 }
 template void bottomHatOnHost<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
 template void bottomHatOnHost<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);

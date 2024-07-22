@@ -174,7 +174,9 @@ ext_modules = [
 #    *get_extension_modules('harpia.quantification'),
 #    *get_extension_modules('harpia.threshold')
 ]
-
+print(cuda_sources)
+print(files)
+print(ext_modules)
 setup(
     name='cudaext',
     version='0.1',

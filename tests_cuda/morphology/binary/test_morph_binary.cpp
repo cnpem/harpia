@@ -8,11 +8,11 @@
 #include "../../../include/morphology/test_morph_binary.h"
 #include "../../../include/morphology/test_util.h"
 #include "../../../include/morphology/test_image_processing.h"
+#include "../../../include/common/grid_block_sizes.h"
 
 void test_morphBinaryOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation,
-                         const int flag_check, const int flag_verbose)
+                         MorphOp operation, const int flag_check, const int flag_verbose)
 {
     // set input dimension
     int size = xsize*ysize*zsize;
@@ -32,7 +32,7 @@ void test_morphBinaryOnDevice(const std::string& filename, const int xsize, cons
     readInput(host_A,filename, size, flag_verbose);
     
     morphBinaryOnDevice(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, 
-                        block_xsize, block_ysize, block_zsize, operation, flag_verbose);
+                        operation, flag_verbose);
 
     if(flag_check){
         int *host_ref;  
@@ -101,7 +101,7 @@ void test_morphBinaryOnHost(const std::string& filename, const int xsize, const 
 
 void test_morphBinaryOnDeviceTime(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation, int n)
+                         MorphOp operation, int n)
 {
     int flag_check=0;
     int flag_verbose=0;
@@ -113,7 +113,6 @@ void test_morphBinaryOnDeviceTime(const std::string& filename, const int xsize, 
         iStart = cpuSecond();
         test_morphBinaryOnDevice(filename, xsize, ysize, zsize, kernel,  
                                 kernel_xsize, kernel_ysize, kernel_zsize, 
-                                block_xsize, block_ysize, block_zsize, 
                                 operation, flag_check, flag_verbose);
         iElaps += cpuSecond() - iStart;
     }
@@ -124,7 +123,7 @@ void test_morphBinaryOnDeviceTime(const std::string& filename, const int xsize, 
 
 void test_morphBinaryTimeCompare(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation)
+                         MorphOp operation)
 {
     int flag_show=0;
     int flag_check=0;
@@ -137,7 +136,6 @@ void test_morphBinaryTimeCompare(const std::string& filename, const int xsize, c
     iStart = cpuSecond();
     test_morphBinaryOnDevice(filename, xsize, ysize, zsize, kernel,  
                              kernel_xsize, kernel_ysize, kernel_zsize, 
-                             block_xsize, block_ysize, block_zsize, 
                              operation, flag_check, flag_verbose);
     iElapsDeviceBinary = cpuSecond() - iStart;
     printf("\n morphBinaryOnDevice Time elapsed %f sec\n", iElapsDeviceBinary);

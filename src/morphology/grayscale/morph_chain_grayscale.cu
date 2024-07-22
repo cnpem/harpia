@@ -1,13 +1,13 @@
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/cuda_helper.h"
+#include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
 
 
 template<typename dtype>
 void morphChainGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                        const int xsize, const int ysize, const int zsize, const int block_xsize, const int block_ysize, const int block_zsize, 
-                        MorphChain chain, const int flag_verbose){
+                        const int xsize, const int ysize, const int zsize, MorphChain chain, const int flag_verbose){
     // set input dimension
     int size = xsize*ysize*zsize;    
     size_t nBytes = size * sizeof(dtype);
@@ -29,9 +29,10 @@ void morphChainGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput, int *kerne
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
     //set up execution configuratio
-    dim3 block (block_xsize,block_ysize,block_zsize);
+    dim3 block(BLOCK_3D,BLOCK_3D,BLOCK_3D);
+    if(zsize == 1) dim3 block(BLOCK_2D,BLOCK_2D,1);
     dim3 grid((xsize+block.x-1)/block.x, (ysize+block.y-1)/block.y, (zsize+block.z-1)/block.z);
-
+   
     // check grid and block dimension from host side
     if(flag_verbose){
         printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
@@ -55,12 +56,9 @@ void morphChainGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput, int *kerne
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void morphChainGrayscaleOnDevice<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, 
-                                                        const int, const int, const int, MorphChain, const int);
-template void morphChainGrayscaleOnDevice<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int, const int, 
-                                                        const int, MorphChain, const int);
-template void morphChainGrayscaleOnDevice<float>(float *, float *, int *, int, int, int, const int, const int, const int, 
-                                                        const int, const int, const int, MorphChain, const int);
+template void morphChainGrayscaleOnDevice<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
+template void morphChainGrayscaleOnDevice<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
+template void morphChainGrayscaleOnDevice<float>(float *, float *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
 
 
 //morphChain check operation on host

@@ -6,8 +6,7 @@
 
 void test_morphChainBinaryOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphChain chain,
-                         const int flag_check, const int flag_verbose);
+                         MorphChain chain, const int flag_check, const int flag_verbose);
 
 void test_morphChainGrayscaleOnHost(const std::string& filename, const int xsize, const int ysize, const int zsize,
                             int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize, 

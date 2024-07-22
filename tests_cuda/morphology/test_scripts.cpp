@@ -26,7 +26,7 @@ int test_script1(MorphOp operation){
 
     // create kernel   
     int *kernel;
-    kernel = (int*)malloc(sizeof(int)*27); 
+    kernel = (int*)malloc(sizeof(int)*25); 
     getStructuringElement3D(kernel, 5, 5, 1);
 
     int flag_show = 1; //whether to plot the result
@@ -50,10 +50,10 @@ int test_script1(MorphOp operation){
     // block_xsize*block_ysize*block_zsize < 1024 for the notebook GPU 
 
     printf("\nTest cuda binary %s.\n", (operation ? "dilation" : "erosion"));
-    test_morphBinaryOnDevice(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, 32, 32, 1, operation, flag_check, flag_verbose);
+    test_morphBinaryOnDevice(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, operation, flag_check, flag_verbose);
 
     printf("\nTest cuda grayscale %s.\n", (operation ? "dilation" : "erosion"));
-    test_morphGrayscaleOnDevice(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, 32, 32, 1, operation, flag_check, flag_verbose);
+    test_morphGrayscaleOnDevice(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, operation, flag_check, flag_verbose);
 
     flag_show = 1; 
     flag_check = 0;
@@ -104,21 +104,14 @@ int test_script2(){
     int kernel_ysize=3; 
     int kernel_zsize=3;
 
-    int block_xsize = 8; 
-    int block_ysize = 8; 
-    int block_zsize = 8;
 
-    test_morphBinaryTimeCompare(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                               block_xsize, block_ysize, block_zsize, EROSION);
+    test_morphBinaryTimeCompare(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
 
-    test_morphGrayscaleTimeCompare(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                               block_xsize, block_ysize, block_zsize, EROSION);
+    test_morphGrayscaleTimeCompare(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
                                
-    test_morphGrayscaleOnDeviceTime(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                               block_xsize, block_ysize, block_zsize, EROSION, 10);
+    test_morphGrayscaleOnDeviceTime(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize, EROSION, 10);
 
-    test_morphBinaryOnDeviceTime(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                               block_xsize, block_ysize, block_zsize, EROSION, 10);
+    test_morphBinaryOnDeviceTime(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize, kernel_zsize, EROSION, 10);
 
     return 0;
 }
@@ -134,7 +127,7 @@ int test_script3(MorphChain chain){
 
     // create kernel   
     int *kernel;
-    kernel = (int*)malloc(sizeof(int)*27); 
+    kernel = (int*)malloc(sizeof(int)*125); 
     getStructuringElement3D(kernel, 5, 5, 5);
 
     int flag_show = 1; //whether to plot the result
@@ -158,10 +151,10 @@ int test_script3(MorphChain chain){
     // block_xsize*block_ysize*block_zsize < 1024 for the notebook GPU 
 
     printf("\nTest cuda binary %s.\n", (closing_flag ? "closing" : "opening"));
-    test_morphChainBinaryOnDevice(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, 32, 32, 1, chain, flag_check, flag_verbose);
+    test_morphChainBinaryOnDevice(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, chain, flag_check, flag_verbose);
 
     printf("\nTest cuda grayscale %s.\n", (closing_flag ? "closing" : "opening"));
-    test_morphChainGrayscaleOnDevice(filenameGrayscale, 600, 1520, 10, kernel, 5, 5, 5, 32, 32, 1, chain, flag_check, flag_verbose);
+    test_morphChainGrayscaleOnDevice(filenameGrayscale, 600, 1520, 10, kernel, 5, 5, 5, chain, flag_check, flag_verbose);
 
     free(kernel);
 
@@ -179,9 +172,8 @@ int test_script4(){
     printf("\nTest subtraction on host.\n");
     test_subtractionOnHost(filenameGrayscale, filenameGrayscale, 600, 1520, 2, flag_show, flag_verbose);
 
-    int block_size = 8;
     printf("\nTest subtraction on device.\n");
-    test_subtractionOnDevice(filenameGrayscale, filenameGrayscale, 600, 1520, 500, block_size, flag_check, flag_verbose);
+    test_subtractionOnDevice(filenameGrayscale, filenameGrayscale, 600, 1520, 500, flag_check, flag_verbose);
 
     return 0;
 }
@@ -193,8 +185,8 @@ int test_script5(){
 
     // create kernel   
     int *kernel;
-    kernel = (int*)malloc(sizeof(int)*27); 
-    getStructuringElement3D(kernel, 5, 5, 1);
+    kernel = (int*)malloc(sizeof(int)*125); 
+    getStructuringElement3D(kernel, 5, 5, 5);
 
     int flag_show = 1; //whether to plot the result
     int flag_check = 0; //whether to compare with opencv erosion
@@ -211,10 +203,10 @@ int test_script5(){
     printf("\n2 - Compare device and host.\n");
     flag_verbose = 1;
     printf("\nTest grayscale bottomHat in 3D.\n");
-    test_bottomHatOnDevice(filenameGrayscale, 600, 1520, 100, kernel, 5, 5, 5, 8,8,8, flag_check, flag_verbose);
+    test_bottomHatOnDevice(filenameGrayscale, 600, 1520, 100, kernel, 5, 5, 5, flag_check, flag_verbose);
 
     printf("\nTest grayscale topHat in 3D.\n");
-    test_topHatOnDevice(filenameGrayscale, 600, 1520, 100, kernel, 5, 5, 5, 8,8,8, flag_check, flag_verbose);
+    test_topHatOnDevice(filenameGrayscale, 600, 1520, 100, kernel, 5, 5, 5, flag_check, flag_verbose);
    
     free(kernel);
 

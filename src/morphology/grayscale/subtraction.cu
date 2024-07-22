@@ -1,4 +1,5 @@
 #include "../../../include/morphology/cuda_helper.h"
+#include "../../../include/common/grid_block_sizes.h"
 
 #include <stdio.h>
 
@@ -20,8 +21,7 @@ template __global__ void subtractionKernel<float>(float*, float*, float*, const 
 
 // Slide kernel and erosion operation over all input image pixels
 template<typename dtype>
-void subtraction(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const int size, 
-                         const int block_size, const int flag_verbose)
+void subtraction(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const int size, const int flag_verbose)
 {
     // set input dimension
     size_t nBytes = size * sizeof(dtype);
@@ -37,7 +37,7 @@ void subtraction(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const i
     CHECK(cudaMemcpy(deviceImage2, hostImage2, nBytes, cudaMemcpyHostToDevice));
 
     //set up execution configuratio
-    dim3 block (block_size);
+    dim3 block (BLOCK_1D);
     dim3 grid((size+block.x-1)/block.x);
 
     // check grid and block dimension from host side
@@ -58,9 +58,9 @@ void subtraction(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const i
     cudaFree(deviceImage2);
     cudaFree(deviceOutput);
 }
-template void subtraction<u_int32_t>(u_int32_t *,u_int32_t *, u_int32_t *, const int, const int, const int);
-template void subtraction<int>(int *,int *, int *, const int, const int, const int);
-template void subtraction<float>(float *,float *, float *, const int, const int, const int);
+template void subtraction<u_int32_t>(u_int32_t *,u_int32_t *, u_int32_t *, const int, const int);
+template void subtraction<int>(int *,int *, int *, const int, const int);
+template void subtraction<float>(float *,float *, float *, const int, const int);
 
 
 // Slide kernel and erosion operation over all input image pixels

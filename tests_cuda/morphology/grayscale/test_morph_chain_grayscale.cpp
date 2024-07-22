@@ -12,8 +12,7 @@
 
 void test_morphChainGrayscaleOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphChain chain,
-                         const int flag_check, const int flag_verbose)
+                         MorphChain chain, const int flag_check, const int flag_verbose)
 {
     // set input dimension
     int size = xsize*ysize*zsize;
@@ -34,7 +33,7 @@ void test_morphChainGrayscaleOnDevice(const std::string& filename, const int xsi
 
     // device erosion 
     morphChainGrayscaleOnDevice(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, 
-                           block_xsize, block_ysize, block_zsize, chain, flag_verbose);
+                                chain, flag_verbose);
 
     if(flag_check){
         int *host_ref;

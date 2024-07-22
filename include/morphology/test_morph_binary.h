@@ -6,8 +6,7 @@
 
 void test_morphBinaryOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation,
-                         const int flag_check, const int flag_verbose);
+                         MorphOp operation, const int flag_check, const int flag_verbose);
 
 void test_morphBinaryOnHost(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
@@ -15,10 +14,10 @@ void test_morphBinaryOnHost(const std::string& filename, const int xsize, const 
 
 void test_morphBinaryOnDeviceTime(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation, int n);
+                         MorphOp operation, int n);
 
 void test_morphBinaryTimeCompare(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation);
+                         MorphOp operation);
 
 #endif // TEST_MORPHOLOGY_BINARY_H

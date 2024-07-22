@@ -8,8 +8,7 @@
 
 void test_morphGrayscaleOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation,
-                         const int flag_check, const int flag_verbose)
+                         MorphOp operation, const int flag_check, const int flag_verbose)
 {
     // set input dimension
     int size = xsize*ysize*zsize;
@@ -30,7 +29,7 @@ void test_morphGrayscaleOnDevice(const std::string& filename, const int xsize, c
 
     // device erosion 
     morphGrayscaleOnDevice(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, 
-                           block_xsize, block_ysize, block_zsize, operation, flag_verbose);
+                           operation, flag_verbose);
 
     if(flag_check){
         int *host_ref;
@@ -102,7 +101,7 @@ void test_morphGrayscaleOnHost(const std::string& filename, const int xsize, con
 
 void test_morphGrayscaleOnDeviceTime(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation, int n)
+                         MorphOp operation, int n)
 {
     int flag_check=0;
     int flag_verbose=0;
@@ -114,7 +113,6 @@ void test_morphGrayscaleOnDeviceTime(const std::string& filename, const int xsiz
         iStart = cpuSecond();
         test_morphGrayscaleOnDevice(filename, xsize, ysize, zsize, kernel,   
                                 kernel_xsize, kernel_ysize, kernel_zsize, 
-                                block_xsize, block_ysize, block_zsize, 
                                 operation, flag_check, flag_verbose);
         iElaps += cpuSecond() - iStart;
     }
@@ -123,8 +121,7 @@ void test_morphGrayscaleOnDeviceTime(const std::string& filename, const int xsiz
 }
 
 void test_morphGrayscaleTimeCompare(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                         int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         const int block_xsize, const int block_ysize, const int block_zsize, MorphOp operation)
+                         int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize, MorphOp operation)
 {
     int flag_show=0;
     int flag_check=0;
@@ -137,7 +134,6 @@ void test_morphGrayscaleTimeCompare(const std::string& filename, const int xsize
     iStart = cpuSecond();
     test_morphGrayscaleOnDevice(filename, xsize, ysize, zsize, kernel,   
                                 kernel_xsize, kernel_ysize, kernel_zsize, 
-                                block_xsize, block_ysize, block_zsize, 
                                 operation, flag_check, flag_verbose);
     iElapsDeviceGrayscale = cpuSecond() - iStart;
     printf("\n morphGrayscaleOnDevice Time elapsed %f sec\n", iElapsDeviceGrayscale);
