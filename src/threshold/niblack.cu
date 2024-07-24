@@ -173,3 +173,4 @@ void niblack_threshold(dtype* image, float* output, float weight, int rows, int 
 
 template void niblack_threshold<float>(float* image, float* output, float weight, int rows, int cols, int depth, int rows_kernel, int cols_kernel, int depth_kernel);
 template void niblack_threshold<int>(int* image, float* output, float weight, int rows, int cols, int depth, int rows_kernel, int cols_kernel, int depth_kernel);
+template void niblack_threshold<unsigned int>(unsigned int* image, float* output, float weight, int rows, int cols, int depth, int rows_kernel, int cols_kernel, int depth_kernel);
