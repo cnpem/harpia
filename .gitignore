@@ -1,0 +1,17 @@
+#raw example images (they may be too big)
+***.raw
+
+#ignore
+ignore/
+**/foo/
+
+#build files
+obj/
+Test
+build/
+**.so
+**/__pycache__
+
+#ignore CMakeLists
+**/CMakeLists.txt
+

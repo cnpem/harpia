@@ -1,3 +1,4 @@
 from .filters import*
-from .threshold import*
+from .morphology import*
 from .quantification import*
+from .threshold import*

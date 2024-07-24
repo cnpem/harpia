@@ -37,7 +37,7 @@ def local_gaussian(np.ndarray[numeric, ndim=3] image,
                                     rows, cols, depth,
                                     sigma, weight, type)
 
-# Extern declaration for the Local Mean Threshold function from C/C++ library
+# Local Mean Threshold
 cdef extern from "../../include/threshold/adaptative_mean.h":
     void local_mean_threshold[numeric](numeric* image, float* output, float weight,
                                        int rows, int cols, int depth,
@@ -71,7 +71,7 @@ def local_mean(np.ndarray[numeric, ndim=3] image,
                                 rows, cols, depth,
                                 rows_kernel, cols_kernel, depth_kernel)
 
-# Extern declaration for the Niblack Threshold function from C/C++ library
+# Niblack Threshold
 cdef extern from "../../include/threshold/niblack.h":
     void niblack_threshold[numeric](numeric* image, float* output, float weight,
                                     int rows, int cols, int depth,
@@ -105,7 +105,7 @@ def niblack(np.ndarray[numeric, ndim=3] image,
                              rows, cols, depth,
                              rows_kernel, cols_kernel, depth_kernel)
 
-# Extern declaration for the Sauvola Threshold function from C/C++ library
+# Sauvola Threshold
 cdef extern from "../../include/threshold/sauvola.h":
     void sauvola_threshold[numeric](numeric* image, float* output, float weight, float range,
                                     int rows, int cols, int depth,
