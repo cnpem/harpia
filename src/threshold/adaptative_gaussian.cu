@@ -157,3 +157,5 @@ void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, i
 
 
 template void local_gaussian_threshold<float>(float* image, float* output, int rows, int cols, int slices, float sigma, float weight, bool type);
+template void local_gaussian_threshold<int>(int* image, float* output, int rows, int cols, int slices, float sigma, float weight, bool type);
+template void local_gaussian_threshold<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, float sigma, float weight, bool type);
