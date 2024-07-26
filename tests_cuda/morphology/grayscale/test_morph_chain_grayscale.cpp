@@ -10,18 +10,18 @@
 #include "../../../include/morphology/structuring_elements.h"
 #include "../../../include/morphology/test_util.h"
 
-void test_morphChainGrayscaleOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                         int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                         MorphChain chain, const int flag_check, const int flag_verbose)
+void test_morph_chain_grayscale_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
+                                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
+                                          MorphChain chain, const int flag_check, const int flag_verbose)
 {
     // set input dimension
-    int size = xsize*ysize*zsize;
+    int size = xsize * ysize * zsize;
 
     size_t nBytes = size * sizeof(int);
 
     if(flag_verbose) printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-    int *host_A, *device_ref; //pointers for host memmory
+    int *host_A, *device_ref; //pointers for host memory
     host_A = (int *)malloc(nBytes);
     device_ref = (int *)malloc(nBytes);
 
@@ -29,11 +29,11 @@ void test_morphChainGrayscaleOnDevice(const std::string& filename, const int xsi
     memset(host_A, 0, nBytes); 
     memset(device_ref, 0, nBytes);
 
-    readInput(host_A,filename, size, flag_verbose);
+    read_input(host_A, filename, size, flag_verbose);
 
     // device erosion 
-    morphChainGrayscaleOnDevice(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, 
-                                chain, flag_verbose);
+    morph_chain_grayscale_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, 
+                                    chain, flag_verbose);
 
     if(flag_check){
         int *host_ref;
@@ -41,9 +41,9 @@ void test_morphChainGrayscaleOnDevice(const std::string& filename, const int xsi
         memset(host_ref, 0, nBytes); 
 
         // erosion
-        morphChainGrayscaleOnHost(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain);
+        morph_chain_grayscale_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain);
 
-        checkResult(host_ref, device_ref, xsize, ysize, zsize);
+        check_result(host_ref, device_ref, xsize, ysize, zsize);
 
         free(host_ref);
     }
@@ -52,34 +52,33 @@ void test_morphChainGrayscaleOnDevice(const std::string& filename, const int xsi
     free(device_ref);
 }
 
-void test_morphChainGrayscaleOnHost(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                            int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                            MorphChain chain, const int flag_show, const int flag_check, const int flag_verbose)
+void test_morph_chain_grayscale_on_host(const std::string& filename, const int xsize, const int ysize, const int zsize,
+                                        int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
+                                        MorphChain chain, const int flag_show, const int flag_check, const int flag_verbose)
 {
     // set input dimension
-    int size = xsize*ysize*zsize;
-
+    int size = xsize * ysize * zsize;
 
     size_t nBytes = size * sizeof(float);
     if(flag_verbose) printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-    float *host_A, *host_ref; //pointers for host memmory
+    float *host_A, *host_ref; //pointers for host memory
     host_A = (float *)malloc(nBytes);
     host_ref = (float *)malloc(nBytes);
 
     // set input data
     memset(host_A, 0, nBytes); 
     memset(host_ref, 0, nBytes); 
-    readInput(host_A, filename, size, flag_verbose);
-    if(flag_show) showImage3D(host_A, xsize, ysize, zsize, "Input Image");
+    read_input(host_A, filename, size, flag_verbose);
+    if(flag_show) show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
     // erosion
-    morphChainGrayscaleOnHost(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain);
-    if(flag_show) showImage3D(host_ref, xsize, ysize, zsize, "Result Image");
+    morph_chain_grayscale_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain);
+    if(flag_show) show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 
     if(flag_check){
         if(kernel_zsize > 1){
-            printf("WARNING: Results will not match, opencv is done slice by slice, it is incompatible with kernel zsize: %d", kernel_zsize);
+            printf("WARNING: Results will not match, openCV is done slice by slice, it is incompatible with kernel zsize: %d", kernel_zsize);
         } 
         float *opencv_ref, *opencv_tmp;
         opencv_ref = (float *)malloc(nBytes);
@@ -87,12 +86,12 @@ void test_morphChainGrayscaleOnHost(const std::string& filename, const int xsize
         memset(opencv_ref, 0, nBytes); 
         memset(opencv_tmp, 0, nBytes); 
 
-        // opencv erosion 
-        morphology3DopenCV(host_A, opencv_tmp, kernel_xsize, kernel_ysize, xsize, ysize, zsize, chain.operation1);
-        morphology3DopenCV(opencv_tmp, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize, chain.operation2);
-        if(flag_show) showImage3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
+        // openCV erosion 
+        morphology_3D_openCV(host_A, opencv_tmp, kernel_xsize, kernel_ysize, xsize, ysize, zsize, chain.operation1);
+        morphology_3D_openCV(opencv_tmp, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize, chain.operation2);
+        if(flag_show) show_image_3D(opencv_ref, xsize, ysize, zsize, "Result openCV");
 
-        checkResult(host_ref, opencv_ref, xsize, ysize, zsize);
+        check_result(host_ref, opencv_ref, xsize, ysize, zsize);
 
         free(opencv_ref);
         free(opencv_tmp);
@@ -104,4 +103,3 @@ void test_morphChainGrayscaleOnHost(const std::string& filename, const int xsize
     free(host_A);
     free(host_ref);
 }
-

@@ -6,14 +6,14 @@
 
 
 template<typename dtype>
-void morphChainGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void morph_chain_grayscale_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                         const int xsize, const int ysize, const int zsize, MorphChain chain, const int flag_verbose){
     // set input dimension
     int size = xsize*ysize*zsize;    
     size_t nBytes = size * sizeof(dtype);
 
     // set kenrel dimension
-    int kernel_size = kernel_xsize*kernel_ysize*kernel_zsize;
+    int kernel_size = kernel_xsize * kernel_ysize * kernel_zsize;
     size_t kernel_nBytes = kernel_size * sizeof(int);
 
     // malloc device global memory
@@ -40,10 +40,10 @@ void morphChainGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput, int *kerne
     }
 
     // morphChain operation
-    morphGrayscaleKernel<<<grid, block>>>(deviceImage, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_grayscale<<<grid, block>>>(deviceImage, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                                          xsize, ysize, zsize, chain.operation1);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
-    morphGrayscaleKernel<<<grid, block>>>(deviceTmp, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_grayscale<<<grid, block>>>(deviceTmp, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                                          xsize, ysize, zsize, chain.operation2);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
@@ -56,14 +56,14 @@ void morphChainGrayscaleOnDevice(dtype *hostImage, dtype *hostOutput, int *kerne
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void morphChainGrayscaleOnDevice<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
-template void morphChainGrayscaleOnDevice<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
-template void morphChainGrayscaleOnDevice<float>(float *, float *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
+template void morph_chain_grayscale_on_device<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
+template void morph_chain_grayscale_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
+template void morph_chain_grayscale_on_device<float>(float *, float *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
 
 
 //morphChain check operation on host
 template<typename dtype>
-void morphChainGrayscaleOnHost(dtype *hostImage, dtype *hostOutput, 
+void morph_chain_grayscale_on_host(dtype *hostImage, dtype *hostOutput, 
              int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
              const int xsize, const int ysize, const int zsize, MorphChain chain){
 
@@ -72,19 +72,19 @@ void morphChainGrayscaleOnHost(dtype *hostImage, dtype *hostOutput,
     size_t nBytes = size * sizeof(dtype);
 
     // allocate temporary memory
-    dtype *host_tmp;
-    host_tmp = (dtype *)malloc(nBytes);
+    dtype *hostTmp;
+    hostTmp = (dtype *)malloc(nBytes);
 
     // set input data
-    memset(host_tmp, 0, nBytes); 
+    memset(hostTmp, 0, nBytes); 
     
     // morphChain operation
-    morphGrayscaleOnHost(hostImage, host_tmp, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain.operation1);
-    morphGrayscaleOnHost(host_tmp, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain.operation2);
+    morph_grayscale_on_host(hostImage, hostTmp, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain.operation1);
+    morph_grayscale_on_host(hostTmp, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, chain.operation2);
 
     //free temporary memory
-    free(host_tmp);
+    free(hostTmp);
 }
-template void morphChainGrayscaleOnHost<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain);
-template void morphChainGrayscaleOnHost<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain);
-template void morphChainGrayscaleOnHost<float>(float *, float *, int *, int, int, int, const int, const int, const int, MorphChain);
+template void morph_chain_grayscale_on_host<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain);
+template void morph_chain_grayscale_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain);
+template void morph_chain_grayscale_on_host<float>(float *, float *, int *, int, int, int, const int, const int, const int, MorphChain);

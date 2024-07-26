@@ -6,7 +6,7 @@
 // This function show images of any format using opencv. The Normalization step allow to visualize different data formats
 // But it also always maximize the contrast in the image, which can cause some distortios.
 template<typename dtype>
-void showImage2D(dtype *hostImage, const int xsize, const int ysize, const std::string title){
+void show_image_2D(dtype *hostImage, const int xsize, const int ysize, const std::string title){
 
     int size = xsize*ysize;
     
@@ -39,27 +39,27 @@ void showImage2D(dtype *hostImage, const int xsize, const int ysize, const std::
     // Free the allocated memory
     delete[] data;
 }
-template void showImage2D<int>(int *, const int , const int , const std::string);
-template void showImage2D<uint16_t>(uint16_t *, const int , const int , const std::string);
-template void showImage2D<float>(float *, const int , const int , const std::string);
+template void show_image_2D<int>(int *, const int , const int , const std::string);
+template void show_image_2D<uint16_t>(uint16_t *, const int , const int , const std::string);
+template void show_image_2D<float>(float *, const int , const int , const std::string);
 
 template<typename dtype>
-void showImage3D(dtype *hostImage, const int xsize, const int ysize, int zsize, const std::string title){
+void show_image_3D(dtype *hostImage, const int xsize, const int ysize, int zsize, const std::string title){
     
     dtype *himg = hostImage;    
     
     for(int slice=0; slice < zsize; slice++){
-        showImage2D(himg, xsize, ysize, title+" - slice "+std::to_string(slice));
+        show_image_2D(himg, xsize, ysize, title+" - slice "+std::to_string(slice));
         himg += xsize*ysize;
     }
 }
-template void showImage3D<int>(int *, const int , const int , int , const std::string);
-template void showImage3D<float>(float *, const int , const int , int , const std::string);
+template void show_image_3D<int>(int *, const int , const int , int , const std::string);
+template void show_image_3D<float>(float *, const int , const int , int , const std::string);
 
 
 // Implement the erosion operation with OpenCV for 2D images
 template<typename dtype, typename dtype2>
-void morphology2DopenCV(dtype *hostImage, dtype *hostOutput, 
+void morphology_2D_openCV(dtype *hostImage, dtype *hostOutput, 
                    const int kernel_xsize, const int kernel_ysize, 
                    const int xsize, const int ysize, dtype2 operation) {
     
@@ -97,15 +97,15 @@ void morphology2DopenCV(dtype *hostImage, dtype *hostOutput,
 }
 
 // Explicit template instantiation
-template void morphology2DopenCV<int, MorphCV>(int*, int*, const int, const int, const int, const int, MorphCV);
-template void morphology2DopenCV<int, MorphOp>(int*, int*, const int, const int, const int, const int, MorphOp);
-template void morphology2DopenCV<float, MorphCV>(float*, float*, const int, const int, const int, const int, MorphCV);
-template void morphology2DopenCV<float, MorphOp>(float*, float*, const int, const int, const int, const int, MorphOp);
+template void morphology_2D_openCV<int, MorphCV>(int*, int*, const int, const int, const int, const int, MorphCV);
+template void morphology_2D_openCV<int, MorphOp>(int*, int*, const int, const int, const int, const int, MorphOp);
+template void morphology_2D_openCV<float, MorphCV>(float*, float*, const int, const int, const int, const int, MorphCV);
+template void morphology_2D_openCV<float, MorphOp>(float*, float*, const int, const int, const int, const int, MorphOp);
 
 
 // Implement the erosion operation with opencv for 3D images and save the result in hostOutout
 template<typename dtype, typename dtype2>
-void morphology3DopenCV(dtype *hostImage, dtype *hostOutput, 
+void morphology_3D_openCV(dtype *hostImage, dtype *hostOutput, 
                    const int kernel_xsize, const int kernel_ysize,
                    const int xsize, const int ysize, const int zsize, dtype2 operation)
 {                   
@@ -113,13 +113,13 @@ void morphology3DopenCV(dtype *hostImage, dtype *hostOutput,
     dtype *hout = hostOutput;
 
     for(int iz=0; iz<zsize; iz++){
-        morphology2DopenCV(himg, hout, kernel_xsize, kernel_ysize, xsize, ysize, operation);
+        morphology_2D_openCV(himg, hout, kernel_xsize, kernel_ysize, xsize, ysize, operation);
         himg += xsize*ysize;
         hout += xsize*ysize;
     }
 
 }
-template  void morphology3DopenCV<int, MorphCV>(int*, int*, const int, const int, const int, const int, const int, MorphCV);
-template  void morphology3DopenCV<int, MorphOp>(int*,  int*, const int, const int, const int, const int, const int, MorphOp);
-template  void morphology3DopenCV<float, MorphCV>(float*, float*, const int, const int, const int, const int, const int, MorphCV);
-template  void morphology3DopenCV<float, MorphOp>(float*, float*, const int, const int, const int, const int, const int, MorphOp);
+template  void morphology_3D_openCV<int, MorphCV>(int*, int*, const int, const int, const int, const int, const int, MorphCV);
+template  void morphology_3D_openCV<int, MorphOp>(int*,  int*, const int, const int, const int, const int, const int, MorphOp);
+template  void morphology_3D_openCV<float, MorphCV>(float*, float*, const int, const int, const int, const int, const int, MorphCV);
+template  void morphology_3D_openCV<float, MorphOp>(float*, float*, const int, const int, const int, const int, const int, MorphOp);

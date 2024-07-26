@@ -8,7 +8,7 @@
 
 
 template<typename dtype>
-void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void bottom_hat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                  const int xsize, const int ysize, const int zsize, const int flag_verbose)
 {
 
@@ -45,10 +45,10 @@ void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsiz
     }
 
     // closing operation
-    morphGrayscaleKernel<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_grayscale<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                                          xsize, ysize, zsize, DILATION);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
-    morphGrayscaleKernel<<<grid, block>>>(deviceOutput, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_grayscale<<<grid, block>>>(deviceOutput, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                                          xsize, ysize, zsize, EROSION);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
@@ -64,7 +64,7 @@ void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsiz
     }
 
     //B_hat = closing - f
-    subtractionKernel<<<grid2, block2>>>(deviceTmp, deviceImage, deviceOutput, xsize*ysize*zsize);
+    subtraction_pixel<<<grid2, block2>>>(deviceTmp, deviceImage, deviceOutput, xsize*ysize*zsize);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
     // transfer data from the device to the host
@@ -76,13 +76,13 @@ void bottomHat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsiz
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void bottomHat<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void bottomHat<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
-template void bottomHat<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
 
 template<typename dtype>
-void bottomHatOnHost(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void bottom_hat_on_host(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                  const int xsize, const int ysize, const int zsize, const int flag_verbose)
 {
     // set input dimension
@@ -99,14 +99,14 @@ void bottomHatOnHost(dtype *hostImage, dtype *hostOutput, int *kernel, int kerne
 
     // opening operation
     MorphChain closing = {DILATION, EROSION};
-    morphChainGrayscaleOnHost(hostImage, hostTmp, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, closing);
+    morph_chain_grayscale_on_host(hostImage, hostTmp, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, closing);
 
     //B_hat = closimg - f
-    subtractionOnHost(hostTmp, hostImage, hostOutput, size);
+    subtraction_on_host(hostTmp, hostImage, hostOutput, size);
 
     //free temporary memory
     free(hostTmp);
 }
-template void bottomHatOnHost<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void bottomHatOnHost<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
-template void bottomHatOnHost<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat_on_host<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat_on_host<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);

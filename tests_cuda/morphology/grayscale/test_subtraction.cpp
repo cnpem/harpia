@@ -7,7 +7,7 @@
 #include "../../../include/morphology/test_image_processing.h"
 #include "../../../include/morphology/test_util.h"
 
-void test_subtractionOnDevice(const std::string& filename, const std::string& filename2, const int xsize, const int ysize, const int zsize,
+void test_subtraction_on_device(const std::string& filename, const std::string& filename2, const int xsize, const int ysize, const int zsize,
                               const int flag_check, const int flag_verbose)
 {
     int size = xsize*ysize*zsize;
@@ -26,8 +26,8 @@ void test_subtractionOnDevice(const std::string& filename, const std::string& fi
     memset(host_A, 0, nBytes); 
     memset(device_ref, 0, nBytes);
 
-    readInput(host_A,filename, size, flag_verbose);
-    readInput(host_B,filename2, size, flag_verbose);
+    read_input(host_A,filename, size, flag_verbose);
+    read_input(host_B,filename2, size, flag_verbose);
 
     // device erosion 
     subtraction(host_A, host_B, device_ref, size, flag_verbose);
@@ -38,9 +38,9 @@ void test_subtractionOnDevice(const std::string& filename, const std::string& fi
         memset(host_ref, 0, nBytes); 
 
         // erosion
-        subtractionOnHost(host_A, host_B, host_ref, size);
+        subtraction_on_host(host_A, host_B, host_ref, size);
 
-        checkResult(host_ref, device_ref, xsize, ysize, zsize);
+        check_result(host_ref, device_ref, xsize, ysize, zsize);
 
         free(host_ref);
     }
@@ -51,7 +51,7 @@ void test_subtractionOnDevice(const std::string& filename, const std::string& fi
 }
 
 
-void test_subtractionOnHost(const std::string& filename, const std::string& filename2, const int xsize, const int ysize, const int zsize,
+void test_subtraction_on_host(const std::string& filename, const std::string& filename2, const int xsize, const int ysize, const int zsize,
                             const int flag_show, const int flag_verbose)
 {
     // set input dimension
@@ -69,14 +69,14 @@ void test_subtractionOnHost(const std::string& filename, const std::string& file
     memset(host_A, 1, nBytes); 
     memset(host_B, 1, nBytes); 
     memset(host_ref, 1, nBytes); 
-    readInput(host_A, filename, size, flag_verbose);
-    readInput(host_B, filename, size, flag_verbose);
-    if(flag_show) showImage3D(host_A, xsize, ysize, zsize, "Input Image A");
-    if(flag_show) showImage3D(host_B, xsize, ysize, zsize, "Input Image B");
+    read_input(host_A, filename, size, flag_verbose);
+    read_input(host_B, filename, size, flag_verbose);
+    if(flag_show) show_image_3D(host_A, xsize, ysize, zsize, "Input Image A");
+    if(flag_show) show_image_3D(host_B, xsize, ysize, zsize, "Input Image B");
 
     // bottomHat
-    subtractionOnHost(host_A, host_B, host_ref, size);
-    if(flag_show) showImage3D(host_ref, xsize, ysize, zsize, "Result Image");
+    subtraction_on_host(host_A, host_B, host_ref, size);
+    if(flag_show) show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 
     if(flag_show) cv::waitKey(0);
 

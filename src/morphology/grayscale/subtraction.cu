@@ -6,7 +6,7 @@
 //kernel for image subtraction
 template<typename dtype>
 __global__
-void subtractionKernel(dtype *deviceImage1,dtype *deviceImage2, dtype *deviceOutput, const int size)
+void subtraction_pixel(dtype *deviceImage1,dtype *deviceImage2, dtype *deviceOutput, const int size)
 {
     int index = threadIdx.x + blockIdx.x*blockDim.x;
 
@@ -14,9 +14,9 @@ void subtractionKernel(dtype *deviceImage1,dtype *deviceImage2, dtype *deviceOut
         deviceOutput[index] = deviceImage1[index] - deviceImage2[index];
     }
 }        
-template __global__ void subtractionKernel<u_int32_t>(u_int32_t*, u_int32_t*, u_int32_t*, const int);
-template __global__ void subtractionKernel<int>(int*, int*, int*, const int);
-template __global__ void subtractionKernel<float>(float*, float*, float*, const int);
+template __global__ void subtraction_pixel<u_int32_t>(u_int32_t*, u_int32_t*, u_int32_t*, const int);
+template __global__ void subtraction_pixel<int>(int*, int*, int*, const int);
+template __global__ void subtraction_pixel<float>(float*, float*, float*, const int);
 
 
 // Slide kernel and erosion operation over all input image pixels
@@ -47,7 +47,7 @@ void subtraction(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const i
     } 
 
     // device erosion/dialation 
-    subtractionKernel<<<grid, block>>>(deviceImage1, deviceImage2, deviceOutput, size);
+    subtraction_pixel<<<grid, block>>>(deviceImage1, deviceImage2, deviceOutput, size);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
     // transfer data from the device to the host
@@ -65,12 +65,12 @@ template void subtraction<float>(float *,float *, float *, const int, const int)
 
 // Slide kernel and erosion operation over all input image pixels
 template<typename dtype>
-void subtractionOnHost(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const int size)
+void subtraction_on_host(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const int size)
 {
     for(int idx = 0; idx < size; idx++){
         hostOutput[idx] = hostImage1[idx] - hostImage2[idx];
     }// slide over image
 }
-template void subtractionOnHost<u_int32_t>(u_int32_t *,u_int32_t *, u_int32_t *, const int);
-template void subtractionOnHost<int>(int *,int *, int *, const int);
-template void subtractionOnHost<float>(float *,float *, float *, const int);
+template void subtraction_on_host<u_int32_t>(u_int32_t *,u_int32_t *, u_int32_t *, const int);
+template void subtraction_on_host<int>(int *,int *, int *, const int);
+template void subtraction_on_host<float>(float *,float *, float *, const int);

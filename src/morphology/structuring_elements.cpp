@@ -4,7 +4,7 @@
 #include "../../include/morphology/structuring_elements.h"
 
 // Create a structuring element of any rectangular size given
-void getStructuringElement3D(int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize)
+void get_structuring_element_3D(int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize)
 {
     //adapted from: https://www.hindawi.com/journals/mpe/2016/4904279/
 
@@ -89,7 +89,7 @@ void vertical_line_kernel(int* kernel)
     }
 }
 
-void custumKernel3D(int* kernel)
+void custum_kernel_3D(int* kernel)
 {
     //adapted from: https://www.hindawi.com/journals/mpe/2016/4904279/
 

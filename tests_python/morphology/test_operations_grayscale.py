@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # workaround to allow importing harpia python module
 import sys
 sys.path.append('../../')
-from harpia.morphology.operations_grayscale import erosionGrayscale
+from harpia.morphology.operations_grayscale import erosion_grayscale
 
 def contiguous(array: np.ndarray ) -> np.ndarray:
     if not array.flags['C_CONTIGUOUS']:
@@ -51,7 +51,7 @@ print(output_image.shape)
 print(kernel.shape)
 
 # Call the erosion_binary function
-erosionGrayscale(contiguous(image), contiguous(output_image), kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
+erosion_grayscale(contiguous(image), contiguous(output_image), kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
 
 # Plot the original and the processed images
 slice = 0

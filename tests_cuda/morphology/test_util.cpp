@@ -4,7 +4,7 @@
 #include <cstdint> // For uint16_t
 #include <sys/time.h> // For gettimeofday
 
-double cpuSecond(){
+double cpu_second(){
     struct timeval tp;
     gettimeofday(&tp, NULL);
     return ((double)tp.tv_sec + (double)tp.tv_usec*1.e-6);//convert usec to sec and sum correctly
@@ -12,7 +12,7 @@ double cpuSecond(){
 
 // Read input raw uint16_t image data to dtype allocated memory pointer
 template<typename dtype>
-void readInput(dtype *image, const std::string& filename, const int size, const int flag_verbose){
+void read_input(dtype *image, const std::string& filename, const int size, const int flag_verbose){
 
     // Open the raw file
     std::ifstream file(filename, std::ios::in | std::ios::binary);
@@ -38,13 +38,13 @@ void readInput(dtype *image, const std::string& filename, const int size, const 
     // Clean up
     delete[] data;  
 }
-template void readInput<int>(int*, const std::string&, const int, const int);
-template void readInput<uint16_t>(uint16_t*, const std::string&, const int, const int);
-template void readInput<float>(float*, const std::string&, const int, const int);
+template void read_input<int>(int*, const std::string&, const int, const int);
+template void read_input<uint16_t>(uint16_t*, const std::string&, const int, const int);
+template void read_input<float>(float*, const std::string&, const int, const int);
 
 // Print 2D matrix
 template<typename dtype>
-void showMatrix3D(dtype *image, const int xsize, const int ysize, const int zsize) {
+void show_matrix_3D(dtype *image, const int xsize, const int ysize, const int zsize) {
     dtype *im = image;
     std::cout << "\nMatrix: (" << xsize << "." << ysize << "." << zsize << ")\n";
     for (int idz = 0; idz < zsize; idz++) {
@@ -59,13 +59,13 @@ void showMatrix3D(dtype *image, const int xsize, const int ysize, const int zsiz
         std::cout << "\n";
     }
 }
-template void showMatrix3D<int>(int *, const int, const int, const int);
-template void showMatrix3D<float>(float *, const int, const int, const int);
+template void show_matrix_3D<int>(int *, const int, const int, const int);
+template void show_matrix_3D<float>(float *, const int, const int, const int);
 
 
 //check the results obtained
 template<typename dtype>
-void checkResult(dtype *test, dtype *ref, const int nx, const int ny, const int nz) {
+void check_result(dtype *test, dtype *ref, const int nx, const int ny, const int nz) {
 
     double epsilon = 1.0E-8;
     bool match = 1;
@@ -90,5 +90,5 @@ void checkResult(dtype *test, dtype *ref, const int nx, const int ny, const int 
     }
     if(match) std::cout << "Matrices match!\n";
 }
-template  void checkResult<int>(int*,  int*, const int, const int, const int);
-template  void checkResult<float>(float*,  float*, const int, const int, const int);
+template  void check_result<int>(int*,  int*, const int, const int, const int);
+template  void check_result<float>(float*,  float*, const int, const int, const int);

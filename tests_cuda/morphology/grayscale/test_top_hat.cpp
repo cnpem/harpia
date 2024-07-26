@@ -7,7 +7,7 @@
 #include "../../../include/morphology/test_top_hat.h"
 #include "../../../include/morphology/top_hat.h"
 
-void test_topHatOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
+void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
                          const int flag_check, const int flag_verbose)
 {
@@ -26,10 +26,10 @@ void test_topHatOnDevice(const std::string& filename, const int xsize, const int
     memset(host_A, 0, nBytes); 
     memset(device_ref, 0, nBytes);
 
-    readInput(host_A,filename, size, flag_verbose);
+    read_input(host_A,filename, size, flag_verbose);
 
     // device erosion 
-    topHat(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose);
+    top_hat(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose);
 
     if(flag_check){
         int *host_ref;
@@ -37,9 +37,9 @@ void test_topHatOnDevice(const std::string& filename, const int xsize, const int
         memset(host_ref, 0, nBytes); 
 
         // erosion
-        topHatOnHost(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose);
+        top_hat_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose);
 
-        checkResult(host_ref, device_ref, xsize, ysize, zsize);
+        check_result(host_ref, device_ref, xsize, ysize, zsize);
 
         free(host_ref);
     }
@@ -49,7 +49,7 @@ void test_topHatOnDevice(const std::string& filename, const int xsize, const int
 }
 
 
-void test_topHatOnHost(const std::string& filename, const int xsize, const int ysize, const int zsize,
+void test_top_hat_on_host(const std::string& filename, const int xsize, const int ysize, const int zsize,
                             int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
                             const int flag_show, const int flag_check, const int flag_verbose)
 {
@@ -66,12 +66,12 @@ void test_topHatOnHost(const std::string& filename, const int xsize, const int y
     // set input data
     memset(host_A, 0, nBytes); 
     memset(host_ref, 0, nBytes); 
-    readInput(host_A, filename, size, flag_verbose);
-    if(flag_show) showImage3D(host_A, xsize, ysize, zsize, "Input Image");
+    read_input(host_A, filename, size, flag_verbose);
+    if(flag_show) show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
     // bottomHat
-    topHatOnHost(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize,flag_verbose);
-    if(flag_show) showImage3D(host_ref, xsize, ysize, zsize, "Result Image");
+    top_hat_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize,flag_verbose);
+    if(flag_show) show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 
     if(flag_check){
         if(kernel_zsize > 1){
@@ -83,10 +83,10 @@ void test_topHatOnHost(const std::string& filename, const int xsize, const int y
         memset(opencv_ref, 0, nBytes); 
 
         // opencv erosion 
-        morphology3DopenCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize, TOPHAT);
-        if(flag_show) showImage3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
+        morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize, TOPHAT);
+        if(flag_show) show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
 
-        checkResult(host_ref, opencv_ref, xsize, ysize, zsize);
+        check_result(host_ref, opencv_ref, xsize, ysize, zsize);
 
         free(opencv_ref);
     }

@@ -6,7 +6,7 @@
 //kernel for image subtraction
 template<typename dtype>
 CUDA_GLOBAL
-void subtractionKernel(dtype *deviceImage1,dtype *deviceImage2, dtype *deviceOutput, const int size);
+void subtraction_pixel(dtype *deviceImage1,dtype *deviceImage2, dtype *deviceOutput, const int size);
 
 
 // Slide kernel and erosion operation over all input image pixels
@@ -16,6 +16,6 @@ void subtraction(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const i
 
 // Slide kernel and erosion operation over all input image pixels
 template<typename dtype>
-void subtractionOnHost(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const int size);
+void subtraction_on_host(dtype *hostImage1,dtype *hostImage2, dtype *hostOutput, const int size);
 
 #endif // SUBTRACTION_H

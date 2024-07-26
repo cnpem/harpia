@@ -3,9 +3,9 @@
 
 
 // Create a structuring element of any rectangular size given
-void getStructuringElement3D(int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize);
+void get_structuring_element_3D(int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize);
 
-void custumKernel3D(int** kernel);
+void custum_kernel_3D(int** kernel);
 
 void horizontal_line_kernel(int* kernel);
 

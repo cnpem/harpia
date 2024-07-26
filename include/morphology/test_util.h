@@ -5,15 +5,15 @@
 #include <string>
 
 // Function prototypes
-double cpuSecond();
+double cpu_second();
 
 template<typename dtype>
-void readInput(dtype *image, const std::string& filename, const int size, const int flag_verbose);
+void read_input(dtype *image, const std::string& filename, const int size, const int flag_verbose);
 
 template<typename dtype>
-void showMatrix3D(dtype *image, const int xsize, const int ysize, const int zsize);
+void show_matrix_3D(dtype *image, const int xsize, const int ysize, const int zsize);
 
 template<typename dtype>
-void checkResult(dtype *testRef, dtype *opencvRef, const int nx, const int ny, const int nz);
+void check_result(dtype *testRef, dtype *opencvRef, const int nx, const int ny, const int nz);
 
 #endif // TEST_UTIL_H

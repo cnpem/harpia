@@ -3,53 +3,53 @@
 #include "../../../include/morphology/operations_grayscale.h"
 
 template<typename dtype>
-void erosionGrayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void erosion_grayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                  const int xsize, const int ysize, const int zsize, const int flag_verbose)
 {
-    morphGrayscaleOnDevice(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_grayscale_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                         xsize, ysize, zsize, EROSION, flag_verbose);
 }
-template void erosionGrayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void erosionGrayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
-template void erosionGrayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void erosion_grayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void erosion_grayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void erosion_grayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
 
 template<typename dtype>
-void dilationGrayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void dilation_grayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                  const int xsize, const int ysize, const int zsize, const int flag_verbose)
 {
-    morphGrayscaleOnDevice(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_grayscale_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                         xsize, ysize, zsize, DILATION, flag_verbose);
 }
-template void dilationGrayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void dilationGrayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
-template void dilationGrayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void dilation_grayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void dilation_grayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void dilation_grayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
 
 template<typename dtype>
-void closingGrayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void closing_grayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                         const int xsize, const int ysize, const int zsize, const int flag_verbose){
    
    MorphChain closing = {DILATION, EROSION};
 
-   morphChainGrayscaleOnDevice(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize,
+   morph_chain_grayscale_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize,
                               closing, flag_verbose);
 }
-template void closingGrayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void closingGrayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
-template void closingGrayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void closing_grayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void closing_grayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void closing_grayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
 template<typename dtype>
-void openingGrayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void opening_grayscale(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                         const int xsize, const int ysize, const int zsize, const int flag_verbose){
    
    MorphChain opening = {EROSION, DILATION};
 
-   morphChainGrayscaleOnDevice(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize,
+   morph_chain_grayscale_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize,
                                opening, flag_verbose);
 }
-template void openingGrayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void openingGrayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
-template void openingGrayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void opening_grayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void opening_grayscale<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void opening_grayscale<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
  

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # workaround to allow importing harpia python module
 import sys
 sys.path.append('../../')
-from harpia.morphology.operations_binary import erosionBinary
+from harpia.morphology.operations_binary import erosion_binary
 
 
 def contiguous(array: np.ndarray ) -> np.ndarray:
@@ -50,7 +50,7 @@ print(output_image.shape)
 print(kernel.shape)
 
 # Call the erosion_binary function
-erosionBinary(image, output_image, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
+erosion_binary(image, output_image, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
 
 #image = image.reshape((ysize, xsize))
 #output_image = output_image.reshape((ysize, xsize))

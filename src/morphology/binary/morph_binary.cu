@@ -6,7 +6,7 @@
 // Perform erosion/dilation operation for one pixel
 template<typename dtype>
 CUDA_HOSTDEV 
-void morphBinaryPixel(dtype *image, dtype *output, 
+void morph_binary_pixel(dtype *image, dtype *output, 
                    int centerIdx, int centerIdy, int centerIdz, 
                    int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                    const int xsize, const int ysize, const int zsize, MorphOp operation){
@@ -59,31 +59,31 @@ void morphBinaryPixel(dtype *image, dtype *output,
     }
     output[centerIdz*ysize*xsize + centerIdy*xsize + centerIdx] = aux;
 }
-template CUDA_HOSTDEV void morphBinaryPixel<int>(int *, int *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
-template CUDA_HOSTDEV void morphBinaryPixel<u_int32_t>(u_int32_t *, u_int32_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
-template CUDA_HOSTDEV void morphBinaryPixel<u_int16_t>(u_int16_t *, u_int16_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<int>(int *, int *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<u_int32_t>(u_int32_t *, u_int32_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<u_int16_t>(u_int16_t *, u_int16_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
 
 template<typename dtype>
 __global__
-void morphBinaryKernel(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void morph_binary_kernel(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                         const int xsize, const int ysize, const int zsize, MorphOp operation){
     int idx = threadIdx.x + blockIdx.x*blockDim.x;
     int idy = threadIdx.y + blockIdx.y*blockDim.y;
     int idz = threadIdx.z + blockIdx.z*blockDim.z;
 
     if (idx < xsize && idy < ysize && idz < zsize){
-        morphBinaryPixel(deviceImage, deviceOutput, idx, idy, idz, 
+        morph_binary_pixel(deviceImage, deviceOutput, idx, idy, idz, 
                            kernel, kernel_xsize, kernel_ysize, kernel_zsize,
                            xsize, ysize, zsize, operation);
     }
 }
-template __global__ void morphBinaryKernel<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morphBinaryKernel<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morphBinaryKernel<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary_kernel<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary_kernel<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary_kernel<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
 
 // Slide kernel and erosion/dilation operation over all input image pixels
 template<typename dtype>
-void morphBinaryOnDevice(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void morph_binary_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                  const int xsize, const int ysize, const int zsize, MorphOp operation, const int flag_verbose)
 {
     // set input dimension
@@ -118,7 +118,7 @@ void morphBinaryOnDevice(dtype *hostImage, dtype *hostOutput, int *kernel, int k
     }
 
     // device erosion/dialation 
-    morphBinaryKernel<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_binary_kernel<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                                          xsize, ysize, zsize, operation);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
@@ -130,13 +130,13 @@ void morphBinaryOnDevice(dtype *hostImage, dtype *hostOutput, int *kernel, int k
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void morphBinaryOnDevice<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
-template void morphBinaryOnDevice<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
-template void morphBinaryOnDevice<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_binary_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_binary_on_device<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_binary_on_device<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
 
 // Slide kernel and erosion/dilation operation over all input image pixels
 template<typename dtype>
-void morphBinaryOnHost(dtype *hostImage, dtype *hostOutput, 
+void morph_binary_on_host(dtype *hostImage, dtype *hostOutput, 
              int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
              const int xsize, const int ysize, const int zsize, MorphOp operation){
 
@@ -144,7 +144,7 @@ void morphBinaryOnHost(dtype *hostImage, dtype *hostOutput,
         for(int idy = 0; idy < ysize; idy++){
             for(int idx = 0; idx < xsize; idx++){
 
-                morphBinaryPixel(hostImage, hostOutput, idx, idy, idz, 
+                morph_binary_pixel(hostImage, hostOutput, idx, idy, idz, 
                                      kernel, kernel_xsize, kernel_ysize, kernel_zsize,
                                      xsize, ysize, zsize, operation);
                 
@@ -152,6 +152,6 @@ void morphBinaryOnHost(dtype *hostImage, dtype *hostOutput,
         }
     }// slide over image
 }
-template void morphBinaryOnHost<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
-template void morphBinaryOnHost<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
-template void morphBinaryOnHost<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template void morph_binary_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
+template void morph_binary_on_host<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template void morph_binary_on_host<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);

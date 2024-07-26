@@ -9,43 +9,43 @@ ctypedef fused numeric:
 
 #basic operations
 cdef extern from "../../include/morphology/operations_grayscale.h":
-    void _erosionGrayscale "erosionGrayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
-    void _dilationGrayscale "dilationGrayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
-    void _closingGrayscale "closingGrayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
-    void _openingGrayscale "openingGrayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
+    void _erosion_grayscale "erosion_grayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
+    void _dilation_grayscale "dilation_grayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
+    void _closing_grayscale "closing_grayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
+    void _opening_grayscale "opening_grayscale"[dtype](dtype *, dtype *, int *, int, int, int, int, int, int, int)
 
-def erosionGrayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                    int xsize, int ysize, int zsize, int flag_verbose):
-    return _erosionGrayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
+    return _erosion_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
                             xsize, ysize, zsize, flag_verbose)
 
-def dilationGrayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+def dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                    int xsize, int ysize, int zsize, int flag_verbose):
-    return _dilationGrayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
+    return _dilation_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
                             xsize, ysize, zsize, flag_verbose)
 
-def closingGrayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+def closing_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                    int xsize, int ysize, int zsize, int flag_verbose):
-    return _closingGrayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
+    return _closing_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
                             xsize, ysize, zsize, flag_verbose)
 
-def openingGrayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+def opening_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                    int xsize, int ysize, int zsize, int flag_verbose):
-    return _openingGrayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
+    return _opening_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
                             xsize, ysize, zsize, flag_verbose)
 
 #top_hat
 cdef extern from "../../include/morphology/top_hat.h":
-    void _topHat "topHat"[dtype](dtype *, dtype *, int *, int, int, int, const int, const int, const int, const int)
+    void _top_hat "top_hat"[dtype](dtype *, dtype *, int *, int, int, int, const int, const int, const int, const int)
 
-def topHat(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+def top_hat(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
            const int xsize, const int ysize, const int zsize, const int flag_verbose):
-    return  _topHat(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
+    return  _top_hat(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
 
 #bottom_hat
 cdef extern from "../../include/morphology/bottom_hat.h":
-    void _bottomHat "bottomHat"[dtype](dtype *, dtype *, int *, int, int, int, const int, const int, const int, const int)
+    void _bottom_hat "bottom_hat"[dtype](dtype *, dtype *, int *, int, int, int, const int, const int, const int, const int)
 
-def bottomHat(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+def bottom_hat(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
            const int xsize, const int ysize, const int zsize, const int flag_verbose):
-    return  _bottomHat(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)             
+    return  _bottom_hat(&hostImage[0,0,0], &hostOutput[0,0,0], &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)             
