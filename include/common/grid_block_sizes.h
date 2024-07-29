@@ -1,4 +1,3 @@
-// grid_block_sizes.h
 #ifndef GRID_BLOCK_SIZES_H
 #define GRID_BLOCK_SIZES_H
 

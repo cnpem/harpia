@@ -3,7 +3,24 @@
 #include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
 
-// Perform erosion/dilation operation for one pixel
+/**
+ * @brief Perform erosion/dilation operation for one pixel.
+ * 
+ * @tparam dtype The data type of the image.
+ * @param image Input image.
+ * @param output Output image.
+ * @param centerIdx Center index in the x-dimension.
+ * @param centerIdy Center index in the y-dimension.
+ * @param centerIdz Center index in the z-dimension.
+ * @param kernel Morphological operation kernel.
+ * @param kernel_xsize Size of the kernel in the x-dimension.
+ * @param kernel_ysize Size of the kernel in the y-dimension.
+ * @param kernel_zsize Size of the kernel in the z-dimension.
+ * @param xsize Size of the image in the x-dimension.
+ * @param ysize Size of the image in the y-dimension.
+ * @param zsize Size of the image in the z-dimension.
+ * @param operation Morphological operation (EROSION or DILATION).
+ */
 template<typename dtype>
 CUDA_HOSTDEV 
 void morph_binary_pixel(dtype *image, dtype *output, 
@@ -63,9 +80,24 @@ template CUDA_HOSTDEV void morph_binary_pixel<int>(int *, int *, int, int, int, 
 template CUDA_HOSTDEV void morph_binary_pixel<u_int32_t>(u_int32_t *, u_int32_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
 template CUDA_HOSTDEV void morph_binary_pixel<u_int16_t>(u_int16_t *, u_int16_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
 
+/**
+ * @brief Kernel function to perform erosion/dilation operation on the entire image.
+ * 
+ * @tparam dtype The data type of the image.
+ * @param deviceImage Input image on the device.
+ * @param deviceOutput Output image on the device.
+ * @param kernel Morphological operation kernel.
+ * @param kernel_xsize Size of the kernel in the x-dimension.
+ * @param kernel_ysize Size of the kernel in the y-dimension.
+ * @param kernel_zsize Size of the kernel in the z-dimension.
+ * @param xsize Size of the image in the x-dimension.
+ * @param ysize Size of the image in the y-dimension.
+ * @param zsize Size of the image in the z-dimension.
+ * @param operation Morphological operation (EROSION or DILATION).
+ */
 template<typename dtype>
 __global__
-void morph_binary_kernel(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void morph_binary(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                         const int xsize, const int ysize, const int zsize, MorphOp operation){
     int idx = threadIdx.x + blockIdx.x*blockDim.x;
     int idy = threadIdx.y + blockIdx.y*blockDim.y;
@@ -77,11 +109,28 @@ void morph_binary_kernel(dtype *deviceImage, dtype *deviceOutput, int *kernel, i
                            xsize, ysize, zsize, operation);
     }
 }
-template __global__ void morph_binary_kernel<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morph_binary_kernel<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morph_binary_kernel<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
 
-// Slide kernel and erosion/dilation operation over all input image pixels
+
+/**
+ * @brief Perform erosion/dilation operation on the entire image using the GPU. This function is meant to be called from host
+ * and slide the morph_binary kerel function through all pixels.
+ * 
+ * @tparam dtype The data type of the image.
+ * @param hostImage Input image on the host.
+ * @param hostOutput Output image on the host.
+ * @param kernel Morphological operation kernel.
+ * @param kernel_xsize Size of the kernel in the x-dimension.
+ * @param kernel_ysize Size of the kernel in the y-dimension.
+ * @param kernel_zsize Size of the kernel in the z-dimension.
+ * @param xsize Size of the image in the x-dimension.
+ * @param ysize Size of the image in the y-dimension.
+ * @param zsize Size of the image in the z-dimension.
+ * @param operation Morphological operation (EROSION or DILATION).
+ * @param flag_verbose Verbose flag to print grid and block dimensions.
+ */
 template<typename dtype>
 void morph_binary_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                  const int xsize, const int ysize, const int zsize, MorphOp operation, const int flag_verbose)
@@ -118,7 +167,7 @@ void morph_binary_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, in
     }
 
     // device erosion/dialation 
-    morph_binary_kernel<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+    morph_binary<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
                                          xsize, ysize, zsize, operation);
     cudaDeviceSynchronize(); //assures all gpu threads are fineshed
 
@@ -134,7 +183,21 @@ template void morph_binary_on_device<int>(int *, int *, int *, int, int, int, co
 template void morph_binary_on_device<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
 template void morph_binary_on_device<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
 
-// Slide kernel and erosion/dilation operation over all input image pixels
+/**
+ * @brief Perform erosion/dilation operation on the entire image using the CPU. This function is used to check GPU results correctness.
+ * 
+ * @tparam dtype The data type of the image.
+ * @param hostImage Input image on the host.
+ * @param hostOutput Output image on the host.
+ * @param kernel Morphological operation kernel.
+ * @param kernel_xsize Size of the kernel in the x-dimension.
+ * @param kernel_ysize Size of the kernel in the y-dimension.
+ * @param kernel_zsize Size of the kernel in the z-dimension.
+ * @param xsize Size of the image in the x-dimension.
+ * @param ysize Size of the image in the y-dimension.
+ * @param zsize Size of the image in the z-dimension.
+ * @param operation Morphological operation (EROSION or DILATION).
+ */
 template<typename dtype>
 void morph_binary_on_host(dtype *hostImage, dtype *hostOutput, 
              int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 

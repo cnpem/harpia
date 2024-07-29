@@ -52,17 +52,18 @@ print(kernel.shape)
 # Call the erosion_binary function
 erosion_binary(image, output_image, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
 
-#image = image.reshape((ysize, xsize))
-#output_image = output_image.reshape((ysize, xsize))
+# image = image.reshape((ysize, xsize))
+# output_image = output_image.reshape((ysize, xsize))
 
 # Plot the original and the processed images
 fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 axes[0].imshow(image, cmap='gray')
 axes[0].set_title('Original Image')
 axes[0].axis('off')
-
 axes[1].imshow(output_image, cmap='gray')
 axes[1].set_title('Processed Image')
 axes[1].axis('off')
+
+
 
 plt.show()
