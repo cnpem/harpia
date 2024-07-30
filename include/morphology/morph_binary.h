@@ -16,7 +16,7 @@ void morph_binary_on_host(dtype *hostImage, dtype *hostOutput,
 
 template<typename dtype>
 CUDA_GLOBAL
-void morph_binary_kernel(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void morph_binary(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                         const int xsize, const int ysize, const int zsize, MorphOp operation);
 
 #endif // BINARY_MORPHOLOGY_H

@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv){
 
-    // // printf("%s Starting... \n", argv[0]);
+    printf("%s Starting... \n", argv[0]);
 
     test_check_device_info();
 
@@ -36,7 +36,7 @@ int main(int argc, char **argv){
     printf("# TEST 4: subtraction #\n");
     printf("#############################################\n\n");
  
-    test_script4();
+    // test_script4();
     printf("#############################################\n");
     printf("# TEST 5: topHat nad bottomHat #\n");
     printf("#############################################\n\n");

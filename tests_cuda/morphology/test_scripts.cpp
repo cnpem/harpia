@@ -17,21 +17,29 @@
 #include <cstring>
 //#include <test_bottomHat.h>
 
-// Test erosion/dilation for 2D/3D, binary/grayscale images
-int test_script1(MorphOp operation){
-
+/**
+ * @brief Test erosion/dilation operations for 2D/3D, binary/grayscale images.
+ * 
+ * This function performs morphological operations such as erosion and dilation on binary
+ * and grayscale images. It tests both host and device implementations and compares results.
+ * 
+ * @param operation Specifies the morphological operation to test: 
+ *                  EROSION or DILATION.
+ * 
+ * @return Returns 0 on success.
+ */
+int test_script1(MorphOp operation) {
     std::string filenameBinary = "./example_images/binary/blobs_355x321x1_16b.raw";
     std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
 
-
-    // create kernel   
+    // Create kernel   
     int *kernel;
-    kernel = (int*)malloc(sizeof(int) * 27); //this size is to feat the horizontal line kernels 3.3.3
+    kernel = (int*)malloc(sizeof(int) * 27); // Size to fit the horizontal line kernels 3x3x3
     get_structuring_element_3D(kernel, 5, 5, 1);
 
-    int flag_show = 1; //whether to plot the result
-    int flag_check = 1; //whether to compare with openCV erosion
-    int flag_verbose = 0; //whether to print status messages
+    int flag_show = 1; // Whether to plot the result
+    int flag_check = 1; // Whether to compare with OpenCV erosion
+    int flag_verbose = 0; // Whether to print status messages
 
     printf("\n1 - Compare erosion results with OpenCV.\n");
 
@@ -59,7 +67,7 @@ int test_script1(MorphOp operation){
     flag_check = 0;
     flag_verbose = 0;
 
-    // it is not possible to check the host erosion with openCV for different kernels, because the check function
+    // It is not possible to check the host erosion with OpenCV for different kernels because the check function
     // was developed to use only rectangular kernels of 1's
 
     printf("\n4 - Test horizontal line kernel on binary %s.\n", (operation ? "dilation" : "erosion"));
@@ -72,21 +80,26 @@ int test_script1(MorphOp operation){
     show_matrix_3D(kernel, 3, 3, 1);
     test_morph_binary_on_host(filenameBinary, 355, 321, 1, kernel, 3, 3, 1, operation, flag_show, flag_check, flag_verbose);
 
-    // you can't test line kernels on grayscale operation, because the grayscale operation only distinguishes care and don't care pixels. 
-    // background and foreground values (0's and 1's) on the kernel are treated the same way.
+    // You can't test line kernels on grayscale operations because the grayscale operation only distinguishes care and don't care pixels. 
+    // Background and foreground values (0's and 1's) on the kernel are treated the same way.
 
     free(kernel);
 
     return 0;
 }
 
-// Compare execution time of erosion/dilation on host/device
-int test_script2(){
-
-    // Using a binary file it is possible to perform either the binary erosion or the grayscale operation
+/**
+ * @brief Compare execution time of erosion/dilation on host/device.
+ * 
+ * This function compares the execution time of erosion/dilation operations on the host and the device.
+ * 
+ * @return Returns 0 on success.
+ */
+int test_script2() {
+    // Using a binary file, it is possible to perform either the binary erosion or the grayscale operation
     std::string filename = "./example_images/binary/ILSIMG_600x1520x1520_16bits.raw";
 
-    // create kernel   
+    // Create kernel   
     int *kernel;
     kernel = (int*)malloc(sizeof(int) * 27); 
     get_structuring_element_3D(kernel, 3, 3, 3);
@@ -98,7 +111,7 @@ int test_script2(){
 
     int xsize = 600; 
     int ysize = 1520; 
-    int zsize = 500; // maximum size to execute on laptop
+    int zsize = 500; // Maximum size to execute on laptop
 
     int kernel_xsize = 3; 
     int kernel_ysize = 3; 
@@ -115,23 +128,31 @@ int test_script2(){
     return 0;
 }
 
-// Test opening/closing
-int test_script3(MorphChain chain){
-
+/**
+ * @brief Test opening/closing operations.
+ * 
+ * This function tests morphological opening and closing operations on binary and grayscale images.
+ * It compares the results between host and device implementations.
+ * 
+ * @param chain Specifies the morphological chain of operations to test.
+ * 
+ * @return Returns 0 on success.
+ */
+int test_script3(MorphChain chain) {
     std::string filenameBinary = "./example_images/binary/blobs_355x321x1_16b.raw";
     std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
 
     MorphChain closing = {DILATION, EROSION};
     const int closing_flag = (chain.operation1 == closing.operation1) && (chain.operation2 == closing.operation2);
 
-    // create kernel   
+    // Create kernel   
     int *kernel;
     kernel = (int*)malloc(sizeof(int) * 125); 
     get_structuring_element_3D(kernel, 5, 5, 5);
 
-    int flag_show = 1; //whether to plot the result
-    int flag_check = 1; //whether to compare with openCV erosion
-    int flag_verbose = 0; //whether to print status messages
+    int flag_show = 1; // Whether to plot the result
+    int flag_check = 1; // Whether to compare with OpenCV erosion
+    int flag_verbose = 0; // Whether to print status messages
 
     printf("\n1 - Compare erosion results with OpenCV.\n");
 
@@ -160,14 +181,19 @@ int test_script3(MorphChain chain){
     return 0;
 }
 
-// Test subtraction
-int test_script4(){
-
+/**
+ * @brief Test subtraction operations.
+ * 
+ * This function tests the subtraction operation on grayscale images using both host and device implementations.
+ * 
+ * @return Returns 0 on success.
+ */
+int test_script4() {
     std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
 
-    int flag_show = 1; //whether to plot the result
-    int flag_check = 1; //whether to compare with openCV erosion
-    int flag_verbose = 1; //whether to print status messages
+    int flag_show = 1; // Whether to plot the result
+    int flag_check = 1; // Whether to compare with OpenCV erosion
+    int flag_verbose = 1; // Whether to print status messages
 
     printf("\nTest subtraction on host.\n");
     test_subtraction_on_host(filenameGrayscale, filenameGrayscale, 600, 1520, 2, flag_show, flag_verbose);
@@ -178,19 +204,24 @@ int test_script4(){
     return 0;
 }
 
-// Test topHat BottomHat
-int test_script5(){
-
+/**
+ * @brief Test topHat and bottomHat transformations.
+ * 
+ * This function tests the topHat and bottomHat transformations on grayscale images using both host and device implementations.
+ * 
+ * @return Returns 0 on success.
+ */
+int test_script5() {
     std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
 
-    // create kernel   
+    // Create kernel   
     int *kernel;
     kernel = (int*)malloc(sizeof(int) * 125); 
     get_structuring_element_3D(kernel, 5, 5, 5);
 
-    int flag_show = 1; //whether to plot the result
-    int flag_check = 0; //whether to compare with openCV erosion
-    int flag_verbose = 0; //whether to print status messages
+    int flag_show = 1; // Whether to plot the result
+    int flag_check = 0; // Whether to compare with OpenCV erosion
+    int flag_verbose = 0; // Whether to print status messages
 
     printf("\n1 - Compare topHat and bottomHat results with OpenCV.\n");
 

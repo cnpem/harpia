@@ -3,77 +3,120 @@
 
 #include <fstream>
 
-// This function show images of any format using opencv. The Normalization step allow to visualize different data formats
-// But it also always maximize the contrast in the image, which can cause some distortios.
+/**
+ * @brief Displays a 2D image using OpenCV with normalization.
+ * 
+ * This function normalizes the input image data to fit the 0-255 range for visualization,
+ * and then uses OpenCV to display the image. The normalization maximizes contrast, which 
+ * may cause some distortion if the original data range is very different.
+ * 
+ * @tparam dtype The data type of the image elements (e.g., int, uint16_t, float).
+ * @param hostImage Pointer to the input image data.
+ * @param xsize The width of the image.
+ * @param ysize The height of the image.
+ * @param title The title for the display window.
+ */
 template<typename dtype>
-void show_image_2D(dtype *hostImage, const int xsize, const int ysize, const std::string title){
-
-    int size = xsize*ysize;
+void show_image_2D(dtype *hostImage, const int xsize, const int ysize, const std::string title)
+{
+    int size = xsize * ysize;
     
-    // Find max value for normalization
+    // Find the maximum value in the image for normalization
     int max = 0;
-    for(int i = 0; i<size; i++){
-        if(hostImage[i] > max){
+    for (int i = 0; i < size; i++) {
+        if (hostImage[i] > max) {
             max = hostImage[i];
         }
     }
 
-    // Normalize the slice and convert data to uint8_t
+    // Normalize the image data to range [0, 255] and convert to uint8_t
     uint8_t* data = new uint8_t[size];
     for (int i = 0; i < size; ++i) {
-        data[i] = static_cast<uint8_t>(hostImage[i]*255/max); 
+        data[i] = static_cast<uint8_t>(hostImage[i] * 255 / max); 
     }
 
-    // Create a Mat object with the appropriate size, type and data
+    // Create a cv::Mat object for OpenCV
     cv::Mat image(ysize, xsize, CV_8U, data);
 
-    // Normalize the slice to the range [0, 255] for display purposes (better visualization)
+    // Normalize the image for better visualization
     cv::Mat normalizedImage;
     cv::normalize(image, normalizedImage, 0, 255, cv::NORM_MINMAX, CV_8U);
 
-    // Display the original image
+    // Display the image
     cv::namedWindow(title, cv::WINDOW_AUTOSIZE);
     cv::imshow(title, normalizedImage);
-    //cv::waitKey(0);
 
     // Free the allocated memory
     delete[] data;
 }
-template void show_image_2D<int>(int *, const int , const int , const std::string);
-template void show_image_2D<uint16_t>(uint16_t *, const int , const int , const std::string);
-template void show_image_2D<float>(float *, const int , const int , const std::string);
 
+// Explicit template instantiations for different data types
+template void show_image_2D<int>(int *, const int, const int, const std::string);
+template void show_image_2D<uint16_t>(uint16_t *, const int, const int, const std::string);
+template void show_image_2D<float>(float *, const int, const int, const std::string);
+
+/**
+ * @brief Displays a 3D image by showing each slice as a 2D image.
+ * 
+ * This function iterates over the slices of a 3D image and calls `show_image_2D` to display 
+ * each slice individually.
+ * 
+ * @tparam dtype The data type of the image elements (e.g., int, float).
+ * @param hostImage Pointer to the input 3D image data.
+ * @param xsize The width of each slice.
+ * @param ysize The height of each slice.
+ * @param zsize The number of slices (depth) in the 3D image.
+ * @param title The title prefix for the display windows.
+ */
 template<typename dtype>
-void show_image_3D(dtype *hostImage, const int xsize, const int ysize, int zsize, const std::string title){
-    
+void show_image_3D(dtype *hostImage, const int xsize, const int ysize, int zsize, const std::string title)
+{
     dtype *himg = hostImage;    
     
-    for(int slice=0; slice < zsize; slice++){
-        show_image_2D(himg, xsize, ysize, title+" - slice "+std::to_string(slice));
-        himg += xsize*ysize;
+    // Display each slice of the 3D image
+    for (int slice = 0; slice < zsize; slice++) {
+        show_image_2D(himg, xsize, ysize, title + " - slice " + std::to_string(slice));
+        himg += xsize * ysize;
     }
 }
-template void show_image_3D<int>(int *, const int , const int , int , const std::string);
-template void show_image_3D<float>(float *, const int , const int , int , const std::string);
 
+// Explicit template instantiations for different data types
+template void show_image_3D<int>(int *, const int, const int, int, const std::string);
+template void show_image_3D<float>(float *, const int, const int, int, const std::string);
 
-// Implement the erosion operation with OpenCV for 2D images
+/**
+ * @brief Performs morphological operations on a 2D image using OpenCV.
+ * 
+ * This function applies a specified morphological operation (e.g., erosion, dilation) 
+ * to a 2D image using OpenCV's built-in functions.
+ * 
+ * @tparam dtype The data type of the image elements (e.g., int, float).
+ * @tparam dtype2 The type of the morphological operation enum.
+ * @param hostImage Pointer to the input image data.
+ * @param hostOutput Pointer to the output image data.
+ * @param kernel_xsize The width of the structuring element.
+ * @param kernel_ysize The height of the structuring element.
+ * @param xsize The width of the image.
+ * @param ysize The height of the image.
+ * @param operation The morphological operation to apply.
+ */
 template<typename dtype, typename dtype2>
 void morphology_2D_openCV(dtype *hostImage, dtype *hostOutput, 
                    const int kernel_xsize, const int kernel_ysize, 
-                   const int xsize, const int ysize, dtype2 operation) {
-    
-    // Create a cv::Mat object with the appropriate size and type
-    cv::Mat image(ysize, xsize, CV_32F);  // Assuming dtype is float, use CV_8U for uchar
+                   const int xsize, const int ysize, dtype2 operation)
+{
+    // Create a cv::Mat object for the input image
+    cv::Mat image(ysize, xsize, CV_32F);  // Use CV_32F for float data
     memcpy(image.data, hostImage, xsize * ysize * sizeof(dtype));
 
     // Create a structuring element
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, 
                                                 cv::Size(kernel_xsize, kernel_ysize), 
                                                 cv::Point(kernel_xsize / 2, kernel_ysize / 2));
-    // Create an output Mat    
-    cv::Mat outImage(ysize, xsize, CV_32F);  // Make sure the type matches the image data
+    // Create an output Mat
+    cv::Mat outImage(ysize, xsize, CV_32F);  // Output image should match the input type
     
+    // Apply the selected morphological operation
     switch (operation)
     {
     case ERODE:
@@ -92,18 +135,32 @@ void morphology_2D_openCV(dtype *hostImage, dtype *hostOutput,
         break;
     }
 
-    // Copy the result back to hostOutput
+    // Copy the result back to the output buffer
     memcpy(hostOutput, outImage.data, xsize * ysize * sizeof(dtype));
 }
 
-// Explicit template instantiation
+// Explicit template instantiations for different data types and operations
 template void morphology_2D_openCV<int, MorphCV>(int*, int*, const int, const int, const int, const int, MorphCV);
 template void morphology_2D_openCV<int, MorphOp>(int*, int*, const int, const int, const int, const int, MorphOp);
 template void morphology_2D_openCV<float, MorphCV>(float*, float*, const int, const int, const int, const int, MorphCV);
 template void morphology_2D_openCV<float, MorphOp>(float*, float*, const int, const int, const int, const int, MorphOp);
 
-
-// Implement the erosion operation with opencv for 3D images and save the result in hostOutout
+/**
+ * @brief Performs morphological operations on a 3D image using OpenCV.
+ * 
+ * This function applies the specified morphological operation to each slice of a 3D image.
+ * 
+ * @tparam dtype The data type of the image elements (e.g., int, float).
+ * @tparam dtype2 The type of the morphological operation enum.
+ * @param hostImage Pointer to the input 3D image data.
+ * @param hostOutput Pointer to the output 3D image data.
+ * @param kernel_xsize The width of the structuring element.
+ * @param kernel_ysize The height of the structuring element.
+ * @param xsize The width of each slice.
+ * @param ysize The height of each slice.
+ * @param zsize The number of slices (depth) in the 3D image.
+ * @param operation The morphological operation to apply.
+ */
 template<typename dtype, typename dtype2>
 void morphology_3D_openCV(dtype *hostImage, dtype *hostOutput, 
                    const int kernel_xsize, const int kernel_ysize,
@@ -112,14 +169,16 @@ void morphology_3D_openCV(dtype *hostImage, dtype *hostOutput,
     dtype *himg = hostImage;
     dtype *hout = hostOutput;
 
-    for(int iz=0; iz<zsize; iz++){
+    // Apply the morphological operation to each slice
+    for (int iz = 0; iz < zsize; iz++) {
         morphology_2D_openCV(himg, hout, kernel_xsize, kernel_ysize, xsize, ysize, operation);
-        himg += xsize*ysize;
-        hout += xsize*ysize;
+        himg += xsize * ysize;
+        hout += xsize * ysize;
     }
-
 }
-template  void morphology_3D_openCV<int, MorphCV>(int*, int*, const int, const int, const int, const int, const int, MorphCV);
-template  void morphology_3D_openCV<int, MorphOp>(int*,  int*, const int, const int, const int, const int, const int, MorphOp);
-template  void morphology_3D_openCV<float, MorphCV>(float*, float*, const int, const int, const int, const int, const int, MorphCV);
-template  void morphology_3D_openCV<float, MorphOp>(float*, float*, const int, const int, const int, const int, const int, MorphOp);
+
+// Explicit template instantiations for different data types and operations
+template void morphology_3D_openCV<int, MorphCV>(int*, int*, const int, const int, const int, const int, const int, MorphCV);
+template void morphology_3D_openCV<int, MorphOp>(int*, int*, const int, const int, const int, const int, const int, MorphOp);
+template void morphology_3D_openCV<float, MorphCV>(float*, float*, const int, const int, const int, const int, const int, MorphCV);
+template void morphology_3D_openCV<float, MorphOp>(float*, float*, const int, const int, const int, const int, const int, MorphOp);

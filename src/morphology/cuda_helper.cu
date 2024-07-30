@@ -1,30 +1,34 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
-
 #include "../../include/morphology/cuda_helper.h"
 
-//get cuda error messages
+/**
+ * @brief Checks for CUDA errors and prints an error message if any.
+ * 
+ * @param error The CUDA error code.
+ * @param file The file name where the error occurred.
+ * @param line The line number where the error occurred.
+ */
 void throw_on_cuda_error(cudaError_t error, const char *file, int line) {
-    if (error != cudaSuccess){
+    if (error != cudaSuccess) {
         printf("Error: %s: %d", __FILE__, __LINE__);
         printf("code:%d, reason:%s\n", error, cudaGetErrorString(error));
         exit(1);
     }
 }
 
-void test_check_device_info(){
-
+/**
+ * @brief Tests and prints the information about the CUDA device.
+ */
+void test_check_device_info() {
     printf("\nCheck device info:\n\n");
 
     int deviceCount = 0;
     cudaGetDeviceCount(&deviceCount);
 
-    if (deviceCount == 0)
-    {
+    if (deviceCount == 0) {
         printf("There are no available device(s) that support CUDA\n");
-    }
-    else
-    {
+    } else {
         printf("Detected %d CUDA Capable device(s)\n", deviceCount);
     }
 
@@ -41,32 +45,32 @@ void test_check_device_info(){
            runtimeVersion / 1000, (runtimeVersion % 100) / 10);
     printf("  CUDA Capability Major/Minor version number:    %d.%d\n",
            deviceProp.major, deviceProp.minor);
-    printf("  Total amount of global memory:                 %.2f MBytes (%llu "
-           "bytes)\n", (float)deviceProp.totalGlobalMem / pow(1024.0, 3),
+    printf("  Total amount of global memory:                 %.2f MBytes (%llu bytes)\n",
+           (float)deviceProp.totalGlobalMem / pow(1024.0, 3),
            (unsigned long long)deviceProp.totalGlobalMem);
-    printf("  GPU Clock rate:                                %.0f MHz (%0.2f "
-           "GHz)\n", deviceProp.clockRate * 1e-3f,
+    printf("  GPU Clock rate:                                %.0f MHz (%0.2f GHz)\n",
+           deviceProp.clockRate * 1e-3f,
            deviceProp.clockRate * 1e-6f);
-    printf("  Memory Clock rate:                             %.0f Mhz\n",
+    printf("  Memory Clock rate:                             %.0f MHz\n",
            deviceProp.memoryClockRate * 1e-3f);
     printf("  Memory Bus Width:                              %d-bit\n",
            deviceProp.memoryBusWidth);
 
-    if (deviceProp.l2CacheSize)
-    {
+    if (deviceProp.l2CacheSize) {
         printf("  L2 Cache Size:                                 %d bytes\n",
                deviceProp.l2CacheSize);
     }
 
     printf("  Max Texture Dimension Size (x,y,z)             1D=(%d), "
-           "2D=(%d,%d), 3D=(%d,%d,%d)\n", deviceProp.maxTexture1D,
+           "2D=(%d,%d), 3D=(%d,%d,%d)\n",
+           deviceProp.maxTexture1D,
            deviceProp.maxTexture2D[0], deviceProp.maxTexture2D[1],
            deviceProp.maxTexture3D[0], deviceProp.maxTexture3D[1],
            deviceProp.maxTexture3D[2]);
     printf("  Max Layered Texture Size (dim) x layers        1D=(%d) x %d, "
-           "2D=(%d,%d) x %d\n", deviceProp.maxTexture1DLayered[0],
-           deviceProp.maxTexture1DLayered[1], deviceProp.maxTexture2DLayered[0],
-           deviceProp.maxTexture2DLayered[1],
+           "2D=(%d,%d) x %d\n",
+           deviceProp.maxTexture1DLayered[0], deviceProp.maxTexture1DLayered[1],
+           deviceProp.maxTexture2DLayered[0], deviceProp.maxTexture2DLayered[1],
            deviceProp.maxTexture2DLayered[2]);
     printf("  Total amount of constant memory:               %lu bytes\n",
            deviceProp.totalConstMem);
@@ -90,6 +94,4 @@ void test_check_device_info(){
            deviceProp.maxGridSize[2]);
     printf("  Maximum memory pitch:                          %lu bytes\n",
            deviceProp.memPitch);
-
-    return;
 }
