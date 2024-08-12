@@ -41,6 +41,8 @@ ENV CPATH=/usr/include/hdf5/serial/:$CUDA_HOME/include:$CPATH \
 RUN ln -sf /usr/local/cuda/lib64/*.* /usr/lib/ && \
     ln -sf /usr/local/cuda/include/*.* /usr/include/
 
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         autoconf \
@@ -67,6 +69,7 @@ RUN apt-get update -y && \
         libhdf5-* \
         libnetcdf-dev \
         libnss3 \
+        libopencv-dev \
         libopenmpi-dev \
         libssl-dev \
         libtool \
@@ -186,5 +189,9 @@ RUN python3 -m pip config set global.extra-index-url https://gitlab.cnpem.br/api
 
 RUN python3 -m pip install --upgrade pip setuptools wheel build pyclean
 
-RUN python3 -m pip install numpy==1.22.3 && \
-    python3 -m pip install SharedArray==3.2.0
+COPY . /opt/harpia
+
+# pip
+COPY requirements.txt /opt/harpia/requirements.txt
+RUN pip3 --no-cache-dir install -r /opt/harpia/requirements.txt && \
+    rm -rf /opt/harpia/requirements.txt

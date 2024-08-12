@@ -63,6 +63,11 @@ From: nvcr.io/nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04
     ln -sf /usr/local/cuda/lib64/*.* /usr/lib/
     ln -sf /usr/local/cuda/include/*.* /usr/include/
 
+%environment
+    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+%post
+    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+
 %post
     apt-get update -y
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -90,6 +95,7 @@ From: nvcr.io/nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04
         libhdf5-* \
         libnetcdf-dev \
         libnss3 \
+        libopencv-dev \
         libopenmpi-dev \
         libssl-dev \
         libtool \
@@ -233,6 +239,13 @@ From: nvcr.io/nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04
 %post
     python3 -m pip install --upgrade pip setuptools wheel build pyclean
 
+%files
+    . /opt/harpia
+
+# pip
+%files
+    requirements.txt /opt/harpia/requirements.txt
 %post
-    python3 -m pip install numpy==1.22.3
-    python3 -m pip install SharedArray==3.2.0
+    cd /
+    pip3 --no-cache-dir install -r /opt/harpia/requirements.txt
+    rm -rf /opt/harpia/requirements.txt

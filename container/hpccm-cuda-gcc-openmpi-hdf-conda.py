@@ -108,6 +108,12 @@ stage += hpccm.primitives.shell(
     chdir=False,
 )
 
+stage += hpccm.primitives.environment(
+    variables={
+        'PKG_CONFIG_PATH': '/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH', #for opencv
+    }
+)
+
 # Install development tools
 ospackages = [
     'autoconf',
@@ -134,6 +140,7 @@ ospackages = [
     'libhdf5-*',
     'libnetcdf-dev',
     'libnss3',
+    'libopencv-dev',
     'libopenmpi-dev',
     'libssl-dev',
     'libtool',
@@ -210,13 +217,8 @@ stage += hpccm.primitives.shell(
 )
 
 # Install Harpia
-stage += hpccm.primitives.shell(
-    commands=[
-        'python3 -m pip install numpy==1.22.3',
-        'python3 -m pip install SharedArray==3.2.0',
-    ],
-    chdir=False,
-)
+stage += hpccm.primitives.copy(src='.', dest='/opt/harpia')
+stage += hpccm.building_blocks.pip(ospackages=[], requirements='requirements.txt', pip='pip3')
 
 # Output container specification
 print(stage)
