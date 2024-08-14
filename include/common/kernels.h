@@ -6,7 +6,7 @@
 #include<cmath>
 
 template<typename dtype>
-__device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int rows, int cols, int rows_kernel, int cols_kernel)
+__device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int xsize, int ysize, int kx, int ky)
 {
 
     int input_col;
@@ -14,19 +14,19 @@ __device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int 
 
     float accumulation = 0;
     
-    for(int m = 0; m < rows_kernel; m++)
+    for(int m = 0; m < kx; m++)
     {
 
-        for (int n = 0; n < cols_kernel; n++)
+        for (int n = 0; n < ky; n++)
         {
             //this is needed to compute everything with respect to the center of the kernel.
-            input_row = i - rows_kernel / 2 + m;
-            input_col = j - cols_kernel / 2 + n;
+            input_row = i - kx / 2 + m;
+            input_col = j - ky / 2 + n;
 
             // Check if input_row and input_col are within bounds
-            if (input_row >= 0 && input_row < rows && input_col >= 0 && input_col < cols)
+            if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize)
             {
-                accumulation += image[input_row * cols + input_col];
+                accumulation += image[input_row * ysize + input_col];
             }
             
             //make a padding function to substitute this line of code.
@@ -36,15 +36,15 @@ __device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int 
                 // Reflect padding
                 if (input_row < 0)
                     input_row = -input_row;
-                else if (input_row >= rows)
-                    input_row = 2 * rows - input_row - 1;
+                else if (input_row >= xsize)
+                    input_row = 2 * xsize - input_row - 1;
 
                 if (input_col < 0)
                     input_col = -input_col;
-                else if (input_col >= cols)
-                    input_col = 2 * cols - input_col - 1;
+                else if (input_col >= ysize)
+                    input_col = 2 * ysize - input_col - 1;
 
-                accumulation += image[input_row * cols + input_col];
+                accumulation += image[input_row * ysize + input_col];
 
             }
             
@@ -52,39 +52,39 @@ __device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int 
 
     }
 
-    *mean = accumulation/(rows_kernel*cols_kernel);
+    *mean = accumulation/(kx*ky);
 
 }
 
 template<typename dtype>
 __device__ void get_mean_kernel_3d(dtype* image, float* mean,
                           int i, int j, int k, 
-                          int rows, int cols, int depth,
-                          int rows_kernel, int cols_kernel, int depth_kernel)
+                          int xsize, int ysize, int zsize,
+                          int kx, int ky, int kz)
 {
 
     float accumulation = 0;
 
     int input_col;
     int input_row;
-    int input_depth;
+    int input_zsize;
     
-    for (int l = 0; l < depth_kernel; l++)
+    for (int l = 0; l < kz; l++)
     {
 
-        for(int m = 0; m < rows_kernel; m++)
+        for(int m = 0; m < kx; m++)
         {
 
-            for (int n = 0; n < cols_kernel; n++)
+            for (int n = 0; n < ky; n++)
             {
                 //this is needed to compute everything with respect to the center of the kernel.
-                input_row = i - rows_kernel / 2 + m;
-                input_col = j - cols_kernel / 2 + n;
-                input_depth = k - depth_kernel / 2 + l;
+                input_row = i - kx / 2 + m;
+                input_col = j - ky / 2 + n;
+                input_zsize = k - kz / 2 + l;
 
-                if (input_row >= 0 && input_row < rows && input_col >= 0 && input_col < cols && input_depth >= 0 && input_depth < depth)
+                if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize && input_zsize >= 0 && input_zsize < zsize)
                 {
-                    accumulation += image[(input_depth * rows * cols) + (input_row * cols) + input_col];
+                    accumulation += image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col];
                 }
                 
                 //make a padding function to substitute this line of code.
@@ -96,9 +96,9 @@ __device__ void get_mean_kernel_3d(dtype* image, float* mean,
                         input_row = -input_row;
                     }
 
-                    else if (input_row >= rows)
+                    else if (input_row >= xsize)
                     {
-                        input_row = 2 * rows - input_row - 1;
+                        input_row = 2 * xsize - input_row - 1;
                     }
 
 
@@ -107,23 +107,23 @@ __device__ void get_mean_kernel_3d(dtype* image, float* mean,
                         input_col = -input_col;
                     }
 
-                    else if (input_col >= cols)
+                    else if (input_col >= ysize)
                     {
-                        input_col = 2 * cols - input_col - 1;
+                        input_col = 2 * ysize - input_col - 1;
                     }
 
-                    if (input_depth < 0)
+                    if (input_zsize < 0)
                     {
-                        input_depth = - input_depth;
+                        input_zsize = - input_zsize;
                     }
 
-                    else if (input_depth>=depth)
+                    else if (input_zsize>=zsize)
                     {
-                        input_depth = 2 * depth - input_depth -1;
+                        input_zsize = 2 * zsize - input_zsize -1;
                     }
                     
 
-                    accumulation += image[(input_depth * rows * cols) + (input_row * cols) + input_col];
+                    accumulation += image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col];
 
                 }
                 
@@ -133,13 +133,13 @@ __device__ void get_mean_kernel_3d(dtype* image, float* mean,
 
     }
 
-    *mean = accumulation/(rows_kernel*cols_kernel*depth_kernel);
+    *mean = accumulation/(kx*ky*kz);
 
 }
 
 
 template<typename dtype>
-__device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_deviation, int i, int j, int rows, int cols, int rows_kernel, int cols_kernel)
+__device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_deviation, int i, int j, int xsize, int ysize, int kx, int ky)
 {
 
     int input_col;
@@ -147,19 +147,19 @@ __device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_devi
 
     float accumulation = 0;
     
-    for(int m = 0; m < rows_kernel; m++)
+    for(int m = 0; m < kx; m++)
     {
 
-        for (int n = 0; n < cols_kernel; n++)
+        for (int n = 0; n < ky; n++)
         {
             //this is needed to compute everything with respect to the center of the kernel.
-            input_row = i - rows_kernel / 2 + m;
-            input_col = j - cols_kernel / 2 + n;
+            input_row = i - kx / 2 + m;
+            input_col = j - ky / 2 + n;
 
             // Check if input_row and input_col are within bounds
-            if (input_row >= 0 && input_row < rows && input_col >= 0 && input_col < cols)
+            if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize)
             {
-                accumulation += pow(image[input_row * cols + input_col] - mean,2);
+                accumulation += pow(image[input_row * ysize + input_col] - mean,2);
             }
             
             //make a padding function to substitute this line of code.
@@ -169,15 +169,15 @@ __device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_devi
                 // Reflect padding
                 if (input_row < 0)
                     input_row = -input_row;
-                else if (input_row >= rows)
-                    input_row = 2 * rows - input_row - 1;
+                else if (input_row >= xsize)
+                    input_row = 2 * xsize - input_row - 1;
 
                 if (input_col < 0)
                     input_col = -input_col;
-                else if (input_col >= cols)
-                    input_col = 2 * cols - input_col - 1;
+                else if (input_col >= ysize)
+                    input_col = 2 * ysize - input_col - 1;
 
-                accumulation += pow(image[input_row * cols + input_col] - mean,2);
+                accumulation += pow(image[input_row * ysize + input_col] - mean,2);
 
             }
             
@@ -185,7 +185,7 @@ __device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_devi
 
     }
 
-    *standard_deviation = sqrt(accumulation/(rows_kernel*cols_kernel) );
+    *standard_deviation = sqrt(accumulation/(kx*ky) );
 
 }
 
@@ -194,32 +194,32 @@ __device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_devi
 template<typename dtype>
 __device__ void get_std_kernel_3d(dtype* image, float mean, float* standard_deviation,
                           int i, int j, int k, 
-                          int rows, int cols, int depth,
-                          int rows_kernel, int cols_kernel, int depth_kernel)
+                          int xsize, int ysize, int zsize,
+                          int kx, int ky, int kz)
 {
 
     float accumulation = 0;
 
     int input_col;
     int input_row;
-    int input_depth;
+    int input_zsize;
     
-    for (int l = 0; l < depth_kernel; l++)
+    for (int l = 0; l < kz; l++)
     {
 
-        for(int m = 0; m < rows_kernel; m++)
+        for(int m = 0; m < kx; m++)
         {
 
-            for (int n = 0; n < cols_kernel; n++)
+            for (int n = 0; n < ky; n++)
             {
                 //this is needed to compute everything with respect to the center of the kernel.
-                input_row = i - rows_kernel / 2 + m;
-                input_col = j - cols_kernel / 2 + n;
-                input_depth = k - depth_kernel / 2 + l;
+                input_row = i - kx / 2 + m;
+                input_col = j - ky / 2 + n;
+                input_zsize = k - kz / 2 + l;
 
-                if (input_row >= 0 && input_row < rows && input_col >= 0 && input_col < cols && input_depth >= 0 && input_depth < depth)
+                if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize && input_zsize >= 0 && input_zsize < zsize)
                 {
-                    accumulation += pow(image[(input_depth * rows * cols) + (input_row * cols) + input_col] - mean,2);
+                    accumulation += pow(image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col] - mean,2);
                 }
                 
                 //make a padding function to substitute this line of code.
@@ -231,9 +231,9 @@ __device__ void get_std_kernel_3d(dtype* image, float mean, float* standard_devi
                         input_row = -input_row;
                     }
 
-                    else if (input_row >= rows)
+                    else if (input_row >= xsize)
                     {
-                        input_row = 2 * rows - input_row - 1;
+                        input_row = 2 * xsize - input_row - 1;
                     }
 
 
@@ -242,23 +242,23 @@ __device__ void get_std_kernel_3d(dtype* image, float mean, float* standard_devi
                         input_col = -input_col;
                     }
 
-                    else if (input_col >= cols)
+                    else if (input_col >= ysize)
                     {
-                        input_col = 2 * cols - input_col - 1;
+                        input_col = 2 * ysize - input_col - 1;
                     }
 
-                    if (input_depth < 0)
+                    if (input_zsize < 0)
                     {
-                        input_depth = - input_depth;
+                        input_zsize = - input_zsize;
                     }
 
-                    else if (input_depth>=depth)
+                    else if (input_zsize>=zsize)
                     {
-                        input_depth = 2 * depth - input_depth -1;
+                        input_zsize = 2 * zsize - input_zsize -1;
                     }
                     
 
-                    accumulation += pow(image[(input_depth * rows * cols) + (input_row * cols) + input_col]-mean,2);
+                    accumulation += pow(image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col]-mean,2);
 
                 }
                 
@@ -268,12 +268,12 @@ __device__ void get_std_kernel_3d(dtype* image, float mean, float* standard_devi
 
     }
 
-    *standard_deviation = sqrt(accumulation/(rows_kernel*cols_kernel*depth_kernel));
+    *standard_deviation = sqrt(accumulation/(kx*ky*kz));
 
 }
 
 
-static void get_gaussian_kernel_2d(float** kernel, int rows, int cols, float sigma)
+static void get_gaussian_kernel_2d(float** kernel, int xsize, int ysize, float sigma)
 {
     /*
 
@@ -284,7 +284,7 @@ static void get_gaussian_kernel_2d(float** kernel, int rows, int cols, float sig
     */
 
    //kernel allocation
-    *kernel = (float*)malloc(sizeof(float)*rows*cols);
+    *kernel = (float*)malloc(sizeof(float)*xsize*ysize);
 
     if (! *kernel)
     {
@@ -294,17 +294,17 @@ static void get_gaussian_kernel_2d(float** kernel, int rows, int cols, float sig
     int x;
     int y;
 
-    int center_row = rows / 2;
-    int center_col = cols / 2;
+    int center_row = xsize / 2;
+    int center_col = ysize / 2;
 
     float distance = 0;
     float normalization = 0;
 
     // Generate the kernel values.
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < xsize; i++)
     {
 
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < ysize; j++)
         {
 
             x = i - center_row;
@@ -312,10 +312,10 @@ static void get_gaussian_kernel_2d(float** kernel, int rows, int cols, float sig
 
             distance = x * x + y * y;
 
-            (*kernel)[i * cols + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
-            normalization += (*kernel)[i * cols +j];
+            (*kernel)[i * ysize + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
+            normalization += (*kernel)[i * ysize +j];
 
-            //std::cout<<(*kernel)[i*cols+j]<<" ";
+            //std::cout<<(*kernel)[i*ysize+j]<<" ";
 
         }
 
@@ -324,7 +324,7 @@ static void get_gaussian_kernel_2d(float** kernel, int rows, int cols, float sig
 
     }
 
-    for (int i = 0; i < rows*cols; i++)
+    for (int i = 0; i < xsize*ysize; i++)
     {
         (*kernel)[i] = (*kernel)[i]/normalization;
     }
@@ -334,7 +334,7 @@ static void get_gaussian_kernel_2d(float** kernel, int rows, int cols, float sig
 }
 
 
-static void get_gaussian_kernel_3d(float** kernel, int rows, int cols, int depth, float sigma)
+static void get_gaussian_kernel_3d(float** kernel, int xsize, int ysize, int zsize, float sigma)
 {
     /*
 
@@ -345,7 +345,7 @@ static void get_gaussian_kernel_3d(float** kernel, int rows, int cols, int depth
     */
 
    //kernel allocation
-    *kernel = (float*)malloc(sizeof(float)*rows*cols*depth);
+    *kernel = (float*)malloc(sizeof(float)*xsize*ysize*zsize);
 
     if (! *kernel)
     {
@@ -356,33 +356,33 @@ static void get_gaussian_kernel_3d(float** kernel, int rows, int cols, int depth
     int y;
     int z;
 
-    int center_row = rows / 2;
-    int center_col = cols / 2;
-    int center_depth = depth / 2;
+    int center_row = xsize / 2;
+    int center_col = ysize / 2;
+    int center_zsize = zsize / 2;
 
     float distance = 0;
     float normalization = 0;
 
     // Generate the kernel values.
-    for (int k = 0; k < depth; k++)
+    for (int k = 0; k < zsize; k++)
     {
     
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
 
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
 
                 x = i - center_row;
                 y = j - center_col;
-                z = k - center_depth;
+                z = k - center_zsize;
 
                 distance = x * x + y * y + z * z;
 
-                (*kernel)[k*rows*cols + i * cols + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
-                normalization += (*kernel)[k*rows*cols + i * cols + j];
+                (*kernel)[k*xsize*ysize + i * ysize + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
+                normalization += (*kernel)[k*xsize*ysize + i * ysize + j];
 
-                //std::cout<<(*kernel)[i*cols+j]<<" ";
+                //std::cout<<(*kernel)[i*ysize+j]<<" ";
 
             }
 
@@ -394,7 +394,7 @@ static void get_gaussian_kernel_3d(float** kernel, int rows, int cols, int depth
     }
 
 
-    for (int i = 0; i < rows*cols*depth; i++)
+    for (int i = 0; i < xsize*ysize*zsize; i++)
     {
         (*kernel)[i] = (*kernel)[i]/normalization;
     }

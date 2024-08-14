@@ -105,7 +105,7 @@ CUDA = locate_cuda()
 cuda_sources = []
 # TODO: correct some compilation bugs for filters and use 'src' folder
 #for root, _, files in os.walk('src'): 
-for root, _, files in os.walk('src/morphology'):
+for root, _, files in os.walk('src'):
      for file in files:
         if file.endswith('.cu'):
             cuda_sources.append(os.path.join(root, file))
@@ -170,10 +170,11 @@ def get_extension_modules(basedir):
 ext_modules = [
     *get_extension_modules('harpia'), 
     *get_extension_modules('harpia.morphology'),
-#    *get_extension_modules('harpia.filters'),
-#    *get_extension_modules('harpia.quantification'),
-#    *get_extension_modules('harpia.threshold')
+    *get_extension_modules('harpia.filters'),
+    *get_extension_modules('harpia.quantification'),
+    *get_extension_modules('harpia.threshold')
 ]
+
 print(cuda_sources)
 print(files)
 print(ext_modules)
