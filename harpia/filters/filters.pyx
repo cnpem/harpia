@@ -240,3 +240,41 @@ def median(np.ndarray[numeric, ndim=3] image,
                           &output[0,0,0],
                           rows, cols, depth,
                           rows_kernel, cols_kernel, depth_kernel)
+
+cdef extern from '../../../src/filters/anisotropic_diffusion.h':
+    void anisotropicDiffusion2D[dtype](dtype* inputImage, int totalIterations, float deltaT, 
+                            float kappa, int diffusionOption, int numRows, int numCols)
+
+    void anisotropicDiffusion3D[dtype](dtype* inputImage, int totalIterations, float deltaT, 
+                        float kappa, int diffusionOption, int numRows, int numCols, int numSlices)
+
+    void anisotropicDiffusion2DGPU[dtype](dtype* inputImage, int totalIterations, float deltaT, 
+                                float kappa, int diffusionOption, int numRows, int numCols)
+    
+    void anisotropicDiffusion3DGPU[dtype](dtype* inputImage, int totalIterations, float deltaT, 
+                                float kappa, int diffusionOption, int numRows, int numCols, int slices)
+
+def anisotropic_diffusion2D(numeric[:,::1] input_image, int total_iterations,
+                          float delta_t, float kappa, int diffusion_option, gpu = False):
+    cdef int rows = input_image.shape[0]
+    cdef int cols = input_image.shape[1]
+
+    if gpu == True:
+        anisotropicDiffusion2DGPU(&input_image[0,0], total_iterations, delta_t, kappa, diffusion_option, rows, cols)
+    else:
+        anisotropicDiffusion2D(&input_image[0,0], total_iterations, delta_t, kappa, diffusion_option, rows, cols)
+
+    return input_image  # Should the array be returned?
+
+def anisotropic_diffusion3D(numeric[:,:,::1] input_image, int total_iterations,
+                          float delta_t, float kappa, int diffusion_option, gpu = False):
+    cdef int rows = input_image.shape[0]
+    cdef int cols = input_image.shape[1]
+    cdef int slices = input_image.shape[2]
+
+    if gpu == True:
+        anisotropicDiffusion3DGPU(&input_image[0,0,0], total_iterations, delta_t, kappa, diffusion_option, rows, cols, slices)
+    else:
+        anisotropicDiffusion3D(&input_image[0,0,0], total_iterations, delta_t, kappa, diffusion_option, rows, cols, slices)
+
+    return input_image  # Should the array be returned?
