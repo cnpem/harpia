@@ -16,15 +16,15 @@ void get_prewitt_depth_kernel_3d(float** kernel);
 template<typename dtype>
 __global__ void prewitt_filter_kernel_2d(dtype* image, float* output,
                                          float* dev_kernel_horizontal, float* dev_kernel_vertical,
-                                         int idz, int rows, int cols, int slices);
+                                         int idz, int xsize, int ysize, int zsize);
 
 template<typename dtype>
 __global__ void prewitt_filter_kernel_3d(dtype* image, float* output,
                                          float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth,
-                                         int rows, int cols, int depth);
+                                         int xsize, int ysize, int depth);
 
 // Function declaration for prewitt filtering
 template<typename dtype>
-void prewitt_filtering(dtype* image, float* output, int rows, int cols, int slices, bool type);
+void prewitt_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type);
 
 #endif // PREWITT_FILTER_H
