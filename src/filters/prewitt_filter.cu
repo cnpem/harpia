@@ -297,66 +297,66 @@ void get_prewitt_depth_kernel_3d(float** kernel)
 template<typename dtype>
 __global__ void prewitt_filter_kernel_2d(dtype* image, float* output,
                                          float* dev_kernel_horizontal, float* dev_kernel_vertical,
-                                         int idz, int rows, int cols, int slices)
+                                         int idz, int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < rows && idy < cols)
+    if (idx < xsize && idy < ysize)
     {
         float temp_vertical;
         float temp_horizontal;
 
-        convolution_2d(image + idz * rows * cols, &temp_horizontal, dev_kernel_horizontal, idx, idy, rows, cols, 3, 3);
-        convolution_2d(image + idz * rows * cols, &temp_vertical, dev_kernel_vertical, idx, idy, rows, cols, 3, 3);
+        convolution2d(image + idz * xsize * ysize, &temp_horizontal, dev_kernel_horizontal, idx, idy, xsize, ysize, 3, 3);
+        convolution2d(image + idz * xsize * ysize, &temp_vertical, dev_kernel_vertical, idx, idy, xsize, ysize, 3, 3);
 
-        output[idz * rows * cols + idx * cols + idy] = temp_horizontal * temp_horizontal + temp_vertical * temp_vertical;
-        output[idz * rows * cols + idx * cols + idy] = (float)sqrtf(output[idz * rows * cols + idx * cols + idy]);
+        output[idz * xsize * ysize + idx * ysize + idy] = temp_horizontal * temp_horizontal + temp_vertical * temp_vertical;
+        output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
     }
 }
 
 template<typename dtype>
 __global__ void prewitt_filter_kernel_3d(dtype* image, float* output,
                                          float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth,
-                                         int rows, int cols, int depth)
+                                         int xsize, int ysize, int depth)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
     const int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if (idx < rows && idy < cols && idz < depth)
+    if (idx < xsize && idy < ysize && idz < depth)
     {
         float temp_vertical;
         float temp_horizontal;
         float temp_depth;
 
-        convolution_3d(image, &temp_horizontal, dev_kernel_horizontal, idx, idy, idz, rows, cols, depth, 3, 3, 3);
-        convolution_3d(image, &temp_vertical, dev_kernel_vertical, idx, idy, idz, rows, cols, depth, 3, 3, 3);
-        convolution_3d(image, &temp_depth, dev_kernel_depth, idx, idy, idz, rows, cols, depth, 3, 3, 3);
+        convolution3d(image, &temp_horizontal, dev_kernel_horizontal, idx, idy, idz, xsize, ysize, depth, 3, 3, 3);
+        convolution3d(image, &temp_vertical, dev_kernel_vertical, idx, idy, idz, xsize, ysize, depth, 3, 3, 3);
+        convolution3d(image, &temp_depth, dev_kernel_depth, idx, idy, idz, xsize, ysize, depth, 3, 3, 3);
 
-        output[idz * rows * cols + idx * cols + idy] = temp_horizontal * temp_horizontal + temp_vertical * temp_vertical + temp_depth * temp_depth;
-        output[idz * rows * cols + idx * cols + idy] = (float)sqrtf(output[idz * rows * cols + idx * cols + idy]);
+        output[idz * xsize * ysize + idx * ysize + idy] = temp_horizontal * temp_horizontal + temp_vertical * temp_vertical + temp_depth * temp_depth;
+        output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
     }
 }
 
-template __global__ void prewitt_filter_kernel_2d<int>(int* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, int idz,int rows, int cols,int slices);
-template __global__ void prewitt_filter_kernel_2d<float>(float* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, int idz,int rows, int cols,int slices);
+template __global__ void prewitt_filter_kernel_2d<int>(int* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, int idz,int xsize, int ysize,int zsize);
+template __global__ void prewitt_filter_kernel_2d<float>(float* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, int idz,int xsize, int ysize,int zsize);
 
-template __global__ void prewitt_filter_kernel_3d<int>(int* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth, int rows, int cols, int depth);
-template __global__ void prewitt_filter_kernel_3d<float>(float* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth, int rows, int cols, int depth);
+template __global__ void prewitt_filter_kernel_3d<int>(int* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth, int xsize, int ysize, int depth);
+template __global__ void prewitt_filter_kernel_3d<float>(float* image, float* output, float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth, int xsize, int ysize, int depth);
 
 
 
 template<typename dtype>
-void prewitt_filtering(dtype* image, float* output, int rows, int cols, int slices, bool type)
+void prewitt_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type)
 {
 
     dtype* dev_image;
     float* dev_output;
-    cudaMalloc((void**)&dev_image, rows * cols * slices * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, rows * cols * slices * sizeof(float));
+    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
 
-    cudaMemcpy(dev_image, image, rows * cols * slices * sizeof(dtype), cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
     
 
     if (type == false)
@@ -376,12 +376,12 @@ void prewitt_filtering(dtype* image, float* output, int rows, int cols, int slic
         cudaMemcpy(dev_kernel_vertical, kernel_vertical, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
         dim3 blockSize(16, 16);
-        dim3 gridSize((rows + blockSize.y - 1) / blockSize.y,(cols + blockSize.x - 1) / blockSize.x );
+        dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y,(ysize + blockSize.x - 1) / blockSize.x );
 
         auto start = std::chrono::high_resolution_clock::now();
 
-        for (int k = 0; k < slices; ++k) {
-            prewitt_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel_horizontal, dev_kernel_vertical, k, rows, cols, slices);
+        for (int k = 0; k < zsize; ++k) {
+            prewitt_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel_horizontal, dev_kernel_vertical, k, xsize, ysize, zsize);
         }
         cudaDeviceSynchronize();
 
@@ -418,13 +418,13 @@ void prewitt_filtering(dtype* image, float* output, int rows, int cols, int slic
 
 
         dim3 blockSize(8, 8, 8);
-        dim3 gridSize( (rows + blockSize.y - 1) / blockSize.y, (cols + blockSize.x - 1) / blockSize.x, (slices + blockSize.z - 1) / blockSize.z);
+        dim3 gridSize( (xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x, (zsize + blockSize.z - 1) / blockSize.z);
 
         auto start = std::chrono::high_resolution_clock::now();
 
         prewitt_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output,
                                                          dev_kernel_horizontal, dev_kernel_vertical, dev_kernel_depth,
-                                                         rows, cols, slices);
+                                                         xsize, ysize, zsize);
 
         cudaDeviceSynchronize();
 
@@ -437,7 +437,7 @@ void prewitt_filtering(dtype* image, float* output, int rows, int cols, int slic
         cudaFree(dev_kernel_depth);
     }
 
-    cudaMemcpy(output, dev_output, rows * cols * slices * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
 
     cudaFree(dev_image);
     cudaFree(dev_output);
@@ -445,60 +445,60 @@ void prewitt_filtering(dtype* image, float* output, int rows, int cols, int slic
 
 
 // Explicit instantiation 
-template void prewitt_filtering<float>(float* image, float* output, int rows, int cols, int slices, bool type);
-template void prewitt_filtering<int>(int* image, float* output, int rows, int cols, int slices, bool type);
-template void prewitt_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, bool type);
+template void prewitt_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, bool type);
+template void prewitt_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize, bool type);
+template void prewitt_filtering<unsigned int>(unsigned int* image, float* output, int xsize, int ysize, int zsize, bool type);
 
 
 /*
 
 int main()
 {
-    int rows = 10;
-    int cols = 10;
-    int slices = 1;
+    int xsize = 10;
+    int ysize = 10;
+    int zsize = 1;
 
     static int* image;
-    image = (int*)malloc(slices*rows*cols*sizeof(int));
+    image = (int*)malloc(zsize*xsize*ysize*sizeof(int));
 
     static int* output;
-    output = (int*)malloc(slices*rows*cols*sizeof(int));
+    output = (int*)malloc(zsize*xsize*ysize*sizeof(int));
 
-    for (int k = 0; k < slices; k++)
+    for (int k = 0; k < zsize; k++)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
                 if (i!=j)
                 {
-                    image[k * rows * cols + i * cols + j] = 1;
+                    image[k * xsize * ysize + i * ysize + j] = 1;
                 }
 
                 if (i==j)
                 {
-                    image[k * rows * cols + i * cols + j] = -1;
+                    image[k * xsize * ysize + i * ysize + j] = -1;
                 }
                 
         
-                output[k * rows * cols + i * cols + j] = 0;
+                output[k * xsize * ysize + i * ysize + j] = 0;
             }
         }
 
     }
 
 
-    prewitt_filtering(image,output,rows,cols,slices, false);
+    prewitt_filtering(image,output,xsize,ysize,zsize, false);
     
-    for (int k = 0; k < slices; k++)
+    for (int k = 0; k < zsize; k++)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
-                std::cout<<output[k*rows*cols + i*cols +j]<<" ";
+                std::cout<<output[k*xsize*ysize + i*ysize +j]<<" ";
             }
 
             std::cout<<"\n";

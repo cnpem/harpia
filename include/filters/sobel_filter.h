@@ -26,16 +26,16 @@ void get_sobel_depth_kernel_3d(float** kernel);
 template<typename dtype>
 __global__ void sobel_filter_kernel_2d(dtype* image, float* output, 
                                        float* dev_kernel_horizontal, float* dev_kernel_vertical, 
-                                       int idz, int rows, int cols, int slices);
+                                       int idz, int xsize, int ysize, int zsize);
 
 // Sobel filter kernel for 3D images
 template<typename dtype>
 __global__ void sobel_filter_kernel_3d(dtype* image, float* output, 
                                        float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth, 
-                                       int rows, int cols, int depth);
+                                       int xsize, int ysize, int depth);
 
 // Function to apply Sobel filter to an image
 template<typename dtype>
-void sobel_filtering(dtype* image, float* output, int rows, int cols, int slices, bool type);
+void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type);
 
 #endif // SOBEL_FILTER_H

@@ -79,21 +79,21 @@ void get_vertical_kernel_2d(float** kernel)
 
 __global__ void gradient_magnitude_direction_2d(float* image, float* magnitude, uint8_t* direction,
                                                 float* horizontal_kernel, float* vertical_kernel,
-                                                int rows, int cols, int idz)
+                                                int xsize, int ysize, int idz)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < rows && idy < cols)
+    if (idx < xsize && idy < ysize)
     {
-        int index = idz * rows * cols + idx * cols + idy;
+        int index = idz * xsize * ysize + idx * ysize + idy;
 
         uint8_t temp = 0;
         float grad_x = 0;
         float grad_y = 0;
 
-        convolution_2d(image + idz * rows * cols, &grad_x, horizontal_kernel, idx, idy, rows, cols, 3, 3);
-        convolution_2d(image + idz * rows * cols, &grad_y, vertical_kernel, idx, idy, rows, cols, 3, 3);
+        convolution2d(image + idz * xsize * ysize, &grad_x, horizontal_kernel, idx, idy, xsize, ysize, 3, 3);
+        convolution2d(image + idz * xsize * ysize, &grad_y, vertical_kernel, idx, idy, xsize, ysize, 3, 3);
 
         if (grad_x == 0 || grad_y == 0)
         {
@@ -140,15 +140,15 @@ __global__ void gradient_magnitude_direction_2d(float* image, float* magnitude, 
 
 //can be optimized -- > improve borders by reflect -- > already done it in the gradient step, no need here
 //therefore its done
-__global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, int rows, int cols, int idz)
+__global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, int xsize, int ysize, int idz)
 {
 
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < rows && idy < cols)
+    if (idx < xsize && idy < ysize)
     {
-        int index = idz * rows * cols + idx * cols + idy;
+        int index = idz * xsize * ysize + idx * ysize + idy;
         
         switch (direction[index])
         {
@@ -164,8 +164,8 @@ __global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, 
             
             case 2:
 
-                if (magnitude[index - (cols-1)] >= magnitude[index] ||
-                    magnitude[index + (cols-1)] > magnitude[index])
+                if (magnitude[index - (ysize-1)] >= magnitude[index] ||
+                    magnitude[index + (ysize-1)] > magnitude[index])
                 {
                     magnitude[index] = 0;
                 }
@@ -174,8 +174,8 @@ __global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, 
 
             case 3:
 
-                if (magnitude[index - cols] >= magnitude[index] ||
-                    magnitude[index + cols] > magnitude[index])
+                if (magnitude[index - ysize] >= magnitude[index] ||
+                    magnitude[index + ysize] > magnitude[index])
                 {
                     magnitude[index] = 0;
                 }
@@ -185,8 +185,8 @@ __global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, 
 
             case 4:
 
-                if (magnitude[index - (cols+1)] >= magnitude[index] ||
-                    magnitude[index + (cols+1)] > magnitude[index])
+                if (magnitude[index - (ysize+1)] >= magnitude[index] ||
+                    magnitude[index + (ysize+1)] > magnitude[index])
                 {
                     magnitude[index] = 0;
                 }
@@ -210,15 +210,15 @@ __global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, 
 }
 
 
-__global__ void thresholding_2d(float* image, float low, float high, int rows, int cols, int idz)
+__global__ void thresholding_2d(float* image, float low, float high, int xsize, int ysize, int idz)
 {
 
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < rows && idy <cols)
+    if (idx < xsize && idy <ysize)
     {
-        int index = idz * rows * cols + idx * cols + idy;
+        int index = idz * xsize * ysize + idx * ysize + idy;
 
         //strong edge.
         if (image[index] > high)
@@ -247,22 +247,22 @@ __global__ void thresholding_2d(float* image, float low, float high, int rows, i
 }
 
 //done
-__global__ void hysteresis_2d(float* image, int rows, int cols, int idz)
+__global__ void hysteresis_2d(float* image, int xsize, int ysize, int idz)
 {
 
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < rows && idy < cols)
+    if (idx < xsize && idy < ysize)
     {
-        int index = idz * rows * cols + idx * cols + idy;
+        int index = idz * xsize * ysize + idx * ysize + idy;
 
         if (image[index] == 100)//uma forma melhor seria usando a soma dos valores e utilizar o resto da divisão, para analisar se a condição é valida==> muito mais rapido que ifs
         {
             if (image[index - 1] == 255 || image[index + 1] == 255 ||
-                image[index - cols] == 255 || image[index + cols] ||
-                image[index - cols - 1] == 255 || image[index - cols + 1] == 255 || 
-                image[index + cols - 1] == 255 || image[index + cols + 1] == 255)
+                image[index - ysize] == 255 || image[index + ysize] ||
+                image[index - ysize - 1] == 255 || image[index - ysize + 1] == 255 || 
+                image[index + ysize - 1] == 255 || image[index + ysize + 1] == 255)
             {
                 image[index] = 255;
             }
@@ -285,7 +285,7 @@ __global__ void hysteresis_2d(float* image, int rows, int cols, int idz)
 
 template<typename dtype>
 void canny_filtering(dtype* image, float* output,
-                     int rows, int cols , int depth,
+                     int xsize, int ysize , int zsize,
                      float sigma, float low_threshold, float high_threshold)
 {
 
@@ -298,37 +298,37 @@ void canny_filtering(dtype* image, float* output,
     //device allocation for input and output images for the gaussian step.
     dtype* dev_image;
     float* dev_output;
-    cudaMalloc((void**)&dev_image, rows * cols * depth * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, rows * cols * depth * sizeof(float));
-    cudaMemcpy(dev_image, image, rows * cols * depth * sizeof(dtype), cudaMemcpyHostToDevice);
+    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
+    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
 
     // get gaussian kernel size
-    int rows_gaussian_kernel = (int)ceil(2*sigma+1);
-    int cols_gaussian_kernel = rows_gaussian_kernel;
+    int xsize_gaussian_kernel = (int)ceil(2*sigma+1);
+    int ysize_gaussian_kernel = xsize_gaussian_kernel;
 
     //get gaussian kernel.
     float* gaussian_kernel;
-    get_gaussian_kernel_2d(&gaussian_kernel, rows_gaussian_kernel, cols_gaussian_kernel, sigma);
+    get_gaussian_kernel_2d(&gaussian_kernel, xsize_gaussian_kernel, ysize_gaussian_kernel, sigma);
 
     //device allocation for the gaussian kernel
     float* dev_gaussian_kernel;
-    cudaMalloc((void**)&dev_gaussian_kernel, rows_gaussian_kernel * cols_gaussian_kernel * sizeof(float));
-    cudaMemcpy(dev_gaussian_kernel, gaussian_kernel, rows_gaussian_kernel * cols_gaussian_kernel * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMalloc((void**)&dev_gaussian_kernel, xsize_gaussian_kernel * ysize_gaussian_kernel * sizeof(float));
+    cudaMemcpy(dev_gaussian_kernel, gaussian_kernel, xsize_gaussian_kernel * ysize_gaussian_kernel * sizeof(float), cudaMemcpyHostToDevice);
 
     //Free host gaussian kernel
     free(gaussian_kernel);
 
     //cuda kernel configuration
     dim3 blockSize(32, 32);
-    dim3 gridSize((rows + blockSize.y - 1) / blockSize.y, (cols + blockSize.x - 1) / blockSize.x);
+    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
 
     //apply gaussian blur
-    for (int k = 0; k < depth; k++)
+    for (int k = 0; k < zsize; k++)
     {
             gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_gaussian_kernel,
-                                                               k, rows, cols, depth,
-                                                               rows_gaussian_kernel, cols_gaussian_kernel);
+                                                               k, xsize, ysize, zsize,
+                                                               xsize_gaussian_kernel, ysize_gaussian_kernel);
     }
 
     //sync with host
@@ -347,8 +347,8 @@ void canny_filtering(dtype* image, float* output,
     //device allocation for the gradient magnitude and direction.
     float* dev_magnitude;
     uint8_t* dev_direction;
-    cudaMalloc((void**)&dev_magnitude, rows * cols * depth * sizeof(float));
-    cudaMalloc((void**)&dev_direction, rows * cols * depth * sizeof(uint8_t));
+    cudaMalloc((void**)&dev_magnitude, xsize * ysize * zsize * sizeof(float));
+    cudaMalloc((void**)&dev_direction, xsize * ysize * zsize * sizeof(uint8_t));
     
     //get gradient kernels.
     float* horizontal_kernel;
@@ -370,11 +370,11 @@ void canny_filtering(dtype* image, float* output,
     free(horizontal_kernel);
     free(vertical_kernel);
 
-    for (int k = 0; k < depth; k++)
+    for (int k = 0; k < zsize; k++)
     {
         gradient_magnitude_direction_2d<<<gridSize, blockSize>>>(dev_output, dev_magnitude, dev_direction,
                                                                  dev_horizontal_kernel, dev_vertical_kernel,
-                                                                 rows, cols, k);
+                                                                 xsize, ysize, k);
     }
     
     cudaDeviceSynchronize();
@@ -389,9 +389,9 @@ void canny_filtering(dtype* image, float* output,
     
     */
 
-   for (int k = 0; k < depth; k++)
+   for (int k = 0; k < zsize; k++)
    {
-        non_maximum_supression_2d<<<gridSize,blockSize>>>(dev_magnitude, dev_direction, rows, cols, k);
+        non_maximum_supression_2d<<<gridSize,blockSize>>>(dev_magnitude, dev_direction, xsize, ysize, k);
    }
 
    cudaDeviceSynchronize();
@@ -404,10 +404,10 @@ void canny_filtering(dtype* image, float* output,
    
    */
 
-    for (int k = 0; k < depth; k++)
+    for (int k = 0; k < zsize; k++)
     {
 
-        thresholding_2d<<<gridSize, blockSize>>>(dev_magnitude,low_threshold, high_threshold, rows, cols, k);
+        thresholding_2d<<<gridSize, blockSize>>>(dev_magnitude,low_threshold, high_threshold, xsize, ysize, k);
         
     }
     
@@ -420,15 +420,15 @@ void canny_filtering(dtype* image, float* output,
    
    */
 
-    for (int k = 0; k < depth; k++)
+    for (int k = 0; k < zsize; k++)
     {
-        hysteresis_2d<<<gridSize, blockSize>>>(dev_magnitude, rows, cols, k);
+        hysteresis_2d<<<gridSize, blockSize>>>(dev_magnitude, xsize, ysize, k);
     }
 
     cudaDeviceSynchronize();
 
 
-    cudaMemcpy(output, dev_magnitude, rows * cols * depth * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, dev_magnitude, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
 
     cudaFree(dev_magnitude);
 
@@ -436,50 +436,50 @@ void canny_filtering(dtype* image, float* output,
 
 // Explicit instantiation
 template void canny_filtering<float>(float* image, float* output,
-                                    int rows, int cols , int depth,
+                                    int xsize, int ysize , int zsize,
                                     float sigma, float low_threshold, float high_threshold);
 
 template void canny_filtering<int>(int* image, float* output,
-                                    int rows, int cols , int depth,
+                                    int xsize, int ysize , int zsize,
                                     float sigma, float low_threshold, float high_threshold);
 
 template void canny_filtering<unsigned int>(unsigned int* image, float* output,
-                                    int rows, int cols , int depth,
+                                    int xsize, int ysize , int zsize,
                                     float sigma, float low_threshold, float high_threshold);
 
 /*
 
 int main()
 {
-    int rows = 50;
-    int cols = 50;
+    int xsize = 50;
+    int ysize = 50;
     int slices = 1;
 
     static float* image;
-    image = (float*)malloc(slices*rows*cols*sizeof(int));
+    image = (float*)malloc(slices*xsize*ysize*sizeof(int));
 
     static float* output;
-    output = (float*)malloc(slices*rows*cols*sizeof(int));
+    output = (float*)malloc(slices*xsize*ysize*sizeof(int));
 
     for (int k = 0; k < slices; k++)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
                 if (i!=j)
                 {
-                    image[k * rows * cols + i * cols + j] = i+j;
+                    image[k * xsize * ysize + i * ysize + j] = i+j;
                 }
 
                 if (i==j)
                 {
-                    image[k * rows * cols + i * cols + j] = 0;
+                    image[k * xsize * ysize + i * ysize + j] = 0;
                 }
                 
         
-                output[k * rows * cols + i * cols + j] = 0;
+                output[k * xsize * ysize + i * ysize + j] = 0;
             }
         }
 
@@ -488,17 +488,17 @@ int main()
     float sigma = 1.;
     float high = 5.;
     float low = 0.;
-    canny_filtering(image,output,rows,cols,slices,sigma,low, high);
+    canny_filtering(image,output,xsize,ysize,slices,sigma,low, high);
 
 
     for (int k = 0; k < slices; k++)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
-                std::cout<<image[k*rows*cols + i*cols +j]<<" ";
+                std::cout<<image[k*xsize*ysize + i*ysize +j]<<" ";
             }
 
             std::cout<<"\n";
@@ -513,11 +513,11 @@ int main()
     for (int k = 0; k < slices; k++)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
-                std::cout<<output[k*rows*cols + i*cols +j]<<" ";
+                std::cout<<output[k*xsize*ysize + i*ysize +j]<<" ";
             }
 
             std::cout<<"\n";

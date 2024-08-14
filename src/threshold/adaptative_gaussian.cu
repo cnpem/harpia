@@ -22,7 +22,7 @@ __global__ void local_gaussian_kernel_2d(dtype* image, float* output,float* dev_
         float temp;
 
         //convolution.
-        convolution_2d(image + idz * rows * cols,&temp,dev_kernel,idx,idy,rows,cols,rows_kernel,cols_kernel); 
+        convolution2d(image + idz * rows * cols,&temp,dev_kernel,idx,idy,rows,cols,rows_kernel,cols_kernel); 
 
 
         float T_local_gaussian = temp - weight;
@@ -51,7 +51,7 @@ __global__ void local_gaussian_kernel_3d(dtype* image, float* output,float* dev_
     {
         float temp;
 
-        convolution_3d(image, &temp, dev_kernel, idx, idy, idz, rows, cols, depth, rows_kernel, cols_kernel, depth_kernel);
+        convolution3d(image, &temp, dev_kernel, idx, idy, idz, rows, cols, depth, rows_kernel, cols_kernel, depth_kernel);
 
         float T_local_gaussian = temp - weight;
 

@@ -113,57 +113,57 @@ void get_laplacian_kernel_3d(float** kernel)
 }
 
 template<typename dtype>
-__global__ void log_filter_kernel_2d(dtype* image, float* output, float* dev_kernel, int idz, int rows, int cols, int slices)
+__global__ void log_filter_kernel_2d(dtype* image, float* output, float* dev_kernel, int idz, int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < rows && idy < cols)
+    if (idx < xsize && idy < ysize)
     {
         float temp;
 
-        convolution_2d(image + idz * rows * cols, &temp, dev_kernel, idx, idy, rows, cols, 3, 3);
+        convolution2d(image + idz * xsize * ysize, &temp, dev_kernel, idx, idy, xsize, ysize, 3, 3);
 
-        output[idz * rows * cols + idx * cols + idy] = (float)sqrtf(temp * temp);
+        output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(temp * temp);
     }
 }
 
 template<typename dtype>
-__global__ void log_filter_kernel_3d(dtype* image, float* output, float* dev_kernel, int rows, int cols, int depth)
+__global__ void log_filter_kernel_3d(dtype* image, float* output, float* dev_kernel, int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
     const int idz = blockIdx.z * blockDim.z + threadIdx.z;
     
-    //change rows and cols notation-->you made a mistake dummy.
-    if (idx < rows && idy < cols && idz < depth)
+    //change xsize and ysize notation-->you made a mistake dummy.
+    if (idx < xsize && idy < ysize && idz < zsize)
     {
         float temp;
 
-        convolution_3d(image, &temp, dev_kernel, idx, idy, idz, rows, cols, depth, 3, 3, 3);
+        convolution3d(image, &temp, dev_kernel, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
 
-        output[idz * rows * cols + idx * cols + idy] = (float)sqrtf(temp*temp);
+        output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(temp*temp);
     }
 }
 
-template __global__ void log_filter_kernel_2d<int>(int* image, float* output, float* dev_kernel, int idz,int rows, int cols,int slices);
-template __global__ void log_filter_kernel_2d<float>(float* image, float* output, float* dev_kernel, int idz,int rows, int cols,int slices);
+template __global__ void log_filter_kernel_2d<int>(int* image, float* output, float* dev_kernel, int idz,int xsize, int ysize,int zsize);
+template __global__ void log_filter_kernel_2d<float>(float* image, float* output, float* dev_kernel, int idz,int xsize, int ysize,int zsize);
 
-template __global__ void log_filter_kernel_3d<int>(int* image, float* output, float* dev_kernel, int rows, int cols, int depth);
-template __global__ void log_filter_kernel_3d<float>(float* image, float* output, float* dev_kernel, int rows, int cols, int depth);
+template __global__ void log_filter_kernel_3d<int>(int* image, float* output, float* dev_kernel, int xsize, int ysize, int zsize);
+template __global__ void log_filter_kernel_3d<float>(float* image, float* output, float* dev_kernel, int xsize, int ysize, int zsize);
 
 
 
 template<typename dtype>
-void log_filtering(dtype* image, float* output, int rows, int cols, int slices, bool type)
+void log_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type)
 {
 
     dtype* dev_image;
     float* dev_output;
-    cudaMalloc((void**)&dev_image, rows * cols * slices * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, rows * cols * slices * sizeof(float));
+    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
 
-    cudaMemcpy(dev_image, image, rows * cols * slices * sizeof(dtype), cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
     if (type == false)
     {
@@ -175,13 +175,13 @@ void log_filtering(dtype* image, float* output, int rows, int cols, int slices, 
         cudaMemcpy(dev_kernel, kernel, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
         dim3 blockSize(32, 32);
-        dim3 gridSize((rows + blockSize.y - 1) / blockSize.y, (cols + blockSize.x - 1) / blockSize.x);
+        dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
 
         auto start = std::chrono::high_resolution_clock::now();
 
-        for (int k = 0; k < slices; ++k)
+        for (int k = 0; k < zsize; ++k)
         {
-            log_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, k, rows, cols, slices);
+            log_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, k, xsize, ysize, zsize);
         }
         cudaDeviceSynchronize();
 
@@ -202,11 +202,11 @@ void log_filtering(dtype* image, float* output, int rows, int cols, int slices, 
         cudaMemcpy(dev_kernel, kernel, 27 * sizeof(float), cudaMemcpyHostToDevice);
 
         dim3 blockSize(8, 8, 8);
-        dim3 gridSize((rows + blockSize.y - 1) / blockSize.y, (cols + blockSize.x - 1) / blockSize.x, (slices + blockSize.z - 1) / blockSize.z);
+        dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x, (zsize + blockSize.z - 1) / blockSize.z);
 
         auto start = std::chrono::high_resolution_clock::now();
 
-        log_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output,dev_kernel,rows, cols, slices);
+        log_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output,dev_kernel,xsize, ysize, zsize);
 
         cudaDeviceSynchronize();
 
@@ -217,14 +217,14 @@ void log_filtering(dtype* image, float* output, int rows, int cols, int slices, 
         cudaFree(dev_kernel);
     }
 
-    cudaMemcpy(output, dev_output, rows * cols * slices * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
 
     cudaFree(dev_image);
     cudaFree(dev_output);
 }
 
 // Explicit instantiation
-template void log_filtering<float>(float* image, float* output, int rows, int cols, int slices, bool type);
-template void log_filtering<int>(int* image, float* output, int rows, int cols, int slices, bool type);
-template void log_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, bool type);
+template void log_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, bool type);
+template void log_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize, bool type);
+template void log_filtering<unsigned int>(unsigned int* image, float* output, int xsize, int ysize, int zsize, bool type);
 
