@@ -25,14 +25,14 @@ void get_sobel_depth_kernel_3d(float** kernel);
 // Sobel filter kernel for 2D images
 template<typename dtype>
 __global__ void sobel_filter_kernel_2d(dtype* image, float* output, 
-                                       float* dev_kernel_horizontal, float* dev_kernel_vertical, 
+                                       float* deviceKernelHorizontal, float* deviceKernelVertical, 
                                        int idz, int xsize, int ysize, int zsize);
 
 // Sobel filter kernel for 3D images
 template<typename dtype>
 __global__ void sobel_filter_kernel_3d(dtype* image, float* output, 
-                                       float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth, 
-                                       int xsize, int ysize, int depth);
+                                       float* deviceKernelHorizontal, float* deviceKernelVertical, float* deviceKernelDepth, 
+                                       int xsize, int ysize, int zsize);
 
 // Function to apply Sobel filter to an image
 template<typename dtype>

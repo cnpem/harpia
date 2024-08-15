@@ -44,6 +44,8 @@ void get_horizontal_kernel_2d(float** kernel)
 }
 
 
+
+
 void get_vertical_kernel_2d(float** kernel)
 {
     /*
@@ -138,6 +140,8 @@ __global__ void gradient_magnitude_direction_2d(float* image, float* magnitude, 
 
 }
 
+
+
 //can be optimized -- > improve borders by reflect -- > already done it in the gradient step, no need here
 //therefore its done
 __global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, int xsize, int ysize, int idz)
@@ -210,6 +214,8 @@ __global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, 
 }
 
 
+
+
 __global__ void thresholding_2d(float* image, float low, float high, int xsize, int ysize, int idz)
 {
 
@@ -245,6 +251,8 @@ __global__ void thresholding_2d(float* image, float low, float high, int xsize, 
 
 
 }
+
+
 
 //done
 __global__ void hysteresis_2d(float* image, int xsize, int ysize, int idz)

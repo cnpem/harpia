@@ -113,7 +113,7 @@ void get_laplacian_kernel_3d(float** kernel)
 }
 
 template<typename dtype>
-__global__ void log_filter_kernel_2d(dtype* image, float* output, float* dev_kernel, int idz, int xsize, int ysize, int zsize)
+__global__ void log_filter_kernel_2d(dtype* image, float* output, float* deviceKernel, int idz, int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -122,14 +122,14 @@ __global__ void log_filter_kernel_2d(dtype* image, float* output, float* dev_ker
     {
         float temp;
 
-        convolution2d(image + idz * xsize * ysize, &temp, dev_kernel, idx, idy, xsize, ysize, 3, 3);
+        convolution2d(image + idz * xsize * ysize, &temp, deviceKernel, idx, idy, xsize, ysize, 3, 3);
 
         output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(temp * temp);
     }
 }
 
 template<typename dtype>
-__global__ void log_filter_kernel_3d(dtype* image, float* output, float* dev_kernel, int xsize, int ysize, int zsize)
+__global__ void log_filter_kernel_3d(dtype* image, float* output, float* deviceKernel, int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -140,17 +140,17 @@ __global__ void log_filter_kernel_3d(dtype* image, float* output, float* dev_ker
     {
         float temp;
 
-        convolution3d(image, &temp, dev_kernel, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
+        convolution3d(image, &temp, deviceKernel, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
 
         output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(temp*temp);
     }
 }
 
-template __global__ void log_filter_kernel_2d<int>(int* image, float* output, float* dev_kernel, int idz,int xsize, int ysize,int zsize);
-template __global__ void log_filter_kernel_2d<float>(float* image, float* output, float* dev_kernel, int idz,int xsize, int ysize,int zsize);
+template __global__ void log_filter_kernel_2d<int>(int* image, float* output, float* deviceKernel, int idz,int xsize, int ysize,int zsize);
+template __global__ void log_filter_kernel_2d<float>(float* image, float* output, float* deviceKernel, int idz,int xsize, int ysize,int zsize);
 
-template __global__ void log_filter_kernel_3d<int>(int* image, float* output, float* dev_kernel, int xsize, int ysize, int zsize);
-template __global__ void log_filter_kernel_3d<float>(float* image, float* output, float* dev_kernel, int xsize, int ysize, int zsize);
+template __global__ void log_filter_kernel_3d<int>(int* image, float* output, float* deviceKernel, int xsize, int ysize, int zsize);
+template __global__ void log_filter_kernel_3d<float>(float* image, float* output, float* deviceKernel, int xsize, int ysize, int zsize);
 
 
 
@@ -158,21 +158,21 @@ template<typename dtype>
 void log_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type)
 {
 
-    dtype* dev_image;
-    float* dev_output;
-    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
+    dtype* deviceImage;
+    float* deviceOutput;
+    cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
 
-    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
     if (type == false)
     {
         float* kernel;
         get_laplacian_kernel_2d(&kernel);
 
-        float* dev_kernel;
-        cudaMalloc((void**)&dev_kernel, 9 * sizeof(float));
-        cudaMemcpy(dev_kernel, kernel, 9 * sizeof(float), cudaMemcpyHostToDevice);
+        float* deviceKernel;
+        cudaMalloc((void**)&deviceKernel, 9 * sizeof(float));
+        cudaMemcpy(deviceKernel, kernel, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
         dim3 blockSize(32, 32);
         dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
@@ -181,7 +181,7 @@ void log_filtering(dtype* image, float* output, int xsize, int ysize, int zsize,
 
         for (int k = 0; k < zsize; ++k)
         {
-            log_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, k, xsize, ysize, zsize);
+            log_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel, k, xsize, ysize, zsize);
         }
         cudaDeviceSynchronize();
 
@@ -189,7 +189,7 @@ void log_filtering(dtype* image, float* output, int xsize, int ysize, int zsize,
         std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
         std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
-        cudaFree(dev_kernel);   
+        cudaFree(deviceKernel);   
     }
 
     else
@@ -197,16 +197,16 @@ void log_filtering(dtype* image, float* output, int xsize, int ysize, int zsize,
         float* kernel;
         get_laplacian_kernel_3d(&kernel);
 
-        float* dev_kernel;
-        cudaMalloc((void**)&dev_kernel, 27 * sizeof(float));
-        cudaMemcpy(dev_kernel, kernel, 27 * sizeof(float), cudaMemcpyHostToDevice);
+        float* deviceKernel;
+        cudaMalloc((void**)&deviceKernel, 27 * sizeof(float));
+        cudaMemcpy(deviceKernel, kernel, 27 * sizeof(float), cudaMemcpyHostToDevice);
 
         dim3 blockSize(8, 8, 8);
         dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x, (zsize + blockSize.z - 1) / blockSize.z);
 
         auto start = std::chrono::high_resolution_clock::now();
 
-        log_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output,dev_kernel,xsize, ysize, zsize);
+        log_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput,deviceKernel,xsize, ysize, zsize);
 
         cudaDeviceSynchronize();
 
@@ -214,13 +214,13 @@ void log_filtering(dtype* image, float* output, int xsize, int ysize, int zsize,
         std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
         std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl; 
 
-        cudaFree(dev_kernel);
+        cudaFree(deviceKernel);
     }
 
-    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
 
-    cudaFree(dev_image);
-    cudaFree(dev_output);
+    cudaFree(deviceImage);
+    cudaFree(deviceOutput);
 }
 
 // Explicit instantiation
