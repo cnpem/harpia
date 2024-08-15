@@ -15,12 +15,12 @@ void get_prewitt_depth_kernel_3d(float** kernel);
 // Function declarations for CUDA kernels
 template<typename dtype>
 __global__ void prewitt_filter_kernel_2d(dtype* image, float* output,
-                                         float* dev_kernel_horizontal, float* dev_kernel_vertical,
+                                         float* deviceKernelHorizontal, float* deviceKernelVertical,
                                          int idz, int xsize, int ysize, int zsize);
 
 template<typename dtype>
 __global__ void prewitt_filter_kernel_3d(dtype* image, float* output,
-                                         float* dev_kernel_horizontal, float* dev_kernel_vertical, float* dev_kernel_depth,
+                                         float* deviceKernelHorizontal, float* deviceKernelVertical, float* deviceKernelDepth,
                                          int xsize, int ysize, int depth);
 
 // Function declaration for prewitt filtering

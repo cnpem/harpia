@@ -6,27 +6,27 @@
 #include<cmath>
 
 template<typename dtype>
-__device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int xsize, int ysize, int kx, int ky)
+__device__ void get_mean_kernel_2d(dtype* image, float* mean, int idx, int idy, int xsize, int ysize, int nx, int ny)
 {
 
-    int input_col;
-    int input_row;
+    int inputY;
+    int inputX;
 
     float accumulation = 0;
     
-    for(int m = 0; m < kx; m++)
+    for(int m = 0; m < nx; m++)
     {
 
-        for (int n = 0; n < ky; n++)
+        for (int n = 0; n < ny; n++)
         {
             //this is needed to compute everything with respect to the center of the kernel.
-            input_row = i - kx / 2 + m;
-            input_col = j - ky / 2 + n;
+            inputX = idx - nx / 2 + m;
+            inputY = idy - ny / 2 + n;
 
-            // Check if input_row and input_col are within bounds
-            if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize)
+            // Check if inputX and inputY are within bounds
+            if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize)
             {
-                accumulation += image[input_row * ysize + input_col];
+                accumulation += image[inputX * ysize + inputY];
             }
             
             //make a padding function to substitute this line of code.
@@ -34,17 +34,17 @@ __device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int 
             {
 
                 // Reflect padding
-                if (input_row < 0)
-                    input_row = -input_row;
-                else if (input_row >= xsize)
-                    input_row = 2 * xsize - input_row - 1;
+                if (inputX < 0)
+                    inputX = -inputX;
+                else if (inputX >= xsize)
+                    inputX = 2 * xsize - inputX - 1;
 
-                if (input_col < 0)
-                    input_col = -input_col;
-                else if (input_col >= ysize)
-                    input_col = 2 * ysize - input_col - 1;
+                if (inputY < 0)
+                    inputY = -inputY;
+                else if (inputY >= ysize)
+                    inputY = 2 * ysize - inputY - 1;
 
-                accumulation += image[input_row * ysize + input_col];
+                accumulation += image[inputX * ysize + inputY];
 
             }
             
@@ -52,78 +52,78 @@ __device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int 
 
     }
 
-    *mean = accumulation/(kx*ky);
+    *mean = accumulation/(nx*ny);
 
 }
 
 template<typename dtype>
 __device__ void get_mean_kernel_3d(dtype* image, float* mean,
-                          int i, int j, int k, 
+                          int idx, int idy, int idz, 
                           int xsize, int ysize, int zsize,
-                          int kx, int ky, int kz)
+                          int nx, int ny, int nz)
 {
 
     float accumulation = 0;
 
-    int input_col;
-    int input_row;
-    int input_zsize;
+    int inputY;
+    int inputX;
+    int inputZ;
     
-    for (int l = 0; l < kz; l++)
+    for (int l = 0; l < nz; l++)
     {
 
-        for(int m = 0; m < kx; m++)
+        for(int m = 0; m < nx; m++)
         {
 
-            for (int n = 0; n < ky; n++)
+            for (int n = 0; n < ny; n++)
             {
                 //this is needed to compute everything with respect to the center of the kernel.
-                input_row = i - kx / 2 + m;
-                input_col = j - ky / 2 + n;
-                input_zsize = k - kz / 2 + l;
+                inputX = idx - nx / 2 + m;
+                inputY = idy - ny / 2 + n;
+                inputZ = idz - nz / 2 + l;
 
-                if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize && input_zsize >= 0 && input_zsize < zsize)
+                if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize && inputZ >= 0 && inputZ < zsize)
                 {
-                    accumulation += image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col];
+                    accumulation += image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
                 }
                 
                 //make a padding function to substitute this line of code.
                 else
                 {
                     // Reflect padding
-                    if (input_row < 0)
+                    if (inputX < 0)
                     {
-                        input_row = -input_row;
+                        inputX = -inputX;
                     }
 
-                    else if (input_row >= xsize)
+                    else if (inputX >= xsize)
                     {
-                        input_row = 2 * xsize - input_row - 1;
+                        inputX = 2 * xsize - inputX - 1;
                     }
 
 
-                    if (input_col < 0)
+                    if (inputY < 0)
                     {
-                        input_col = -input_col;
+                        inputY = -inputY;
                     }
 
-                    else if (input_col >= ysize)
+                    else if (inputY >= ysize)
                     {
-                        input_col = 2 * ysize - input_col - 1;
+                        inputY = 2 * ysize - inputY - 1;
                     }
 
-                    if (input_zsize < 0)
+                    if (inputZ < 0)
                     {
-                        input_zsize = - input_zsize;
+                        inputZ = - inputZ;
                     }
 
-                    else if (input_zsize>=zsize)
+                    else if (inputZ>=zsize)
                     {
-                        input_zsize = 2 * zsize - input_zsize -1;
+                        inputZ = 2 * zsize - inputZ -1;
                     }
                     
 
-                    accumulation += image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col];
+                    accumulation += image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
 
                 }
                 
@@ -133,33 +133,33 @@ __device__ void get_mean_kernel_3d(dtype* image, float* mean,
 
     }
 
-    *mean = accumulation/(kx*ky*kz);
+    *mean = accumulation/(nx*ny*nz);
 
 }
 
 
 template<typename dtype>
-__device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_deviation, int i, int j, int xsize, int ysize, int kx, int ky)
+__device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_deviation, int idx, int idy, int xsize, int ysize, int nx, int ny)
 {
 
-    int input_col;
-    int input_row;
+    int inputY;
+    int inputX;
 
     float accumulation = 0;
     
-    for(int m = 0; m < kx; m++)
+    for(int m = 0; m < nx; m++)
     {
 
-        for (int n = 0; n < ky; n++)
+        for (int n = 0; n < ny; n++)
         {
             //this is needed to compute everything with respect to the center of the kernel.
-            input_row = i - kx / 2 + m;
-            input_col = j - ky / 2 + n;
+            inputX = idx - nx / 2 + m;
+            inputY = idy - ny / 2 + n;
 
-            // Check if input_row and input_col are within bounds
-            if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize)
+            // Check if inputX and inputY are within bounds
+            if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize)
             {
-                accumulation += pow(image[input_row * ysize + input_col] - mean,2);
+                accumulation += pow(image[inputX * ysize + inputY] - mean,2);
             }
             
             //make a padding function to substitute this line of code.
@@ -167,17 +167,17 @@ __device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_devi
             {
 
                 // Reflect padding
-                if (input_row < 0)
-                    input_row = -input_row;
-                else if (input_row >= xsize)
-                    input_row = 2 * xsize - input_row - 1;
+                if (inputX < 0)
+                    inputX = -inputX;
+                else if (inputX >= xsize)
+                    inputX = 2 * xsize - inputX - 1;
 
-                if (input_col < 0)
-                    input_col = -input_col;
-                else if (input_col >= ysize)
-                    input_col = 2 * ysize - input_col - 1;
+                if (inputY < 0)
+                    inputY = -inputY;
+                else if (inputY >= ysize)
+                    inputY = 2 * ysize - inputY - 1;
 
-                accumulation += pow(image[input_row * ysize + input_col] - mean,2);
+                accumulation += pow(image[inputX * ysize + inputY] - mean,2);
 
             }
             
@@ -185,7 +185,7 @@ __device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_devi
 
     }
 
-    *standard_deviation = sqrt(accumulation/(kx*ky) );
+    *standard_deviation = sqrt(accumulation/(nx*ny) );
 
 }
 
@@ -193,72 +193,72 @@ __device__ void get_std_kernel_2d(dtype* image, float mean, float* standard_devi
 
 template<typename dtype>
 __device__ void get_std_kernel_3d(dtype* image, float mean, float* standard_deviation,
-                          int i, int j, int k, 
+                          int idx, int idy, int idz, 
                           int xsize, int ysize, int zsize,
-                          int kx, int ky, int kz)
+                          int nx, int ny, int nz)
 {
 
     float accumulation = 0;
 
-    int input_col;
-    int input_row;
-    int input_zsize;
+    int inputY;
+    int inputX;
+    int inputZ;
     
-    for (int l = 0; l < kz; l++)
+    for (int l = 0; l < nz; l++)
     {
 
-        for(int m = 0; m < kx; m++)
+        for(int m = 0; m < nx; m++)
         {
 
-            for (int n = 0; n < ky; n++)
+            for (int n = 0; n < ny; n++)
             {
                 //this is needed to compute everything with respect to the center of the kernel.
-                input_row = i - kx / 2 + m;
-                input_col = j - ky / 2 + n;
-                input_zsize = k - kz / 2 + l;
+                inputX = idx - nx / 2 + m;
+                inputY = idy - ny / 2 + n;
+                inputZ = idz - nz / 2 + l;
 
-                if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize && input_zsize >= 0 && input_zsize < zsize)
+                if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize && inputZ >= 0 && inputZ < zsize)
                 {
-                    accumulation += pow(image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col] - mean,2);
+                    accumulation += pow(image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY] - mean,2);
                 }
                 
                 //make a padding function to substitute this line of code.
                 else
                 {
                     // Reflect padding
-                    if (input_row < 0)
+                    if (inputX < 0)
                     {
-                        input_row = -input_row;
+                        inputX = -inputX;
                     }
 
-                    else if (input_row >= xsize)
+                    else if (inputX >= xsize)
                     {
-                        input_row = 2 * xsize - input_row - 1;
+                        inputX = 2 * xsize - inputX - 1;
                     }
 
 
-                    if (input_col < 0)
+                    if (inputY < 0)
                     {
-                        input_col = -input_col;
+                        inputY = -inputY;
                     }
 
-                    else if (input_col >= ysize)
+                    else if (inputY >= ysize)
                     {
-                        input_col = 2 * ysize - input_col - 1;
+                        inputY = 2 * ysize - inputY - 1;
                     }
 
-                    if (input_zsize < 0)
+                    if (inputZ < 0)
                     {
-                        input_zsize = - input_zsize;
+                        inputZ = - inputZ;
                     }
 
-                    else if (input_zsize>=zsize)
+                    else if (inputZ>=zsize)
                     {
-                        input_zsize = 2 * zsize - input_zsize -1;
+                        inputZ = 2 * zsize - inputZ -1;
                     }
                     
 
-                    accumulation += pow(image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col]-mean,2);
+                    accumulation += pow(image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY]-mean,2);
 
                 }
                 
@@ -268,12 +268,12 @@ __device__ void get_std_kernel_3d(dtype* image, float mean, float* standard_devi
 
     }
 
-    *standard_deviation = sqrt(accumulation/(kx*ky*kz));
+    *standard_deviation = sqrt(accumulation/(nx*ny*nz));
 
 }
 
 
-static void get_gaussian_kernel_2d(float** kernel, int xsize, int ysize, float sigma)
+static void get_gaussian_kernel_2d(float** kernel, int nx, int ny, float sigma)
 {
     /*
 
@@ -284,7 +284,7 @@ static void get_gaussian_kernel_2d(float** kernel, int xsize, int ysize, float s
     */
 
    //kernel allocation
-    *kernel = (float*)malloc(sizeof(float)*xsize*ysize);
+    *kernel = (float*)malloc(sizeof(float)*nx*ny);
 
     if (! *kernel)
     {
@@ -294,26 +294,26 @@ static void get_gaussian_kernel_2d(float** kernel, int xsize, int ysize, float s
     int x;
     int y;
 
-    int center_row = xsize / 2;
-    int center_col = ysize / 2;
+    int x0 = nx / 2;
+    int y0 = ny / 2;
 
     float distance = 0;
     float normalization = 0;
 
     // Generate the kernel values.
-    for (int i = 0; i < xsize; i++)
+    for (int i = 0; i < nx; i++)
     {
 
-        for (int j = 0; j < ysize; j++)
+        for (int j = 0; j < ny; j++)
         {
 
-            x = i - center_row;
-            y = j - center_col;
+            x = i - x0;
+            y = j - y0;
 
             distance = x * x + y * y;
 
-            (*kernel)[i * ysize + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
-            normalization += (*kernel)[i * ysize +j];
+            (*kernel)[i * ny + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
+            normalization += (*kernel)[i * ny +j];
 
             //std::cout<<(*kernel)[i*ysize+j]<<" ";
 
@@ -324,7 +324,7 @@ static void get_gaussian_kernel_2d(float** kernel, int xsize, int ysize, float s
 
     }
 
-    for (int i = 0; i < xsize*ysize; i++)
+    for (int i = 0; i < nx*ny; i++)
     {
         (*kernel)[i] = (*kernel)[i]/normalization;
     }
@@ -334,7 +334,7 @@ static void get_gaussian_kernel_2d(float** kernel, int xsize, int ysize, float s
 }
 
 
-static void get_gaussian_kernel_3d(float** kernel, int xsize, int ysize, int zsize, float sigma)
+static void get_gaussian_kernel_3d(float** kernel, int nx, int ny, int nz, float sigma)
 {
     /*
 
@@ -345,7 +345,7 @@ static void get_gaussian_kernel_3d(float** kernel, int xsize, int ysize, int zsi
     */
 
    //kernel allocation
-    *kernel = (float*)malloc(sizeof(float)*xsize*ysize*zsize);
+    *kernel = (float*)malloc(sizeof(float)*nx*ny*nz);
 
     if (! *kernel)
     {
@@ -356,31 +356,31 @@ static void get_gaussian_kernel_3d(float** kernel, int xsize, int ysize, int zsi
     int y;
     int z;
 
-    int center_row = xsize / 2;
-    int center_col = ysize / 2;
-    int center_zsize = zsize / 2;
+    int x0 = nx / 2;
+    int y0 = ny / 2;
+    int z0 = nz / 2;
 
     float distance = 0;
     float normalization = 0;
 
     // Generate the kernel values.
-    for (int k = 0; k < zsize; k++)
+    for (int k = 0; k < nz; k++)
     {
     
-        for (int i = 0; i < xsize; i++)
+        for (int i = 0; i < nx; i++)
         {
 
-            for (int j = 0; j < ysize; j++)
+            for (int j = 0; j < ny; j++)
             {
 
-                x = i - center_row;
-                y = j - center_col;
-                z = k - center_zsize;
+                x = i - x0;
+                y = j - y0;
+                z = k - z0;
 
                 distance = x * x + y * y + z * z;
 
-                (*kernel)[k*xsize*ysize + i * ysize + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
-                normalization += (*kernel)[k*xsize*ysize + i * ysize + j];
+                (*kernel)[k*nx*ny + i * ny + j] = exp(-distance / (2 * sigma * sigma + 1E-16))*1E2;
+                normalization += (*kernel)[k*nx*ny + i * ny + j];
 
                 //std::cout<<(*kernel)[i*ysize+j]<<" ";
 
@@ -394,7 +394,7 @@ static void get_gaussian_kernel_3d(float** kernel, int xsize, int ysize, int zsi
     }
 
 
-    for (int i = 0; i < xsize*ysize*zsize; i++)
+    for (int i = 0; i < nx*ny*nz; i++)
     {
         (*kernel)[i] = (*kernel)[i]/normalization;
     }

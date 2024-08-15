@@ -7,7 +7,7 @@
 
 
 template<typename dtype>
-__global__ void mean_filter_kernel_2d(dtype* image, float* output, int xsize, int ysize, int idz, int kx, int ky)
+__global__ void mean_filter_kernel_2d(dtype* image, float* output, int xsize, int ysize, int idz, int nx, int ny)
 {
 
     //threads
@@ -20,7 +20,7 @@ __global__ void mean_filter_kernel_2d(dtype* image, float* output, int xsize, in
         float mean = 0;
 
         //get the neighbors
-        get_mean_kernel_2d(image + idz * xsize * ysize, &mean, idx, idy, xsize, ysize, kx, ky);
+        get_mean_kernel_2d(image + idz * xsize * ysize, &mean, idx, idy, xsize, ysize, nx, ny);
 
         //assign the mean value
         output[idz * xsize * ysize + idx * ysize + idy] = mean;
@@ -31,7 +31,7 @@ __global__ void mean_filter_kernel_2d(dtype* image, float* output, int xsize, in
 template<typename dtype>
 __global__ void mean_filter_kernel_3d(dtype* image, float* output,
                                     int xsize, int ysize, int zsize,
-                                    int kx, int ky, int kz)
+                                    int nx, int ny, int nz)
 {
 
     //threads
@@ -49,7 +49,7 @@ __global__ void mean_filter_kernel_3d(dtype* image, float* output,
         get_mean_kernel_3d(image,&mean,
                         idx,idy,idz,
                         xsize,ysize,zsize,
-                        kx,ky, kz);
+                        nx,ny, nz);
 
 
         //assign the mean value
@@ -61,28 +61,28 @@ __global__ void mean_filter_kernel_3d(dtype* image, float* output,
 }
 
 
-template __global__ void mean_filter_kernel_2d<int>(int* image, float* output, int xsize, int ysize, int idz, int kx, int ky);
-template __global__ void mean_filter_kernel_2d<float>(float* image, float* output, int xsize, int ysize, int idz, int kx, int ky);
+template __global__ void mean_filter_kernel_2d<int>(int* image, float* output, int xsize, int ysize, int idz, int nx, int ny);
+template __global__ void mean_filter_kernel_2d<float>(float* image, float* output, int xsize, int ysize, int idz, int nx, int ny);
 
-template __global__ void mean_filter_kernel_3d<int>(int* image, float* output,int xsize, int ysize, int zsize,int kx, int ky, int kz);
-template __global__ void mean_filter_kernel_3d<float>(float* image, float* output,int xsize, int ysize, int zsize,int kx, int ky, int kz);
+template __global__ void mean_filter_kernel_3d<int>(int* image, float* output,int xsize, int ysize, int zsize,int nx, int ny, int nz);
+template __global__ void mean_filter_kernel_3d<float>(float* image, float* output,int xsize, int ysize, int zsize,int nx, int ny, int nz);
 
 
 
 
 template<typename dtype>
-void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, int kx, int ky, int kz)
+void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, int nx, int ny, int nz)
 {
 
-    dtype* dev_image;
-    float* dev_output;
+    dtype* deviceImage;
+    float* deviceOutput;
 
-    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
+    cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
 
-    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
-    if (kz == 1)
+    if (nz == 1)
     {
 
         dim3 blockSize(32, 32);
@@ -92,7 +92,7 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
 
         for (int k = 0; k < zsize; ++k)
         {
-            mean_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, xsize, ysize, k, kx, ky);
+            mean_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, xsize, ysize, k, nx, ny);
 
             cudaDeviceSynchronize();
         }
@@ -112,7 +112,7 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
 
         auto start = std::chrono::high_resolution_clock::now();
 
-        mean_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output, xsize, ysize, zsize, kx, ky, kz);
+        mean_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, xsize, ysize, zsize, nx, ny, nz);
 
         cudaDeviceSynchronize();
 
@@ -122,13 +122,13 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
 
     }
 
-    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
 
-    cudaFree(dev_image);
-    cudaFree(dev_output);
+    cudaFree(deviceImage);
+    cudaFree(deviceOutput);
 }
 
 // Explicit instantiation for float
-template void mean_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
-template void mean_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
-template void mean_filtering<unsigned int>(unsigned int* image, float* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
+template void mean_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);
+template void mean_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);
+template void mean_filtering<unsigned int>(unsigned int* image, float* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);

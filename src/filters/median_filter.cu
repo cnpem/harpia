@@ -43,25 +43,25 @@ __device__ void bubble_sort(dtype *array, int size)
 }
 
 template<typename dtype>
-__device__ void get_median_kernel_2d(dtype* image, dtype* kernel, int i, int j, int xsize, int ysize, int kx, int ky)
+__device__ void get_median_kernel_2d(dtype* image, dtype* kernel, int i, int j, int xsize, int ysize, int nx, int ny)
 {
 
-    int input_col;
-    int input_row;
+    int inputY;
+    int inputX;
     
-    for(int m = 0; m < kx; m++)
+    for(int m = 0; m < nx; m++)
     {
 
-        for (int n = 0; n < ky; n++)
+        for (int n = 0; n < ny; n++)
         {
             //this is needed to compute everything with respect to the center of the kernel.
-            input_row = i - kx / 2 + m;
-            input_col = j - ky / 2 + n;
+            inputX = i - nx / 2 + m;
+            inputY = j - ny / 2 + n;
 
-            // Check if input_row and input_col are within bounds
-            if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize)
+            // Check if inputX and inputY are within bounds
+            if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize)
             {
-                kernel[(i * ysize + j) * (kx * ky) + (m * ky + n)] = image[input_row * ysize + input_col];
+                kernel[(i * ysize + j) * (nx * ny) + (m * ny + n)] = image[inputX * ysize + inputY];
             }
             
             //make a padding function to substitute this line of code.
@@ -69,17 +69,17 @@ __device__ void get_median_kernel_2d(dtype* image, dtype* kernel, int i, int j, 
             {
 
                 // Reflect padding
-                if (input_row < 0)
-                    input_row = -input_row;
-                else if (input_row >= xsize)
-                    input_row = 2 * xsize - input_row - 1;
+                if (inputX < 0)
+                    inputX = -inputX;
+                else if (inputX >= xsize)
+                    inputX = 2 * xsize - inputX - 1;
 
-                if (input_col < 0)
-                    input_col = -input_col;
-                else if (input_col >= ysize)
-                    input_col = 2 * ysize - input_col - 1;
+                if (inputY < 0)
+                    inputY = -inputY;
+                else if (inputY >= ysize)
+                    inputY = 2 * ysize - inputY - 1;
 
-                kernel[(i * ysize + j) * (kx * ky) + (m * ky + n)] = image[input_row * ysize + input_col];
+                kernel[(i * ysize + j) * (nx * ny) + (m * ny + n)] = image[inputX * ysize + inputY];
 
             }
             
@@ -95,68 +95,68 @@ template<typename dtype>
 __device__ void get_median_kernel_3d(dtype* image, dtype* kernel,
                           int i, int j, int k, 
                           int xsize, int ysize, int zsize,
-                          int kx, int ky, int kz)
+                          int nx, int ny, int nz)
 {
 
-    int input_col;
-    int input_row;
-    int input_zsize;
+    int inputY;
+    int inputX;
+    int inputZ;
     
-    for (int l = 0; l < kz; l++)
+    for (int l = 0; l < nz; l++)
     {
 
-        for(int m = 0; m < kx; m++)
+        for(int m = 0; m < nx; m++)
         {
 
-            for (int n = 0; n < ky; n++)
+            for (int n = 0; n < ny; n++)
             {
                 //this is needed to compute everything with respect to the center of the kernel.
-                input_row = i - kx / 2 + m;
-                input_col = j - ky / 2 + n;
-                input_zsize = k - kz / 2 + l;
+                inputX = i - nx / 2 + m;
+                inputY = j - ny / 2 + n;
+                inputZ = k - nz / 2 + l;
 
-                if (input_row >= 0 && input_row < xsize && input_col >= 0 && input_col < ysize && input_zsize >= 0 && input_zsize < zsize)
+                if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize && inputZ >= 0 && inputZ < zsize)
                 {
-                    kernel[(k * xsize * ysize + i * ysize + j) * (kx * ky * kz) + (l * kx * ky) + (m * ky) + n] = image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col];
+                    kernel[(k * xsize * ysize + i * ysize + j) * (nx * ny * nz) + (l * nx * ny) + (m * ny) + n] = image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
                 }
                 
                 //make a padding function to substitute this line of code.
                 else
                 {
                     // Reflect padding
-                    if (input_row < 0)
+                    if (inputX < 0)
                     {
-                        input_row = -input_row;
+                        inputX = -inputX;
                     }
 
-                    else if (input_row >= xsize)
+                    else if (inputX >= xsize)
                     {
-                        input_row = 2 * xsize - input_row - 1;
+                        inputX = 2 * xsize - inputX - 1;
                     }
 
 
-                    if (input_col < 0)
+                    if (inputY < 0)
                     {
-                        input_col = -input_col;
+                        inputY = -inputY;
                     }
 
-                    else if (input_col >= ysize)
+                    else if (inputY >= ysize)
                     {
-                        input_col = 2 * ysize - input_col - 1;
+                        inputY = 2 * ysize - inputY - 1;
                     }
 
-                    if (input_zsize < 0)
+                    if (inputZ < 0)
                     {
-                        input_zsize = - input_zsize;
+                        inputZ = - inputZ;
                     }
 
-                    else if (input_zsize>=zsize)
+                    else if (inputZ>=zsize)
                     {
-                        input_zsize = 2 * zsize - input_zsize -1;
+                        inputZ = 2 * zsize - inputZ -1;
                     }
                     
 
-                    kernel[(k * xsize * ysize + i * ysize + j) * (kx * ky * kz) + (l * kx * ky) + (m * ky) + n] = image[(input_zsize * xsize * ysize) + (input_row * ysize) + input_col];
+                    kernel[(k * xsize * ysize + i * ysize + j) * (nx * ny * nz) + (l * nx * ny) + (m * ny) + n] = image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
 
                 }
                 
@@ -171,28 +171,28 @@ __device__ void get_median_kernel_3d(dtype* image, dtype* kernel,
 
 
 template<typename dtype>
-__global__ void median_filter_kernel_2d(dtype* image, dtype* output, dtype* kernel, int xsize, int ysize, int idz, int kx, int ky)
+__global__ void median_filter_kernel_2d(dtype* image, dtype* output, dtype* kernel, int xsize, int ysize, int idz, int nx, int ny)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (idx < xsize && idy < ysize)
     {
-        get_median_kernel_2d(image + idz * xsize * ysize, kernel, idx, idy, xsize, ysize, kx, ky);
-        bubble_sort(kernel + (idx * ysize + idy) * (kx * ky), kx * ky);
+        get_median_kernel_2d(image + idz * xsize * ysize, kernel, idx, idy, xsize, ysize, nx, ny);
+        bubble_sort(kernel + (idx * ysize + idy) * (nx * ny), nx * ny);
 
-        int median_index = (kx * ky) / 2;
+        int medianIndex = (nx * ny) / 2;
 
-        if ((kx * ky) % 2 == 0)
+        if ((nx * ny) % 2 == 0)
         {
-            dtype median_value = (kernel[(idx * ysize + idy) * (kx * ky) + median_index] +
-                                  kernel[(idx * ysize + idy) * (kx * ky) + median_index - 1]) / 2;
-            output[idz * xsize * ysize + idx * ysize + idy] = median_value;
+            dtype medianValue = (kernel[(idx * ysize + idy) * (nx * ny) + medianIndex] +
+                                  kernel[(idx * ysize + idy) * (nx * ny) + medianIndex - 1]) / 2;
+            output[idz * xsize * ysize + idx * ysize + idy] = medianValue;
         }
 
         else
         {
-            output[idz * xsize * ysize + idx * ysize + idy] = kernel[(idx * ysize + idy) * (kx * ky) + median_index];
+            output[idz * xsize * ysize + idx * ysize + idy] = kernel[(idx * ysize + idy) * (nx * ny) + medianIndex];
         }
 
     }
@@ -202,7 +202,7 @@ __global__ void median_filter_kernel_2d(dtype* image, dtype* output, dtype* kern
 template<typename dtype>
 __global__ void median_filter_kernel_3d(dtype* image, dtype* output, dtype* kernel,
                                         int xsize, int ysize, int zsize, int idz,
-                                        int kx, int ky, int kz)
+                                        int nx, int ny, int nz)
 {
 
     //threads
@@ -211,20 +211,20 @@ __global__ void median_filter_kernel_3d(dtype* image, dtype* output, dtype* kern
 
     if (idx < xsize && idy < ysize)
     {
-        get_median_kernel_3d(image, kernel, idx, idy, idz, xsize, ysize, zsize, kx, ky, kz);
-        bubble_sort(kernel + (idz * xsize * ysize + idx * ysize + idy) * (kx * ky * kz), kx * ky * kz);
+        get_median_kernel_3d(image, kernel, idx, idy, idz, xsize, ysize, zsize, nx, ny, nz);
+        bubble_sort(kernel + (idz * xsize * ysize + idx * ysize + idy) * (nx * ny * nz), nx * ny * nz);
 
-        int median_index = (kx * ky * kz) / 2;
+        int medianIndex = (nx * ny * nz) / 2;
 
-        if ((kx * ky * kz) % 2 == 0)
+        if ((nx * ny * nz) % 2 == 0)
         {
-            dtype median_value = (kernel[(idz * xsize * ysize + idx * ysize + idy) * (kx * ky*kz) + median_index] +
-                                kernel[(idz * xsize * ysize + idx * ysize + idy) * (kx * ky*kz) + median_index - 1]) / 2;
-            output[idz * xsize * ysize + idx * ysize + idy] = median_value;
+            dtype medianValue = (kernel[(idz * xsize * ysize + idx * ysize + idy) * (nx * ny*nz) + medianIndex] +
+                                kernel[(idz * xsize * ysize + idx * ysize + idy) * (nx * ny*nz) + medianIndex - 1]) / 2;
+            output[idz * xsize * ysize + idx * ysize + idy] = medianValue;
         }
         else
         {
-            output[idz * xsize * ysize + idx * ysize + idy] = kernel[(idz * xsize * ysize + idx * ysize + idy) * (kx * ky * kz) + median_index];
+            output[idz * xsize * ysize + idx * ysize + idy] = kernel[(idz * xsize * ysize + idx * ysize + idy) * (nx * ny * nz) + medianIndex];
         }
 
     }   
@@ -233,35 +233,35 @@ __global__ void median_filter_kernel_3d(dtype* image, dtype* output, dtype* kern
 }
 
 
-template __global__ void median_filter_kernel_2d<int>(int* image, int* output, int* kernel, int xsize, int ysize, int idz, int kx, int ky);
-template __global__ void median_filter_kernel_2d<float>(float* image, float* output, float* kernel, int xsize, int ysize, int idz, int kx, int ky);
+template __global__ void median_filter_kernel_2d<int>(int* image, int* output, int* kernel, int xsize, int ysize, int idz, int nx, int ny);
+template __global__ void median_filter_kernel_2d<float>(float* image, float* output, float* kernel, int xsize, int ysize, int idz, int nx, int ny);
 
 template __global__ void median_filter_kernel_3d<int>(int* image, int* output, int* kernel,
                                                       int xsize, int ysize, int zsize, int idz,
-                                                      int kx, int ky, int kz);
+                                                      int nx, int ny, int nz);
 
 template __global__ void median_filter_kernel_3d<float>(float* image, float* output, float* kernel,
                                                         int xsize, int ysize, int zsize, int idz,
-                                                        int kx, int ky, int kz);
+                                                        int nx, int ny, int nz);
 
 
 
 
 template<typename dtype>
-void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsize, int kx, int ky, int kz)
+void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsize, int nx, int ny, int nz)
 {
 
-    dtype* dev_image;
-    dtype* dev_output;
-    dtype* dev_kernel;
+    dtype* deviceImage;
+    dtype* deviceOutput;
+    dtype* deviceKernel;
 
-    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(dtype));
-    cudaMalloc((void**)&dev_kernel, xsize * ysize * kx * ky * kz * sizeof(dtype));
+    cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&deviceKernel, xsize * ysize * nx * ny * nz * sizeof(dtype));
 
-    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
-    if (kz == 1)
+    if (nz == 1)
     {
 
         dim3 blockSize(32, 32);
@@ -271,7 +271,7 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
 
         for (int k = 0; k < zsize; ++k)
         {
-            median_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, xsize, ysize, k, kx, ky);
+            median_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel, xsize, ysize, k, nx, ny);
 
             cudaDeviceSynchronize();
         }
@@ -293,7 +293,7 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
 
         for (int k = 0; k < zsize; ++k)
         {
-            median_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, xsize, ysize, zsize, k, kx, ky, kz);
+            median_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel, xsize, ysize, zsize, k, nx, ny, nz);
 
             cudaDeviceSynchronize();
         }
@@ -304,14 +304,14 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
 
     }
 
-    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyDeviceToHost);
 
-    cudaFree(dev_image);
-    cudaFree(dev_output);
-    cudaFree(dev_kernel);
+    cudaFree(deviceImage);
+    cudaFree(deviceOutput);
+    cudaFree(deviceKernel);
 }
 
 // Explicit instantiation for dtype
-template void median_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
-template void median_filtering<int>(int* image, int* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
-template void median_filtering<unsigned int>(unsigned int* image, unsigned int* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
+template void median_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);
+template void median_filtering<int>(int* image, int* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);
+template void median_filtering<unsigned int>(unsigned int* image, unsigned int* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);

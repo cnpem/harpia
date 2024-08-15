@@ -10,13 +10,13 @@
 
 // CUDA kernel for 2D Gaussian filtering
 template<typename dtype>
-__global__ void gaussian_filter_kernel_2d(dtype* image, float* output, float* dev_kernel,
-                                          int idz, int xsize, int ysize, int zsize, int kx, int ky);
+__global__ void gaussian_filter_kernel_2d(dtype* image, float* output, float* deviceKernel,
+                                          int idz, int xsize, int ysize, int zsize, int nx, int ny);
 
 // CUDA kernel for 3D Gaussian filtering
 template<typename dtype>
-__global__ void gaussian_filter_kernel_3d(dtype* image, float* output, float* dev_kernel,
-                                          int xsize, int ysize, int zsize, int kx, int ky, int kz);
+__global__ void gaussian_filter_kernel_3d(dtype* image, float* output, float* deviceKernel,
+                                          int xsize, int ysize, int zsize, int nx, int ny, int nz);
 
 // Host function for Gaussian filtering
 template<typename dtype>
