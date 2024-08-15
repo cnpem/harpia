@@ -26,13 +26,10 @@ def gaussian(np.ndarray[numeric, ndim=3] hostImage, np.ndarray[np.float32_t, ndi
         zsize (int): Number of slices in the hostImage.
         sigma (float): Standard deviation for Gaussian kernel.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return gaussian_filtering(&hostImage[0,0,0], &hostOutput[0,0,0],
-                              xsize, ysize, zsize,
-                              sigma, type)
+    gaussian_filtering(&hostImage[0,0,0], &hostOutput[0,0,0],
+                        xsize, ysize, zsize,
+                        sigma, type)
 
 #Extern declaration for the Mean filtering function from C / C++ library
 cdef extern from "../../include/filters/mean_filter.h":
@@ -56,14 +53,11 @@ def mean(np.ndarray[numeric, ndim=3] hostImage,
         nx (int): Number of rows in the kernel.
         ny (int): Number of columns in the kernel.
         nz (int): Number of slices in the kernel.
-
-    Returns:
-        None
     """
-    return mean_filtering(&hostImage[0,0,0],
-                          &hostOutput[0,0,0],
-                          xsize, ysize, zsize,
-                          nx, ny, nz)
+    mean_filtering(&hostImage[0,0,0],
+                   &hostOutput[0,0,0],
+                   xsize, ysize, zsize,
+                   nx, ny, nz)
 
 #Extern declaration for the LoG filtering function from C / C++ library
 cdef extern from "../../include/filters/log_filter.h":
@@ -86,13 +80,11 @@ def LoG(np.ndarray[numeric, ndim=3] hostImage,
         zsize (int): Number of slices in the hostImage.
         type (bool): Type of filtering (specific to implementation).
 
-    Returns:
-        None
     """
-    return log_filtering(&hostImage[0,0,0],
-                         &hostOutput[0,0,0],
-                         xsize, ysize, zsize,
-                         type)
+    log_filtering(&hostImage[0,0,0],
+                  &hostOutput[0,0,0],
+                  xsize, ysize, zsize,
+                  type)
 
 #Extern declaration for the Unsharp Mask filtering function from C / C++ library
 cdef extern from "../../include/filters/unsharp_mask_filter.h":
@@ -117,14 +109,11 @@ def unsharp_mask(np.ndarray[numeric, ndim=3] hostImage,
         amount (float): Amount of the unsharp mask.
         threshold (float): Threshold for the unsharp mask.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return unsharp_mask_filtering(&hostImage[0,0,0],
-                                  &hostOutput[0,0,0],
-                                  xsize, ysize, zsize,
-                                  sigma, amount, threshold, type)
+    unsharp_mask_filtering(&hostImage[0,0,0],
+                           &hostOutput[0,0,0],
+                           xsize, ysize, zsize,
+                           sigma, amount, threshold, type)
 
 #Extern declaration for the Sobel filtering function from C / C++ library
 cdef extern from "../../include/filters/sobel_filter.h":
@@ -144,13 +133,10 @@ def sobel(np.ndarray[numeric, ndim=3] hostImage,
         ysize (int): Number of columns in the hostImage.
         zsize (int): Number of slices in the hostImage.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return sobel_filtering(&hostImage[0,0,0],
-                           &hostOutput[0,0,0],
-                           xsize, ysize, zsize, type)
+    sobel_filtering(&hostImage[0,0,0],
+                    &hostOutput[0,0,0],
+                    xsize, ysize, zsize, type)
 
 #Extern declaration for the Prewitt filtering function from C / C++ library
 cdef extern from "../../include/filters/prewitt_filter.h":
@@ -170,13 +156,10 @@ def prewitt(np.ndarray[numeric, ndim=3] hostImage,
         ysize (int): Number of columns in the hostImage.
         zsize (int): Number of slices in the hostImage.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return prewitt_filtering(&hostImage[0,0,0],
-                             &hostOutput[0,0,0],
-                             xsize, ysize, zsize, type)
+    prewitt_filtering(&hostImage[0,0,0],
+                      &hostOutput[0,0,0],
+                      xsize, ysize, zsize, type)
 
 #Extern declaration for the Canny filtering function from C / C++ library
 cdef extern from "../../include/filters/canny_filter.h":
@@ -200,14 +183,11 @@ def canny(np.ndarray[numeric, ndim=3] hostImage,
         sigma (float): Standard deviation for Gaussian kernel.
         low_threshold (float): Lower threshold for the hysteresis procedure.
         high_threshold (float): Upper threshold for the hysteresis procedure.
-
-    Returns:
-        None
     """
-    return canny_filtering(&hostImage[0,0,0],
-                           &hostOutput[0,0,0],
-                           xsize, ysize, zsize,
-                           sigma, low_threshold, high_threshold)
+    canny_filtering(&hostImage[0,0,0],
+                    &hostOutput[0,0,0],
+                    xsize, ysize, zsize,
+                    sigma, low_threshold, high_threshold)
 
 #Extern declaration for the median filtering function from C / C++ library
 cdef extern from "../../include/filters/median_filter.h":
@@ -231,9 +211,6 @@ def median(np.ndarray[numeric, ndim=3] hostImage,
         nx (int): Number of rows in the kernel.
         ny (int): Number of columns in the kernel.
         nz (int): Number of slices in the kernel.
-
-    Returns:
-        None
     """
     return median_filtering(&hostImage[0,0,0],
                           &hostOutput[0,0,0],
