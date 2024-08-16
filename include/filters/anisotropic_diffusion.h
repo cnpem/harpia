@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <numeric>
-#include <iostream>
 
 /**
  * @brief Performs anisotropic diffusion on a 2D or 3D image.
@@ -27,21 +26,10 @@
  * @param numCols Number of columns in the image.
  */
 template<typename dtype>
-void anisotropicDiffusion2D(dtype* inputImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int numRows, int numCols);
-
-template<typename dtype>
-void anisotropicDiffusion3D(dtype* inputImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int numRows, int numCols, int numSlices);
-
-template<typename dtype>
 void anisotropicDiffusion2DGPU(dtype* inputImage, int totalIterations, float deltaT, 
                             float kappa, int diffusionOption, int numRows, int numCols);
-
 template<typename dtype>
 void anisotropicDiffusion3DGPU(dtype* inputImage, int totalIterations, float deltaT, 
                             float kappa, int diffusionOption, int numRows, int numCols, int numSlices);
-
-
 
 #endif
