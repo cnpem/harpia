@@ -4,19 +4,19 @@
 #include <string>
 #include "morphology.h"
 
-void test_morphGrayscaleOnDevice(const std::string& filename, const int xsize, const int ysize, const int zsize,
+void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
                          MorphOp operation, const int flag_check, const int flag_verbose);
 
-void test_morphGrayscaleOnHost(const std::string& filename, const int xsize, const int ysize, const int zsize,
+void test_morph_grayscale_on_host(const std::string& filename, const int xsize, const int ysize, const int zsize,
                             int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize, 
                             MorphOp operation, const int flag_show, const int flag_check, const int flag_verbose);
 
-void test_morphGrayscaleOnDeviceTime(const std::string& filename, const int xsize, const int ysize, const int zsize,
+void test_morph_grayscale_on_device_time(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
                          MorphOp operation, int n);
 
-void test_morphGrayscaleTimeCompare(const std::string& filename, const int xsize, const int ysize, const int zsize,
+void test_morph_grayscale_time_compare(const std::string& filename, const int xsize, const int ysize, const int zsize,
                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
                          MorphOp operation);
 

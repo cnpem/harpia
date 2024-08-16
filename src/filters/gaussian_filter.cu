@@ -8,7 +8,7 @@
 
 template<typename dtype>
 __global__ void gaussian_filter_kernel_2d(dtype* image, float* output,float* dev_kernel,
-                                          int idz, int rows, int cols, int slices, int rows_kernel, int cols_kernel)
+                                          int idz, int xsize, int ysize, int zsize, int kx, int ky)
 {   
 
     //threads indices
@@ -16,15 +16,15 @@ __global__ void gaussian_filter_kernel_2d(dtype* image, float* output,float* dev
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
     // general matrix convolution for each pixel of the image.
-    if (idx<rows && idy<cols)
+    if (idx<xsize && idy<ysize)
     {   
         //temp variable
         float temp;
 
         //convolution.
-        convolution_2d(image + idz * rows * cols,&temp,dev_kernel,idx,idy,rows,cols,rows_kernel,cols_kernel); 
+        convolution2d(image + idz * xsize * ysize,&temp,dev_kernel,idx,idy,xsize,ysize,kx,ky); 
 
-        output[idz * rows * cols + idx * cols + idy] = (float)temp;
+        output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
         
     }
       
@@ -33,66 +33,67 @@ __global__ void gaussian_filter_kernel_2d(dtype* image, float* output,float* dev
 
 template<typename dtype>
 __global__ void gaussian_filter_kernel_3d(dtype* image, float* output,float* dev_kernel,
-                                          int rows, int cols, int depth,int rows_kernel, int cols_kernel, int depth_kernel)
+                                          int xsize, int ysize, int zsize,int kx, int ky, int kz)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int idy = blockIdx.y * blockDim.y + threadIdx.y;
     const int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if (idx < rows && idy < cols && idz < depth)
+    if (idx < xsize && idy < ysize && idz < zsize)
     {
         float temp;
 
-        convolution_3d(image, &temp, dev_kernel, idx, idy, idz, rows, cols, depth, rows_kernel, cols_kernel, depth_kernel);
+        convolution3d(image, &temp, dev_kernel, idx, idy, idz, xsize, ysize, zsize, kx, ky, kz);
 
-        output[idz * rows * cols + idx * cols + idy] = (float)temp;
+        output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
     }
 }
 
 
-template __global__ void gaussian_filter_kernel_2d<int>(int* image, float* output, float* dev_kernel,int idz, int rows, int cols, int slices, int rows_kernel, int cols_kernel);
-template __global__ void gaussian_filter_kernel_2d<float>(float* image, float* output, float* dev_kernel, int idz, int rows, int cols, int slices, int rows_kernel, int cols_kernel);
+template __global__ void gaussian_filter_kernel_2d<int>(int* image, float* output, float* dev_kernel,int idz, int xsize, int ysize, int zsize, int kx, int ky);
+template __global__ void gaussian_filter_kernel_2d<float>(float* image, float* output, float* dev_kernel, int idz, int xsize, int ysize, int zsize, int kx, int ky);
 
-template __global__ void gaussian_filter_kernel_3d<int>(int* image, float* output,float* dev_kernel,int rows, int cols, int depth,int rows_kernel, int cols_kernel, int depth_kernel);
-template __global__ void gaussian_filter_kernel_3d<float>(float* image, float* output,float* dev_kernel,int rows, int cols, int depth,int rows_kernel, int cols_kernel, int depth_kernel);
+template __global__ void gaussian_filter_kernel_3d<int>(int* image, float* output,float* dev_kernel,int xsize, int ysize, int zsize,int kx, int ky, int kz);
+template __global__ void gaussian_filter_kernel_3d<float>(float* image, float* output,float* dev_kernel,int xsize, int ysize, int zsize,int kx, int ky, int kz);
 
 
 template<typename dtype>
-void gaussian_filtering(dtype* image, float* output, int rows, int cols, int slices, float sigma, bool type)
+void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type)
 {
 
     dtype* dev_image;
     float* dev_output;
-    cudaMalloc((void**)&dev_image, rows * cols * slices * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, rows * cols * slices * sizeof(float));
+    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
+    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
 
-    cudaMemcpy(dev_image, image, rows * cols * slices * sizeof(dtype), cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
     
 
     if (type == false)
     {
         //kernel size
-        int rows_kernel = (int)ceil(2*sigma+1);
-        int cols_kernel = rows_kernel;
+        int kx = (int)ceil(2*sigma+1);
+        int ky = kx;
 
         float* kernel;
-        get_gaussian_kernel_2d(&kernel,rows_kernel,cols_kernel,sigma);
+        get_gaussian_kernel_2d(&kernel,kx,ky,sigma);
         
 
         float* dev_kernel;
-        cudaMalloc((void**)&dev_kernel, rows_kernel * cols_kernel * sizeof(float));
-        cudaMemcpy(dev_kernel, kernel, rows_kernel * cols_kernel * sizeof(float), cudaMemcpyHostToDevice);
+        cudaMalloc((void**)&dev_kernel, kx * ky * sizeof(float));
+        cudaMemcpy(dev_kernel, kernel, kx * ky * sizeof(float), cudaMemcpyHostToDevice);
 
         dim3 blockSize(32, 32);
-        dim3 gridSize( (rows + blockSize.y - 1) / blockSize.y,(cols + blockSize.x - 1) / blockSize.x);
+        dim3 gridSize( (xsize + blockSize.y - 1) / blockSize.y,(ysize + blockSize.x - 1) / blockSize.x);
 
         auto start = std::chrono::high_resolution_clock::now();
 
-        for (int k = 0; k < slices; ++k)
+        for (int k = 0; k < zsize; ++k)
         {
-            gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, k, rows, cols, slices, rows_kernel, cols_kernel);
+            gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, k, xsize, ysize, zsize, kx, ky);
+
+            cudaDeviceSynchronize();
         }
-        cudaDeviceSynchronize();
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
@@ -104,25 +105,25 @@ void gaussian_filtering(dtype* image, float* output, int rows, int cols, int sli
     else
     {
         //kernel size
-        int rows_kernel = (int)ceil(2*sigma+1);
-        int cols_kernel = rows_kernel;
-        int depth_kernel = rows_kernel;
+        int kx = (int)ceil(2*sigma+1);
+        int ky = kx;
+        int kz = kx;
 
         float* kernel;
-        get_gaussian_kernel_3d(&kernel,rows_kernel,cols_kernel, depth_kernel, sigma);
+        get_gaussian_kernel_3d(&kernel,kx,ky, kz, sigma);
         
 
         float* dev_kernel;
-        cudaMalloc((void**)&dev_kernel, rows_kernel * cols_kernel * depth_kernel * sizeof(float));
-        cudaMemcpy(dev_kernel, kernel, rows_kernel * cols_kernel * depth_kernel * sizeof(float), cudaMemcpyHostToDevice);
+        cudaMalloc((void**)&dev_kernel, kx * ky * kz * sizeof(float));
+        cudaMemcpy(dev_kernel, kernel, kx * ky * kz * sizeof(float), cudaMemcpyHostToDevice);
 
 
         dim3 blockSize(8, 8, 8);
-        dim3 gridSize((rows + blockSize.y - 1) / blockSize.y,(cols + blockSize.x - 1) / blockSize.x, (slices + blockSize.z - 1) / blockSize.z);
+        dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y,(ysize + blockSize.x - 1) / blockSize.x, (zsize + blockSize.z - 1) / blockSize.z);
 
         auto start = std::chrono::high_resolution_clock::now();
 
-        gaussian_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output,dev_kernel,rows, cols, slices, rows_kernel, cols_kernel, depth_kernel);
+        gaussian_filter_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output,dev_kernel,xsize, ysize, zsize, kx, ky, kz);
 
         cudaDeviceSynchronize();
 
@@ -133,7 +134,7 @@ void gaussian_filtering(dtype* image, float* output, int rows, int cols, int sli
         cudaFree(dev_kernel);
     }
 
-    cudaMemcpy(output, dev_output, rows * cols * slices * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
 
     cudaFree(dev_image);
     cudaFree(dev_output);
@@ -141,59 +142,59 @@ void gaussian_filtering(dtype* image, float* output, int rows, int cols, int sli
 
 
 // Explicit instantiation
-template void gaussian_filtering<float>(float* image, float* output, int rows, int cols, int slices, float sigma, bool type);
-template void gaussian_filtering<int>(int* image, float* output, int rows, int cols, int slices, float sigma, bool type);
-template void gaussian_filtering<unsigned int>(unsigned int* image, float* output, int rows, int cols, int slices, float sigma, bool type);
+template void gaussian_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type);
+template void gaussian_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type);
+template void gaussian_filtering<unsigned int>(unsigned int* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type);
 
 /*
 int main()
 {
-    int rows = 512;
-    int cols = 512;
-    int slices = 512;
+    int xsize = 512;
+    int ysize = 512;
+    int zsize = 512;
 
     static float* image;
-    image = (float*)malloc(slices*rows*cols*sizeof(int));
+    image = (float*)malloc(zsize*xsize*ysize*sizeof(int));
 
     static float* output;
-    output = (float*)malloc(slices*rows*cols*sizeof(int));
+    output = (float*)malloc(zsize*xsize*ysize*sizeof(int));
 
-    for (int k = 0; k < slices; k++)
+    for (int k = 0; k < zsize; k++)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
                 if (i!=j)
                 {
-                    image[k * rows * cols + i * cols + j] = 1;
+                    image[k * xsize * ysize + i * ysize + j] = 1;
                 }
 
                 if (i==j)
                 {
-                    image[k * rows * cols + i * cols + j] = i+j;
+                    image[k * xsize * ysize + i * ysize + j] = i+j;
                 }
                 
         
-                output[k * rows * cols + i * cols + j] = 0;
+                output[k * xsize * ysize + i * ysize + j] = 0;
             }
         }
 
     }
 
     float sigma = 6.;
-    gaussian_filtering(image,output,rows,cols,slices,sigma,true);
+    gaussian_filtering(image,output,xsize,ysize,zsize,sigma,true);
     
     
-    for (int k = 0; k < slices; k++)
+    for (int k = 0; k < zsize; k++)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < xsize; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < ysize; j++)
             {
-                std::cout<<output[k*rows*cols + i*cols +j]<<" ";
+                std::cout<<output[k*xsize*ysize + i*ysize +j]<<" ";
             }
 
             std::cout<<"\n";
