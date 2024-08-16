@@ -247,27 +247,24 @@ ctypedef fused real:
     double
 
 cdef extern from '../../include/filters/anisotropic_diffusion.h':
-    void anisotropicDiffusion2DGPU[dtype](dtype* inputImage, int totalIterations, float deltaT, 
-                                float kappa, int diffusionOption, int numRows, int numCols)
+    void anisotropicDiffusion2DGPU[dtype](dtype* hostImage, int totalIterations, float deltaT, 
+                            float kappa, int diffusionOption, int xsize, int ysize)
 
-    void anisotropicDiffusion3DGPU[dtype](dtype* inputImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int numRows, int numCols, int numSlices)
+    void anisotropicDiffusion3DGPU[dtype](dtype* hostImage, int totalIterations, float deltaT, 
+                            float kappa, int diffusionOption, int xsize, int ysize, int zsize)
 
-def anisotropic_diffusion2D(np.ndarray[real, ndim=2] input_image, int total_iterations,
+def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterations,
                           float delta_t, float kappa, int diffusion_option):
-    cdef int rows = input_image.shape[0]
-    cdef int cols = input_image.shape[1]
+    cdef int xsize = hostImage.shape[0]
+    cdef int ysize = hostImage.shape[1]
 
-    anisotropicDiffusion2DGPU(&input_image[0,0], total_iterations, delta_t, kappa, diffusion_option, rows, cols)
+    anisotropicDiffusion2DGPU(&hostImage[0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize)
 
-    return input_image  # Should the array be returned?
-
-def anisotropic_diffusion3D(np.ndarray[real, ndim=3] input_image, int total_iterations,
+def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterations,
                           float delta_t, float kappa, int diffusion_option):
-    cdef int rows = input_image.shape[0]
-    cdef int cols = input_image.shape[1]
-    cdef int slices = input_image.shape[2]
 
-    anisotropicDiffusion3DGPU(&input_image[0,0,0], total_iterations, delta_t, kappa, diffusion_option, rows, cols, slices)
+    cdef int xsize = hostImage.shape[0]
+    cdef int ysize = hostImage.shape[1]
+    cdef int zsize = hostImage.shape[2]
 
-    return input_image  # Should the array be returned?
+    anisotropicDiffusion3DGPU(&hostImage[0,0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize, zsize)

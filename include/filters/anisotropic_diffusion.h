@@ -26,10 +26,10 @@
  * @param numCols Number of columns in the image.
  */
 template<typename dtype>
-void anisotropicDiffusion2DGPU(dtype* inputImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int numRows, int numCols);
+void anisotropicDiffusion2DGPU(dtype* hostImage, int totalIterations, float deltaT, 
+                            float kappa, int diffusionOption, int xsize, int ysize);
 template<typename dtype>
-void anisotropicDiffusion3DGPU(dtype* inputImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int numRows, int numCols, int numSlices);
+void anisotropicDiffusion3DGPU(dtype* hostImage, int totalIterations, float deltaT, 
+                            float kappa, int diffusionOption, int xsize, int ysize, int zsize);
 
 #endif
