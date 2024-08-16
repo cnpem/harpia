@@ -8,7 +8,7 @@
 void get_sobel_horizontal_kernel_2d(float** kernel) {
   /*
 
-        Horizontal kernel has the form:
+        Horizontal hostKernel has the form:
 
                    1  0 -1
                    2  0 -2
@@ -38,7 +38,7 @@ void get_sobel_horizontal_kernel_2d(float** kernel) {
 void get_sobel_vertical_kernel_2d(float** kernel) {
   /*
 
-        Vertical kernel has the form:
+        Vertical hostKernel has the form:
 
                    1  2  1
                    0  0  0
@@ -451,11 +451,11 @@ int main()
     int ysize = 1024/2;
     int zsize = 1024/2;
 
-    static int* image;
-    image = (int*)malloc(zsize*xsize*ysize*sizeof(int));
+    static int* deviceImage;
+    deviceImage = (int*)malloc(zsize*xsize*ysize*sizeof(int));
 
-    static int* output;
-    output = (int*)malloc(zsize*xsize*ysize*sizeof(int));
+    static int* deviceOutput;
+    deviceOutput = (int*)malloc(zsize*xsize*ysize*sizeof(int));
 
     for (int k = 0; k < zsize; k++)
     {
@@ -466,23 +466,23 @@ int main()
             {
                 if (i!=j)
                 {
-                    image[k * xsize * ysize + i * ysize + j] = 1;
+                    deviceImage[k * xsize * ysize + i * ysize + j] = 1;
                 }
 
                 if (i==j)
                 {
-                    image[k * xsize * ysize + i * ysize + j] = -1;
+                    deviceImage[k * xsize * ysize + i * ysize + j] = -1;
                 }
                 
         
-                output[k * xsize * ysize + i * ysize + j] = 0;
+                deviceOutput[k * xsize * ysize + i * ysize + j] = 0;
             }
         }
 
     }
 
 
-    sobel_filtering(image,output,xsize,ysize,zsize, false);
+    sobel_filtering(deviceImage,deviceOutput,xsize,ysize,zsize, false);
     
     for (int k = 0; k < zsize; k++)
     {
@@ -491,7 +491,7 @@ int main()
         {
             for (int j = 0; j < ysize; j++)
             {
-                std::cout<<output[k*xsize*ysize + i*ysize +j]<<" ";
+                std::cout<<deviceOutput[k*xsize*ysize + i*ysize +j]<<" ";
             }
 
             std::cout<<"\n";
