@@ -10,7 +10,7 @@
 void get_horizontal_kernel_2d(float** kernel) {
   /*
 
-        Horizontal kernel has the form:
+        Horizontal hostKernel has the form:
 
                    1  0 -1
                    2  0 -2
@@ -40,7 +40,7 @@ void get_horizontal_kernel_2d(float** kernel) {
 void get_vertical_kernel_2d(float** kernel) {
   /*
 
-        Vertical kernel has the form:
+        Vertical hostKernel has the form:
 
                    1  2  1
                    0  0  0
@@ -386,11 +386,11 @@ int main()
     int ysize = 50;
     int slices = 1;
 
-    static float* image;
-    image = (float*)malloc(slices*xsize*ysize*sizeof(int));
+    static float* hostImage;
+    hostImage = (float*)malloc(slices*xsize*ysize*sizeof(int));
 
-    static float* output;
-    output = (float*)malloc(slices*xsize*ysize*sizeof(int));
+    static float* hostOutput;
+    hostOutput = (float*)malloc(slices*xsize*ysize*sizeof(int));
 
     for (int k = 0; k < slices; k++)
     {
@@ -401,16 +401,16 @@ int main()
             {
                 if (i!=j)
                 {
-                    image[k * xsize * ysize + i * ysize + j] = i+j;
+                    hostImage[k * xsize * ysize + i * ysize + j] = i+j;
                 }
 
                 if (i==j)
                 {
-                    image[k * xsize * ysize + i * ysize + j] = 0;
+                    hostImage[k * xsize * ysize + i * ysize + j] = 0;
                 }
                 
         
-                output[k * xsize * ysize + i * ysize + j] = 0;
+                hostOutput[k * xsize * ysize + i * ysize + j] = 0;
             }
         }
 
@@ -419,7 +419,7 @@ int main()
     float sigma = 1.;
     float high = 5.;
     float low = 0.;
-    canny_filtering(image,output,xsize,ysize,slices,sigma,low, high);
+    canny_filtering(hostImage,hostOutput,xsize,ysize,slices,sigma,low, high);
 
 
     for (int k = 0; k < slices; k++)
@@ -429,7 +429,7 @@ int main()
         {
             for (int j = 0; j < ysize; j++)
             {
-                std::cout<<image[k*xsize*ysize + i*ysize +j]<<" ";
+                std::cout<<hostImage[k*xsize*ysize + i*ysize +j]<<" ";
             }
 
             std::cout<<"\n";
@@ -448,7 +448,7 @@ int main()
         {
             for (int j = 0; j < ysize; j++)
             {
-                std::cout<<output[k*xsize*ysize + i*ysize +j]<<" ";
+                std::cout<<hostOutput[k*xsize*ysize + i*ysize +j]<<" ";
             }
 
             std::cout<<"\n";

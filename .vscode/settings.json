@@ -1,5 +1,6 @@
 {
     "files.associations": {
+<<<<<<< HEAD
         "limits": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
@@ -70,5 +71,8 @@
         "__nullptr": "cpp",
         "filesystem": "cpp",
         "__locale": "cpp"
+=======
+        "chrono": "cpp"
+>>>>>>> 0ea7fd1 (refac: camelCase and variable name)
     }
 }
