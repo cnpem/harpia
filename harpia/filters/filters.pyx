@@ -255,6 +255,37 @@ cdef extern from '../../include/filters/anisotropic_diffusion.h':
 
 def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterations,
                           float delta_t, float kappa, int diffusion_option):
+    """
+    Performs anisotropic diffusion on a 2D image.
+
+    This function applies the anisotropic diffusion algorithm to enhance images by reducing noise while preserving edges.
+    It supports three different diffusion options that control the smoothing behavior.
+
+    Parameters:
+    -----------
+    input_image : float numpy.ndarray
+        The input 2D image data.
+    total_iterations : int
+        Number of iterations to perform.
+    delta_t : float
+        Time step size.
+    kappa : float
+        Gradient modulus threshold that influences the conduction.
+    diffusion_option : int
+        Choice of diffusion function:
+        - 1: Exponential decay
+        - 2: Inverse quadratic decay
+        - 3: Hyperbolic tangent decay
+          Option 3 is a faster implementation based on:
+          Mbarki, Zouhair, et al. "A new rapid auto-adapting diffusion function for adaptive anisotropic 
+          image de-noising and sharply conserved edges." Computers & Mathematics with Applications 74.8 (2017): 1751-1768.
+
+    Returns:
+    --------
+    None
+        The diffused image is applied at the input image.
+    """
+
     cdef int xsize = hostImage.shape[0]
     cdef int ysize = hostImage.shape[1]
 
@@ -262,6 +293,36 @@ def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterat
 
 def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterations,
                           float delta_t, float kappa, int diffusion_option):
+    """
+    Performs anisotropic diffusion on a 3D image.
+
+    This function applies the anisotropic diffusion algorithm to enhance images by reducing noise while preserving edges.
+    It supports three different diffusion options that control the smoothing behavior.
+
+    Parameters:
+    -----------
+    input_image : float numpy.ndarray
+        The input 3D image data.
+    total_iterations : int
+        Number of iterations to perform.
+    delta_t : float
+        Time step size.
+    kappa : float
+        Gradient modulus threshold that influences the conduction.
+    diffusion_option : int
+        Choice of diffusion function:
+        - 1: Exponential decay
+        - 2: Inverse quadratic decay
+        - 3: Hyperbolic tangent decay
+          Option 3 is a faster implementation based on:
+          Mbarki, Zouhair, et al. "A new rapid auto-adapting diffusion function for adaptive anisotropic 
+          image de-noising and sharply conserved edges." Computers & Mathematics with Applications 74.8 (2017): 1751-1768.
+
+    Returns:
+    --------
+    None
+        The diffused image is applied at the input image.
+    """
 
     cdef int xsize = hostImage.shape[0]
     cdef int ysize = hostImage.shape[1]
