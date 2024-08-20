@@ -7,19 +7,49 @@
 #include "../common/convolution.h"
 #include "../common/kernels.h"
 
-// Function to get the 2D horizontal Sobel kernel
+/**
+ * @brief Retrieves the 2D horizontal Sobel kernel.
+ *
+ * This function returns the 2D horizontal Sobel kernel for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 2D horizontal Sobel kernel will be stored.
+ */
 void get_sobel_horizontal_kernel_2d(float** kernel);
 
-// Function to get the 2D vertical Sobel kernel
+/**
+ * @brief Retrieves the 2D vertical Sobel kernel.
+ *
+ * This function returns the 2D vertical Sobel kernel for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 2D vertical Sobel kernel will be stored.
+ */
 void get_sobel_vertical_kernel_2d(float** kernel);
 
-// Function to get the 3D horizontal Sobel kernel
+/**
+ * @brief Retrieves the 3D horizontal Sobel kernel.
+ *
+ * This function returns the 3D horizontal Sobel kernel for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 3D horizontal Sobel kernel will be stored.
+ */
 void get_sobel_horizontal_kernel_3d(float** kernel);
 
-// Function to get the 3D vertical Sobel kernel
+/**
+ * @brief Retrieves the 3D vertical Sobel kernel.
+ *
+ * This function returns the 3D vertical Sobel kernel for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 3D vertical Sobel kernel will be stored.
+ */
 void get_sobel_vertical_kernel_3d(float** kernel);
 
-// Function to get the 3D depth Sobel kernel
+/**
+ * @brief Retrieves the 3D depth Sobel kernel.
+ *
+ * This function returns the 3D depth Sobel kernel for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 3D depth Sobel kernel will be stored.
+ */
 void get_sobel_depth_kernel_3d(float** kernel);
 
 // Sobel filter kernel for 2D images
