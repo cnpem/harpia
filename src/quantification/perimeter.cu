@@ -7,13 +7,13 @@
 
 __device__ void isPerimeter(int* image, u_int* counter, int idx, int idy, int idz, int xsize, int ysize, int zsize)
 {
-    int p0 = idz * xsize * ysize + idy * xsize + idx;
-    int p0_counter = image[p0];
+    int imageIndex = idz * xsize * ysize + idy * xsize + idx;
+    int counterIndex = image[imageIndex];
 
     // All borders are perimeters (this is sufficient for this kernel format).
     if (idx == 0 || idx == xsize - 1 || idy == 0 || idy == ysize - 1)
     {
-        atomicAdd(&counter[p0_counter], 1);
+        atomicAdd(&counter[counterIndex], 1);
         return;
     }
 
@@ -28,14 +28,14 @@ __device__ void isPerimeter(int* image, u_int* counter, int idx, int idy, int id
     int p8 = idz * xsize * ysize + (idy - 1) * xsize + (idx + 1);
 
     // Only one case where the pixel is not a perimeter, for the given kernel.
-    if (image[p0] == image[p1] && image[p0] == image[p2] && image[p0] == image[p3] &&
-        image[p0] == image[p4] && image[p0] == image[p5] && image[p0] == image[p6] &&
-        image[p0] == image[p7] && image[p0] == image[p8])
+    if (image[imageIndex] == image[p1] && image[imageIndex] == image[p2] && image[imageIndex] == image[p3] &&
+        image[imageIndex] == image[p4] && image[imageIndex] == image[p5] && image[imageIndex] == image[p6] &&
+        image[imageIndex] == image[p7] && image[imageIndex] == image[p8])
     {
         return;
     }
 
-    atomicAdd(&counter[p0_counter], 1);
+    atomicAdd(&counter[counterIndex], 1);
 }
 
 
@@ -55,26 +55,26 @@ __global__ void perimeter_counter(int* image, u_int* counter, int xsize, int ysi
 
 void perimeter(int* image, u_int* output, int xsize, int ysize, int zsize)
 {
-    int* dev_image;
-    u_int* dev_output;
+    int* deviceImage;
+    u_int* deviceOutput;
 
-    cudaMalloc(&dev_image,xsize * ysize * zsize * sizeof(int));
-    cudaMalloc(&dev_output, xsize * ysize * zsize * sizeof(u_int));
+    cudaMalloc(&deviceImage,xsize * ysize * zsize * sizeof(int));
+    cudaMalloc(&deviceOutput, xsize * ysize * zsize * sizeof(u_int));
 
-    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemset(dev_output, 0, xsize * ysize * zsize * sizeof(u_int));  // Initialize output array to zero
+    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemset(deviceOutput, 0, xsize * ysize * zsize * sizeof(u_int));  // Initialize output array to zero
 
     dim3 blockDim(8, 8, 8);  // Example block dimensions, can be adjusted
     dim3 gridDim((xsize + blockDim.x - 1) / blockDim.x,
                  (ysize + blockDim.y - 1) / blockDim.y,
                  (zsize + blockDim.z - 1) / blockDim.z);
 
-    perimeter_counter<<<gridDim, blockDim>>>(dev_image, dev_output, xsize, ysize, zsize);
+    perimeter_counter<<<gridDim, blockDim>>>(deviceImage, deviceOutput, xsize, ysize, zsize);
 
-    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(u_int), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(u_int), cudaMemcpyDeviceToHost);
 
-    cudaFree(dev_image);
-    cudaFree(dev_output);
+    cudaFree(deviceImage);
+    cudaFree(deviceOutput);
 }
 
 

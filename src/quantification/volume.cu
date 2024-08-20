@@ -7,10 +7,10 @@
 
 __device__ void isVolume(int* image, unsigned int* counter, int idx, int idy, int idz, int xsize, int ysize, int zsize)
 {
-    int image_index = idz * xsize * ysize + idy * xsize + idx;
-    int counter_index = image[image_index];
+    int imageIndex = idz * xsize * ysize + idy * xsize + idx;
+    int counterIndex = image[imageIndex];
 
-    atomicAdd(&counter[counter_index], 1);
+    atomicAdd(&counter[counterIndex], 1);
 }
 
 __global__ void volume_counter(int* image, unsigned int* counter, int idz, int xsize, int ysize, int zsize)
@@ -28,27 +28,27 @@ __global__ void volume_counter(int* image, unsigned int* counter, int idz, int x
 
 void volume(int* image, unsigned int* output, int xsize, int ysize, int zsize)
 {
-    int* dev_image;
-    unsigned int* dev_output;
+    int* deviceImage;
+    unsigned int* deviceOutput;
 
-    cudaMalloc(&dev_image, xsize * ysize * zsize * sizeof(int));
-    cudaMalloc(&dev_output, xsize * ysize * zsize * sizeof(unsigned int));
+    cudaMalloc(&deviceImage, xsize * ysize * zsize * sizeof(int));
+    cudaMalloc(&deviceOutput, xsize * ysize * zsize * sizeof(unsigned int));
 
-    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemset(dev_output, 0, xsize * ysize * zsize * sizeof(unsigned int));  // Initialize output array to zero
+    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemset(deviceOutput, 0, xsize * ysize * zsize * sizeof(unsigned int));  // Initialize output array to zero
 
     dim3 blockDim(32, 32);
     dim3 gridDim((xsize + blockDim.x - 1) / blockDim.x, (ysize + blockDim.y - 1) / blockDim.y);
 
     for (int idz = 0; idz < zsize; idz++)
     {
-        volume_counter<<<gridDim, blockDim>>>(dev_image, dev_output, idz, xsize, ysize, zsize);
+        volume_counter<<<gridDim, blockDim>>>(deviceImage, deviceOutput, idz, xsize, ysize, zsize);
     }
 
-    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(unsigned int), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
-    cudaFree(dev_image);
-    cudaFree(dev_output);
+    cudaFree(deviceImage);
+    cudaFree(deviceOutput);
 
 }
 

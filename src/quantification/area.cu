@@ -7,62 +7,65 @@
 
 __device__ void isArea(int* image, unsigned int* counter, int idx, int idy, int idz, int xsize, int ysize, int zsize)
 {
-    int image_index = idz * xsize * ysize + idy * xsize + idx;
-    int counter_index = image[image_index];
+    int imageIndex = idz * xsize * ysize + idy * xsize + idx;
+    int counterIndex = image[imageIndex];
 
-    atomicAdd(&counter[counter_index], 1);
+    atomicAdd(&counter[counterIndex], 1);
 }
 
 
 __device__ void isSurface(int* image, unsigned int* counter, int idx, int idy, int idz, int xsize, int ysize, int zsize)
 {
-    int p0 = idz * xsize * ysize + idy * xsize + idx;
-    int p0_counter = image[p0];
+    int imageIndex = idz * xsize * ysize + idy * xsize + idx;
+    int counterIndex = image[imageIndex];
 
     // All borders are perimeters (this is sufficient for this kernel format).
     if (idy - 1 < 0 || idx - 1 < 0 || idz - 1 < 0 || idy + 1 >= ysize || idx + 1 >= xsize || idz + 1 >= zsize)
     {
-        atomicAdd(&counter[p0_counter], 1);
+        atomicAdd(&counter[counterIndex], 1);
         return;
     }
     
 
     // Define the dimensions of the kernel
-    const int depth_kernel = 3;
-    const int rows_kernel = 3;
-    const int cols_kernel = 3;
+    const int nz = 3;
+    const int nx = 3;
+    const int ny = 3;
+
+    int inputZ;
+    int inputY;
+    int inputX;
 
     // Iterate over the 26 neighbors
-    for (int l = 0; l < depth_kernel; ++l)
+    for (int l = 0; l < nz; ++l)
     {
 
-        for (int m = 0; m < rows_kernel; ++m)
+        for (int m = 0; m < nx; ++m)
         {
 
-            for (int n = 0; n < cols_kernel; ++n)
+            for (int n = 0; n < ny; ++n)
             {
 
                 // Compute the position with respect to the center of the kernel
-                int neighbor_idz = idz - depth_kernel / 2 + l;
-                int neighbor_idy = idy - rows_kernel / 2 + m;
-                int neighbor_idx = idx - cols_kernel / 2 + n;
+                inputZ = idz - nz / 2 + l;
+                inputY = idy - nx / 2 + m;
+                inputX = idx - ny / 2 + n;
 
                 // Skip the center voxel itself
-                if (l == depth_kernel / 2 && m == rows_kernel / 2 && n == cols_kernel / 2) 
+                if (l == nz / 2 && m == nx / 2 && n == ny / 2) 
                 {
                     continue;
                 }
 
                 // Check for boundary conditions
-                if (neighbor_idx >= 0 && neighbor_idx < xsize &&
-                    neighbor_idy >= 0 && neighbor_idy < ysize &&
-                    neighbor_idz >= 0 && neighbor_idz < zsize)
+                if (inputX >= 0 && inputX < xsize &&
+                    inputY >= 0 && inputY < ysize &&
+                    inputZ >= 0 && inputZ < zsize)
                 {
-                    int neighbor_p = neighbor_idz * xsize * ysize + neighbor_idy * xsize + neighbor_idx;
 
-                    if (image[p0] != image[neighbor_p])
+                    if (image[imageIndex] != image[inputZ * xsize * ysize + inputY * xsize + inputX])
                     {
-                        atomicAdd(&counter[p0_counter], 1);
+                        atomicAdd(&counter[counterIndex], 1);
                         return;
                     }
 
@@ -104,14 +107,14 @@ __global__ void surface_area_counter(int* image, unsigned int* counter, int idz,
 
 void area(int* image, unsigned int* output, int xsize, int ysize, int zsize, bool type)
 {
-    int* dev_image;
-    unsigned int* dev_output;
+    int* deviceImage;
+    unsigned int* deviceOutput;
 
-    cudaMalloc(&dev_image, xsize * ysize * zsize * sizeof(int));
-    cudaMalloc(&dev_output, xsize * ysize * zsize * sizeof(unsigned int));
+    cudaMalloc(&deviceImage, xsize * ysize * zsize * sizeof(int));
+    cudaMalloc(&deviceOutput, xsize * ysize * zsize * sizeof(unsigned int));
 
-    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemset(dev_output, 0, xsize * ysize * zsize * sizeof(unsigned int));  // Initialize output array to zero
+    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemset(deviceOutput, 0, xsize * ysize * zsize * sizeof(unsigned int));  // Initialize output array to zero
 
     dim3 blockDim(32, 32);
     dim3 gridDim((xsize + blockDim.x - 1) / blockDim.x, (ysize + blockDim.y - 1) / blockDim.y);
@@ -121,7 +124,7 @@ void area(int* image, unsigned int* output, int xsize, int ysize, int zsize, boo
         // Computes the area of a 2D object in each slice.
         for (int idz = 0; idz < zsize; idz++)
         {
-            area_counter<<<gridDim, blockDim>>>(dev_image, dev_output, idz, xsize, ysize, zsize);
+            area_counter<<<gridDim, blockDim>>>(deviceImage, deviceOutput, idz, xsize, ysize, zsize);
         }
     }
 
@@ -132,16 +135,16 @@ void area(int* image, unsigned int* output, int xsize, int ysize, int zsize, boo
 
         for (int idz = 0; idz < zsize; idz++)
         {
-            surface_area_counter<<<gridDim, blockDim>>>(dev_image, dev_output,idz, xsize, ysize, zsize);
+            surface_area_counter<<<gridDim, blockDim>>>(deviceImage, deviceOutput,idz, xsize, ysize, zsize);
         }
         
         
     }
 
-    cudaMemcpy(output, dev_output, xsize * ysize * zsize * sizeof(unsigned int), cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
-    cudaFree(dev_image);
-    cudaFree(dev_output);
+    cudaFree(deviceImage);
+    cudaFree(deviceOutput);
 }
 
 /*

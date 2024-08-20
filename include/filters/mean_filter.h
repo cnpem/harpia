@@ -8,22 +8,22 @@
 
 // Kernel to compute the mean for a 2D region
 template<typename dtype>
-__device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int xsize, int cols, int kx, int ky);
+__device__ void get_mean_kernel_2d(dtype* image, float* mean, int i, int j, int xsize, int cols, int nx, int ny);
 
 // Kernel to compute the mean for a 3D region
 template<typename dtype>
-__device__ void get_mean_kernel_3d(dtype* image, float* mean, int i, int j, int k, int xsize, int ysize, int zsize, int kx, int ky, int kz);
+__device__ void get_mean_kernel_3d(dtype* image, float* mean, int i, int j, int k, int xsize, int ysize, int zsize, int nx, int ny, int nz);
 
 // 2D mean filter kernel
 template<typename dtype>
-__global__ void mean_filter_kernel_2d(dtype* image, float* output, int xsize, int ysize, int idz, int kx, int ky);
+__global__ void mean_filter_kernel_2d(dtype* image, float* output, int xsize, int ysize, int idz, int nx, int ny);
 
 // 3D mean filter kernel
 template<typename dtype>
-__global__ void mean_filter_kernel_3d(dtype* image, float* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
+__global__ void mean_filter_kernel_3d(dtype* image, float* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);
 
 // Host function to call the mean filtering
 template<typename dtype>
-void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, int kx, int ky, int kz);
+void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, int nx, int ny, int nz);
 
 #endif // MEAN_FILTER_H
