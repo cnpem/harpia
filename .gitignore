@@ -1,3 +1,6 @@
+#ignore singularity images
+*.sif
+
 #raw example images (they may be too big)
 ***.raw
 
@@ -6,9 +9,11 @@ ignore/
 **/foo/
 
 #build files
+harpia.egg-info/
 obj/
 Test
 build/
+dist/
 **.so
 **/__pycache__
 

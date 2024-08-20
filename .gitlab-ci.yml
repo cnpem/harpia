@@ -1,0 +1,56 @@
+variables:
+    GCD_APPS: /ibira/lnls/labs/tepui/apps/gcd
+    GIT_SUBMODULE_STRATEGY: recursive
+    IMAGE_TAG: $CI_REGISTRY_IMAGE
+
+stages:
+    - build
+    - deploy
+
+build-container:
+    image: docker:20.10.16
+    stage: build
+    services:
+        - docker:20.10.16-dind
+    script:
+        - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN
+        - docker build -t $IMAGE_TAG -f container/Dockerfile .
+        - docker push $IMAGE_TAG
+    only:
+        - main
+    tags:
+        - x86_64
+        - cuda11
+        - docker
+
+build-python-package:
+    image: $IMAGE_TAG
+    stage: build
+    script:
+        - python3 setup.py build_ext -j32
+        - python3 setup.py bdist_wheel
+    tags:
+        - x86_64
+        - cuda11
+        - docker
+    dependencies:
+        - build-container
+    artifacts:
+        paths:
+            - ./dist/*whl
+        expire_in: 1 day
+
+deploy-python-package:
+    image: python
+    stage: deploy
+    script:
+        - python3 -m pip install twine
+        - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python3 -m twine upload --repository-url https://gitlab.cnpem.br/api/v4/projects/${GCD_PKG_REPO}/packages/pypi --verbose ./dist/*
+    tags:
+        - x86_64z
+        - cuda11
+        - docker
+    dependencies:
+        - build-python-package
+    only:
+        - tags

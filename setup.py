@@ -8,6 +8,13 @@ from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
 
+# Read the version from __version__.py
+# I cant use from harpia import __version__ because other references are not found before cython compilation
+# i.e cannot find harpia.filters.filters and so on
+version = {}
+with open(os.path.join("harpia", "__version__.py")) as fp:
+    exec(fp.read(), version)
+
 def find_in_path(name, path):
     """Find a file in a search path"""
 
@@ -179,10 +186,10 @@ print(cuda_sources)
 print(files)
 print(ext_modules)
 setup(
-    name='cudaext',
-    version='0.1',
+    name='harpia',
+    version=version['__version__'],
     description='CUDA extension for Python',
-    script_args = ["build_ext", "--inplace"],
+    script_args = ["build_ext", "--inplace", "bdist_wheel"],
     ext_modules=cythonize(
         ext_modules,
         compiler_directives=dict(
