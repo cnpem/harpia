@@ -17,7 +17,7 @@ build-container:
         - docker build -t $IMAGE_TAG -f container/Dockerfile .
         - docker push $IMAGE_TAG
     only:
-        - main
+        - container
     tags:
         - x86_64
         - cuda11
