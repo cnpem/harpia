@@ -131,7 +131,7 @@ int main()
     const int ysize = 8;
     const int zsize = 8;
 
-    unsigned int output[xsize * ysize * zsize] = {0};
+    unsigned int hostOutput[xsize * ysize * zsize] = {0};
 
     int image[xsize * ysize * zsize] = 
     {
@@ -145,11 +145,11 @@ int main()
          0, 0, 0, 0, 0, 0, 0, 0,
     };
 
-    area(image, output, xsize, ysize, zsize, 1);
+    area(image, hostOutput, xsize, ysize, zsize, 1);
 
     for (int i = 0; i < ysize; i++) {
         for (int j = 0; j < xsize; j++) {
-            std::cout << output[i*xsize +j] << " ";
+            std::cout << hostOutput[i*xsize +j] << " ";
         }
         std::cout << std::endl;
     }
