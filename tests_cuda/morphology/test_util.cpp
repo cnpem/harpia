@@ -1,4 +1,4 @@
-#include "../../include/morphology/test_util.h"
+#include "../../include/tests/morphology/test_util.h"
 #include <fstream>
 #include <iomanip>
 #include <cstdint> // For uint16_t

@@ -4,11 +4,11 @@
 #include <string>
 #include <cstring>
 
-#include "../../../include/morphology/test_image_processing.h"
 #include "../../../include/morphology/morph_chain_binary.h"
-#include "../../../include/morphology/test_morph_chain_binary.h"
 #include "../../../include/morphology/structuring_elements.h"
-#include "../../../include/morphology/test_util.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
+#include "../../../include/tests/morphology/test_morph_chain_binary.h"
+#include "../../../include/tests/morphology/test_util.h"
 
 /**
  * @brief Tests the binary morphological operations performed in a chain on the GPU.

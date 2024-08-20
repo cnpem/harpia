@@ -9,7 +9,7 @@
  * This function processes a single pixel in the grayscale image based on a given kernel and morphological
  * operation (erosion or dilation). It considers the pixel's neighborhood defined by the kernel.
  * 
- * @tparam dtype The data type of the image pixels (e.g., u_int32_t, int, float).
+ * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
  * @param image Pointer to the input grayscale image.
  * @param output Pointer to the output image where the result will be stored.
  * @param centerIdx X-coordinate of the central pixel in the image.
@@ -26,7 +26,7 @@
  */
 template<typename dtype>
 CUDA_HOSTDEV 
-void morph_pixel_grayscale(dtype *image, dtype *output, 
+void morph_grayscale_pixel(dtype *image, dtype *output, 
                              int centerIdx, int centerIdy, int centerIdz, 
                              int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                              const int xsize, const int ysize, const int zsize, MorphOp operation)
@@ -72,34 +72,16 @@ void morph_pixel_grayscale(dtype *image, dtype *output,
     }
     output[centerIdz * ysize * xsize + centerIdy * xsize + centerIdx] = aux;
 }
-template CUDA_HOSTDEV void morph_pixel_grayscale<u_int32_t>(u_int32_t*, u_int32_t*, int, int, int, int*, int, int, int, 
+template CUDA_HOSTDEV void morph_grayscale_pixel<unsigned int>(unsigned int*, unsigned int*, int, int, int, int*, int, int, int, 
                                                                  const int, const int, const int, MorphOp);
-template CUDA_HOSTDEV void morph_pixel_grayscale<int>(int*, int*, int, int, int, int*, int, int, int, 
+template CUDA_HOSTDEV void morph_grayscale_pixel<int>(int*, int*, int, int, int, int*, int, int, int, 
                                                                const int, const int, const int, MorphOp);
-template CUDA_HOSTDEV void morph_pixel_grayscale<float>(float*, float*, int, int, int, int*, int, int, int, 
+template CUDA_HOSTDEV void morph_grayscale_pixel<float>(float*, float*, int, int, int, int*, int, int, int, 
                                                                  const int, const int, const int, MorphOp);
 
-/**
- * @brief CUDA kernel for applying grayscale morphological operations to the entire image.
- * 
- * This kernel function processes all pixels in the image using a specified kernel and morphological
- * operation (erosion or dilation) by calling the `morph_pixel_grayscale` function for each pixel.
- * 
- * @tparam dtype The data type of the image pixels (e.g., u_int32_t, int, float).
- * @param deviceImage Pointer to the input grayscale image on the device.
- * @param deviceOutput Pointer to the output image where the result will be stored on the device.
- * @param kernel Pointer to the kernel used for the morphological operation.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation The morphological operation to perform (erosion or dilation).
- */
 template<typename dtype>
 __global__
-void morph_grayscale(dtype *deviceImage, dtype *deviceOutput, 
+void morph_grayscale_kernel(dtype *deviceImage, dtype *deviceOutput, 
                        int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                        const int xsize, const int ysize, const int zsize, MorphOp operation)
 {
@@ -108,14 +90,39 @@ void morph_grayscale(dtype *deviceImage, dtype *deviceOutput,
     int idz = threadIdx.z + blockIdx.z * blockDim.z;
 
     if (idx < xsize && idy < ysize && idz < zsize) {
-        morph_pixel_grayscale(deviceImage, deviceOutput, idx, idy, idz, 
+        morph_grayscale_pixel(deviceImage, deviceOutput, idx, idy, idz, 
                         kernel, kernel_xsize, kernel_ysize, kernel_zsize,
                         xsize, ysize, zsize, operation);
     }
 }
-template __global__ void morph_grayscale<u_int32_t>(u_int32_t*, u_int32_t*, int*, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morph_grayscale<int>(int*, int*, int*, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morph_grayscale<float>(float*, float*, int*, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_grayscale_kernel<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_grayscale_kernel<int>(int*, int*, int*, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_grayscale_kernel<float>(float*, float*, int*, int, int, int, const int, const int, const int, MorphOp);
+
+template<typename dtype>
+void morph_grayscale(dtype *deviceImage, dtype *deviceOutput, 
+                       int *deviceKernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+                       const int xsize, const int ysize, const int zsize, MorphOp operation, const int flag_verbose)
+{
+    // Set up execution configuration
+    dim3 block(BLOCK_3D, BLOCK_3D, BLOCK_3D);
+    if (zsize == 1) block = dim3(BLOCK_2D, BLOCK_2D, 1);
+    dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y, (zsize + block.z - 1) / block.z);
+
+    // Check grid and block dimensions from host side
+    if (flag_verbose) {
+        printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
+        printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+    } 
+
+    // Device erosion/dilation
+    morph_grayscale_kernel<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                          xsize, ysize, zsize, operation);
+    cudaDeviceSynchronize(); // Assures all GPU threads are finished
+}
+template void morph_grayscale<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_grayscale<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_grayscale<float>(float*, float*, int*, int, int, int, const int, const int, const int, MorphOp, const int);
 
 /**
  * @brief Applies grayscale morphological operations on the device.
@@ -123,7 +130,7 @@ template __global__ void morph_grayscale<float>(float*, float*, int*, int, int, 
  * This function sets up the execution configuration and memory on the device, launches the CUDA kernel
  * to apply the morphological operation across the image, and then transfers the result back to the host.
  * 
- * @tparam dtype The data type of the image pixels (e.g., u_int32_t, int, float).
+ * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
  * @param hostImage Pointer to the input grayscale image on the host.
  * @param hostOutput Pointer to the output image where the result will be stored on the host.
  * @param kernel Pointer to the kernel used for the morphological operation.
@@ -160,21 +167,9 @@ void morph_grayscale_on_device(dtype *hostImage, dtype *hostOutput,
     CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
-    // Set up execution configuration
-    dim3 block(BLOCK_3D, BLOCK_3D, BLOCK_3D);
-    if (zsize == 1) dim3 block(BLOCK_2D, BLOCK_2D, 1);
-    dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y, (zsize + block.z - 1) / block.z);
-
-    // Check grid and block dimensions from host side
-    if (flag_verbose) {
-        printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
-        printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
-    } 
-
     // Device erosion/dilation
-    morph_grayscale<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                          xsize, ysize, zsize, operation);
-    cudaDeviceSynchronize(); // Assures all GPU threads are finished
+    morph_grayscale(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                          xsize, ysize, zsize, operation, flag_verbose);
 
     // Transfer data from the device to the host
     CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
@@ -184,7 +179,7 @@ void morph_grayscale_on_device(dtype *hostImage, dtype *hostOutput,
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void morph_grayscale_on_device<u_int32_t>(u_int32_t*, u_int32_t*, int*, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int, const int, const int, const int, MorphOp, const int);
 template void morph_grayscale_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
 template void morph_grayscale_on_device<float>(float*, float*, int*, int, int, int, const int, const int, const int, MorphOp, const int);
 
@@ -192,9 +187,9 @@ template void morph_grayscale_on_device<float>(float*, float*, int*, int, int, i
  * @brief Applies grayscale morphological operations on the host.
  * 
  * This function iterates over all pixels in the image and applies the morphological operation using the
- * `morph_pixel_grayscale` function on the CPU.
+ * `morph_grayscale_pixel` function on the CPU.
  * 
- * @tparam dtype The data type of the image pixels (e.g., u_int32_t, int, float).
+ * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
  * @param hostImage Pointer to the input grayscale image on the host.
  * @param hostOutput Pointer to the output image where the result will be stored on the host.
  * @param kernel Pointer to the kernel used for the morphological operation.
@@ -215,13 +210,13 @@ void morph_grayscale_on_host(dtype *hostImage, dtype *hostOutput,
         for (int idy = 0; idy < ysize; idy++) {
             for (int idx = 0; idx < xsize; idx++) {
 
-                morph_pixel_grayscale(hostImage, hostOutput, idx, idy, idz, 
+                morph_grayscale_pixel(hostImage, hostOutput, idx, idy, idz, 
                                 kernel, kernel_xsize, kernel_ysize, kernel_zsize,
                                 xsize, ysize, zsize, operation);
             }
         }
     } // Slide over image
 }
-template void morph_grayscale_on_host<u_int32_t>(u_int32_t*, u_int32_t*, int*, int, int, int, const int, const int, const int, MorphOp);
+template void morph_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int, const int, const int, const int, MorphOp);
 template void morph_grayscale_on_host<int>(int*, int*, int*, int, int, int, const int, const int, const int, MorphOp);
 template void morph_grayscale_on_host<float>(float*, float*, int*, int, int, int, const int, const int, const int, MorphOp);

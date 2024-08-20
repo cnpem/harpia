@@ -4,11 +4,11 @@
 #include <string>
 #include <cstring>
 
-#include "../../../include/morphology/morph_binary.h"
-#include "../../../include/morphology/test_morph_binary.h"
-#include "../../../include/morphology/test_util.h"
-#include "../../../include/morphology/test_image_processing.h"
 #include "../../../include/common/grid_block_sizes.h"
+#include "../../../include/morphology/morph_binary.h"
+#include "../../../include/tests/morphology/test_morph_binary.h" 
+#include "../../../include/tests/morphology/test_util.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
 
 /**
  * @brief Tests the binary morphological operations on the GPU.

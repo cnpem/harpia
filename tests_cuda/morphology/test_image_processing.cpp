@@ -1,4 +1,4 @@
-#include "../../include/morphology/test_image_processing.h"
+#include "../../include/tests/morphology/test_image_processing.h"
 #include "../../include/morphology/morphology.h"
 
 #include <fstream>
@@ -22,13 +22,14 @@ void show_image_2D(dtype *hostImage, const int xsize, const int ysize, const std
     int size = xsize * ysize;
     
     // Find the maximum value in the image for normalization
-    int max = 0;
+    // max is set for at least 1 to avoid floating point exception
+    int max = 1; 
     for (int i = 0; i < size; i++) {
         if (hostImage[i] > max) {
             max = hostImage[i];
         }
     }
-
+    
     // Normalize the image data to range [0, 255] and convert to uint8_t
     uint8_t* data = new uint8_t[size];
     for (int i = 0; i < size; ++i) {
