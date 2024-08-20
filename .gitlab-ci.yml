@@ -27,8 +27,8 @@ build-python-package:
     image: $IMAGE_TAG
     stage: build
     script:
-        - python3 setup.py build_ext -j32
-        - python3 setup.py bdist_wheel
+        - python3 -m pip install -r requirements.txt
+        - python3 setup.py build_ext -j64 bdist_wheel           
     tags:
         - x86_64
         - cuda11
