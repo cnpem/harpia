@@ -5,7 +5,7 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 
-#include "morphology.h"
+#include "../../morphology/morphology.h"
 
 // Function prototypes
 

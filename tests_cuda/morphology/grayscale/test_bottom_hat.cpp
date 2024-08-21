@@ -2,10 +2,10 @@
 #include <string>
 #include <cstring>
 
-#include "../../../include/morphology/test_image_processing.h"
-#include "../../../include/morphology/test_util.h"
-#include "../../../include/morphology/test_bottom_hat.h"
 #include "../../../include/morphology/bottom_hat.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
+#include "../../../include/tests/morphology/test_util.h"
+#include "../../../include/tests/morphology/test_bottom_hat.h"
 
 void test_bottom_hat_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
                                int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
@@ -29,7 +29,7 @@ void test_bottom_hat_on_device(const std::string& filename, const int xsize, con
     read_input(host_A, filename, size, flag_verbose);
 
     // device erosion 
-    bottom_hat(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose);
+    bottom_hat_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose);
 
     if(flag_check){
         int *host_ref;

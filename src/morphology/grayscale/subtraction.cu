@@ -14,7 +14,7 @@
  */
 template<typename dtype>
 __global__
-void subtraction_pixel(dtype *deviceImage1, dtype *deviceImage2, dtype *deviceOutput, const int size)
+void subtraction_kernel(dtype *deviceImage1, dtype *deviceImage2, dtype *deviceOutput, const int size)
 {
     int index = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -23,9 +23,32 @@ void subtraction_pixel(dtype *deviceImage1, dtype *deviceImage2, dtype *deviceOu
     }
 }
 // Template instantiations for specific types
-template __global__ void subtraction_pixel<u_int32_t>(u_int32_t*, u_int32_t*, u_int32_t*, const int);
-template __global__ void subtraction_pixel<int>(int*, int*, int*, const int);
-template __global__ void subtraction_pixel<float>(float*, float*, float*, const int);
+template __global__ void subtraction_kernel<unsigned int>(unsigned int*, unsigned int*, unsigned int*, const int);
+template __global__ void subtraction_kernel<int>(int*, int*, int*, const int);
+template __global__ void subtraction_kernel<float>(float*, float*, float*, const int);
+
+template<typename dtype>
+void subtraction(dtype *deviceImage1, dtype *deviceImage2, dtype *deviceOutput, const int size, const int flag_verbose)
+{
+    // Set up execution configuration
+    dim3 block(BLOCK_1D);
+    dim3 grid((size + block.x - 1) / block.x);
+
+    // Check grid and block dimension from host side
+    if (flag_verbose) {
+        printf("grid.x %d \n", grid.x);
+        printf("block.x %d \n", block.x);
+    }
+
+    // Perform subtraction on the device
+    subtraction_kernel<<<grid, block>>>(deviceImage1, deviceImage2, deviceOutput, size);
+    cudaDeviceSynchronize(); // Ensure all GPU threads are finished
+}
+
+// Template instantiations for specific types
+template void subtraction<unsigned int>(unsigned int *, unsigned int *, unsigned int *, const int, const int);
+template void subtraction<int>(int *, int *, int *, const int, const int);
+template void subtraction<float>(float *, float *, float *, const int, const int);
 
 /**
  * @brief Perform pixel-wise subtraction of two images on the device.
@@ -38,7 +61,7 @@ template __global__ void subtraction_pixel<float>(float*, float*, float*, const 
  * @param flag_verbose Flag for verbose output.
  */
 template<typename dtype>
-void subtraction(dtype *hostImage1, dtype *hostImage2, dtype *hostOutput, const int size, const int flag_verbose)
+void subtraction_on_device(dtype *hostImage1, dtype *hostImage2, dtype *hostOutput, const int size, const int flag_verbose)
 {
     // Set input dimension
     size_t nBytes = size * sizeof(dtype);
@@ -53,19 +76,8 @@ void subtraction(dtype *hostImage1, dtype *hostImage2, dtype *hostOutput, const 
     CHECK(cudaMemcpy(deviceImage1, hostImage1, nBytes, cudaMemcpyHostToDevice));
     CHECK(cudaMemcpy(deviceImage2, hostImage2, nBytes, cudaMemcpyHostToDevice));
 
-    // Set up execution configuration
-    dim3 block(BLOCK_1D);
-    dim3 grid((size + block.x - 1) / block.x);
-
-    // Check grid and block dimension from host side
-    if (flag_verbose) {
-        printf("grid.x %d \n", grid.x);
-        printf("block.x %d \n", block.x);
-    }
-
     // Perform subtraction on the device
-    subtraction_pixel<<<grid, block>>>(deviceImage1, deviceImage2, deviceOutput, size);
-    cudaDeviceSynchronize(); // Ensure all GPU threads are finished
+    subtraction(deviceImage1, deviceImage2, deviceOutput, size, flag_verbose);
 
     // Transfer data from the device to the host
     CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
@@ -76,9 +88,9 @@ void subtraction(dtype *hostImage1, dtype *hostImage2, dtype *hostOutput, const 
     cudaFree(deviceOutput);
 }
 // Template instantiations for specific types
-template void subtraction<u_int32_t>(u_int32_t *, u_int32_t *, u_int32_t *, const int, const int);
-template void subtraction<int>(int *, int *, int *, const int, const int);
-template void subtraction<float>(float *, float *, float *, const int, const int);
+template void subtraction_on_device<unsigned int>(unsigned int *, unsigned int *, unsigned int *, const int, const int);
+template void subtraction_on_device<int>(int *, int *, int *, const int, const int);
+template void subtraction_on_device<float>(float *, float *, float *, const int, const int);
 
 /**
  * @brief Perform pixel-wise subtraction of two images on the host.
@@ -97,6 +109,6 @@ void subtraction_on_host(dtype *hostImage1, dtype *hostImage2, dtype *hostOutput
     }
 }
 // Template instantiations for specific types
-template void subtraction_on_host<u_int32_t>(u_int32_t *, u_int32_t *, u_int32_t *, const int);
+template void subtraction_on_host<unsigned int>(unsigned int *, unsigned int *, unsigned int *, const int);
 template void subtraction_on_host<int>(int *, int *, int *, const int);
 template void subtraction_on_host<float>(float *, float *, float *, const int);

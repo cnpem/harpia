@@ -1,15 +1,16 @@
 #include "../../include/morphology/morphology.h"
-#include "../../include/morphology/test_util.h"
-#include "../../include/morphology/test_morph_binary.h"
-#include "../../include/morphology/test_morph_grayscale.h"
-#include "../../include/morphology/test_morph_chain_binary.h"
-#include "../../include/morphology/test_morph_chain_grayscale.h"
+#include "../../include/tests/morphology/test_util.h"
+#include "../../include/tests/morphology/test_morph_binary.h"
+#include "../../include/tests/morphology/test_morph_grayscale.h"
+#include "../../include/tests/morphology/test_morph_chain_binary.h"
+#include "../../include/tests/morphology/test_morph_chain_grayscale.h"
+#include "../../include/tests/morphology/test_fill_holes.h" 
 #include "../../include/morphology/cuda_helper.h"
 #include "../../include/morphology/structuring_elements.h"
-#include "../../include/morphology/test_top_hat.h"
-#include "../../include/morphology/test_bottom_hat.h"
-#include "../../include/morphology/test_image_processing.h"
-#include "../../include/morphology/test_subtraction.h"
+#include "../../include/tests/morphology/test_top_hat.h"
+#include "../../include/tests/morphology/test_bottom_hat.h"
+#include "../../include/tests/morphology/test_image_processing.h"
+#include "../../include/tests/morphology/test_subtraction.h"
 
 #include<stdio.h>
 #include <stdlib.h>
@@ -240,6 +241,24 @@ int test_script5() {
     test_top_hat_on_device(filenameGrayscale, 600, 1520, 100, kernel, 5, 5, 5, flag_check, flag_verbose);
    
     free(kernel);
+
+    return 0;
+}
+
+int test_script6() {
+    //Atention: if th einput image has a white border (of 1's), the algorithm 'breaks'
+    // The fill_holes F image(marker/input) will be completely 0, this way the reconstruction by dilation
+    // has no start point, the output will be completely zero.
+
+    std::string filenameBinary = "./example_images/binary/eagle_275x183x1_16b.raw";
+
+    int flag_show = 1; // Whether to plot the result
+    int flag_check = 1; // Whether to compare with OpenCV erosion
+    int flag_verbose = 0; // Whether to print status messages
+    
+    test_fill_holes_on_host(filenameBinary, 275, 183, 1, flag_show, 0, flag_verbose);
+    
+    test_fill_holes_on_device(filenameBinary, 355, 321, 1, flag_check, flag_verbose);
 
     return 0;
 }

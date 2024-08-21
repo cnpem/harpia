@@ -2,10 +2,10 @@
 #include <string>
 #include <cstring>
 
-#include "../../../include/morphology/test_subtraction.h"
 #include "../../../include/morphology/subtraction.h"
-#include "../../../include/morphology/test_image_processing.h"
-#include "../../../include/morphology/test_util.h"
+#include "../../../include/tests/morphology/test_subtraction.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
+#include "../../../include/tests/morphology/test_util.h"
 
 void test_subtraction_on_device(const std::string& filename, const std::string& filename2, const int xsize, const int ysize, const int zsize,
                               const int flag_check, const int flag_verbose)
@@ -30,7 +30,7 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
     read_input(host_B,filename2, size, flag_verbose);
 
     // device erosion 
-    subtraction(host_A, host_B, device_ref, size, flag_verbose);
+    subtraction_on_device(host_A, host_B, device_ref, size, flag_verbose);
 
     if(flag_check){
         int *host_ref;

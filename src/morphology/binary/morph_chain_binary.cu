@@ -3,6 +3,7 @@
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
+#include <cstdint> // For uint16_t, unsigned int
 
 
 /**
@@ -36,26 +37,20 @@ void morph_chain_binary_on_device(dtype *hostImage, dtype *hostOutput, int *kern
     // malloc device global memory
     dtype *deviceImage, *deviceTmp ,*deviceOutput; 
     int *deviceKernel; 
-    CHECK(cudaMalloc((int**)&deviceImage, nBytes));
-    CHECK(cudaMalloc((int**)&deviceTmp, nBytes));
-    CHECK(cudaMalloc((int**)&deviceOutput, nBytes));
+    CHECK(cudaMalloc((dtype**)&deviceImage, nBytes));
+    CHECK(cudaMalloc((dtype**)&deviceTmp, nBytes));
+    CHECK(cudaMalloc((dtype**)&deviceOutput, nBytes));
     CHECK(cudaMalloc((int**)&deviceKernel, kernel_nBytes));
 
     // transfer data from the host to the device
     CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
-    // set up execution configuration
-    dim3 block (BLOCK_3D,BLOCK_3D,BLOCK_3D);
-    dim3 grid((xsize+block.x-1)/block.x, (ysize+block.y-1)/block.y, (zsize+block.z-1)/block.z);
-
     // morphChain operation
-    morph_binary<<<grid, block>>>(deviceImage, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                         xsize, ysize, zsize, chain.operation1);
-    cudaDeviceSynchronize(); // assures all GPU threads are finished
-    morph_binary<<<grid, block>>>(deviceTmp, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                         xsize, ysize, zsize, chain.operation2);
-    cudaDeviceSynchronize(); // assures all GPU threads are finished
+    morph_binary(deviceImage, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                         xsize, ysize, zsize, chain.operation1, flag_verbose);
+    morph_binary(deviceTmp, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                         xsize, ysize, zsize, chain.operation2, flag_verbose);
 
     // transfer data from the device to the host
     CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
@@ -69,9 +64,9 @@ void morph_chain_binary_on_device(dtype *hostImage, dtype *hostOutput, int *kern
 
 // Template instantiations for specific types
 template void morph_chain_binary_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
-template void morph_chain_binary_on_device<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, 
+template void morph_chain_binary_on_device<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, 
                                                   MorphChain, const int);
-template void morph_chain_binary_on_device<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, 
+template void morph_chain_binary_on_device<uint16_t>(uint16_t *, uint16_t *, int *, int, int, int, const int, const int, const int, 
                                                   MorphChain, const int);
 
 /**
@@ -115,5 +110,5 @@ void morph_chain_binary_on_host(dtype *hostImage, dtype *hostOutput,
 
 // Template instantiations for specific types
 template void morph_chain_binary_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain);
-template void morph_chain_binary_on_host<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain);
-template void morph_chain_binary_on_host<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphChain);
+template void morph_chain_binary_on_host<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, MorphChain);
+template void morph_chain_binary_on_host<uint16_t>(uint16_t *, uint16_t *, int *, int, int, int, const int, const int, const int, MorphChain);

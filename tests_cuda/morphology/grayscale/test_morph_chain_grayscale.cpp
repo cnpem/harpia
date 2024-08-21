@@ -4,11 +4,11 @@
 #include <string>
 #include <cstring>
 
-#include "../../../include/morphology/test_image_processing.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
-#include "../../../include/morphology/test_morph_chain_grayscale.h"
 #include "../../../include/morphology/structuring_elements.h"
-#include "../../../include/morphology/test_util.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
+#include "../../../include/tests/morphology/test_morph_chain_grayscale.h"
+#include "../../../include/tests/morphology/test_util.h"
 
 void test_morph_chain_grayscale_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
                                           int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,

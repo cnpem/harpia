@@ -2,9 +2,9 @@
 #include <cstring>
 
 #include "../../../include/morphology/morph_grayscale.h"
-#include "../../../include/morphology/test_morph_grayscale.h"
-#include "../../../include/morphology/test_util.h"
-#include "../../../include/morphology/test_image_processing.h"
+#include "../../../include/tests/morphology/test_morph_grayscale.h"
+#include "../../../include/tests/morphology/test_util.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
 
 void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
                                     int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,

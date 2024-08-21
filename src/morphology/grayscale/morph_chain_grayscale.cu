@@ -11,7 +11,7 @@
  * CUDA. It allocates memory on the device, transfers data, applies the operations, and then copies the 
  * result back to the host.
  * 
- * @tparam dtype The data type of the image pixels (e.g., u_int32_t, int, float).
+ * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
  * @param hostImage Pointer to the input grayscale image on the host.
  * @param hostOutput Pointer to the output image where the result will be stored on the host.
  * @param kernel Pointer to the kernel used for the morphological operations.
@@ -47,26 +47,13 @@ void morph_chain_grayscale_on_device(dtype *hostImage, dtype *hostOutput, int *k
     CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
-    // set up execution configuration
-    dim3 block(BLOCK_3D, BLOCK_3D, BLOCK_3D);
-    if (zsize == 1) dim3 block(BLOCK_2D, BLOCK_2D, 1);
-    dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y, (zsize + block.z - 1) / block.z);
-   
-    // check grid and block dimension from host side
-    if (flag_verbose) {
-        printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
-        printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
-    }
-
     // Perform the first operation in the chain
-    morph_grayscale<<<grid, block>>>(deviceImage, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                         xsize, ysize, zsize, chain.operation1);
-    cudaDeviceSynchronize(); // Ensure all GPU threads are finished
+    morph_grayscale(deviceImage, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                         xsize, ysize, zsize, chain.operation1, flag_verbose);
 
     // Perform the second operation in the chain
-    morph_grayscale<<<grid, block>>>(deviceTmp, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                         xsize, ysize, zsize, chain.operation2);
-    cudaDeviceSynchronize(); // Ensure all GPU threads are finished
+    morph_grayscale(deviceTmp, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                         xsize, ysize, zsize, chain.operation2, flag_verbose);
 
     // transfer data from the device to the host
     CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
@@ -77,7 +64,7 @@ void morph_chain_grayscale_on_device(dtype *hostImage, dtype *hostOutput, int *k
     cudaFree(deviceOutput);
     cudaFree(deviceKernel);
 }
-template void morph_chain_grayscale_on_device<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
+template void morph_chain_grayscale_on_device<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
 template void morph_chain_grayscale_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
 template void morph_chain_grayscale_on_device<float>(float *, float *, int *, int, int, int, const int, const int, const int, MorphChain, const int);
 
@@ -89,7 +76,7 @@ template void morph_chain_grayscale_on_device<float>(float *, float *, int *, in
  * a CPU-based approach. It first allocates temporary memory, applies the operations sequentially, and 
  * then frees the temporary memory.
  * 
- * @tparam dtype The data type of the image pixels (e.g., u_int32_t, int, float).
+ * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
  * @param hostImage Pointer to the input grayscale image on the host.
  * @param hostOutput Pointer to the output image where the result will be stored on the host.
  * @param kernel Pointer to the kernel used for the morphological operations.
@@ -126,6 +113,6 @@ void morph_chain_grayscale_on_host(dtype *hostImage, dtype *hostOutput,
     // Free temporary memory
     free(hostTmp);
 }
-template void morph_chain_grayscale_on_host<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphChain);
+template void morph_chain_grayscale_on_host<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, MorphChain);
 template void morph_chain_grayscale_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphChain);
 template void morph_chain_grayscale_on_host<float>(float *, float *, int *, int, int, int, const int, const int, const int, MorphChain);

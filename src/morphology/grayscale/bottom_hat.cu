@@ -22,7 +22,7 @@
  * @param flag_verbose Flag for verbose output.
  */
 template<typename dtype>
-void bottom_hat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void bottom_hat_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                  const int xsize, const int ysize, const int zsize, const int flag_verbose)
 {
     // Set input dimension
@@ -45,40 +45,13 @@ void bottom_hat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsi
     CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
-    // Set up execution configuration
-    dim3 block(BLOCK_3D, BLOCK_3D, BLOCK_3D);
-    if (zsize == 1) block = dim3(BLOCK_2D, BLOCK_2D, 1);
-    dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y, (zsize + block.z - 1) / block.z);
-
-    // Check grid and block dimension from host side
-    if (flag_verbose) {
-        printf("\nClosing operation configuration\n");
-        printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
-        printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
-    }
-
     // Closing operation
-    morph_grayscale<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                     xsize, ysize, zsize, DILATION);
-    cudaDeviceSynchronize(); // Assures all GPU threads are finished
-    morph_grayscale<<<grid, block>>>(deviceOutput, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                     xsize, ysize, zsize, EROSION);
-    cudaDeviceSynchronize(); // Assures all GPU threads are finished
-
-    // Set up execution configuration
-    dim3 block2(BLOCK_1D);
-    dim3 grid2((size + block2.x - 1) / block2.x);
-
-    // Check grid and block dimension from host side
-    if (flag_verbose) {
-        printf("\nSubtraction operation configuration\n");
-        printf("grid.x %d grid.y %d grid.z %d\n", grid2.x, grid2.y, grid2.z);
-        printf("block.x %d block.y %d block.z %d\n", block2.x, block2.y, block2.z);
-    }
-
+    morph_grayscale(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                     xsize, ysize, zsize, DILATION, flag_verbose);
+    morph_grayscale(deviceOutput, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                     xsize, ysize, zsize, EROSION, flag_verbose);
     // B_hat = closing - f
-    subtraction_pixel<<<grid2, block2>>>(deviceTmp, deviceImage, deviceOutput, xsize * ysize * zsize);
-    cudaDeviceSynchronize(); // Assures all GPU threads are finished
+    subtraction(deviceTmp, deviceImage, deviceOutput, xsize * ysize * zsize, flag_verbose);
 
     // Transfer data from the device to the host
     CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
@@ -90,9 +63,9 @@ void bottom_hat(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsi
     cudaFree(deviceKernel);
 }
 // Template instantiations for specific types
-template void bottom_hat<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void bottom_hat<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
-template void bottom_hat<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat_on_device<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat_on_device<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
 
 /**
  * @brief Performs the bottom-hat transformation on the input image on the host (CPU).
@@ -136,5 +109,5 @@ void bottom_hat_on_host(dtype *hostImage, dtype *hostOutput, int *kernel, int ke
 }
 // Template instantiations for specific types
 template void bottom_hat_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void bottom_hat_on_host<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, const int);
+template void bottom_hat_on_host<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, const int);
 template void bottom_hat_on_host<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);

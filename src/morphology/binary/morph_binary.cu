@@ -2,6 +2,7 @@
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
+#include <cstdint> // For uint16_t, unsigned int
 
 /**
  * @brief Perform erosion/dilation operation for one pixel.
@@ -77,8 +78,8 @@ void morph_binary_pixel(dtype *image, dtype *output,
     output[centerIdz*ysize*xsize + centerIdy*xsize + centerIdx] = aux;
 }
 template CUDA_HOSTDEV void morph_binary_pixel<int>(int *, int *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
-template CUDA_HOSTDEV void morph_binary_pixel<u_int32_t>(u_int32_t *, u_int32_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
-template CUDA_HOSTDEV void morph_binary_pixel<u_int16_t>(u_int16_t *, u_int16_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<unsigned int>(unsigned int *, unsigned int *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<uint16_t>(uint16_t *, uint16_t *, int, int, int, int *, int, int, int, const int, const int, const int, MorphOp);
 
 /**
  * @brief Kernel function to perform erosion/dilation operation on the entire image.
@@ -97,7 +98,7 @@ template CUDA_HOSTDEV void morph_binary_pixel<u_int16_t>(u_int16_t *, u_int16_t 
  */
 template<typename dtype>
 __global__
-void morph_binary(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+void morph_binary_kernel(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
                         const int xsize, const int ysize, const int zsize, MorphOp operation){
     int idx = threadIdx.x + blockIdx.x*blockDim.x;
     int idy = threadIdx.y + blockIdx.y*blockDim.y;
@@ -109,10 +110,35 @@ void morph_binary(dtype *deviceImage, dtype *deviceOutput, int *kernel, int kern
                            xsize, ysize, zsize, operation);
     }
 }
-template __global__ void morph_binary<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morph_binary<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void morph_binary<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary_kernel<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary_kernel<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, MorphOp);
+template __global__ void morph_binary_kernel<uint16_t>(uint16_t *, uint16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
 
+template<typename dtype>
+void morph_binary(dtype *deviceImage, dtype *deviceOutput, int *deviceKernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
+                 const int xsize, const int ysize, const int zsize, MorphOp operation, const int flag_verbose)
+{
+    //set up execution configuratio
+    dim3 block(BLOCK_3D,BLOCK_3D,BLOCK_3D);
+    if(zsize == 1) block = dim3(BLOCK_2D,BLOCK_2D,1);
+
+    dim3 grid((xsize+block.x-1)/block.x, (ysize+block.y-1)/block.y, (zsize+block.z-1)/block.z);
+
+    // check grid and block dimension from host side
+    if(flag_verbose){
+        printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
+        printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+    }
+
+    // device erosion/dialation 
+    morph_binary_kernel<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                                         xsize, ysize, zsize, operation);
+    cudaDeviceSynchronize(); //assures all gpu threads are fineshed
+
+}
+template void morph_binary<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_binary<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_binary<uint16_t>(uint16_t *, uint16_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
 
 /**
  * @brief Perform erosion/dilation operation on the entire image using the GPU. This function is meant to be called from host
@@ -146,30 +172,17 @@ void morph_binary_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, in
     // malloc device global memory
     dtype *deviceImage, *deviceOutput; 
     int *deviceKernel; 
-    CHECK(cudaMalloc((int**)&deviceImage, nBytes));
-    CHECK(cudaMalloc((int**)&deviceOutput, nBytes));
+    CHECK(cudaMalloc((dtype**)&deviceImage, nBytes));
+    CHECK(cudaMalloc((dtype**)&deviceOutput, nBytes));
     CHECK(cudaMalloc((int**)&deviceKernel, kernel_nBytes));
 
     // transfer data from the host to the device
     CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
     CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
-    //set up execution configuratio
-    dim3 block(BLOCK_3D,BLOCK_3D,BLOCK_3D);
-    if(zsize == 1) dim3 block(BLOCK_2D,BLOCK_2D,1);
-
-    dim3 grid((xsize+block.x-1)/block.x, (ysize+block.y-1)/block.y, (zsize+block.z-1)/block.z);
-
-    // check grid and block dimension from host side
-    if(flag_verbose){
-        printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
-        printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
-    }
-
     // device erosion/dialation 
-    morph_binary<<<grid, block>>>(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                         xsize, ysize, zsize, operation);
-    cudaDeviceSynchronize(); //assures all gpu threads are fineshed
+    morph_binary(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+                 xsize, ysize, zsize, operation, flag_verbose);
 
     // transfer data from the device to the host
     CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
@@ -180,8 +193,8 @@ void morph_binary_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, in
     cudaFree(deviceKernel);
 }
 template void morph_binary_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
-template void morph_binary_on_device<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
-template void morph_binary_on_device<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_binary_on_device<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
+template void morph_binary_on_device<uint16_t>(uint16_t *, uint16_t *, int *, int, int, int, const int, const int, const int, MorphOp, const int);
 
 /**
  * @brief Perform erosion/dilation operation on the entire image using the CPU. This function is used to check GPU results correctness.
@@ -216,5 +229,5 @@ void morph_binary_on_host(dtype *hostImage, dtype *hostOutput,
     }// slide over image
 }
 template void morph_binary_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, MorphOp);
-template void morph_binary_on_host<u_int32_t>(u_int32_t *, u_int32_t *, int *, int, int, int, const int, const int, const int, MorphOp);
-template void morph_binary_on_host<u_int16_t>(u_int16_t *, u_int16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
+template void morph_binary_on_host<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, MorphOp);
+template void morph_binary_on_host<uint16_t>(uint16_t *, uint16_t *, int *, int, int, int, const int, const int, const int, MorphOp);
