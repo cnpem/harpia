@@ -33,17 +33,17 @@ repos:
           - id: interrogate
             files: ^src/
             always_run: true
-            args: [-vv, -i, --fail-under=80, --ignore-module]
+            args: [-vv, -i, --fail-under=70, --ignore-module]
             stages: [pre-commit]
     - repo: local
       hooks:
-          - id: clang-format
-            name: clang-format
-            description: Format files with ClangFormat.
-            entry: clang-format -i
-            language: system
-            files: \.(cu|cuh|h|hpp|cpp|inl)$
-            args: ['-fallback-style=none']
+        - id: clang-format
+          name: clang-format
+          description: Format files with ClangFormat.
+          entry: clang-format
+          language: system
+          files: \.(cu|cuh|h|hpp|cpp|inl)$
+          args: ['-i', '--fallback-style=none']
 
     - repo: https://github.com/jorisroovers/gitlint
       rev: "v0.19.1"

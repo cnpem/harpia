@@ -1,7 +1,10 @@
 cimport cython
 cimport numpy
+
 import numpy as np
+
 from libcpp cimport bool
+
 
 # Extern declaration for the fraction calculation function from C/C++ library
 cdef extern from "../../include/quantification/fraction.h":

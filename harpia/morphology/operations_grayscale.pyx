@@ -1,5 +1,6 @@
-from libc.stdint cimport uint32_t
 cimport numpy
+from libc.stdint cimport uint32_t
+
 import numpy
 
 ctypedef fused numeric:
