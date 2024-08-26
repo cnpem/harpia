@@ -44,7 +44,7 @@ repos:
           language: system
           files: \.(cu|cuh|h|hpp|cpp|inl)$
           args: ['-i', '--fallback-style=none']
-
+          stages: [pre-commit]
     - repo: https://github.com/jorisroovers/gitlint
       rev: "v0.19.1"
       hooks:
