@@ -59,7 +59,18 @@ print(output_image.shape)
 print(kernel.shape)
 
 # Call the erosion_binary function
-erosion_binary(image, output_image, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, flag_verbose)
+erosion_binary(
+    image,
+    output_image,
+    kernel,
+    kernel_xsize,
+    kernel_ysize,
+    kernel_zsize,
+    xsize,
+    ysize,
+    zsize,
+    flag_verbose,
+)
 
 # image = image.reshape((ysize, xsize))
 # output_image = output_image.reshape((ysize, xsize))

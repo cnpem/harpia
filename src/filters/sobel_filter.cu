@@ -1,14 +1,12 @@
-#include<iostream>
-#include<cmath>
-#include<cuda.h>
-#include<cuda_runtime.h>
-#include<chrono>
-#include"../../include/filters/sobel_filter.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <chrono>
+#include <cmath>
+#include <iostream>
+#include "../../include/filters/sobel_filter.h"
 
-
-void get_sobel_horizontal_kernel_2d(float** kernel)
-{
-    /*
+void get_sobel_horizontal_kernel_2d(float** kernel) {
+  /*
 
         Horizontal kernel has the form:
 
@@ -18,33 +16,27 @@ void get_sobel_horizontal_kernel_2d(float** kernel)
 
     */
 
-    *kernel = (float*)malloc(sizeof(float)*9);
+  *kernel = (float*)malloc(sizeof(float) * 9);
 
-    if (! *kernel)
-    {
-        return;
-    }
-    
+  if (!*kernel) {
+    return;
+  }
 
-    (*kernel)[0] = 1;
-    (*kernel)[1] = 0;
-    (*kernel)[2] = -1;
+  (*kernel)[0] = 1;
+  (*kernel)[1] = 0;
+  (*kernel)[2] = -1;
 
-    (*kernel)[3] = 2;
-    (*kernel)[4] = 0;
-    (*kernel)[5] = -2;
+  (*kernel)[3] = 2;
+  (*kernel)[4] = 0;
+  (*kernel)[5] = -2;
 
-    (*kernel)[6] = 1;
-    (*kernel)[7] = 0;
-    (*kernel)[8] = -1;
-    
-
+  (*kernel)[6] = 1;
+  (*kernel)[7] = 0;
+  (*kernel)[8] = -1;
 }
 
-
-void get_sobel_vertical_kernel_2d(float** kernel)
-{
-    /*
+void get_sobel_vertical_kernel_2d(float** kernel) {
+  /*
 
         Vertical kernel has the form:
 
@@ -54,33 +46,29 @@ void get_sobel_vertical_kernel_2d(float** kernel)
 
     */
 
-    *kernel = (float*)malloc(sizeof(float)*9);
+  *kernel = (float*)malloc(sizeof(float) * 9);
 
-    if (! *kernel)
-    {
-        return;
-    }
+  if (!*kernel) {
+    return;
+  }
 
-    (*kernel)[0] = 1;
-    (*kernel)[1] = 2;
-    (*kernel)[2] = 1;
+  (*kernel)[0] = 1;
+  (*kernel)[1] = 2;
+  (*kernel)[2] = 1;
 
-    (*kernel)[3] = 0;
-    (*kernel)[4] = 0;
-    (*kernel)[5] = 0;
+  (*kernel)[3] = 0;
+  (*kernel)[4] = 0;
+  (*kernel)[5] = 0;
 
-    (*kernel)[6] = -1;
-    (*kernel)[7] = -2;
-    (*kernel)[8] = -1;
-
+  (*kernel)[6] = -1;
+  (*kernel)[7] = -2;
+  (*kernel)[8] = -1;
 }
 
+void get_sobel_horizontal_kernel_3d(float** kernel) {
+  //adapted from: https://www.hindawi.com/journals/mpe/2016/4904279/
 
-void get_sobel_horizontal_kernel_3d(float** kernel)
-{
-    //adapted from: https://www.hindawi.com/journals/mpe/2016/4904279/
-
-    /*
+  /*
             
                  +---------------+
                 /    -2  0  2   /|
@@ -99,62 +87,55 @@ void get_sobel_horizontal_kernel_3d(float** kernel)
     
     */
 
+  //kernel allocation.
+  *kernel = (float*)malloc(27 * sizeof(float));
 
+  if (!*kernel) {
+    return;
+  }
 
-    //kernel allocation.
-    *kernel = (float*)malloc(27*sizeof(float));
+  //first plane
+  (*kernel)[0] = -2;
+  (*kernel)[1] = 0;
+  (*kernel)[2] = 2;
 
-    if (! *kernel)
-    {
-        return;
-    }
+  (*kernel)[3] = -3;
+  (*kernel)[4] = 0;
+  (*kernel)[5] = 3;
 
-    //first plane
-    (*kernel)[0] = -2;
-    (*kernel)[1] =  0;
-    (*kernel)[2] =  2;
+  (*kernel)[6] = -2;
+  (*kernel)[7] = 0;
+  (*kernel)[8] = 2;
 
-    (*kernel)[3] = -3;
-    (*kernel)[4] =  0;
-    (*kernel)[5] =  3;
+  //second plane
+  (*kernel)[9] = -3;
+  (*kernel)[10] = 0;
+  (*kernel)[11] = -3;
 
-    (*kernel)[6] = -2;
-    (*kernel)[7] =  0;
-    (*kernel)[8] =  2;
+  (*kernel)[12] = -6;
+  (*kernel)[13] = 0;
+  (*kernel)[14] = 6;
 
-    //second plane
-    (*kernel)[9] = -3;
-    (*kernel)[10] =  0;
-    (*kernel)[11] = -3;
+  (*kernel)[15] = -3;
+  (*kernel)[16] = 0;
+  (*kernel)[17] = 3;
 
-    (*kernel)[12] = -6;
-    (*kernel)[13] =  0;
-    (*kernel)[14] =  6;
+  //third plane
+  (*kernel)[18] = -2;
+  (*kernel)[19] = 0;
+  (*kernel)[20] = 2;
 
-    (*kernel)[15] = -3;
-    (*kernel)[16] =  0;
-    (*kernel)[17] =  3;
+  (*kernel)[21] = -3;
+  (*kernel)[22] = 0;
+  (*kernel)[23] = 3;
 
-    //third plane
-    (*kernel)[18] = -2;
-    (*kernel)[19] =  0;
-    (*kernel)[20] =  2;
-
-    (*kernel)[21] = -3;
-    (*kernel)[22] =  0;
-    (*kernel)[23] =  3;
-
-    (*kernel)[24] = -2;
-    (*kernel)[25] =  0;
-    (*kernel)[26] =  2;
-    
-
+  (*kernel)[24] = -2;
+  (*kernel)[25] = 0;
+  (*kernel)[26] = 2;
 }
 
-
-void get_sobel_vertical_kernel_3d(float** kernel)
-{
-    /*
+void get_sobel_vertical_kernel_3d(float** kernel) {
+  /*
             
                  +---------------+
                 /    -2 -3 -2   /|
@@ -173,59 +154,56 @@ void get_sobel_vertical_kernel_3d(float** kernel)
     
     */
 
-        //kernel allocation.
-    *kernel = (float*)malloc(27*sizeof(float));
+  //kernel allocation.
+  *kernel = (float*)malloc(27 * sizeof(float));
 
-    if (! *kernel)
-    {
-        return;
-    }
+  if (!*kernel) {
+    return;
+  }
 
-    //first plane
-    (*kernel)[0] = -2;
-    (*kernel)[1] = -3;
-    (*kernel)[2] = -2;
+  //first plane
+  (*kernel)[0] = -2;
+  (*kernel)[1] = -3;
+  (*kernel)[2] = -2;
 
-    (*kernel)[3] =  0;
-    (*kernel)[4] =  0;
-    (*kernel)[5] =  0;
+  (*kernel)[3] = 0;
+  (*kernel)[4] = 0;
+  (*kernel)[5] = 0;
 
-    (*kernel)[6] =  2;
-    (*kernel)[7] =  3;
-    (*kernel)[8] =  2;
+  (*kernel)[6] = 2;
+  (*kernel)[7] = 3;
+  (*kernel)[8] = 2;
 
-    //second plane
-    (*kernel)[9] = -3;
-    (*kernel)[10] = -6;
-    (*kernel)[11] = -3;
+  //second plane
+  (*kernel)[9] = -3;
+  (*kernel)[10] = -6;
+  (*kernel)[11] = -3;
 
-    (*kernel)[12] =  0;
-    (*kernel)[13] =  0;
-    (*kernel)[14] =  0;
+  (*kernel)[12] = 0;
+  (*kernel)[13] = 0;
+  (*kernel)[14] = 0;
 
-    (*kernel)[15] =  3;
-    (*kernel)[16] =  6;
-    (*kernel)[17] =  3;
+  (*kernel)[15] = 3;
+  (*kernel)[16] = 6;
+  (*kernel)[17] = 3;
 
-    //third plane
-    (*kernel)[18] = -2;
-    (*kernel)[19] = -3;
-    (*kernel)[20] = -2;
+  //third plane
+  (*kernel)[18] = -2;
+  (*kernel)[19] = -3;
+  (*kernel)[20] = -2;
 
-    (*kernel)[21] =  0;
-    (*kernel)[22] =  0;
-    (*kernel)[23] =  0;
+  (*kernel)[21] = 0;
+  (*kernel)[22] = 0;
+  (*kernel)[23] = 0;
 
-    (*kernel)[24] =  2;
-    (*kernel)[25] =  3;
-    (*kernel)[26] =  2;
+  (*kernel)[24] = 2;
+  (*kernel)[25] = 3;
+  (*kernel)[26] = 2;
 }
 
+void get_sobel_depth_kernel_3d(float** kernel) {
 
-void get_sobel_depth_kernel_3d(float** kernel)
-{
-
-      /*
+  /*
             
                  +---------------+
                 /    2  3  2    /|
@@ -243,209 +221,227 @@ void get_sobel_depth_kernel_3d(float** kernel)
 
     
     */
-    //kernel allocation.
-    *kernel = (float*)malloc(27*sizeof(float));
+  //kernel allocation.
+  *kernel = (float*)malloc(27 * sizeof(float));
 
-    if (! *kernel)
-    {
-        return;
-    }
+  if (!*kernel) {
+    return;
+  }
 
-    //first plane
-    (*kernel)[0] = 2;
-    (*kernel)[1] = 3;
-    (*kernel)[2] = 2;
+  //first plane
+  (*kernel)[0] = 2;
+  (*kernel)[1] = 3;
+  (*kernel)[2] = 2;
 
-    (*kernel)[3] = 3;
-    (*kernel)[4] = 6;
-    (*kernel)[5] = 3;
+  (*kernel)[3] = 3;
+  (*kernel)[4] = 6;
+  (*kernel)[5] = 3;
 
-    (*kernel)[6] = 2;
-    (*kernel)[7] = 3;
-    (*kernel)[8] = 2;
+  (*kernel)[6] = 2;
+  (*kernel)[7] = 3;
+  (*kernel)[8] = 2;
 
-    //second plane
-    (*kernel)[9] = 0;
-    (*kernel)[10] = 0;
-    (*kernel)[11] = 0;
+  //second plane
+  (*kernel)[9] = 0;
+  (*kernel)[10] = 0;
+  (*kernel)[11] = 0;
 
-    (*kernel)[12] = 0;
-    (*kernel)[13] = 0;
-    (*kernel)[14] = 0;
+  (*kernel)[12] = 0;
+  (*kernel)[13] = 0;
+  (*kernel)[14] = 0;
 
-    (*kernel)[15] = 0;
-    (*kernel)[16] = 0;
-    (*kernel)[17] = 0;
+  (*kernel)[15] = 0;
+  (*kernel)[16] = 0;
+  (*kernel)[17] = 0;
 
-    //third plane
-    (*kernel)[18] =  -2;
-    (*kernel)[19] =  -3;
-    (*kernel)[20] =  -2;
+  //third plane
+  (*kernel)[18] = -2;
+  (*kernel)[19] = -3;
+  (*kernel)[20] = -2;
 
-    (*kernel)[21] =  -3;
-    (*kernel)[22] =  -6;
-    (*kernel)[23] =  -3;
+  (*kernel)[21] = -3;
+  (*kernel)[22] = -6;
+  (*kernel)[23] = -3;
 
-    (*kernel)[24] =  -2;
-    (*kernel)[25] =  -3;
-    (*kernel)[26] =  -2;
+  (*kernel)[24] = -2;
+  (*kernel)[25] = -3;
+  (*kernel)[26] = -2;
 }
 
+template <typename dtype>
+__global__ void sobel_filter_kernel_2d(dtype* image, float* output, float* deviceKernelHorizontal,
+                                       float* deviceKernelVertical, int idz, int xsize, int ysize,
+                                       int zsize) {
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-template<typename dtype>
-__global__ void sobel_filter_kernel_2d(dtype* image, float* output,
-                                         float* deviceKernelHorizontal, float* deviceKernelVertical,
-                                         int idz, int xsize, int ysize, int zsize)
-{
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  if (idx < xsize && idy < ysize) {
+    float tempVertical;
+    float tempHorizontal;
 
-    if (idx < xsize && idy < ysize)
-    {
-        float tempVertical;
-        float tempHorizontal;
+    convolution2d(image + idz * xsize * ysize, &tempHorizontal, deviceKernelHorizontal, idx, idy,
+                  xsize, ysize, 3, 3);
+    convolution2d(image + idz * xsize * ysize, &tempVertical, deviceKernelVertical, idx, idy, xsize,
+                  ysize, 3, 3);
 
-        convolution2d(image + idz * xsize * ysize, &tempHorizontal, deviceKernelHorizontal, idx, idy, xsize, ysize, 3, 3);
-        convolution2d(image + idz * xsize * ysize, &tempVertical, deviceKernelVertical, idx, idy, xsize, ysize, 3, 3);
-
-        output[idz * xsize * ysize + idx * ysize + idy] = tempHorizontal * tempHorizontal + tempVertical * tempVertical;
-        output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
-    }
+    output[idz * xsize * ysize + idx * ysize + idy] =
+        tempHorizontal * tempHorizontal + tempVertical * tempVertical;
+    output[idz * xsize * ysize + idx * ysize + idy] =
+        (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
+  }
 }
 
-template<typename dtype>
-__global__ void sobel_filter_kernel_3d(dtype* image, float* output,
-                                         float* deviceKernelHorizontal, float* deviceKernelVertical, float* deviceKernelDepth,
-                                         int xsize, int ysize, int zsize)
-{
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
-    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+template <typename dtype>
+__global__ void sobel_filter_kernel_3d(dtype* image, float* output, float* deviceKernelHorizontal,
+                                       float* deviceKernelVertical, float* deviceKernelDepth,
+                                       int xsize, int ysize, int zsize) {
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if (idx < xsize && idy < ysize && idz < zsize)
-    {
-        float tempVertical;
-        float tempHorizontal;
-        float tempDepth;
+  if (idx < xsize && idy < ysize && idz < zsize) {
+    float tempVertical;
+    float tempHorizontal;
+    float tempDepth;
 
-        convolution3d(image, &tempHorizontal, deviceKernelHorizontal, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
-        convolution3d(image, &tempVertical, deviceKernelVertical, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
-        convolution3d(image, &tempDepth, deviceKernelDepth, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
+    convolution3d(image, &tempHorizontal, deviceKernelHorizontal, idx, idy, idz, xsize, ysize,
+                  zsize, 3, 3, 3);
+    convolution3d(image, &tempVertical, deviceKernelVertical, idx, idy, idz, xsize, ysize, zsize, 3,
+                  3, 3);
+    convolution3d(image, &tempDepth, deviceKernelDepth, idx, idy, idz, xsize, ysize, zsize, 3, 3,
+                  3);
 
-        output[idz * xsize * ysize + idx * ysize + idy] = tempHorizontal * tempHorizontal + tempVertical * tempVertical + tempDepth * tempDepth;
-        output[idz * xsize * ysize + idx * ysize + idy] = (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
-    }
+    output[idz * xsize * ysize + idx * ysize + idy] =
+        tempHorizontal * tempHorizontal + tempVertical * tempVertical + tempDepth * tempDepth;
+    output[idz * xsize * ysize + idx * ysize + idy] =
+        (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
+  }
 }
 
-template __global__ void sobel_filter_kernel_2d<int>(int* image, float* output, float* deviceKernelHorizontal, float* deviceKernelVertical, int idz,int xsize, int ysize,int zsize);
-template __global__ void sobel_filter_kernel_2d<float>(float* image, float* output, float* deviceKernelHorizontal, float* deviceKernelVertical, int idz,int xsize, int ysize,int zsize);
+template __global__ void sobel_filter_kernel_2d<int>(int* image, float* output,
+                                                     float* deviceKernelHorizontal,
+                                                     float* deviceKernelVertical, int idz,
+                                                     int xsize, int ysize, int zsize);
+template __global__ void sobel_filter_kernel_2d<float>(float* image, float* output,
+                                                       float* deviceKernelHorizontal,
+                                                       float* deviceKernelVertical, int idz,
+                                                       int xsize, int ysize, int zsize);
 
-template __global__ void sobel_filter_kernel_3d<int>(int* image, float* output, float* deviceKernelHorizontal, float* deviceKernelVertical, float* deviceKernelDepth, int xsize, int ysize, int zsize);
-template __global__ void sobel_filter_kernel_3d<float>(float* image, float* output, float* deviceKernelHorizontal, float* deviceKernelVertical, float* deviceKernelDepth, int xsize, int ysize, int zsize);
+template __global__ void sobel_filter_kernel_3d<int>(int* image, float* output,
+                                                     float* deviceKernelHorizontal,
+                                                     float* deviceKernelVertical,
+                                                     float* deviceKernelDepth, int xsize, int ysize,
+                                                     int zsize);
+template __global__ void sobel_filter_kernel_3d<float>(float* image, float* output,
+                                                       float* deviceKernelHorizontal,
+                                                       float* deviceKernelVertical,
+                                                       float* deviceKernelDepth, int xsize,
+                                                       int ysize, int zsize);
 
+template <typename dtype>
+void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type) {
 
+  dtype* deviceImage;
+  float* deviceOutput;
+  cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
+  cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
 
-template<typename dtype>
-void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type)
-{
+  cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
-    dtype* deviceImage;
-    float* deviceOutput;
-    cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
-    cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
+  if (type == false) {
+    float* kernelHorizontal;
+    get_sobel_horizontal_kernel_2d(&kernelHorizontal);
 
-    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+    float* kernelVertical;
+    get_sobel_vertical_kernel_2d(&kernelVertical);
 
-    if (type == false)
-    {
-        float* kernelHorizontal;
-        get_sobel_horizontal_kernel_2d(&kernelHorizontal);
+    float* deviceKernelHorizontal;
+    cudaMalloc((void**)&deviceKernelHorizontal, 9 * sizeof(float));
+    cudaMemcpy(deviceKernelHorizontal, kernelHorizontal, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
-        float* kernelVertical;
-        get_sobel_vertical_kernel_2d(&kernelVertical);
+    float* deviceKernelVertical;
+    cudaMalloc((void**)&deviceKernelVertical, 9 * sizeof(float));
+    cudaMemcpy(deviceKernelVertical, kernelVertical, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
-        float* deviceKernelHorizontal;
-        cudaMalloc((void**)&deviceKernelHorizontal, 9 * sizeof(float));
-        cudaMemcpy(deviceKernelHorizontal, kernelHorizontal, 9 * sizeof(float), cudaMemcpyHostToDevice);
+    dim3 blockSize(16, 16);
+    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
 
-        float* deviceKernelVertical;
-        cudaMalloc((void**)&deviceKernelVertical, 9 * sizeof(float));
-        cudaMemcpy(deviceKernelVertical, kernelVertical, 9 * sizeof(float), cudaMemcpyHostToDevice);
+    auto start = std::chrono::high_resolution_clock::now();
 
-        dim3 blockSize(16, 16);
-        dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y,(ysize + blockSize.x - 1) / blockSize.x );
-
-        auto start = std::chrono::high_resolution_clock::now();
-
-        for (int k = 0; k < zsize; ++k) {
-            sobel_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernelHorizontal, deviceKernelVertical, k, xsize, ysize, zsize);
-        }
-        cudaDeviceSynchronize();
-
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
-
-        cudaFree(deviceKernelHorizontal);
-        cudaFree(deviceKernelVertical);    
+    for (int k = 0; k < zsize; ++k) {
+      sobel_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput,
+                                                      deviceKernelHorizontal, deviceKernelVertical,
+                                                      k, xsize, ysize, zsize);
     }
+    cudaDeviceSynchronize();
 
-    else
-    {
-        float* kernelHorizontal;
-        get_sobel_horizontal_kernel_3d(&kernelHorizontal);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::microseconds duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
-        float* kernelVertical;
-        get_sobel_vertical_kernel_3d(&kernelVertical);
+    cudaFree(deviceKernelHorizontal);
+    cudaFree(deviceKernelVertical);
+  }
 
-        float* kernelDepth;
-        get_sobel_depth_kernel_3d(&kernelDepth); // Corrected function name
+  else {
+    float* kernelHorizontal;
+    get_sobel_horizontal_kernel_3d(&kernelHorizontal);
 
-        float* deviceKernelHorizontal;
-        cudaMalloc((void**)&deviceKernelHorizontal, 27 * sizeof(float));
-        cudaMemcpy(deviceKernelHorizontal, kernelHorizontal, 27 * sizeof(float), cudaMemcpyHostToDevice);
+    float* kernelVertical;
+    get_sobel_vertical_kernel_3d(&kernelVertical);
 
-        float* deviceKernelVertical;
-        cudaMalloc((void**)&deviceKernelVertical, 27 * sizeof(float));
-        cudaMemcpy(deviceKernelVertical, kernelVertical, 27 * sizeof(float), cudaMemcpyHostToDevice);
+    float* kernelDepth;
+    get_sobel_depth_kernel_3d(&kernelDepth);  // Corrected function name
 
-        float* deviceKernelDepth;
-        cudaMalloc((void**)&deviceKernelDepth, 27 * sizeof(float));
-        cudaMemcpy(deviceKernelDepth, kernelDepth, 27 * sizeof(float), cudaMemcpyHostToDevice);
+    float* deviceKernelHorizontal;
+    cudaMalloc((void**)&deviceKernelHorizontal, 27 * sizeof(float));
+    cudaMemcpy(deviceKernelHorizontal, kernelHorizontal, 27 * sizeof(float),
+               cudaMemcpyHostToDevice);
 
+    float* deviceKernelVertical;
+    cudaMalloc((void**)&deviceKernelVertical, 27 * sizeof(float));
+    cudaMemcpy(deviceKernelVertical, kernelVertical, 27 * sizeof(float), cudaMemcpyHostToDevice);
 
-        dim3 blockSize(8, 8, 8);
-        dim3 gridSize( (xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x, (zsize + blockSize.z - 1) / blockSize.z);
+    float* deviceKernelDepth;
+    cudaMalloc((void**)&deviceKernelDepth, 27 * sizeof(float));
+    cudaMemcpy(deviceKernelDepth, kernelDepth, 27 * sizeof(float), cudaMemcpyHostToDevice);
 
-        auto start = std::chrono::high_resolution_clock::now();
+    dim3 blockSize(8, 8, 8);
+    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x,
+                  (zsize + blockSize.z - 1) / blockSize.z);
 
-        sobel_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput,
-                                                         deviceKernelHorizontal, deviceKernelVertical, deviceKernelDepth,
-                                                         xsize, ysize, zsize);
+    auto start = std::chrono::high_resolution_clock::now();
 
-        cudaDeviceSynchronize();
+    sobel_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput,
+                                                    deviceKernelHorizontal, deviceKernelVertical,
+                                                    deviceKernelDepth, xsize, ysize, zsize);
 
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl; 
+    cudaDeviceSynchronize();
 
-        cudaFree(deviceKernelHorizontal);
-        cudaFree(deviceKernelVertical);
-        cudaFree(deviceKernelDepth);
-    }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::microseconds duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
-    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaFree(deviceKernelHorizontal);
+    cudaFree(deviceKernelVertical);
+    cudaFree(deviceKernelDepth);
+  }
 
-    cudaFree(deviceImage);
-    cudaFree(deviceOutput);
+  cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+
+  cudaFree(deviceImage);
+  cudaFree(deviceOutput);
 }
 
 // Explicit instantiation
-template void sobel_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, bool type);
-template void sobel_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize, bool type);
-template void sobel_filtering<unsigned int>(unsigned int* image, float* output, int xsize, int ysize, int zsize, bool type);
-
-
+template void sobel_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize,
+                                     bool type);
+template void sobel_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize,
+                                   bool type);
+template void sobel_filtering<unsigned int>(unsigned int* image, float* output, int xsize,
+                                            int ysize, int zsize, bool type);
 
 /*
 

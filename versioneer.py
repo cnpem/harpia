@@ -1321,7 +1321,17 @@ def git_pieces_from_vcs(tag_prefix: str, root: str, verbose: bool, runner: Calla
     # if there is a tag matching tag_prefix, this yields TAG-NUM-gHEX[-dirty]
     # if there isn't one, this yields HEX[-dirty] (no NUM)
     describe_out, rc = runner(
-        GITS, ["describe", "--tags", "--dirty", "--always", "--long", "--match", f"{tag_prefix}[[:digit:]]*"], cwd=root
+        GITS,
+        [
+            "describe",
+            "--tags",
+            "--dirty",
+            "--always",
+            "--long",
+            "--match",
+            f"{tag_prefix}[[:digit:]]*",
+        ],
+        cwd=root,
     )
     # --long was added in git-1.5.5
     if describe_out is None:
@@ -1395,7 +1405,10 @@ def git_pieces_from_vcs(tag_prefix: str, root: str, verbose: bool, runner: Calla
             if verbose:
                 fmt = "tag '%s' doesn't start with prefix '%s'"
                 print(fmt % (full_tag, tag_prefix))
-            pieces["error"] = "tag '%s' doesn't start with prefix '%s'" % (full_tag, tag_prefix)
+            pieces["error"] = "tag '%s' doesn't start with prefix '%s'" % (
+                full_tag,
+                tag_prefix,
+            )
             return pieces
         pieces["closest-tag"] = full_tag[len(tag_prefix) :]
 

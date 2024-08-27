@@ -9,23 +9,14 @@
 #define CUDA_GLOBAL
 #endif
 
-typedef enum {
-    EROSION,
-    DILATION
-} MorphOp;
+typedef enum { EROSION, DILATION } MorphOp;
 
 // Define the enum
-typedef enum {
-    ERODE,
-    DILATE,
-    TOPHAT,
-    BOTTOMHAT
-} MorphCV;
+typedef enum { ERODE, DILATE, TOPHAT, BOTTOMHAT } MorphCV;
 
 typedef struct {
-    MorphOp operation1;
-    MorphOp operation2;
+  MorphOp operation1;
+  MorphOp operation2;
 } MorphChain;
 
-
-#endif // MORPHOLOGY_H
+#endif  // MORPHOLOGY_H

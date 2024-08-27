@@ -1,16 +1,14 @@
-#include<iostream>
-#include<cmath>
-#include<cuda.h>
-#include<cuda_runtime.h>
-#include<chrono>
-#include"../../include/filters/canny_filter.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <chrono>
+#include <cmath>
+#include <iostream>
+#include "../../include/filters/canny_filter.h"
 
 //based on: https://github.com/arashsm79/parallel-canny-edge-detector/tree/main
 
-
-void get_horizontal_kernel_2d(float** kernel)
-{
-    /*
+void get_horizontal_kernel_2d(float** kernel) {
+  /*
 
         Horizontal kernel has the form:
 
@@ -20,35 +18,27 @@ void get_horizontal_kernel_2d(float** kernel)
 
     */
 
-    *kernel = (float*)malloc(sizeof(float)*9);
+  *kernel = (float*)malloc(sizeof(float) * 9);
 
-    if (! *kernel)
-    {
-        return;
-    }
-    
+  if (!*kernel) {
+    return;
+  }
 
-    (*kernel)[0] = 1;
-    (*kernel)[1] = 0;
-    (*kernel)[2] = -1;
+  (*kernel)[0] = 1;
+  (*kernel)[1] = 0;
+  (*kernel)[2] = -1;
 
-    (*kernel)[3] = 2;
-    (*kernel)[4] = 0;
-    (*kernel)[5] = -2;
+  (*kernel)[3] = 2;
+  (*kernel)[4] = 0;
+  (*kernel)[5] = -2;
 
-    (*kernel)[6] = 1;
-    (*kernel)[7] = 0;
-    (*kernel)[8] = -1;
-    
-
+  (*kernel)[6] = 1;
+  (*kernel)[7] = 0;
+  (*kernel)[8] = -1;
 }
 
-
-
-
-void get_vertical_kernel_2d(float** kernel)
-{
-    /*
+void get_vertical_kernel_2d(float** kernel) {
+  /*
 
         Vertical kernel has the form:
 
@@ -58,402 +48,335 @@ void get_vertical_kernel_2d(float** kernel)
 
     */
 
-    *kernel = (float*)malloc(sizeof(float)*9);
+  *kernel = (float*)malloc(sizeof(float) * 9);
 
-    if (! *kernel)
-    {
-        return;
-    }
+  if (!*kernel) {
+    return;
+  }
 
-    (*kernel)[0] = 1;
-    (*kernel)[1] = 2;
-    (*kernel)[2] = 1;
+  (*kernel)[0] = 1;
+  (*kernel)[1] = 2;
+  (*kernel)[2] = 1;
 
-    (*kernel)[3] = 0;
-    (*kernel)[4] = 0;
-    (*kernel)[5] = 0;
+  (*kernel)[3] = 0;
+  (*kernel)[4] = 0;
+  (*kernel)[5] = 0;
 
-    (*kernel)[6] = -1;
-    (*kernel)[7] = -2;
-    (*kernel)[8] = -1;
-
+  (*kernel)[6] = -1;
+  (*kernel)[7] = -2;
+  (*kernel)[8] = -1;
 }
 
 __global__ void gradient_magnitude_direction_2d(float* image, float* magnitude, uint8_t* direction,
                                                 float* horizontal_kernel, float* vertical_kernel,
-                                                int xsize, int ysize, int idz)
-{
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+                                                int xsize, int ysize, int idz) {
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < xsize && idy < ysize)
-    {
-        int index = idz * xsize * ysize + idx * ysize + idy;
+  if (idx < xsize && idy < ysize) {
+    int index = idz * xsize * ysize + idx * ysize + idy;
 
-        uint8_t temp = 0;
-        float grad_x = 0;
-        float grad_y = 0;
+    uint8_t temp = 0;
+    float grad_x = 0;
+    float grad_y = 0;
 
-        convolution2d(image + idz * xsize * ysize, &grad_x, horizontal_kernel, idx, idy, xsize, ysize, 3, 3);
-        convolution2d(image + idz * xsize * ysize, &grad_y, vertical_kernel, idx, idy, xsize, ysize, 3, 3);
+    convolution2d(image + idz * xsize * ysize, &grad_x, horizontal_kernel, idx, idy, xsize, ysize,
+                  3, 3);
+    convolution2d(image + idz * xsize * ysize, &grad_y, vertical_kernel, idx, idy, xsize, ysize, 3,
+                  3);
 
-        if (grad_x == 0 || grad_y == 0)
-        {
-            magnitude[index] = (float)0.;
-        }
-
-        else
-        {
-            magnitude[index] = (float)sqrtf(grad_x*grad_x + grad_y*grad_y);
-
-            float theta = atan2f(grad_y,grad_x) * (360.0f/PI);
-            
-            if ((theta <= 22.5 && theta >= -22.5) || (theta <= -157.5) || (theta >= 157.5))
-            {
-                temp = 1;
-            }
-            
-            else if ((theta > 22.5 && theta <= 67.5) || (theta > -157.5 && theta <= -112.5))
-            {
-                temp = 2;
-            }
-
-            else if ((theta > 67.5 && theta <= 112.5) || (theta >= -112.5 && theta < -67.5))
-            {
-                temp = 3;
-            }
-
-            else if ((theta >= -67.5 && theta < -22.5) || (theta > 112.5 && theta < 157.5))
-            {
-                temp = 4;
-            }
-            
-            
-        }
-
-        direction[index] = temp;
-        
-        
-
+    if (grad_x == 0 || grad_y == 0) {
+      magnitude[index] = (float)0.;
     }
 
+    else {
+      magnitude[index] = (float)sqrtf(grad_x * grad_x + grad_y * grad_y);
 
-}
+      float theta = atan2f(grad_y, grad_x) * (360.0f / PI);
 
+      if ((theta <= 22.5 && theta >= -22.5) || (theta <= -157.5) || (theta >= 157.5)) {
+        temp = 1;
+      }
 
+      else if ((theta > 22.5 && theta <= 67.5) || (theta > -157.5 && theta <= -112.5)) {
+        temp = 2;
+      }
 
-//can be optimized -- > improve borders by reflect -- > already done it in the gradient step, no need here
-//therefore its done
-__global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, int xsize, int ysize, int idz)
-{
+      else if ((theta > 67.5 && theta <= 112.5) || (theta >= -112.5 && theta < -67.5)) {
+        temp = 3;
+      }
 
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
-
-    if (idx < xsize && idy < ysize)
-    {
-        int index = idz * xsize * ysize + idx * ysize + idy;
-        
-        switch (direction[index])
-        {
-            case 1:
-                
-                if (magnitude[index - 1] >= magnitude[index] ||
-                    magnitude[index + 1] > magnitude[index])
-                {
-                    magnitude[index] = 0;
-                }
-                
-                break;
-            
-            case 2:
-
-                if (magnitude[index - (ysize-1)] >= magnitude[index] ||
-                    magnitude[index + (ysize-1)] > magnitude[index])
-                {
-                    magnitude[index] = 0;
-                }
-
-                break;
-
-            case 3:
-
-                if (magnitude[index - ysize] >= magnitude[index] ||
-                    magnitude[index + ysize] > magnitude[index])
-                {
-                    magnitude[index] = 0;
-                }
-
-                break;
-
-
-            case 4:
-
-                if (magnitude[index - (ysize+1)] >= magnitude[index] ||
-                    magnitude[index + (ysize+1)] > magnitude[index])
-                {
-                    magnitude[index] = 0;
-                }
-
-                break;
-
-            default:
-
-                magnitude[index] = 0;
-                
-                break;
-            
-                
-        }
-
-
-
+      else if ((theta >= -67.5 && theta < -22.5) || (theta > 112.5 && theta < 157.5)) {
+        temp = 4;
+      }
     }
-    
 
+    direction[index] = temp;
+  }
 }
 
+// can be optimized -- > improve borders by reflect -- > already done it in the gradient step, no
+// need here therefore its done
+__global__ void non_maximum_supression_2d(float* magnitude, uint8_t* direction, int xsize,
+                                          int ysize, int idz) {
 
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
+  if (idx < xsize && idy < ysize) {
+    int index = idz * xsize * ysize + idx * ysize + idy;
 
-__global__ void thresholding_2d(float* image, float low, float high, int xsize, int ysize, int idz)
-{
+    switch (direction[index]) {
+      case 1:
 
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
-
-    if (idx < xsize && idy <ysize)
-    {
-        int index = idz * xsize * ysize + idx * ysize + idy;
-
-        //strong edge.
-        if (image[index] > high)
-        {
-            image[index] = 255;
+        if (magnitude[index - 1] >= magnitude[index] || magnitude[index + 1] > magnitude[index]) {
+          magnitude[index] = 0;
         }
 
-        //weak edge.
-        else if (image[index] > low)
-        {
-            image[index] = 100;
+        break;
+
+      case 2:
+
+        if (magnitude[index - (ysize - 1)] >= magnitude[index] ||
+            magnitude[index + (ysize - 1)] > magnitude[index]) {
+          magnitude[index] = 0;
         }
 
-        //not an edge.
-        else
-        {
-            image[index] = 0;
+        break;
+
+      case 3:
+
+        if (magnitude[index - ysize] >= magnitude[index] ||
+            magnitude[index + ysize] > magnitude[index]) {
+          magnitude[index] = 0;
         }
-        
-        
-        
+
+        break;
+
+      case 4:
+
+        if (magnitude[index - (ysize + 1)] >= magnitude[index] ||
+            magnitude[index + (ysize + 1)] > magnitude[index]) {
+          magnitude[index] = 0;
+        }
+
+        break;
+
+      default:
+
+        magnitude[index] = 0;
+
+        break;
     }
-    
-
-
+  }
 }
 
+__global__ void thresholding_2d(float* image, float low, float high, int xsize, int ysize,
+                                int idz) {
 
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+  if (idx < xsize && idy < ysize) {
+    int index = idz * xsize * ysize + idx * ysize + idy;
+
+    //strong edge.
+    if (image[index] > high) {
+      image[index] = 255;
+    }
+
+    //weak edge.
+    else if (image[index] > low) {
+      image[index] = 100;
+    }
+
+    //not an edge.
+    else {
+      image[index] = 0;
+    }
+  }
+}
 
 //done
-__global__ void hysteresis_2d(float* image, int xsize, int ysize, int idz)
-{
+__global__ void hysteresis_2d(float* image, int xsize, int ysize, int idz) {
 
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < xsize && idy < ysize)
+  if (idx < xsize && idy < ysize) {
+    int index = idz * xsize * ysize + idx * ysize + idy;
+
+    if (image[index] ==
+        100)  //uma forma melhor seria usando a soma dos valores e utilizar o resto da divisão, para
+              //analisar se a condição é valida==> muito mais rapido que ifs
     {
-        int index = idz * xsize * ysize + idx * ysize + idy;
+      if (image[index - 1] == 255 || image[index + 1] == 255 || image[index - ysize] == 255 ||
+          image[index + ysize] || image[index - ysize - 1] == 255 ||
+          image[index - ysize + 1] == 255 || image[index + ysize - 1] == 255 ||
+          image[index + ysize + 1] == 255) {
+        image[index] = 255;
+      }
 
-        if (image[index] == 100)//uma forma melhor seria usando a soma dos valores e utilizar o resto da divisão, para analisar se a condição é valida==> muito mais rapido que ifs
-        {
-            if (image[index - 1] == 255 || image[index + 1] == 255 ||
-                image[index - ysize] == 255 || image[index + ysize] ||
-                image[index - ysize - 1] == 255 || image[index - ysize + 1] == 255 || 
-                image[index + ysize - 1] == 255 || image[index + ysize + 1] == 255)
-            {
-                image[index] = 255;
-            }
-
-            else
-            {
-                image[index] = 0;
-            }
-            
-            
-        }
-        
+      else {
+        image[index] = 0;
+      }
     }
-    
-
-
+  }
 }
 
+template <typename dtype>
+void canny_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, float sigma,
+                     float low_threshold, float high_threshold) {
 
-
-template<typename dtype>
-void canny_filtering(dtype* image, float* output,
-                     int xsize, int ysize , int zsize,
-                     float sigma, float low_threshold, float high_threshold)
-{
-
-    /*
+  /*
 
         gaussian step.
 
     */
 
-    //device allocation for input and output images for the gaussian step.
-    dtype* dev_image;
-    float* dev_output;
-    cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
-    cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
-    cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+  //device allocation for input and output images for the gaussian step.
+  dtype* dev_image;
+  float* dev_output;
+  cudaMalloc((void**)&dev_image, xsize * ysize * zsize * sizeof(dtype));
+  cudaMalloc((void**)&dev_output, xsize * ysize * zsize * sizeof(float));
+  cudaMemcpy(dev_image, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
+  // get gaussian kernel size
+  int xsize_gaussian_kernel = (int)ceil(2 * sigma + 1);
+  int ysize_gaussian_kernel = xsize_gaussian_kernel;
 
-    // get gaussian kernel size
-    int xsize_gaussian_kernel = (int)ceil(2*sigma+1);
-    int ysize_gaussian_kernel = xsize_gaussian_kernel;
+  //get gaussian kernel.
+  float* gaussian_kernel;
+  get_gaussian_kernel_2d(&gaussian_kernel, xsize_gaussian_kernel, ysize_gaussian_kernel, sigma);
 
-    //get gaussian kernel.
-    float* gaussian_kernel;
-    get_gaussian_kernel_2d(&gaussian_kernel, xsize_gaussian_kernel, ysize_gaussian_kernel, sigma);
+  //device allocation for the gaussian kernel
+  float* dev_gaussian_kernel;
+  cudaMalloc((void**)&dev_gaussian_kernel,
+             xsize_gaussian_kernel * ysize_gaussian_kernel * sizeof(float));
+  cudaMemcpy(dev_gaussian_kernel, gaussian_kernel,
+             xsize_gaussian_kernel * ysize_gaussian_kernel * sizeof(float), cudaMemcpyHostToDevice);
 
-    //device allocation for the gaussian kernel
-    float* dev_gaussian_kernel;
-    cudaMalloc((void**)&dev_gaussian_kernel, xsize_gaussian_kernel * ysize_gaussian_kernel * sizeof(float));
-    cudaMemcpy(dev_gaussian_kernel, gaussian_kernel, xsize_gaussian_kernel * ysize_gaussian_kernel * sizeof(float), cudaMemcpyHostToDevice);
+  //Free host gaussian kernel
+  free(gaussian_kernel);
 
-    //Free host gaussian kernel
-    free(gaussian_kernel);
+  //cuda kernel configuration
+  dim3 blockSize(32, 32);
+  dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
 
-    //cuda kernel configuration
-    dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
+  //apply gaussian blur
+  for (int k = 0; k < zsize; k++) {
+    gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(
+        dev_image, dev_output, dev_gaussian_kernel, k, xsize, ysize, zsize, xsize_gaussian_kernel,
+        ysize_gaussian_kernel);
+  }
 
-    //apply gaussian blur
-    for (int k = 0; k < zsize; k++)
-    {
-            gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_gaussian_kernel,
-                                                               k, xsize, ysize, zsize,
-                                                               xsize_gaussian_kernel, ysize_gaussian_kernel);
-    }
+  //sync with host
+  cudaDeviceSynchronize();
 
-    //sync with host
-    cudaDeviceSynchronize();
+  //manage device memory.
+  cudaFree(dev_image);
+  cudaFree(dev_gaussian_kernel);
 
-    //manage device memory.
-    cudaFree(dev_image);
-    cudaFree(dev_gaussian_kernel);
-
-    /*
+  /*
     
         gradient step.
     
     */
 
-    //device allocation for the gradient magnitude and direction.
-    float* dev_magnitude;
-    uint8_t* dev_direction;
-    cudaMalloc((void**)&dev_magnitude, xsize * ysize * zsize * sizeof(float));
-    cudaMalloc((void**)&dev_direction, xsize * ysize * zsize * sizeof(uint8_t));
-    
-    //get gradient kernels.
-    float* horizontal_kernel;
-    get_horizontal_kernel_2d(&horizontal_kernel);
+  //device allocation for the gradient magnitude and direction.
+  float* dev_magnitude;
+  uint8_t* dev_direction;
+  cudaMalloc((void**)&dev_magnitude, xsize * ysize * zsize * sizeof(float));
+  cudaMalloc((void**)&dev_direction, xsize * ysize * zsize * sizeof(uint8_t));
 
-    float* vertical_kernel;
-    get_vertical_kernel_2d(&vertical_kernel);
+  //get gradient kernels.
+  float* horizontal_kernel;
+  get_horizontal_kernel_2d(&horizontal_kernel);
 
-    //allocate gradient kernels in device
-    float* dev_horizontal_kernel;
-    cudaMalloc((void**)&dev_horizontal_kernel, 9 * sizeof(float));
-    cudaMemcpy(dev_horizontal_kernel, horizontal_kernel, 9 * sizeof(float), cudaMemcpyHostToDevice);
+  float* vertical_kernel;
+  get_vertical_kernel_2d(&vertical_kernel);
 
-    float* dev_vertical_kernel;
-    cudaMalloc((void**)&dev_vertical_kernel, 9 * sizeof(float));
-    cudaMemcpy(dev_vertical_kernel, vertical_kernel, 9 * sizeof(float), cudaMemcpyHostToDevice);
+  //allocate gradient kernels in device
+  float* dev_horizontal_kernel;
+  cudaMalloc((void**)&dev_horizontal_kernel, 9 * sizeof(float));
+  cudaMemcpy(dev_horizontal_kernel, horizontal_kernel, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
-    //Free memory allocated for host gradient kernels.
-    free(horizontal_kernel);
-    free(vertical_kernel);
+  float* dev_vertical_kernel;
+  cudaMalloc((void**)&dev_vertical_kernel, 9 * sizeof(float));
+  cudaMemcpy(dev_vertical_kernel, vertical_kernel, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
-    for (int k = 0; k < zsize; k++)
-    {
-        gradient_magnitude_direction_2d<<<gridSize, blockSize>>>(dev_output, dev_magnitude, dev_direction,
-                                                                 dev_horizontal_kernel, dev_vertical_kernel,
-                                                                 xsize, ysize, k);
-    }
-    
-    cudaDeviceSynchronize();
+  //Free memory allocated for host gradient kernels.
+  free(horizontal_kernel);
+  free(vertical_kernel);
 
-    cudaFree(dev_output);
-    cudaFree(dev_horizontal_kernel);
-    cudaFree(dev_vertical_kernel);
+  for (int k = 0; k < zsize; k++) {
+    gradient_magnitude_direction_2d<<<gridSize, blockSize>>>(dev_output, dev_magnitude,
+                                                             dev_direction, dev_horizontal_kernel,
+                                                             dev_vertical_kernel, xsize, ysize, k);
+  }
 
-    /*
+  cudaDeviceSynchronize();
+
+  cudaFree(dev_output);
+  cudaFree(dev_horizontal_kernel);
+  cudaFree(dev_vertical_kernel);
+
+  /*
     
         non-maximum supression step.
     
     */
 
-   for (int k = 0; k < zsize; k++)
-   {
-        non_maximum_supression_2d<<<gridSize,blockSize>>>(dev_magnitude, dev_direction, xsize, ysize, k);
-   }
+  for (int k = 0; k < zsize; k++) {
+    non_maximum_supression_2d<<<gridSize, blockSize>>>(dev_magnitude, dev_direction, xsize, ysize,
+                                                       k);
+  }
 
-   cudaDeviceSynchronize();
+  cudaDeviceSynchronize();
 
-   cudaFree(dev_direction);
-   
-   /*
+  cudaFree(dev_direction);
+
+  /*
    
         thresholding step.
    
    */
 
-    for (int k = 0; k < zsize; k++)
-    {
+  for (int k = 0; k < zsize; k++) {
 
-        thresholding_2d<<<gridSize, blockSize>>>(dev_magnitude,low_threshold, high_threshold, xsize, ysize, k);
-        
-    }
-    
-    cudaDeviceSynchronize();
+    thresholding_2d<<<gridSize, blockSize>>>(dev_magnitude, low_threshold, high_threshold, xsize,
+                                             ysize, k);
+  }
 
+  cudaDeviceSynchronize();
 
-   /*
+  /*
    
         hysteresis step.
    
    */
 
-    for (int k = 0; k < zsize; k++)
-    {
-        hysteresis_2d<<<gridSize, blockSize>>>(dev_magnitude, xsize, ysize, k);
-    }
+  for (int k = 0; k < zsize; k++) {
+    hysteresis_2d<<<gridSize, blockSize>>>(dev_magnitude, xsize, ysize, k);
+  }
 
-    cudaDeviceSynchronize();
+  cudaDeviceSynchronize();
 
+  cudaMemcpy(output, dev_magnitude, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
 
-    cudaMemcpy(output, dev_magnitude, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
-
-    cudaFree(dev_magnitude);
-
+  cudaFree(dev_magnitude);
 }
 
 // Explicit instantiation
-template void canny_filtering<float>(float* image, float* output,
-                                    int xsize, int ysize , int zsize,
-                                    float sigma, float low_threshold, float high_threshold);
+template void canny_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize,
+                                     float sigma, float low_threshold, float high_threshold);
 
-template void canny_filtering<int>(int* image, float* output,
-                                    int xsize, int ysize , int zsize,
-                                    float sigma, float low_threshold, float high_threshold);
+template void canny_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize,
+                                   float sigma, float low_threshold, float high_threshold);
 
-template void canny_filtering<unsigned int>(unsigned int* image, float* output,
-                                    int xsize, int ysize , int zsize,
-                                    float sigma, float low_threshold, float high_threshold);
+template void canny_filtering<unsigned int>(unsigned int* image, float* output, int xsize,
+                                            int ysize, int zsize, float sigma, float low_threshold,
+                                            float high_threshold);
 
 /*
 

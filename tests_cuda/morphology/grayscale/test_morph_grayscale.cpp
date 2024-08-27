@@ -2,144 +2,156 @@
 #include <cstring>
 
 #include "../../../include/morphology/morph_grayscale.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
 #include "../../../include/tests/morphology/test_morph_grayscale.h"
 #include "../../../include/tests/morphology/test_util.h"
-#include "../../../include/tests/morphology/test_image_processing.h"
 
-void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                                    int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                                    MorphOp operation, const int flag_check, const int flag_verbose)
-{
-    // set input dimension
-    int size = xsize * ysize * zsize;
+void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize,
+                                    const int zsize, int* kernel, const int kernel_xsize,
+                                    const int kernel_ysize, const int kernel_zsize,
+                                    MorphOp operation, const int flag_check,
+                                    const int flag_verbose) {
+  // set input dimension
+  int size = xsize * ysize * zsize;
 
-    size_t nBytes = size * sizeof(int);
+  size_t nBytes = size * sizeof(int);
 
-    if(flag_verbose) printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+  if (flag_verbose)
+    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-    int *host_A, *device_ref; //pointers for host memory
-    host_A = (int *)malloc(nBytes);
-    device_ref = (int *)malloc(nBytes);
+  int *host_A, *device_ref;  //pointers for host memory
+  host_A = (int*)malloc(nBytes);
+  device_ref = (int*)malloc(nBytes);
 
-    // set input data
-    memset(host_A, 0, nBytes); 
-    memset(device_ref, 0, nBytes);
+  // set input data
+  memset(host_A, 0, nBytes);
+  memset(device_ref, 0, nBytes);
 
-    read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose);
 
-    // device erosion 
-    morph_grayscale_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, 
-                              operation, flag_verbose);
+  // device erosion
+  morph_grayscale_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
+                            xsize, ysize, zsize, operation, flag_verbose);
 
-    if(flag_check){
-        int *host_ref;
-        host_ref = (int *)malloc(nBytes);
-        memset(host_ref, 0, nBytes); 
-
-        // erosion
-        morph_grayscale_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, operation);
-
-        check_result(host_ref, device_ref, xsize, ysize, zsize);
-
-        free(host_ref);
-    }
-
-    free(host_A);
-    free(device_ref);
-}
-
-void test_morph_grayscale_on_host(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                                  int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                                  MorphOp operation, const int flag_show, const int flag_check, const int flag_verbose)
-{
-    // set input dimension
-    int size = xsize * ysize * zsize;
-
-    size_t nBytes = size * sizeof(float);
-    if(flag_verbose) printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
-
-    float *host_A, *host_ref; //pointers for host memory
-    host_A = (float *)malloc(nBytes);
-    host_ref = (float *)malloc(nBytes);
-
-    // set input data
-    memset(host_A, 0, nBytes); 
-    memset(host_ref, 0, nBytes); 
-    read_input(host_A, filename, size, flag_verbose);
-    if(flag_show) show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
+  if (flag_check) {
+    int* host_ref;
+    host_ref = (int*)malloc(nBytes);
+    memset(host_ref, 0, nBytes);
 
     // erosion
-    morph_grayscale_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, operation);
-    if(flag_show) show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
+    morph_grayscale_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
+                            xsize, ysize, zsize, operation);
 
-    if(flag_check){
-        if(kernel_zsize > 1){
-            printf("WARNING: Results will not match, openCV is done slice by slice, it is incompatible with kernel zsize: %d", kernel_zsize);
-        }
+    check_result(host_ref, device_ref, xsize, ysize, zsize);
 
-        float *opencv_ref;
-        opencv_ref = (float *)malloc(nBytes);
-        memset(opencv_ref, 0, nBytes); 
-
-        // openCV erosion 
-        morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize, operation);
-        if(flag_show) show_image_3D(opencv_ref, xsize, ysize, zsize, "Result openCV");
-
-        check_result(host_ref, opencv_ref, xsize, ysize, zsize);
-
-        free(opencv_ref);
-    }
-
-    if(flag_show) cv::waitKey(0);
-
-    //free host memory
-    free(host_A);
     free(host_ref);
+  }
+
+  free(host_A);
+  free(device_ref);
 }
 
-void test_morph_grayscale_on_device_time(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                                         int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-                                         MorphOp operation, int n)
-{
-    int flag_check = 0;
-    int flag_verbose = 0;
+void test_morph_grayscale_on_host(const std::string& filename, const int xsize, const int ysize,
+                                  const int zsize, int* kernel, const int kernel_xsize,
+                                  const int kernel_ysize, const int kernel_zsize, MorphOp operation,
+                                  const int flag_show, const int flag_check,
+                                  const int flag_verbose) {
+  // set input dimension
+  int size = xsize * ysize * zsize;
 
-    double iStart, iElaps;
-    iElaps = 0;
+  size_t nBytes = size * sizeof(float);
+  if (flag_verbose)
+    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-    for(int i = 0; i < n; i++){
-        iStart = cpu_second();
-        test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel,   
-                                       kernel_xsize, kernel_ysize, kernel_zsize, 
-                                       operation, flag_check, flag_verbose);
-        iElaps += cpu_second() - iStart;
+  float *host_A, *host_ref;  //pointers for host memory
+  host_A = (float*)malloc(nBytes);
+  host_ref = (float*)malloc(nBytes);
+
+  // set input data
+  memset(host_A, 0, nBytes);
+  memset(host_ref, 0, nBytes);
+  read_input(host_A, filename, size, flag_verbose);
+  if (flag_show)
+    show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
+
+  // erosion
+  morph_grayscale_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
+                          ysize, zsize, operation);
+  if (flag_show)
+    show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
+
+  if (flag_check) {
+    if (kernel_zsize > 1) {
+      printf(
+          "WARNING: Results will not match, openCV is done slice by slice, it "
+          "is incompatible with kernel zsize: %d",
+          kernel_zsize);
     }
-    iElaps = iElaps / n;
-    printf("\nmorph_grayscale_on_device Mean time elapsed %f sec\n", iElaps);
+
+    float* opencv_ref;
+    opencv_ref = (float*)malloc(nBytes);
+    memset(opencv_ref, 0, nBytes);
+
+    // openCV erosion
+    morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+                         operation);
+    if (flag_show)
+      show_image_3D(opencv_ref, xsize, ysize, zsize, "Result openCV");
+
+    check_result(host_ref, opencv_ref, xsize, ysize, zsize);
+
+    free(opencv_ref);
+  }
+
+  if (flag_show)
+    cv::waitKey(0);
+
+  //free host memory
+  free(host_A);
+  free(host_ref);
 }
 
-void test_morph_grayscale_time_compare(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                                       int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize, MorphOp operation)
-{
-    int flag_show = 0;
-    int flag_check = 0;
-    int flag_verbose = 0;
+void test_morph_grayscale_on_device_time(const std::string& filename, const int xsize,
+                                         const int ysize, const int zsize, int* kernel,
+                                         const int kernel_xsize, const int kernel_ysize,
+                                         const int kernel_zsize, MorphOp operation, int n) {
+  int flag_check = 0;
+  int flag_verbose = 0;
 
-    double iStart, iElapsHostGrayscale, iElapsDeviceGrayscale;
-    iElapsHostGrayscale = 0;
-    iElapsDeviceGrayscale = 0;
+  double iStart, iElaps;
+  iElaps = 0;
 
+  for (int i = 0; i < n; i++) {
     iStart = cpu_second();
-    test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel,   
-                                   kernel_xsize, kernel_ysize, kernel_zsize, 
-                                   operation, flag_check, flag_verbose);
-    iElapsDeviceGrayscale = cpu_second() - iStart;
-    printf("\nmorph_grayscale_on_device Time elapsed %f sec\n", iElapsDeviceGrayscale);
+    test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                   kernel_ysize, kernel_zsize, operation, flag_check, flag_verbose);
+    iElaps += cpu_second() - iStart;
+  }
+  iElaps = iElaps / n;
+  printf("\nmorph_grayscale_on_device Mean time elapsed %f sec\n", iElaps);
+}
 
-    iStart = cpu_second();
-    test_morph_grayscale_on_host(filename, xsize, ysize, zsize, kernel, 
-                                 kernel_xsize, kernel_ysize, kernel_zsize,
-                                 operation, flag_show, flag_check, flag_verbose);
-    iElapsHostGrayscale = cpu_second() - iStart;
-    printf("\nmorph_grayscale_on_host Time elapsed %f sec\n", iElapsHostGrayscale);
+void test_morph_grayscale_time_compare(const std::string& filename, const int xsize,
+                                       const int ysize, const int zsize, int* kernel,
+                                       const int kernel_xsize, const int kernel_ysize,
+                                       const int kernel_zsize, MorphOp operation) {
+  int flag_show = 0;
+  int flag_check = 0;
+  int flag_verbose = 0;
+
+  double iStart, iElapsHostGrayscale, iElapsDeviceGrayscale;
+  iElapsHostGrayscale = 0;
+  iElapsDeviceGrayscale = 0;
+
+  iStart = cpu_second();
+  test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                                 kernel_zsize, operation, flag_check, flag_verbose);
+  iElapsDeviceGrayscale = cpu_second() - iStart;
+  printf("\nmorph_grayscale_on_device Time elapsed %f sec\n", iElapsDeviceGrayscale);
+
+  iStart = cpu_second();
+  test_morph_grayscale_on_host(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                               kernel_zsize, operation, flag_show, flag_check, flag_verbose);
+  iElapsHostGrayscale = cpu_second() - iStart;
+  printf("\nmorph_grayscale_on_host Time elapsed %f sec\n", iElapsHostGrayscale);
 }

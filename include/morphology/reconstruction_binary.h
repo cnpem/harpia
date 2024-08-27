@@ -3,16 +3,19 @@
 
 #include "morphology.h"
 
-template<typename dtype>
-void reconstruction_binary(dtype *deviceMarker, dtype *deviceOutput, dtype *deviceMask, 
-                 const int xsize, const int ysize, const int zsize, MorphOp operation, const int flag_verbose);
+template <typename dtype>
+void reconstruction_binary(dtype* deviceMarker, dtype* deviceOutput, dtype* deviceMask,
+                           const int xsize, const int ysize, const int zsize, MorphOp operation,
+                           const int flag_verbose);
 
-template<typename dtype>
-void reconstruction_binary_on_device(dtype *hostImage, dtype *hostOutput, dtype *hostMask,
-                 const int xsize, const int ysize, const int zsize, MorphOp operation, const int flag_verbose);
+template <typename dtype>
+void reconstruction_binary_on_device(dtype* hostImage, dtype* hostOutput, dtype* hostMask,
+                                     const int xsize, const int ysize, const int zsize,
+                                     MorphOp operation, const int flag_verbose);
 
-template<typename dtype>
-void reconstruction_binary_on_host(dtype *hostImage, dtype *hostOutput, dtype *hostMask,
-                                    const int xsize, const int ysize, const int zsize, MorphOp operation);
+template <typename dtype>
+void reconstruction_binary_on_host(dtype* hostImage, dtype* hostOutput, dtype* hostMask,
+                                   const int xsize, const int ysize, const int zsize,
+                                   MorphOp operation);
 
-#endif // RECONSTRUCTION_BINARY_H
+#endif  // RECONSTRUCTION_BINARY_H

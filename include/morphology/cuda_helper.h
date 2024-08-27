@@ -3,10 +3,11 @@
 
 #include <cuda_runtime.h>
 
-void throw_on_cuda_error(cudaError_t error, const char *file, int line);
+void throw_on_cuda_error(cudaError_t error, const char* file, int line);
 
 void test_check_device_info();
 
-#define CHECK(call){ throw_on_cuda_error((call), __FILE__, __LINE__); };
+#define CHECK(call) \
+  { throw_on_cuda_error((call), __FILE__, __LINE__); };
 
-#endif //CUDA_HELPER_H
+#endif  //CUDA_HELPER_H

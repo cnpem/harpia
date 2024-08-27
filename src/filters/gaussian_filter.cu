@@ -1,150 +1,148 @@
-#include<iostream>
-#include<cmath>
-#include<cuda.h>
-#include<cuda_runtime.h>
-#include<chrono>
-#include"../../include/filters/gaussian_filter.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <chrono>
+#include <cmath>
+#include <iostream>
+#include "../../include/filters/gaussian_filter.h"
 
+template <typename dtype>
+__global__ void gaussian_filter_kernel_2d(dtype* image, float* output, float* deviceKernel, int idz,
+                                          int xsize, int ysize, int zsize, int nx, int ny) {
 
-template<typename dtype>
-__global__ void gaussian_filter_kernel_2d(dtype* image, float* output,float* deviceKernel,
-                                          int idz, int xsize, int ysize, int zsize, int nx, int ny)
-{   
+  //threads indices
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    //threads indices
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  // general matrix convolution for each pixel of the image.
+  if (idx < xsize && idy < ysize) {
+    //temp variable
+    float temp;
 
-    // general matrix convolution for each pixel of the image.
-    if (idx<xsize && idy<ysize)
-    {   
-        //temp variable
-        float temp;
+    //convolution.
+    convolution2d(image + idz * xsize * ysize, &temp, deviceKernel, idx, idy, xsize, ysize, nx, ny);
 
-        //convolution.
-        convolution2d(image + idz * xsize * ysize,&temp,deviceKernel,idx,idy,xsize,ysize,nx,ny); 
-
-        output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
-        
-    }
-      
+    output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
+  }
 }
 
+template <typename dtype>
+__global__ void gaussian_filter_kernel_3d(dtype* image, float* output, float* deviceKernel,
+                                          int xsize, int ysize, int zsize, int nx, int ny, int nz) {
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
-template<typename dtype>
-__global__ void gaussian_filter_kernel_3d(dtype* image, float* output,float* deviceKernel,
-                                          int xsize, int ysize, int zsize,int nx, int ny, int nz)
-{
-    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
-    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+  if (idx < xsize && idy < ysize && idz < zsize) {
+    float temp;
 
-    if (idx < xsize && idy < ysize && idz < zsize)
-    {
-        float temp;
+    convolution3d(image, &temp, deviceKernel, idx, idy, idz, xsize, ysize, zsize, nx, ny, nz);
 
-        convolution3d(image, &temp, deviceKernel, idx, idy, idz, xsize, ysize, zsize, nx, ny, nz);
-
-        output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
-    }
+    output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
+  }
 }
 
+template __global__ void gaussian_filter_kernel_2d<int>(int* image, float* output,
+                                                        float* deviceKernel, int idz, int xsize,
+                                                        int ysize, int zsize, int nx, int ny);
+template __global__ void gaussian_filter_kernel_2d<float>(float* image, float* output,
+                                                          float* deviceKernel, int idz, int xsize,
+                                                          int ysize, int zsize, int nx, int ny);
 
-template __global__ void gaussian_filter_kernel_2d<int>(int* image, float* output, float* deviceKernel,int idz, int xsize, int ysize, int zsize, int nx, int ny);
-template __global__ void gaussian_filter_kernel_2d<float>(float* image, float* output, float* deviceKernel, int idz, int xsize, int ysize, int zsize, int nx, int ny);
+template __global__ void gaussian_filter_kernel_3d<int>(int* image, float* output,
+                                                        float* deviceKernel, int xsize, int ysize,
+                                                        int zsize, int nx, int ny, int nz);
+template __global__ void gaussian_filter_kernel_3d<float>(float* image, float* output,
+                                                          float* deviceKernel, int xsize, int ysize,
+                                                          int zsize, int nx, int ny, int nz);
 
-template __global__ void gaussian_filter_kernel_3d<int>(int* image, float* output,float* deviceKernel,int xsize, int ysize, int zsize,int nx, int ny, int nz);
-template __global__ void gaussian_filter_kernel_3d<float>(float* image, float* output,float* deviceKernel,int xsize, int ysize, int zsize,int nx, int ny, int nz);
+template <typename dtype>
+void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, float sigma,
+                        bool type) {
 
+  dtype* deviceImage;
+  float* deviceOutput;
+  cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
+  cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
 
-template<typename dtype>
-void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type)
-{
+  cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
 
-    dtype* deviceImage;
-    float* deviceOutput;
-    cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
-    cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
+  if (type == false) {
+    //kernel size
+    int nx = (int)ceil(2 * sigma + 1);
+    int ny = nx;
 
-    cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
-    
+    float* kernel;
+    get_gaussian_kernel_2d(&kernel, nx, ny, sigma);
 
-    if (type == false)
-    {
-        //kernel size
-        int nx = (int)ceil(2*sigma+1);
-        int ny = nx;
+    float* deviceKernel;
+    cudaMalloc((void**)&deviceKernel, nx * ny * sizeof(float));
+    cudaMemcpy(deviceKernel, kernel, nx * ny * sizeof(float), cudaMemcpyHostToDevice);
 
-        float* kernel;
-        get_gaussian_kernel_2d(&kernel,nx,ny,sigma);
-        
+    dim3 blockSize(32, 32);
+    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
 
-        float* deviceKernel;
-        cudaMalloc((void**)&deviceKernel, nx * ny * sizeof(float));
-        cudaMemcpy(deviceKernel, kernel, nx * ny * sizeof(float), cudaMemcpyHostToDevice);
+    auto start = std::chrono::high_resolution_clock::now();
 
-        dim3 blockSize(32, 32);
-        dim3 gridSize( (xsize + blockSize.y - 1) / blockSize.y,(ysize + blockSize.x - 1) / blockSize.x);
+    for (int k = 0; k < zsize; ++k) {
+      gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel, k,
+                                                         xsize, ysize, zsize, nx, ny);
 
-        auto start = std::chrono::high_resolution_clock::now();
-
-        for (int k = 0; k < zsize; ++k)
-        {
-            gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel, k, xsize, ysize, zsize, nx, ny);
-
-            cudaDeviceSynchronize();
-        }
-
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
-
-        cudaFree(deviceKernel);   
+      cudaDeviceSynchronize();
     }
 
-    else
-    {
-        //kernel size
-        int nx = (int)ceil(2*sigma+1);
-        int ny = nx;
-        int nz = nx;
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::microseconds duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
-        float* kernel;
-        get_gaussian_kernel_3d(&kernel,nx,ny, nz, sigma);
-        
+    cudaFree(deviceKernel);
+  }
 
-        float* deviceKernel;
-        cudaMalloc((void**)&deviceKernel, nx * ny * nz * sizeof(float));
-        cudaMemcpy(deviceKernel, kernel, nx * ny * nz * sizeof(float), cudaMemcpyHostToDevice);
+  else {
+    //kernel size
+    int nx = (int)ceil(2 * sigma + 1);
+    int ny = nx;
+    int nz = nx;
 
+    float* kernel;
+    get_gaussian_kernel_3d(&kernel, nx, ny, nz, sigma);
 
-        dim3 blockSize(8, 8, 8);
-        dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y,(ysize + blockSize.x - 1) / blockSize.x, (zsize + blockSize.z - 1) / blockSize.z);
+    float* deviceKernel;
+    cudaMalloc((void**)&deviceKernel, nx * ny * nz * sizeof(float));
+    cudaMemcpy(deviceKernel, kernel, nx * ny * nz * sizeof(float), cudaMemcpyHostToDevice);
 
-        auto start = std::chrono::high_resolution_clock::now();
+    dim3 blockSize(8, 8, 8);
+    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x,
+                  (zsize + blockSize.z - 1) / blockSize.z);
 
-        gaussian_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput,deviceKernel,xsize, ysize, zsize, nx, ny, nz);
+    auto start = std::chrono::high_resolution_clock::now();
 
-        cudaDeviceSynchronize();
+    gaussian_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel,
+                                                       xsize, ysize, zsize, nx, ny, nz);
 
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl; 
+    cudaDeviceSynchronize();
 
-        cudaFree(deviceKernel);
-    }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::microseconds duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
-    cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaFree(deviceKernel);
+  }
 
-    cudaFree(deviceImage);
-    cudaFree(deviceOutput);
+  cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+
+  cudaFree(deviceImage);
+  cudaFree(deviceOutput);
 }
-
 
 // Explicit instantiation
-template void gaussian_filtering<float>(float* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type);
-template void gaussian_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type);
-template void gaussian_filtering<unsigned int>(unsigned int* image, float* output, int xsize, int ysize, int zsize, float sigma, bool type);
+template void gaussian_filtering<float>(float* image, float* output, int xsize, int ysize,
+                                        int zsize, float sigma, bool type);
+template void gaussian_filtering<int>(int* image, float* output, int xsize, int ysize, int zsize,
+                                      float sigma, bool type);
+template void gaussian_filtering<unsigned int>(unsigned int* image, float* output, int xsize,
+                                               int ysize, int zsize, float sigma, bool type);
 
 /*
 int main()

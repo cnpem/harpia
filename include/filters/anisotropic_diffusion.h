@@ -7,8 +7,9 @@
 /**
  * @brief Performs anisotropic diffusion on a 2D or 3D image.
  * 
- * This function applies the anisotropic diffusion algorithm to enhance images by reducing noise while preserving edges.
- * The function supports three different diffusion options that control the smoothing behavior.
+ * This function applies the anisotropic diffusion algorithm to enhance images by reducing noise 
+ * while preserving edges. The function supports three different diffusion options that control the 
+ * smoothing behavior.
  * 
  * @tparam dtype Data type of the image (e.g., uint8_t, float).
  * @param inputImage Pointer to the input 2D image data.
@@ -21,15 +22,16 @@
  *                        3 - Hyperbolic tangent decay.
  * Option 3 is a faster implementation:
  * Mbarki, Zouhair, et al. "A new rapid auto-adapting diffusion function for adaptive anisotropic 
- * image de-noising and sharply conserved edges." Computers & Mathematics with Applications 74.8 (2017): 1751-1768.
+ * image de-noising and sharply conserved edges." Computers & Mathematics with Applications 74.8 
+ * (2017): 1751-1768.
  * @param numRows Number of rows in the image.
  * @param numCols Number of columns in the image.
  */
-template<typename dtype>
-void anisotropicDiffusion2DGPU(dtype* hostImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int xsize, int ysize);
-template<typename dtype>
-void anisotropicDiffusion3DGPU(dtype* hostImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int xsize, int ysize, int zsize);
+template <typename dtype>
+void anisotropicDiffusion2DGPU(dtype* hostImage, int totalIterations, float deltaT, float kappa,
+                               int diffusionOption, int xsize, int ysize);
+template <typename dtype>
+void anisotropicDiffusion3DGPU(dtype* hostImage, int totalIterations, float deltaT, float kappa,
+                               int diffusionOption, int xsize, int ysize, int zsize);
 
 #endif

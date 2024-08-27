@@ -1,10 +1,10 @@
-#include "../../../include/morphology/morphology.h"
-#include "../../../include/morphology/cuda_helper.h"
-#include "../../../include/morphology/morph_grayscale.h"
-#include "../../../include/morphology/morph_chain_grayscale.h"
-#include "../../../include/morphology/subtraction.h"
-#include "../../../include/common/grid_block_sizes.h"
 #include <stdio.h>
+#include "../../../include/common/grid_block_sizes.h"
+#include "../../../include/morphology/cuda_helper.h"
+#include "../../../include/morphology/morph_chain_grayscale.h"
+#include "../../../include/morphology/morph_grayscale.h"
+#include "../../../include/morphology/morphology.h"
+#include "../../../include/morphology/subtraction.h"
 
 /**
  * @brief Perform top-hat operation on the device.
@@ -21,51 +21,54 @@
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  */
-template<typename dtype>
-void top_hat_on_device(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                 const int xsize, const int ysize, const int zsize, const int flag_verbose)
-{
-    // Set input dimension
-    int size = xsize * ysize * zsize;    
-    size_t nBytes = size * sizeof(dtype);
+template <typename dtype>
+void top_hat_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
+                       int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
+                       const int zsize, const int flag_verbose) {
+  // Set input dimension
+  int size = xsize * ysize * zsize;
+  size_t nBytes = size * sizeof(dtype);
 
-    // Set kernel dimension
-    int kernel_size = kernel_xsize * kernel_ysize * kernel_zsize;
-    size_t kernel_nBytes = kernel_size * sizeof(int);
+  // Set kernel dimension
+  int kernel_size = kernel_xsize * kernel_ysize * kernel_zsize;
+  size_t kernel_nBytes = kernel_size * sizeof(int);
 
-    // Malloc device global memory
-    dtype *deviceImage, *deviceTmp, *deviceOutput; 
-    int *deviceKernel; 
-    CHECK(cudaMalloc((dtype**)&deviceImage, nBytes));
-    CHECK(cudaMalloc((dtype**)&deviceTmp, nBytes));
-    CHECK(cudaMalloc((dtype**)&deviceOutput, nBytes));
-    CHECK(cudaMalloc((int**)&deviceKernel, kernel_nBytes));
+  // Malloc device global memory
+  dtype *deviceImage, *deviceTmp, *deviceOutput;
+  int* deviceKernel;
+  CHECK(cudaMalloc((dtype**)&deviceImage, nBytes));
+  CHECK(cudaMalloc((dtype**)&deviceTmp, nBytes));
+  CHECK(cudaMalloc((dtype**)&deviceOutput, nBytes));
+  CHECK(cudaMalloc((int**)&deviceKernel, kernel_nBytes));
 
-    // Transfer data from the host to the device
-    CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
+  // Transfer data from the host to the device
+  CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
+  CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
-    // Opening operation: erosion followed by dilation
-    morph_grayscale(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                         xsize, ysize, zsize, EROSION, flag_verbose);
-    morph_grayscale(deviceOutput, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, 
-                                         xsize, ysize, zsize, DILATION, flag_verbose);
-    // Top-hat: input - opening
-    subtraction(deviceImage, deviceTmp, deviceOutput, size, flag_verbose);
+  // Opening operation: erosion followed by dilation
+  morph_grayscale(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
+                  xsize, ysize, zsize, EROSION, flag_verbose);
+  morph_grayscale(deviceOutput, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
+                  xsize, ysize, zsize, DILATION, flag_verbose);
+  // Top-hat: input - opening
+  subtraction(deviceImage, deviceTmp, deviceOutput, size, flag_verbose);
 
-    // Transfer data from the device to the host
-    CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
+  // Transfer data from the device to the host
+  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 
-    // Free device memory
-    cudaFree(deviceTmp);
-    cudaFree(deviceImage);
-    cudaFree(deviceOutput);
-    cudaFree(deviceKernel);
+  // Free device memory
+  cudaFree(deviceTmp);
+  cudaFree(deviceImage);
+  cudaFree(deviceOutput);
+  cudaFree(deviceKernel);
 }
 // Template instantiations for specific types
-template void top_hat_on_device<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void top_hat_on_device<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, const int);
-template void top_hat_on_device<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void top_hat_on_device<int>(int*, int*, int*, int, int, int, const int, const int,
+                                     const int, const int);
+template void top_hat_on_device<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int,
+                                              const int, const int, const int, const int);
+template void top_hat_on_device<float>(float*, float*, int*, int, int, int, const int, const int,
+                                       const int, const int);
 
 /**
  * @brief Perform top-hat operation on the host.
@@ -82,31 +85,35 @@ template void top_hat_on_device<float>(float *, float *, int *, int, int, int, c
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  */
-template<typename dtype>
-void top_hat_on_host(dtype *hostImage, dtype *hostOutput, int *kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                 const int xsize, const int ysize, const int zsize, const int flag_verbose)
-{
-    // Set input dimension
-    int size = xsize * ysize * zsize;    
-    size_t nBytes = size * sizeof(dtype);
+template <typename dtype>
+void top_hat_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
+                     int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
+                     const int zsize, const int flag_verbose) {
+  // Set input dimension
+  int size = xsize * ysize * zsize;
+  size_t nBytes = size * sizeof(dtype);
 
-    // Allocate temporary memory
-    dtype *host_tmp = (dtype *)malloc(nBytes);
+  // Allocate temporary memory
+  dtype* host_tmp = (dtype*)malloc(nBytes);
 
-    // Set input data
-    memset(host_tmp, 0, nBytes); 
+  // Set input data
+  memset(host_tmp, 0, nBytes);
 
-    // Opening operation
-    MorphChain opening = {EROSION, DILATION};
-    morph_chain_grayscale_on_host(hostImage, host_tmp, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, zsize, opening);
+  // Opening operation
+  MorphChain opening = {EROSION, DILATION};
+  morph_chain_grayscale_on_host(hostImage, host_tmp, kernel, kernel_xsize, kernel_ysize,
+                                kernel_zsize, xsize, ysize, zsize, opening);
 
-    // Top-hat: f - opening
-    subtraction_on_host(hostImage, host_tmp, hostOutput, size);
+  // Top-hat: f - opening
+  subtraction_on_host(hostImage, host_tmp, hostOutput, size);
 
-    // Free temporary memory
-    free(host_tmp);
+  // Free temporary memory
+  free(host_tmp);
 }
 // Template instantiations for specific types
-template void top_hat_on_host<int>(int *, int *, int *, int, int, int, const int, const int, const int, const int);
-template void top_hat_on_host<unsigned int>(unsigned int *, unsigned int *, int *, int, int, int, const int, const int, const int, const int);
-template void top_hat_on_host<float>(float *, float *, int *, int, int, int, const int, const int, const int, const int);
+template void top_hat_on_host<int>(int*, int*, int*, int, int, int, const int, const int, const int,
+                                   const int);
+template void top_hat_on_host<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int,
+                                            const int, const int, const int, const int);
+template void top_hat_on_host<float>(float*, float*, int*, int, int, int, const int, const int,
+                                     const int, const int);

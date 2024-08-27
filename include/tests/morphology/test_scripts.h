@@ -11,4 +11,4 @@ int test_script4();
 int test_script5();
 int test_script6();
 
-#endif // TEST_SCRIPTS_H
+#endif  // TEST_SCRIPTS_H

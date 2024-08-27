@@ -39,7 +39,10 @@ parser.add_argument(
     help="Container specification format (default=%(default)s).",
 )
 parser.add_argument(
-    "--singularity_version", type=str, default="3.6.4", help="Singularity version (default=%(default)s)."
+    "--singularity_version",
+    type=str,
+    default="3.6.4",
+    help="Singularity version (default=%(default)s).",
 )
 parser.add_argument(
     "--distro",
@@ -50,7 +53,12 @@ parser.add_argument(
 )
 parser.add_argument("--cuda", type=str, default="11.2.2", help="CUDA version (default=%(default)s).")
 parser.add_argument("--gcc", type=str, default="9", help="CUDA version (default=%(default)s).")
-parser.add_argument("--mlnx", type=str, default="5.1-2.5.8.0", help="CUDA version (default=%(default)s).")
+parser.add_argument(
+    "--mlnx",
+    type=str,
+    default="5.1-2.5.8.0",
+    help="CUDA version (default=%(default)s).",
+)
 parser.add_argument("--ompi", type=str, default="4.1.0", help="OpenMPI version (default=%(default)s).")
 parser.add_argument("--hdf5", type=str, default="1.10.7", help="HDF5 version (default=%(default)s).")
 parser.add_argument("--conda", type=str, default="24.3.0-0", help="Conda version (default=%(default)s).")

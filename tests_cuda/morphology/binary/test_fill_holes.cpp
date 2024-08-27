@@ -1,54 +1,54 @@
-#include <time.h>
-#include <sys/time.h>
 #include <stdio.h>
-#include <string>
+#include <sys/time.h>
+#include <time.h>
 #include <cstring>
+#include <string>
 
 #include "../../../include/common/grid_block_sizes.h"
 #include "../../../include/morphology/fill_holes.h"
-#include "../../../include/tests/morphology/test_fill_holes.h" 
-#include "../../../include/tests/morphology/test_util.h"
+#include "../../../include/tests/morphology/test_fill_holes.h"
 #include "../../../include/tests/morphology/test_image_processing.h"
+#include "../../../include/tests/morphology/test_util.h"
 
+void test_fill_holes_on_device(const std::string& filename, const int xsize, const int ysize,
+                               const int zsize, const int flag_check, const int flag_verbose) {
+  // Set input dimension
+  int size = xsize * ysize * zsize;
+  size_t nBytes = size * sizeof(int);
 
-void test_fill_holes_on_device(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                               const int flag_check, const int flag_verbose)
-{
-    // Set input dimension
-    int size = xsize * ysize * zsize;
-    size_t nBytes = size * sizeof(int);
+  if (flag_verbose)
+    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-    if (flag_verbose) printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+  int *host_A, *device_ref;  // Pointers for host memory
+  host_A = (int*)malloc(nBytes);
+  device_ref = (int*)malloc(nBytes);
 
-    int *host_A, *device_ref; // Pointers for host memory
-    host_A = (int *)malloc(nBytes);
-    device_ref = (int *)malloc(nBytes);
+  // Set input data
+  memset(host_A, 0, nBytes);
+  memset(device_ref, 0, nBytes);
 
-    // Set input data
-    memset(host_A, 0, nBytes); 
-    memset(device_ref, 0, nBytes);
+  read_input(host_A, filename, size, flag_verbose);
 
-    read_input(host_A, filename, size, flag_verbose);
-    
-    fill_holes_on_device(host_A, device_ref, xsize, ysize, zsize, flag_verbose);
+  fill_holes_on_device(host_A, device_ref, xsize, ysize, zsize, flag_verbose);
 
-    if (flag_check) {
-        int *host_ref;  
-        host_ref = (int *)malloc(nBytes);
-        memset(host_ref, 0, nBytes); 
-        // Perform binary morphology on host for comparison
-        fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
+  if (flag_check) {
+    int* host_ref;
+    host_ref = (int*)malloc(nBytes);
+    memset(host_ref, 0, nBytes);
+    // Perform binary morphology on host for comparison
+    fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
 
-        check_result(host_ref, device_ref, xsize, ysize, zsize);
-        free(host_ref);
-    }
+    check_result(host_ref, device_ref, xsize, ysize, zsize);
+    free(host_ref);
+  }
 
-    free(host_A);
-    free(device_ref);
+  free(host_A);
+  free(device_ref);
 }
 
 /**
- * @brief Tests the custom binary erosion operation and compares its result with OpenCV's implementation.
+ * @brief Tests the custom binary erosion operation and compares its result with OpenCV's 
+ * implementation.
  * 
  * @param filename The name of the input file.
  * @param xsize The size of the image in the x-dimension.
@@ -63,54 +63,59 @@ void test_fill_holes_on_device(const std::string& filename, const int xsize, con
  * @param flag_check If set, the results will be checked for correctness.
  * @param flag_verbose If set, additional information will be printed.
  */
-void test_fill_holes_on_host(const std::string& filename, const int xsize, const int ysize, const int zsize,
-                             const int flag_show, const int flag_check, const int flag_verbose)
-{
-    // Set input dimension
-    int size = xsize * ysize * zsize;
-    size_t nBytes = size * sizeof(int);
+void test_fill_holes_on_host(const std::string& filename, const int xsize, const int ysize,
+                             const int zsize, const int flag_show, const int flag_check,
+                             const int flag_verbose) {
+  // Set input dimension
+  int size = xsize * ysize * zsize;
+  size_t nBytes = size * sizeof(int);
 
-    if (flag_verbose) printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+  if (flag_verbose)
+    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-    int *host_A, *host_ref; // Pointers for host memory
-    host_A = (int *)malloc(nBytes);
-    host_ref = (int *)malloc(nBytes);
+  int *host_A, *host_ref;  // Pointers for host memory
+  host_A = (int*)malloc(nBytes);
+  host_ref = (int*)malloc(nBytes);
 
-    // Set input data
-    memset(host_A, 0, nBytes); 
-    memset(host_ref, 0, nBytes);
-    read_input(host_A, filename, size, flag_verbose);
-    if (flag_show) show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
+  // Set input data
+  memset(host_A, 0, nBytes);
+  memset(host_ref, 0, nBytes);
+  read_input(host_A, filename, size, flag_verbose);
+  if (flag_show)
+    show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
-    // Perform binary morphology on host
-    fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
-    if (flag_show) show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
+  // Perform binary morphology on host
+  fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
+  if (flag_show)
+    show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 
-    // TODO: searh if there is an openCV fill_holes function ready
-    // if (flag_check) {
-    //     int *opencv_ref;
-    //     opencv_ref = (int *)malloc(nBytes);
-    //     memset(opencv_ref, 0, nBytes); 
+  // TODO: searh if there is an openCV fill_holes function ready
+  // if (flag_check) {
+  //     int *opencv_ref;
+  //     opencv_ref = (int *)malloc(nBytes);
+  //     memset(opencv_ref, 0, nBytes);
 
-    //     // Perform OpenCV erosion
-    //     morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize, operation);
-    //     if (flag_show) show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
+  //     // Perform OpenCV erosion
+  //     morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+  //     operation);
+  //     if (flag_show) show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
 
-    //     check_result(host_ref, opencv_ref, xsize, ysize, zsize);
+  //     check_result(host_ref, opencv_ref, xsize, ysize, zsize);
 
-    //     free(opencv_ref);
-    // }
+  //     free(opencv_ref);
+  // }
 
-    if (flag_show) cv::waitKey(0); // Needed for the show_image_3D() calls
+  if (flag_show)
+    cv::waitKey(0);  // Needed for the show_image_3D() calls
 
-    // Free host memory
-    free(host_A);
-    free(host_ref);
+  // Free host memory
+  free(host_A);
+  free(host_ref);
 }
 
 // /**
 //  * @brief Measures the time taken to perform binary morphological operations on the GPU.
-//  * 
+//  *
 //  * @param filename The name of the input file.
 //  * @param xsize The size of the image in the x-dimension.
 //  * @param ysize The size of the image in the y-dimension.
@@ -122,20 +127,21 @@ void test_fill_holes_on_host(const std::string& filename, const int xsize, const
 //  * @param operation The morphological operation to perform (e.g., erosion, dilation).
 //  * @param n The number of iterations to average the time over.
 //  */
-// void test_morph_binary_on_device_time(const std::string& filename, const int xsize, const int ysize, const int zsize,
-//                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-//                          MorphOp operation, int n)
+// void test_morph_binary_on_device_time(const std::string& filename, const int xsize, const int
+//                          ysize, const int zsize, int *kernel, const int kernel_xsize,
+//                          const int kernel_ysize, const int kernel_zsize, MorphOp operation,
+//                          int n)
 // {
 //     int flag_check = 0;
 //     int flag_verbose = 0;
 
 //     double iStart, iElaps;
 //     iElaps = 0;
-    
+
 //     for (int i = 0; i < n; i++) {
 //         iStart = cpu_second();
-//         test_morph_binary_on_device(filename, xsize, ysize, zsize, kernel,  
-//                                 kernel_xsize, kernel_ysize, kernel_zsize, 
+//         test_morph_binary_on_device(filename, xsize, ysize, zsize, kernel,
+//                                 kernel_xsize, kernel_ysize, kernel_zsize,
 //                                 operation, flag_check, flag_verbose);
 //         iElaps += cpu_second() - iStart;
 //     }
@@ -145,7 +151,7 @@ void test_fill_holes_on_host(const std::string& filename, const int xsize, const
 
 // /**
 //  * @brief Compares the execution time of binary morphological operations on the GPU and CPU.
-//  * 
+//  *
 //  * @param filename The name of the input file.
 //  * @param xsize The size of the image in the x-dimension.
 //  * @param ysize The size of the image in the y-dimension.
@@ -156,9 +162,9 @@ void test_fill_holes_on_host(const std::string& filename, const int xsize, const
 //  * @param kernel_zsize The size of the kernel in the z-dimension.
 //  * @param operation The morphological operation to perform (e.g., erosion, dilation).
 //  */
-// void test_morph_binary_time_compare(const std::string& filename, const int xsize, const int ysize, const int zsize,
-//                          int *kernel, const int kernel_xsize, const int kernel_ysize, const int kernel_zsize,
-//                          MorphOp operation)
+// void test_morph_binary_time_compare(const std::string& filename, const int xsize,
+//                          const int ysize, const int zsize, int *kernel, const int kernel_xsize,
+//                          const int kernel_ysize, const int kernel_zsize, MorphOp operation)
 // {
 //     int flag_show = 0;
 //     int flag_check = 0;
@@ -169,15 +175,15 @@ void test_fill_holes_on_host(const std::string& filename, const int xsize, const
 //     iElapsDeviceBinary = 0;
 
 //     iStart = cpu_second();
-//     test_morph_binary_on_device(filename, xsize, ysize, zsize, kernel,  
-//                              kernel_xsize, kernel_ysize, kernel_zsize, 
+//     test_morph_binary_on_device(filename, xsize, ysize, zsize, kernel,
+//                              kernel_xsize, kernel_ysize, kernel_zsize,
 //                              operation, flag_check, flag_verbose);
 //     iElapsDeviceBinary = cpu_second() - iStart;
 //     printf("\n morph_binary_on_device Time elapsed %f sec\n", iElapsDeviceBinary);
 
 //     iStart = cpu_second();
-//     test_morph_binary_on_host(filename, xsize, ysize, zsize, 
-//                                 kernel, kernel_xsize, kernel_ysize, kernel_zsize, 
+//     test_morph_binary_on_host(filename, xsize, ysize, zsize,
+//                                 kernel, kernel_xsize, kernel_ysize, kernel_zsize,
 //                                 operation, flag_show, flag_check, flag_verbose);
 //     iElapsHostBinary = cpu_second() - iStart;
 //     printf("\n morph_binary_on_host Time elapsed %f sec\n", iElapsHostBinary);

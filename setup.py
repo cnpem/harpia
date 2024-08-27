@@ -61,7 +61,12 @@ def locate_cuda():
             )
         home = os.path.dirname(os.path.dirname(nvcc))
 
-    cudaconfig = {"home": home, "nvcc": nvcc, "include": pjoin(home, "include"), "lib64": pjoin(home, "lib64")}
+    cudaconfig = {
+        "home": home,
+        "nvcc": nvcc,
+        "include": pjoin(home, "include"),
+        "lib64": pjoin(home, "lib64"),
+    }
     for k, v in cudaconfig.items():
         if not os.path.exists(v):
             raise EnvironmentError(f"The CUDA {k} path could not be located in {v}")
@@ -171,7 +176,10 @@ def get_extension_modules(basedir):
             include_dirs=[numpy_include, CUDA["include"], "src"],
             library_dirs=[CUDA["lib64"]],
             runtime_library_dirs=[CUDA["lib64"]],
-            extra_compile_args={"gcc": [], "nvcc": ["--ptxas-options=-v", "-c", "--compiler-options", "'-fPIC'"]},
+            extra_compile_args={
+                "gcc": [],
+                "nvcc": ["--ptxas-options=-v", "-c", "--compiler-options", "'-fPIC'"],
+            },
         )
         for file in files
     ]
