@@ -36,10 +36,13 @@ int main(int argc, char** argv) {
   // printf("#############################################\n\n");
 
   // // test_script4();
-  // printf("#############################################\n");
-  // printf("# TEST 5: topHat nad bottomHat #\n");
-  // printf("#############################################\n\n");
-  // test_script5();
+  printf("#############################################\n");
+  printf("# TEST 5: topHat and bottomHat #\n");
+  printf("#############################################\n\n");
+  test_script5();
+  printf("#############################################\n");
+  printf("# TEST 6: fillHoles #\n");
+  printf("#############################################\n\n");
   test_script6();
 
   return 0;
