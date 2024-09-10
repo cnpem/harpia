@@ -5,9 +5,9 @@
 #include <string>
 
 #include "../../../include/common/grid_block_sizes.h"
-#include "../../../include/morphology/morph_binary.h"
+#include "../../../include/morphology/morph_binary_pinned.h"
 #include "../../../include/tests/morphology/test_image_processing.h"
-#include "../../../include/tests/morphology/test_morph_binary.h"
+#include "../../../include/tests/morphology/test_morph_binary_pinned.h"
 #include "../../../include/tests/morphology/test_util.h"
 
 /**
@@ -25,10 +25,11 @@
  * @param flag_check If set, the results will be checked for correctness.
  * @param flag_verbose If set, additional information will be printed.
  */
-void test_morph_binary_on_device(const std::string& filename, const int xsize, const int ysize,
-                                 const int zsize, int* kernel, const int kernel_xsize,
-                                 const int kernel_ysize, const int kernel_zsize, MorphOp operation,
-                                 const int flag_check, const int flag_verbose) {
+void test_morph_binary_pinned_on_device(const std::string& filename, const int xsize,
+                                        const int ysize, const int zsize, int* kernel,
+                                        const int kernel_xsize, const int kernel_ysize,
+                                        const int kernel_zsize, MorphOp operation,
+                                        const int flag_check, const int flag_verbose) {
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(int);
@@ -46,16 +47,16 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
 
   read_input(host_A, filename, size, flag_verbose);
 
-  morph_binary_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                         xsize, ysize, zsize, operation, flag_verbose);
+  morph_binary_pinned_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize,
+                                kernel_zsize, xsize, ysize, zsize, operation, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
     host_ref = (int*)malloc(nBytes);
     memset(host_ref, 0, nBytes);
     // Perform binary morphology on host for comparison
-    morph_binary_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                         ysize, zsize, operation);
+    morph_binary_pinned_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
+                                xsize, ysize, zsize, operation);
 
     check_result(host_ref, device_ref, xsize, ysize, zsize);
     free(host_ref);
@@ -82,10 +83,11 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
  * @param flag_check If set, the results will be checked for correctness.
  * @param flag_verbose If set, additional information will be printed.
  */
-void test_morph_binary_on_host(const std::string& filename, const int xsize, const int ysize,
-                               const int zsize, int* kernel, const int kernel_xsize,
-                               const int kernel_ysize, const int kernel_zsize, MorphOp operation,
-                               const int flag_show, const int flag_check, const int flag_verbose) {
+void test_morph_binary_pinned_on_host(const std::string& filename, const int xsize, const int ysize,
+                                      const int zsize, int* kernel, const int kernel_xsize,
+                                      const int kernel_ysize, const int kernel_zsize,
+                                      MorphOp operation, const int flag_show, const int flag_check,
+                                      const int flag_verbose) {
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(int);
@@ -105,8 +107,8 @@ void test_morph_binary_on_host(const std::string& filename, const int xsize, con
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
   // Perform binary morphology on host
-  morph_binary_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                       ysize, zsize, operation);
+  morph_binary_pinned_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
+                              xsize, ysize, zsize, operation);
   if (flag_show)
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 
@@ -155,10 +157,10 @@ void test_morph_binary_on_host(const std::string& filename, const int xsize, con
  * @param operation The morphological operation to perform (e.g., erosion, dilation).
  * @param n The number of iterations to average the time over.
  */
-void test_morph_binary_on_device_time(const std::string& filename, const int xsize, const int ysize,
-                                      const int zsize, int* kernel, const int kernel_xsize,
-                                      const int kernel_ysize, const int kernel_zsize,
-                                      MorphOp operation, int n) {
+void test_morph_binary_pinned_on_device_time(const std::string& filename, const int xsize,
+                                             const int ysize, const int zsize, int* kernel,
+                                             const int kernel_xsize, const int kernel_ysize,
+                                             const int kernel_zsize, MorphOp operation, int n) {
   int flag_check = 0;
   int flag_verbose = 0;
 
@@ -167,12 +169,13 @@ void test_morph_binary_on_device_time(const std::string& filename, const int xsi
 
   for (int i = 0; i < n; i++) {
     iStart = cpu_second();
-    test_morph_binary_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                                kernel_zsize, operation, flag_check, flag_verbose);
+    test_morph_binary_pinned_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                       kernel_ysize, kernel_zsize, operation, flag_check,
+                                       flag_verbose);
     iElaps += cpu_second() - iStart;
   }
   iElaps /= n;
-  printf("\nmorph_binary_on_device Mean time elapsed %f sec\n", iElaps);
+  printf("\nmorph_binary_pinned_on_device Mean time elapsed %f sec\n", iElaps);
 }
 
 /**
@@ -188,10 +191,10 @@ void test_morph_binary_on_device_time(const std::string& filename, const int xsi
  * @param kernel_zsize The size of the kernel in the z-dimension.
  * @param operation The morphological operation to perform (e.g., erosion, dilation).
  */
-void test_morph_binary_time_compare(const std::string& filename, const int xsize, const int ysize,
-                                    const int zsize, int* kernel, const int kernel_xsize,
-                                    const int kernel_ysize, const int kernel_zsize,
-                                    MorphOp operation) {
+void test_morph_binary_pinned_time_compare(const std::string& filename, const int xsize,
+                                           const int ysize, const int zsize, int* kernel,
+                                           const int kernel_xsize, const int kernel_ysize,
+                                           const int kernel_zsize, MorphOp operation) {
   int flag_show = 0;
   int flag_check = 0;
   int flag_verbose = 0;
@@ -201,14 +204,16 @@ void test_morph_binary_time_compare(const std::string& filename, const int xsize
   iElapsDeviceBinary = 0;
 
   iStart = cpu_second();
-  test_morph_binary_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                              kernel_zsize, operation, flag_check, flag_verbose);
+  test_morph_binary_pinned_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                     kernel_ysize, kernel_zsize, operation, flag_check,
+                                     flag_verbose);
   iElapsDeviceBinary = cpu_second() - iStart;
-  printf("\nmorph_binary_on_device Time elapsed %f sec\n", iElapsDeviceBinary);
+  printf("\nmorph_binary_pinned_on_device Time elapsed %f sec\n", iElapsDeviceBinary);
 
   iStart = cpu_second();
-  test_morph_binary_on_host(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                            kernel_zsize, operation, flag_show, flag_check, flag_verbose);
+  test_morph_binary_pinned_on_host(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                   kernel_ysize, kernel_zsize, operation, flag_show, flag_check,
+                                   flag_verbose);
   iElapsHostBinary = cpu_second() - iStart;
-  printf("\nmorph_binary_on_host Time elapsed %f sec\n", iElapsHostBinary);
+  printf("\nmorph_binary_pinned_on_host Time elapsed %f sec\n", iElapsHostBinary);
 }

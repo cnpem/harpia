@@ -35,6 +35,8 @@ void test_check_device_info() {
   int dev = 0, driverVersion = 0, runtimeVersion = 0;
   CHECK(cudaSetDevice(dev));
   cudaDeviceProp deviceProp;
+  size_t free_mem, total_mem;
+
   CHECK(cudaGetDeviceProperties(&deviceProp, dev));
   printf("Device %d: \"%s\"\n", dev, deviceProp.name);
 
@@ -83,4 +85,23 @@ void test_check_device_info() {
   printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n",
          deviceProp.maxGridSize[0], deviceProp.maxGridSize[1], deviceProp.maxGridSize[2]);
   printf("  Maximum memory pitch:                          %lu bytes\n", deviceProp.memPitch);
+}
+
+void checkGpuMem(size_t allocatedBytes) {
+  float free_g, total_g, used_g, allocated_g;
+  size_t free_t, total_t;
+
+  // Get free and total memory on the GPU
+  cudaMemGetInfo(&free_t, &total_t);
+
+  // Convert bytes to gigabytes (1 GB = 1024^3 bytes)
+  free_g = static_cast<float>(free_t) / 1073741824.0f;
+  total_g = static_cast<float>(total_t) / 1073741824.0f;
+  used_g = total_g - free_g;
+  allocated_g = static_cast<float>(allocatedBytes) / 1073741824.0f;
+  // Print memory usage in GB
+  printf(
+      "mem free: %f GB (%zu bytes) | mem total: %f GB (%zu bytes) | mem used: %f GB | mem "
+      "allocated: %f GB\n",
+      free_g, free_t, total_g, total_t, used_g, allocated_g);
 }

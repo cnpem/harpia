@@ -130,7 +130,7 @@ void check_result(dtype* test, dtype* ref, const int nx, const int ny, const int
     }
   }
   if (match)
-    std::cout << "Matrices match!\n";
+    std::cout << "\nMatrices match!\n\n";
 }
 template void check_result<int>(int*, int*, const int, const int, const int);
 template void check_result<float>(float*, float*, const int, const int, const int);

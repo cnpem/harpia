@@ -10,5 +10,6 @@ int test_script3(MorphChain chain);
 int test_script4();
 int test_script5();
 int test_script6();
+int test_script7();
 
 #endif  // TEST_SCRIPTS_H

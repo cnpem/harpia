@@ -1,10 +1,57 @@
 #include <stdlib.h>
 #include <cstring>
 
+#include "../../../include/common/wrapper.h"
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/tests/morphology/test_image_processing.h"
 #include "../../../include/tests/morphology/test_morph_grayscale.h"
 #include "../../../include/tests/morphology/test_util.h"
+
+void test_morph_grayscale_on_device_wrapper(const std::string& filename, const int xsize,
+                                            const int ysize, const int zsize, int* kernel,
+                                            const int kernel_xsize, const int kernel_ysize,
+                                            const int kernel_zsize, MorphOp operation,
+                                            const int flag_check, const int flag_verbose) {
+  // set input dimension
+  int size = xsize * ysize * zsize;
+
+  size_t nBytes = size * sizeof(int);
+
+  if (flag_verbose)
+    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+
+  int *host_A, *device_ref;  //pointers for host memory
+  host_A = (int*)malloc(nBytes);
+  device_ref = (int*)malloc(nBytes);
+
+  // set input data
+  memset(host_A, 0, nBytes);
+  memset(device_ref, 0, nBytes);
+
+  read_input(host_A, filename, size, flag_verbose);
+
+  int ncopies = 2;
+  //tentativa 2
+  wrapper(morph_grayscale_on_device<int>, ncopies, host_A, device_ref, kernel, kernel_xsize,
+          kernel_ysize, kernel_zsize, xsize, ysize, zsize, operation, flag_verbose);
+
+  if (flag_check) {
+    int* host_ref;
+    host_ref = (int*)malloc(nBytes);
+    memset(host_ref, 0, nBytes);
+
+    // erosion
+    morph_grayscale_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
+                            xsize, ysize, zsize, operation);
+
+    check_result(host_ref, device_ref, xsize, ysize, zsize);
+
+    free(host_ref);
+  }
+
+  free(host_A);
+  free(device_ref);
+}
 
 void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize,
                                     const int zsize, int* kernel, const int kernel_xsize,

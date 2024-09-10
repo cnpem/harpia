@@ -9,7 +9,7 @@ int main(int argc, char** argv) {
 
   printf("%s Starting... \n", argv[0]);
 
-  // test_check_device_info();
+  test_check_device_info();
 
   // printf("######################################################\n");
   // printf("# TEST 1: basic morphological operations consistency #\n");
@@ -35,15 +35,16 @@ int main(int argc, char** argv) {
   // printf("# TEST 4: subtraction #\n");
   // printf("#############################################\n\n");
 
-  // // test_script4();
-  printf("#############################################\n");
-  printf("# TEST 5: topHat and bottomHat #\n");
-  printf("#############################################\n\n");
-  test_script5();
-  printf("#############################################\n");
-  printf("# TEST 6: fillHoles #\n");
-  printf("#############################################\n\n");
-  test_script6();
+  // test_script4();
+  // printf("#############################################\n");
+  // printf("# TEST 5: topHat and bottomHat #\n");
+  // printf("#############################################\n\n");
+  // test_script5();
+  // printf("#############################################\n");
+  // printf("# TEST 6: fillHoles #\n");
+  // printf("#############################################\n\n");
+  // test_script6();
+  test_script7();
 
   return 0;
 }

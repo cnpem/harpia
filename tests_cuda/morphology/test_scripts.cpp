@@ -5,9 +5,11 @@
 #include "../../include/tests/morphology/test_fill_holes.h"
 #include "../../include/tests/morphology/test_image_processing.h"
 #include "../../include/tests/morphology/test_morph_binary.h"
+#include "../../include/tests/morphology/test_morph_binary_pinned.h"
 #include "../../include/tests/morphology/test_morph_chain_binary.h"
 #include "../../include/tests/morphology/test_morph_chain_grayscale.h"
 #include "../../include/tests/morphology/test_morph_grayscale.h"
+#include "../../include/tests/morphology/test_morph_grayscale_pinned.h"
 #include "../../include/tests/morphology/test_subtraction.h"
 #include "../../include/tests/morphology/test_top_hat.h"
 #include "../../include/tests/morphology/test_util.h"
@@ -127,17 +129,33 @@ int test_script2() {
   int kernel_ysize = 3;
   int kernel_zsize = 3;
 
-  test_morph_binary_time_compare(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                                 kernel_zsize, EROSION);
+  // printf("\n600x1520x500:\n");
+  // zsize = 500;
 
-  test_morph_grayscale_time_compare(filename, xsize, ysize, zsize, kernel, kernel_xsize,
-                                    kernel_ysize, kernel_zsize, EROSION);
+  // test_morph_binary_time_compare(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+  //                                kernel_zsize, EROSION);
 
-  test_morph_grayscale_on_device_time(filename, xsize, ysize, zsize, kernel, kernel_xsize,
-                                      kernel_ysize, kernel_zsize, EROSION, 10);
+  // test_morph_grayscale_time_compare(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+  //                                   kernel_ysize, kernel_zsize, EROSION);
 
-  test_morph_binary_on_device_time(filename, xsize, ysize, zsize, kernel, kernel_xsize,
-                                   kernel_ysize, kernel_zsize, EROSION, 10);
+  for (zsize = 20; zsize < 1521; zsize += 100) {
+    printf("\n Pinned 600x1520x%d:\n", zsize);
+
+    test_morph_grayscale_pinned_on_device_time(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                               kernel_ysize, kernel_zsize, EROSION, 1);
+    test_morph_binary_pinned_on_device_time(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                            kernel_ysize, kernel_zsize, EROSION, 1);
+
+    printf("\n Normal 600x1520x%d:\n", zsize);
+    if (zsize < 800) {
+      test_morph_grayscale_on_device_time(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                          kernel_ysize, kernel_zsize, EROSION, 1);
+      test_morph_binary_on_device_time(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+                                       kernel_ysize, kernel_zsize, EROSION, 1);
+    } else {
+      printf("\nout of memory\n");
+    }
+  }
 
   return 0;
 }
@@ -286,5 +304,25 @@ int test_script6() {
 
   test_fill_holes_on_device(filenameBinary, 355, 321, 1, flag_check, flag_verbose);
 
+  return 0;
+}
+
+int test_script7() {
+  // Test semaphore wrapper!!!
+
+  std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
+
+  // Create kernel
+  int* kernel;
+  kernel = (int*)malloc(sizeof(int) * 125);
+  get_structuring_element_3D(kernel, 5, 5, 5);
+
+  int flag_check = 1;    // Whether to compare with OpenCV erosion
+  int flag_verbose = 0;  // Whether to print status messages
+
+  test_morph_grayscale_on_device_wrapper(filenameGrayscale, 600, 1520, 500, kernel, 5, 5, 1,
+                                         EROSION, flag_check, flag_verbose);
+  test_morph_grayscale_on_device_wrapper(filenameGrayscale, 600, 1520, 500, kernel, 5, 5, 1,
+                                         DILATION, flag_check, flag_verbose);
   return 0;
 }
