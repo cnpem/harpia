@@ -9,7 +9,7 @@ void erosion_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int 
 template <typename dtype>
 void erosion_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize, const int flag_verbose);
+                               int kernel_ysize, int kernel_zsize);
 
 template <typename dtype>
 void dilation_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
@@ -19,7 +19,7 @@ void dilation_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int
 template <typename dtype>
 void dilation_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                 const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                                int kernel_ysize, int kernel_zsize, const int flag_verbose);
+                                int kernel_ysize, int kernel_zsize);
 
 template <typename dtype>
 void closing_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
@@ -29,7 +29,7 @@ void closing_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int 
 template <typename dtype>
 void closing_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize, const int flag_verbose);
+                               int kernel_ysize, int kernel_zsize);
 
 template <typename dtype>
 void opening_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
@@ -39,6 +39,6 @@ void opening_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int 
 template <typename dtype>
 void opening_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize, const int flag_verbose);
+                               int kernel_ysize, int kernel_zsize);
 
 #endif  // MORPH_grayscale_on_device_OPS_H

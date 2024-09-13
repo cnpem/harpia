@@ -48,11 +48,11 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
 
     // erosion
     top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                    kernel_zsize, flag_verbose);
+                    kernel_zsize);
 
     // erosion
     top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                          kernel_ysize, kernel_zsize, flag_verbose);
+                          kernel_ysize, kernel_zsize);
 
     check_result(host_ref, device_ref, xsize, ysize, zsize);
 
@@ -93,9 +93,9 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
 
   // bottomHat
   top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                  kernel_zsize, flag_verbose);
+                  kernel_zsize);
   top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                        kernel_ysize, kernel_zsize, flag_verbose);
+                        kernel_ysize, kernel_zsize);
   if (flag_show) {
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
     show_image_3D(host_aviso_ref, xsize, ysize, zsize, "Result Aviso Image");

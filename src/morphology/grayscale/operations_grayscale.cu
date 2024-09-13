@@ -36,18 +36,17 @@ template void erosion_grayscale_on_device<float>(float*, float*, const int, cons
 template <typename dtype>
 void erosion_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize, const int flag_verbose) {
+                               int kernel_ysize, int kernel_zsize) {
   morph_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize, EROSION);
 }
 // Template instantiations for specific types
 template void erosion_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*, int,
-                                             int, int, const int);
+                                             int, int);
 template void erosion_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                      const int, const int, int*, int, int, int,
-                                                      const int);
+                                                      const int, const int, int*, int, int, int);
 template void erosion_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                               int*, int, int, int, const int);
+                                               int*, int, int, int);
 
 /**
  * @brief Perform dilation operation on a grayscale image.
@@ -85,18 +84,17 @@ template void dilation_grayscale_on_device<float>(float*, float*, const int, con
 template <typename dtype>
 void dilation_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                 const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                                int kernel_ysize, int kernel_zsize, const int flag_verbose) {
+                                int kernel_ysize, int kernel_zsize) {
   morph_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize, DILATION);
 }
 // Template instantiations for specific types
 template void dilation_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*,
-                                              int, int, int, const int);
+                                              int, int, int);
 template void dilation_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                       const int, const int, int*, int, int, int,
-                                                       const int);
+                                                       const int, const int, int*, int, int, int);
 template void dilation_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                                int*, int, int, int, const int);
+                                                int*, int, int, int);
 
 /**
  * @brief Perform closing operation on a grayscale image.
@@ -136,7 +134,7 @@ template void closing_grayscale_on_device<float>(float*, float*, const int, cons
 template <typename dtype>
 void closing_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize, const int flag_verbose) {
+                               int kernel_ysize, int kernel_zsize) {
   MorphChain closing = {DILATION, EROSION};
 
   morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
@@ -144,12 +142,11 @@ void closing_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xs
 }
 // Template instantiations for specific types
 template void closing_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*, int,
-                                             int, int, const int);
+                                             int, int);
 template void closing_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                      const int, const int, int*, int, int, int,
-                                                      const int);
+                                                      const int, const int, int*, int, int, int);
 template void closing_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                               int*, int, int, int, const int);
+                                               int*, int, int, int);
 
 /**
  * @brief Perform opening operation on a grayscale image.
@@ -189,7 +186,7 @@ template void opening_grayscale_on_device<float>(float*, float*, const int, cons
 template <typename dtype>
 void opening_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize, const int flag_verbose) {
+                               int kernel_ysize, int kernel_zsize) {
   MorphChain opening = {EROSION, DILATION};
 
   morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
@@ -197,9 +194,8 @@ void opening_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xs
 }
 // Template instantiations for specific types
 template void opening_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*, int,
-                                             int, int, const int);
+                                             int, int);
 template void opening_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                      const int, const int, int*, int, int, int,
-                                                      const int);
+                                                      const int, const int, int*, int, int, int);
 template void opening_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                               int*, int, int, int, const int);
+                                               int*, int, int, int);

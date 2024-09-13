@@ -88,7 +88,7 @@ template void bottom_hat_on_device<float>(float*, float*, const int, const int, 
 template <typename dtype>
 void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                         const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
-                        int kernel_zsize, const int flag_verbose) {
+                        int kernel_zsize) {
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
@@ -113,8 +113,8 @@ void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
 }
 // Template instantiations for specific types
 template void bottom_hat_on_host<int>(int*, int*, const int, const int, const int, int*, int, int,
-                                      int, const int);
+                                      int);
 template void bottom_hat_on_host<unsigned int>(unsigned int*, unsigned int*, const int, const int,
-                                               const int, int*, int, int, int, const int);
+                                               const int, int*, int, int, int);
 template void bottom_hat_on_host<float>(float*, float*, const int, const int, const int, int*, int,
-                                        int, int, const int);
+                                        int, int);

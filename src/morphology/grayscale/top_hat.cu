@@ -90,7 +90,7 @@ template void top_hat_on_device<float>(float*, float*, const int, const int, con
 template <typename dtype>
 void top_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                      const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
-                     int kernel_zsize, const int flag_verbose) {
+                     int kernel_zsize) {
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
@@ -118,12 +118,12 @@ void top_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const
   free(host_tmp);
 }
 // Template instantiations for specific types
-template void top_hat_on_host<int>(int*, int*, const int, const int, const int, int*, int, int, int,
-                                   const int);
+template void top_hat_on_host<int>(int*, int*, const int, const int, const int, int*, int, int,
+                                   int);
 template void top_hat_on_host<unsigned int>(unsigned int*, unsigned int*, const int, const int,
-                                            const int, int*, int, int, int, const int);
+                                            const int, int*, int, int, int);
 template void top_hat_on_host<float>(float*, float*, const int, const int, const int, int*, int,
-                                     int, int, const int);
+                                     int, int);
 
 //##################################################################################################
 // AVISO VERSION -----------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ template void top_hat_aviso_on_device<float>(float*, float*, const int, const in
 template <typename dtype>
 void top_hat_aviso_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                            const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
-                           int kernel_zsize, const int flag_verbose) {
+                           int kernel_zsize) {
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
@@ -217,9 +217,8 @@ void top_hat_aviso_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
 }
 // Template instantiations for specific types
 template void top_hat_aviso_on_host<int>(int*, int*, const int, const int, const int, int*, int,
-                                         int, int, const int);
+                                         int, int);
 template void top_hat_aviso_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                  const int, const int, int*, int, int, int,
-                                                  const int);
+                                                  const int, const int, int*, int, int, int);
 template void top_hat_aviso_on_host<float>(float*, float*, const int, const int, const int, int*,
-                                           int, int, int, const int);
+                                           int, int, int);
