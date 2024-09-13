@@ -46,16 +46,16 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
 
   read_input(host_A, filename, size, flag_verbose);
 
-  morph_binary_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                         xsize, ysize, zsize, operation, flag_verbose);
+  morph_binary_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                         kernel_ysize, kernel_zsize, operation, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
     host_ref = (int*)malloc(nBytes);
     memset(host_ref, 0, nBytes);
     // Perform binary morphology on host for comparison
-    morph_binary_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                         ysize, zsize, operation);
+    morph_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                         kernel_zsize, operation);
 
     check_result(host_ref, device_ref, xsize, ysize, zsize);
     free(host_ref);
@@ -105,8 +105,8 @@ void test_morph_binary_on_host(const std::string& filename, const int xsize, con
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
   // Perform binary morphology on host
-  morph_binary_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                       ysize, zsize, operation);
+  morph_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                       kernel_zsize, operation);
   if (flag_show)
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 
@@ -123,7 +123,7 @@ void test_morph_binary_on_host(const std::string& filename, const int xsize, con
     memset(opencv_ref, 0, nBytes);
 
     // Perform OpenCV erosion
-    morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+    morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
                          operation);
     if (flag_show)
       show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");

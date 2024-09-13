@@ -30,8 +30,8 @@ void test_bottom_hat_on_device(const std::string& filename, const int xsize, con
   read_input(host_A, filename, size, flag_verbose);
 
   // device erosion
-  bottom_hat_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                       ysize, zsize, flag_verbose);
+  bottom_hat_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                       kernel_zsize, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
@@ -39,8 +39,8 @@ void test_bottom_hat_on_device(const std::string& filename, const int xsize, con
     memset(host_ref, 0, nBytes);
 
     // erosion
-    bottom_hat_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                       ysize, zsize, flag_verbose);
+    bottom_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                       kernel_zsize, flag_verbose);
 
     check_result(host_ref, device_ref, xsize, ysize, zsize);
 
@@ -74,8 +74,8 @@ void test_bottom_hat_on_host(const std::string& filename, const int xsize, const
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
   // bottom hat
-  bottom_hat_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                     ysize, zsize, flag_verbose);
+  bottom_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                     kernel_zsize, flag_verbose);
 
   if (flag_show)
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
@@ -93,7 +93,7 @@ void test_bottom_hat_on_host(const std::string& filename, const int xsize, const
     memset(opencv_ref, 0, nBytes);
 
     // opencv erosion
-    morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+    morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
                          BOTTOMHAT);
     if (flag_show)
       show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");

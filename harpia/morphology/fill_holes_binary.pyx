@@ -15,15 +15,16 @@ cdef extern from "../../include/morphology/morphology.h":
 
 #reconstruction by erosion/dilation
 cdef extern from "../../include/morphology/reconstruction_binary.h":
-    void reconstruction_binary_on_device[dtype](dtype *, dtype *, dtype *, 
-                 const int, const int, const int, MorphOp, const int )
+    void reconstruction_binary_on_device[dtype](dtype *, dtype *,const int, const int, const int, dtype *, 
+                  MorphOp, const int )
 
 def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                           numpy.ndarray[numeric, ndim=3] hostOutput, 
-                          numpy.ndarray[numeric, ndim=3] hostMask,
                           int xsize, 
                           int ysize, 
                           int zsize,
+                          numpy.ndarray[numeric, ndim=3] hostMask,
+                         
                           int operation, 
                           int flag_verbose):
 
@@ -37,8 +38,9 @@ def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage,
     
     return reconstruction_binary_on_device(&hostImage[0,0,0], 
                                            &hostOutput[0,0,0], 
+                                           xsize, ysize, zsize, 
                                            &hostMask[0,0,0],   
-                                           xsize, ysize, zsize, morph_op, flag_verbose)
+                                           morph_op, flag_verbose)
 
 #reconstruction by erosion/dilation
 cdef extern from "../../include/morphology/fill_holes.h":

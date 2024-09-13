@@ -3,20 +3,10 @@
 #include <iostream>
 #include "../include/morphology/cuda_helper.h"
 
-// template<typename Func, typename T, typename... Args>
-// void wrapper(Func func, int ncopies, T* inputImage, T* outputImage, Args... args) {
-//     // Preprocessing
-//     std::cout << "Preprocessing inputImage and outputImage" << std::endl;
-
-//     // Call the actual function with the rest of the arguments
-//     func(inputImage, outputImage, args...);
-// }
-
 // Wrapper function
 template <typename Func, typename dtype, typename... Args>
-void wrapper(Func func, int ncopies, dtype* hostImage, dtype* hostOutput, int* kernel,
-             int kernel_xsize, int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-             const int zsize, Args... args) {
+void chunkedExecutor(Func func, int ncopies, dtype* hostImage, dtype* hostOutput, const int xsize,
+                     const int ysize, const int zsize, Args... args) {
 
   dtype* i_ref = hostImage;
   dtype* o_ref = hostOutput;
@@ -50,8 +40,7 @@ void wrapper(Func func, int ncopies, dtype* hostImage, dtype* hostOutput, int* k
   for (; iz <= zsize - chunkSize; iz += chunkSize) {
     printf("\niz:%d \n", iz);
     // Call the actual function with the rest of the arguments
-    func(i_ref, o_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, chunkSize,
-         args...);
+    func(i_ref, o_ref, xsize, ysize, chunkSize, args...);
     i_ref += chunkSize * sliceSize;
     o_ref += chunkSize * sliceSize;
   }
@@ -60,7 +49,6 @@ void wrapper(Func func, int ncopies, dtype* hostImage, dtype* hostOutput, int* k
   int remaining = zsize - iz;
   printf("\nremaining:%d \n", remaining);
   if (remaining > 0) {
-    func(i_ref, o_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize, remaining,
-         args...);
+    func(i_ref, o_ref, xsize, ysize, remaining, args...);
   }
 }

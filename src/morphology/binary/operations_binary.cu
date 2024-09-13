@@ -20,33 +20,34 @@
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void erosion_binary_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                              int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                              const int zsize, const int flag_verbose) {
-  morph_binary_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                         xsize, ysize, zsize, EROSION, flag_verbose);
+void erosion_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                              const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                              int kernel_zsize, const int flag_verbose) {
+  morph_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                         kernel_ysize, kernel_zsize, EROSION, flag_verbose);
 }
-template void erosion_binary_on_device<int>(int*, int*, int*, int, int, int, const int, const int,
-                                            const int, const int);
-template void erosion_binary_on_device<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                     int, const int, const int, const int,
+template void erosion_binary_on_device<int>(int*, int*, const int, const int, const int, int*, int,
+                                            int, int, const int);
+template void erosion_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                     const int, const int, int*, int, int, int,
                                                      const int);
-template void erosion_binary_on_device<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int,
-                                                 const int, const int, const int, const int);
+template void erosion_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                 const int, int*, int, int, int, const int);
 
 template <typename dtype>
-void erosion_binary_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                            int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                            const int zsize, const int flag_verbose) {
-  morph_binary_on_host(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                       xsize, ysize, zsize, EROSION);
+void erosion_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                            const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                            int kernel_zsize, const int flag_verbose) {
+  morph_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                       kernel_ysize, kernel_zsize, EROSION);
 }
-template void erosion_binary_on_host<int>(int*, int*, int*, int, int, int, const int, const int,
-                                          const int, const int);
-template void erosion_binary_on_host<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                   int, const int, const int, const int, const int);
-template void erosion_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int, const int,
-                                               const int, const int, const int);
+template void erosion_binary_on_host<int>(int*, int*, const int, const int, const int, int*, int,
+                                          int, int, const int);
+template void erosion_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                   const int, const int, int*, int, int, int,
+                                                   const int);
+template void erosion_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                               const int, int*, int, int, int, const int);
 
 /**
  * @brief Performs binary dilation on the input image.
@@ -64,34 +65,34 @@ template void erosion_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int, 
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void dilation_binary_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                               const int zsize, const int flag_verbose) {
-  morph_binary_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                         xsize, ysize, zsize, DILATION, flag_verbose);
+void dilation_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
+                               const int ysize, const int zsize, int* kernel, int kernel_xsize,
+                               int kernel_ysize, int kernel_zsize, const int flag_verbose) {
+  morph_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                         kernel_ysize, kernel_zsize, DILATION, flag_verbose);
 }
-template void dilation_binary_on_device<int>(int*, int*, int*, int, int, int, const int, const int,
-                                             const int, const int);
-template void dilation_binary_on_device<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                      int, const int, const int, const int,
+template void dilation_binary_on_device<int>(int*, int*, const int, const int, const int, int*, int,
+                                             int, int, const int);
+template void dilation_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                      const int, const int, int*, int, int, int,
                                                       const int);
-template void dilation_binary_on_device<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int,
-                                                  const int, const int, const int, const int);
+template void dilation_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                  const int, int*, int, int, int, const int);
 
 template <typename dtype>
-void dilation_binary_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                             int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                             const int zsize, const int flag_verbose) {
-  morph_binary_on_host(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                       xsize, ysize, zsize, DILATION);
+void dilation_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                             const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                             int kernel_zsize, const int flag_verbose) {
+  morph_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                       kernel_ysize, kernel_zsize, DILATION);
 }
-template void dilation_binary_on_host<int>(int*, int*, int*, int, int, int, const int, const int,
-                                           const int, const int);
-template void dilation_binary_on_host<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                    int, const int, const int, const int,
+template void dilation_binary_on_host<int>(int*, int*, const int, const int, const int, int*, int,
+                                           int, int, const int);
+template void dilation_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                    const int, const int, int*, int, int, int,
                                                     const int);
-template void dilation_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int,
-                                                const int, const int, const int, const int);
+template void dilation_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                const int, int*, int, int, int, const int);
 
 /**
  * @brief Performs binary closing on the input image.
@@ -109,39 +110,40 @@ template void dilation_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int,
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void closing_binary_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                              int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                              const int zsize, const int flag_verbose) {
+void closing_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                              const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                              int kernel_zsize, const int flag_verbose) {
 
   MorphChain closing = {DILATION, EROSION};
 
-  morph_chain_binary_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize,
-                               kernel_zsize, xsize, ysize, zsize, closing, flag_verbose);
+  morph_chain_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, closing, flag_verbose);
 }
-template void closing_binary_on_device<int>(int*, int*, int*, int, int, int, const int, const int,
-                                            const int, const int);
-template void closing_binary_on_device<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                     int, const int, const int, const int,
+template void closing_binary_on_device<int>(int*, int*, const int, const int, const int, int*, int,
+                                            int, int, const int);
+template void closing_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                     const int, const int, int*, int, int, int,
                                                      const int);
-template void closing_binary_on_device<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int,
-                                                 const int, const int, const int, const int);
+template void closing_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                 const int, int*, int, int, int, const int);
 
 template <typename dtype>
-void closing_binary_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                            int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                            const int zsize, const int flag_verbose) {
+void closing_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                            const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                            int kernel_zsize, const int flag_verbose) {
 
   MorphChain closing = {DILATION, EROSION};
 
-  morph_chain_binary_on_host(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize,
-                             kernel_zsize, xsize, ysize, zsize, closing);
+  morph_chain_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                             kernel_ysize, kernel_zsize, closing);
 }
-template void closing_binary_on_host<int>(int*, int*, int*, int, int, int, const int, const int,
-                                          const int, const int);
-template void closing_binary_on_host<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                   int, const int, const int, const int, const int);
-template void closing_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int, const int,
-                                               const int, const int, const int);
+template void closing_binary_on_host<int>(int*, int*, const int, const int, const int, int*, int,
+                                          int, int, const int);
+template void closing_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                   const int, const int, int*, int, int, int,
+                                                   const int);
+template void closing_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                               const int, int*, int, int, int, const int);
 
 /**
  * @brief Performs binary openig on the input image.
@@ -159,39 +161,40 @@ template void closing_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int, 
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void opening_binary_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                              int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                              const int zsize, const int flag_verbose) {
+void opening_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                              const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                              int kernel_zsize, const int flag_verbose) {
 
   MorphChain opening = {EROSION, DILATION};
 
-  morph_chain_binary_on_device(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize,
-                               kernel_zsize, xsize, ysize, zsize, opening, flag_verbose);
+  morph_chain_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, opening, flag_verbose);
 }
-template void opening_binary_on_device<int>(int*, int*, int*, int, int, int, const int, const int,
-                                            const int, const int);
-template void opening_binary_on_device<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                     int, const int, const int, const int,
+template void opening_binary_on_device<int>(int*, int*, const int, const int, const int, int*, int,
+                                            int, int, const int);
+template void opening_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                     const int, const int, int*, int, int, int,
                                                      const int);
-template void opening_binary_on_device<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int,
-                                                 const int, const int, const int, const int);
+template void opening_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                 const int, int*, int, int, int, const int);
 
 template <typename dtype>
-void opening_binary_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                            int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                            const int zsize, const int flag_verbose) {
+void opening_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                            const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                            int kernel_zsize, const int flag_verbose) {
 
   MorphChain opening = {EROSION, DILATION};
 
-  morph_chain_binary_on_host(hostImage, hostOutput, kernel, kernel_xsize, kernel_ysize,
-                             kernel_zsize, xsize, ysize, zsize, opening);
+  morph_chain_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                             kernel_ysize, kernel_zsize, opening);
 }
-template void opening_binary_on_host<int>(int*, int*, int*, int, int, int, const int, const int,
-                                          const int, const int);
-template void opening_binary_on_host<unsigned int>(unsigned int*, unsigned int*, int*, int, int,
-                                                   int, const int, const int, const int, const int);
-template void opening_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int, int, int, const int,
-                                               const int, const int, const int);
+template void opening_binary_on_host<int>(int*, int*, const int, const int, const int, int*, int,
+                                          int, int, const int);
+template void opening_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                   const int, const int, int*, int, int, int,
+                                                   const int);
+template void opening_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                               const int, int*, int, int, int, const int);
 
 /**
  * @brief Perform geodesic erosion operation on the entire image using the GPU. This function is 
@@ -207,34 +210,34 @@ template void opening_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, int, 
  * @param flag_verbose Verbose flag to print grid and block dimensions.
  */
 template <typename dtype>
-void geodesic_erosion_binary_on_device(dtype* hostImage, dtype* hostOutput, dtype* hostMask,
-                                       const int xsize, const int ysize, const int zsize,
+void geodesic_erosion_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
+                                       const int ysize, const int zsize, dtype* hostMask,
                                        const int flag_verbose) {
-  geodesic_morph_binary_on_device(hostImage, hostOutput, hostMask, xsize, ysize, zsize, EROSION,
+  geodesic_morph_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, hostMask, EROSION,
                                   flag_verbose);
 }
-template void geodesic_erosion_binary_on_device<int>(int*, int*, int*, const int, const int,
-                                                     const int, const int);
+template void geodesic_erosion_binary_on_device<int>(int*, int*, const int, const int, const int,
+                                                     int*, const int);
 template void geodesic_erosion_binary_on_device<unsigned int>(unsigned int*, unsigned int*,
-                                                              unsigned int*, const int, const int,
-                                                              const int, const int);
-template void geodesic_erosion_binary_on_device<uint16_t>(uint16_t*, uint16_t*, uint16_t*,
-                                                          const int, const int, const int,
+                                                              const int, const int, const int,
+                                                              unsigned int*, const int);
+template void geodesic_erosion_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int,
+                                                          const int, const int, uint16_t*,
                                                           const int);
 
 template <typename dtype>
-void geodesic_erosion_binary_on_host(dtype* hostImage, dtype* hostOutput, dtype* hostMask,
-                                     const int xsize, const int ysize, const int zsize,
+void geodesic_erosion_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
+                                     const int ysize, const int zsize, dtype* hostMask,
                                      const int flag_verbose) {
-  geodesic_morph_binary_on_host(hostImage, hostOutput, hostMask, xsize, ysize, zsize, EROSION);
+  geodesic_morph_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, hostMask, EROSION);
 }
-template void geodesic_erosion_binary_on_host<int>(int*, int*, int*, const int, const int,
-                                                   const int, const int);
-template void geodesic_erosion_binary_on_host<unsigned int>(unsigned int*, unsigned int*,
-                                                            unsigned int*, const int, const int,
-                                                            const int, const int);
-template void geodesic_erosion_binary_on_host<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
-                                                        const int, const int, const int);
+template void geodesic_erosion_binary_on_host<int>(int*, int*, const int, const int, const int,
+                                                   int*, const int);
+template void geodesic_erosion_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                            const int, const int, unsigned int*,
+                                                            const int);
+template void geodesic_erosion_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                        const int, uint16_t*, const int);
 
 /**
  * @brief Perform geodesic dilation operation on the entire image using the GPU. This function is 
@@ -250,31 +253,32 @@ template void geodesic_erosion_binary_on_host<uint16_t>(uint16_t*, uint16_t*, ui
  * @param flag_verbose Verbose flag to print grid and block dimensions.
  */
 template <typename dtype>
-void geodesic_dilation_binary_on_device(dtype* hostImage, dtype* hostOutput, dtype* hostMask,
-                                        const int xsize, const int ysize, const int zsize,
+void geodesic_dilation_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
+                                        const int ysize, const int zsize, dtype* hostMask,
                                         const int flag_verbose) {
-  geodesic_morph_binary_on_device(hostImage, hostOutput, hostMask, xsize, ysize, zsize, DILATION,
+  geodesic_morph_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, hostMask, DILATION,
                                   flag_verbose);
 }
-template void geodesic_dilation_binary_on_device<int>(int*, int*, int*, const int, const int,
-                                                      const int, const int);
+template void geodesic_dilation_binary_on_device<int>(int*, int*, const int, const int, const int,
+                                                      int*, const int);
 template void geodesic_dilation_binary_on_device<unsigned int>(unsigned int*, unsigned int*,
-                                                               unsigned int*, const int, const int,
-                                                               const int, const int);
-template void geodesic_dilation_binary_on_device<uint16_t>(uint16_t*, uint16_t*, uint16_t*,
-                                                           const int, const int, const int,
+                                                               const int, const int, const int,
+                                                               unsigned int*, const int);
+template void geodesic_dilation_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int,
+                                                           const int, const int, uint16_t*,
                                                            const int);
 
 template <typename dtype>
-void geodesic_dilation_binary_on_host(dtype* hostImage, dtype* hostOutput, dtype* hostMask,
-                                      const int xsize, const int ysize, const int zsize,
+void geodesic_dilation_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
+                                      const int ysize, const int zsize, dtype* hostMask,
+
                                       const int flag_verbose) {
-  geodesic_morph_binary_on_host(hostImage, hostOutput, hostMask, xsize, ysize, zsize, DILATION);
+  geodesic_morph_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, hostMask, DILATION);
 }
-template void geodesic_dilation_binary_on_host<int>(int*, int*, int*, const int, const int,
-                                                    const int, const int);
+template void geodesic_dilation_binary_on_host<int>(int*, int*, const int, const int, const int,
+                                                    int*, const int);
 template void geodesic_dilation_binary_on_host<unsigned int>(unsigned int*, unsigned int*,
-                                                             unsigned int*, const int, const int,
-                                                             const int, const int);
-template void geodesic_dilation_binary_on_host<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
-                                                         const int, const int, const int);
+                                                             const int, const int, const int,
+                                                             unsigned int*, const int);
+template void geodesic_dilation_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                         const int, uint16_t*, const int);

@@ -3,7 +3,6 @@
 #include <cstdint>  // For uint16_t, unsigned int
 #include <iostream>
 #include "../../../include/common/grid_block_sizes.h"
-#include "../../../include/morphology/compare_arrays_binary.h"
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/morphology/geodesic_morph_binary.h"
 #include "../../../include/morphology/morph_binary.h"
@@ -60,10 +59,10 @@ void opening_by_reconstruction_on_device(dtype* hostImage, dtype* hostOutput, in
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
   // Create Marker from Erosion
-  morph_binary(deviceMask, deviceMarker, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
-               xsize, ysize, zsize, EROSION, flag_verbose);
+  morph_binary(deviceMask, deviceMarker, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+               kernel_ysize, kernel_zsize, EROSION, flag_verbose);
 
-  reconstruction_binary(deviceMarker, deviceOutput, deviceMask, xsize, ysize, zsize, operation,
+  reconstruction_binary(deviceMarker, deviceOutput, xsize, ysize, zsize, deviceMask, operation,
                         flag_verbose);
 
   // transfer data from the device to the host

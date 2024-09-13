@@ -101,9 +101,8 @@ template void show_image_3D<float>(float*, const int, const int, int, const std:
  * @param operation The morphological operation to apply.
  */
 template <typename dtype, typename dtype2>
-void morphology_2D_openCV(dtype* hostImage, dtype* hostOutput, const int kernel_xsize,
-                          const int kernel_ysize, const int xsize, const int ysize,
-                          dtype2 operation) {
+void morphology_2D_openCV(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                          const int kernel_xsize, const int kernel_ysize, dtype2 operation) {
   // Create a cv::Mat object for the input image
   cv::Mat image(ysize, xsize, CV_32F);  // Use CV_32F for float data
   memcpy(image.data, hostImage, xsize * ysize * sizeof(dtype));
@@ -164,15 +163,15 @@ template void morphology_2D_openCV<float, MorphOp>(float*, float*, const int, co
  * @param operation The morphological operation to apply.
  */
 template <typename dtype, typename dtype2>
-void morphology_3D_openCV(dtype* hostImage, dtype* hostOutput, const int kernel_xsize,
-                          const int kernel_ysize, const int xsize, const int ysize, const int zsize,
+void morphology_3D_openCV(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                          const int zsize, const int kernel_xsize, const int kernel_ysize,
                           dtype2 operation) {
   dtype* himg = hostImage;
   dtype* hout = hostOutput;
 
   // Apply the morphological operation to each slice
   for (int iz = 0; iz < zsize; iz++) {
-    morphology_2D_openCV(himg, hout, kernel_xsize, kernel_ysize, xsize, ysize, operation);
+    morphology_2D_openCV(himg, hout, xsize, ysize, kernel_xsize, kernel_ysize, operation);
     himg += xsize * ysize;
     hout += xsize * ysize;
   }

@@ -49,8 +49,8 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
   read_input(host_A, filename, size, flag_verbose);
 
   // Apply morphological chain operations on the device (GPU)
-  morph_chain_binary_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                               xsize, ysize, zsize, chain, flag_verbose);
+  morph_chain_binary_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, chain, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
@@ -58,8 +58,8 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
     memset(host_ref, 0, nBytes);
 
     // Apply morphological chain operations on the host (CPU) for comparison
-    morph_chain_binary_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                               xsize, ysize, zsize, chain);
+    morph_chain_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, chain);
 
     // Check results for correctness
     check_result(host_ref, device_ref, xsize, ysize, zsize);
@@ -111,8 +111,8 @@ void test_morph_chain_binary_on_host(const std::string& filename, const int xsiz
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
   // Apply morphological chain operations on the host (CPU)
-  morph_chain_binary_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                             xsize, ysize, zsize, chain);
+  morph_chain_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                             kernel_ysize, kernel_zsize, chain);
   if (flag_show)
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 
@@ -130,9 +130,9 @@ void test_morph_chain_binary_on_host(const std::string& filename, const int xsiz
     memset(opencv_tmp, 0, nBytes);
 
     // Apply OpenCV erosion in chain
-    morphology_3D_openCV(host_A, opencv_tmp, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+    morphology_3D_openCV(host_A, opencv_tmp, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
                          chain.operation1);
-    morphology_3D_openCV(opencv_tmp, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+    morphology_3D_openCV(opencv_tmp, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
                          chain.operation2);
     if (flag_show)
       show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");

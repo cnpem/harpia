@@ -96,7 +96,7 @@ void test_fill_holes_on_host(const std::string& filename, const int xsize, const
   //     memset(opencv_ref, 0, nBytes);
 
   //     // Perform OpenCV erosion
-  //     morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+  //     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
   //     operation);
   //     if (flag_show) show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
 

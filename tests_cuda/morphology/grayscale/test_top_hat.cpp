@@ -32,12 +32,12 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
   read_input(host_A, filename, size, flag_verbose);
 
   // device erosion
-  top_hat_on_device(host_A, device_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                    ysize, zsize, flag_verbose);
+  top_hat_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                    kernel_zsize, flag_verbose);
 
   // device erosion
-  top_hat_aviso_on_device(host_A, device_aviso_ref, kernel, kernel_xsize, kernel_ysize,
-                          kernel_zsize, xsize, ysize, zsize, flag_verbose);
+  top_hat_aviso_on_device(host_A, device_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                          kernel_ysize, kernel_zsize, flag_verbose);
 
   if (flag_check) {
     int *host_ref, *host_aviso_ref;
@@ -47,12 +47,12 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
     memset(host_aviso_ref, 0, nBytes);
 
     // erosion
-    top_hat_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize,
-                    ysize, zsize, flag_verbose);
+    top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                    kernel_zsize, flag_verbose);
 
     // erosion
-    top_hat_aviso_on_host(host_A, host_aviso_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                          xsize, ysize, zsize, flag_verbose);
+    top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                          kernel_ysize, kernel_zsize, flag_verbose);
 
     check_result(host_ref, device_ref, xsize, ysize, zsize);
 
@@ -92,10 +92,10 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
   // bottomHat
-  top_hat_on_host(host_A, host_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize, xsize, ysize,
-                  zsize, flag_verbose);
-  top_hat_aviso_on_host(host_A, host_aviso_ref, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                        xsize, ysize, zsize, flag_verbose);
+  top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                  kernel_zsize, flag_verbose);
+  top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                        kernel_ysize, kernel_zsize, flag_verbose);
   if (flag_show) {
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
     show_image_3D(host_aviso_ref, xsize, ysize, zsize, "Result Aviso Image");
@@ -216,7 +216,7 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
 //     memset(opencv_ref, 0, nBytes);
 
 //     // opencv erosion
-//     morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+//     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize,kernel_xsize, kernel_ysize,
 //                          TOPHAT);
 //     if (flag_show)
 //       show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");

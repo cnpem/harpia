@@ -22,9 +22,9 @@
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                          int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                          const int zsize, const int flag_verbose) {
+void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                          const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                          int kernel_zsize, const int flag_verbose) {
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
@@ -46,10 +46,10 @@ void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int 
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
   // Closing operation
-  morph_grayscale(deviceImage, deviceOutput, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                  xsize, ysize, zsize, DILATION, flag_verbose);
-  morph_grayscale(deviceOutput, deviceTmp, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                  xsize, ysize, zsize, EROSION, flag_verbose);
+  morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+                  kernel_ysize, kernel_zsize, DILATION, flag_verbose);
+  morph_grayscale(deviceOutput, deviceTmp, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+                  kernel_ysize, kernel_zsize, EROSION, flag_verbose);
   // B_hat = closing - f
   subtraction(deviceTmp, deviceImage, deviceOutput, xsize * ysize * zsize, flag_verbose);
 
@@ -63,12 +63,12 @@ void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, int* kernel, int 
   cudaFree(deviceKernel);
 }
 // Template instantiations for specific types
-template void bottom_hat_on_device<int>(int*, int*, int*, int, int, int, const int, const int,
-                                        const int, const int);
-template void bottom_hat_on_device<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int,
-                                                 const int, const int, const int, const int);
-template void bottom_hat_on_device<float>(float*, float*, int*, int, int, int, const int, const int,
-                                          const int, const int);
+template void bottom_hat_on_device<int>(int*, int*, const int, const int, const int, int*, int, int,
+                                        int, const int);
+template void bottom_hat_on_device<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                                 const int, int*, int, int, int, const int);
+template void bottom_hat_on_device<float>(float*, float*, const int, const int, const int, int*,
+                                          int, int, int, const int);
 
 /**
  * @brief Performs the bottom-hat transformation on the input image on the host (CPU).
@@ -86,9 +86,9 @@ template void bottom_hat_on_device<float>(float*, float*, int*, int, int, int, c
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int kernel_xsize,
-                        int kernel_ysize, int kernel_zsize, const int xsize, const int ysize,
-                        const int zsize, const int flag_verbose) {
+void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                        const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
+                        int kernel_zsize, const int flag_verbose) {
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
@@ -102,8 +102,8 @@ void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int ke
 
   // Opening operation
   MorphChain closing = {DILATION, EROSION};
-  morph_chain_grayscale_on_host(hostImage, hostTmp, kernel, kernel_xsize, kernel_ysize,
-                                kernel_zsize, xsize, ysize, zsize, closing);
+  morph_chain_grayscale_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize,
+                                kernel_ysize, kernel_zsize, closing);
 
   // B_hat = closing - f
   subtraction_on_host(hostTmp, hostImage, hostOutput, size);
@@ -112,9 +112,9 @@ void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, int* kernel, int ke
   free(hostTmp);
 }
 // Template instantiations for specific types
-template void bottom_hat_on_host<int>(int*, int*, int*, int, int, int, const int, const int,
-                                      const int, const int);
-template void bottom_hat_on_host<unsigned int>(unsigned int*, unsigned int*, int*, int, int, int,
-                                               const int, const int, const int, const int);
-template void bottom_hat_on_host<float>(float*, float*, int*, int, int, int, const int, const int,
-                                        const int, const int);
+template void bottom_hat_on_host<int>(int*, int*, const int, const int, const int, int*, int, int,
+                                      int, const int);
+template void bottom_hat_on_host<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                               const int, int*, int, int, int, const int);
+template void bottom_hat_on_host<float>(float*, float*, const int, const int, const int, int*, int,
+                                        int, int, const int);

@@ -1,7 +1,9 @@
 # 
 # Title: HPCCM recipe for the HARPIA project.
 # 
-# Description: This scripts implement an HPCCM recipe for the HARPIA project. The default arguments of this recipe will install the following packages:
+# Description: This scripts implement an HPCCM recipe for the HARPIA 
+# project. The default arguments of this recipe will install the following 
+# packages:
 # - Ubuntu version 20.04
 # - CUDA version 11.2.2
 # - cuDNN version 8.1.1
@@ -14,8 +16,11 @@
 # - Anaconda version 24.3.0-0
 # 
 # Usage:
-#     - python3 hpccm-cuda-gcc-openmpi-hdf-conda.py --format docker --cuda 11.2.2 --opmpi 4.1.0 --python py39 > Dockerfile
-#     - python3 hpccm-cuda-gcc-openmpi-hdf-conda.py --format singularity --cuda 11.2.2 --opmpi 4.1.0 --python py39 > Singularity.def
+#     - python3 hpccm-cuda-gcc-openmpi-hdf-conda.py --format docker 
+#       --cuda 11.2.2 --opmpi 4.1.0 --python py39 > Dockerfile
+#     
+#     - python3 hpccm-cuda-gcc-openmpi-hdf-conda.py --format singularity 
+#       --cuda 11.2.2 --opmpi 4.1.0 --python py39 > Singularity.def
 # 
 
 BootStrap: docker
