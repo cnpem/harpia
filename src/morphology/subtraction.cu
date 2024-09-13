@@ -1,7 +1,8 @@
-#include "../../../include/common/grid_block_sizes.h"
-#include "../../../include/morphology/cuda_helper.h"
+#include "../../include/common/grid_block_sizes.h"
+#include "../../include/morphology/cuda_helper.h"
 
 #include <stdio.h>
+#include <cstdint>  // For uint16_t, unsigned int
 
 /**
  * @brief Kernel function to perform pixel-wise subtraction of two images.
@@ -22,6 +23,8 @@ __global__ void subtraction_kernel(dtype* deviceImage1, dtype* deviceImage2, dty
   }
 }
 // Template instantiations for specific types
+template __global__ void subtraction_kernel<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int);
+
 template __global__ void subtraction_kernel<unsigned int>(unsigned int*, unsigned int*,
                                                           unsigned int*, const int);
 template __global__ void subtraction_kernel<int>(int*, int*, int*, const int);
@@ -46,6 +49,7 @@ void subtraction(dtype* deviceImage1, dtype* deviceImage2, dtype* deviceOutput, 
 }
 
 // Template instantiations for specific types
+template void subtraction<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int, const int);
 template void subtraction<unsigned int>(unsigned int*, unsigned int*, unsigned int*, const int,
                                         const int);
 template void subtraction<int>(int*, int*, int*, const int, const int);
@@ -89,6 +93,8 @@ void subtraction_on_device(dtype* hostImage1, dtype* hostImage2, dtype* hostOutp
   cudaFree(deviceOutput);
 }
 // Template instantiations for specific types
+template void subtraction_on_device<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
+                                              const int);
 template void subtraction_on_device<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
                                                   const int, const int);
 template void subtraction_on_device<int>(int*, int*, int*, const int, const int);
@@ -110,6 +116,7 @@ void subtraction_on_host(dtype* hostImage1, dtype* hostImage2, dtype* hostOutput
   }
 }
 // Template instantiations for specific types
+template void subtraction_on_host<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int);
 template void subtraction_on_host<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
                                                 const int);
 template void subtraction_on_host<int>(int*, int*, int*, const int);
