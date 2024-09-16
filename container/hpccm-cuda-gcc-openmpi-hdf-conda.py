@@ -51,7 +51,9 @@ parser.add_argument(
     choices=["ubuntu20", "ubuntu22"],
     help="Linux distribution (default=%(default)s).",
 )
-parser.add_argument("--cuda", type=str, default="11.2.2", help="CUDA version (default=%(default)s).")
+parser.add_argument(
+    "--cuda", type=str, default="11.2.2", help="CUDA version (default=%(default)s)."
+)
 parser.add_argument("--gcc", type=str, default="9", help="CUDA version (default=%(default)s).")
 parser.add_argument(
     "--mlnx",
@@ -59,10 +61,18 @@ parser.add_argument(
     default="5.1-2.5.8.0",
     help="CUDA version (default=%(default)s).",
 )
-parser.add_argument("--ompi", type=str, default="4.1.0", help="OpenMPI version (default=%(default)s).")
-parser.add_argument("--hdf5", type=str, default="1.10.7", help="HDF5 version (default=%(default)s).")
-parser.add_argument("--conda", type=str, default="24.3.0-0", help="Conda version (default=%(default)s).")
-parser.add_argument("--python", type=str, default="py39", help="Python version (default=%(default)s).")
+parser.add_argument(
+    "--ompi", type=str, default="4.1.0", help="OpenMPI version (default=%(default)s)."
+)
+parser.add_argument(
+    "--hdf5", type=str, default="1.10.7", help="HDF5 version (default=%(default)s)."
+)
+parser.add_argument(
+    "--conda", type=str, default="24.3.0-0", help="Conda version (default=%(default)s)."
+)
+parser.add_argument(
+    "--python", type=str, default="py39", help="Python version (default=%(default)s)."
+)
 
 args = parser.parse_args()
 
@@ -203,9 +213,7 @@ stage += hpccm.building_blocks.openmpi(version=args.ompi, toolchain=compiler.too
 # https://portal.hdfgroup.org/downloads/hdf5/hdf5_1_14_4.html
 
 # HDF5 (Manual Download and Install)
-hdf5_url = (
-    f"https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{args.hdf5[:4]}/hdf5-{args.hdf5}/src/hdf5-{args.hdf5}.tar.gz"
-)
+hdf5_url = f"https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{args.hdf5[:4]}/hdf5-{args.hdf5}/src/hdf5-{args.hdf5}.tar.gz"
 
 stage += hpccm.primitives.shell(
     commands=[

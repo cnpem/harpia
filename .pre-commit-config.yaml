@@ -6,7 +6,7 @@ repos:
       rev: 24.3.0
       hooks:
           - id: black
-            args: ['--line-length=120', './']
+            args: ['--line-length=100', './']
             files: '(\.pyx|\.pyi?|wscript|ipynb)$'
             always_run: true
             additional_dependencies: ['click==8.0.4']
@@ -15,7 +15,7 @@ repos:
       rev: 7.0.0
       hooks:
           - id: flake8
-            files: ^src/
+            files: '(^src/|^harpia/)'
             always_run: true
             args: ['--config', '.flake8']
             stages: [pre-commit]
@@ -23,7 +23,7 @@ repos:
       rev: 5.13.2
       hooks:
           - id: isort
-            files: ^src/
+            files: '(^src/|^harpia/)'
             always_run: true
             args: ['--profile', 'black', '.']
             stages: [pre-commit]
@@ -31,7 +31,7 @@ repos:
       rev: 1.7.0
       hooks:
           - id: interrogate
-            files: ^src/
+            files: '(^src/|^harpia/)'
             always_run: true
             args: [-vv, -i, --fail-under=70, --ignore-module]
             stages: [pre-commit]
