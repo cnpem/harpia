@@ -1,7 +1,10 @@
 cimport numpy
-from libc.stdint cimport uint16_t, uint32_t
+import numpy as np
+from libc.stdint cimport uint16_t
 
 import numpy
+
+from harpia.common import Size
 
 ctypedef fused numeric:
     uint16_t
@@ -17,33 +20,82 @@ cdef extern from "../../include/morphology/operations_binary.h":
     void geodesic_erosion_binary_on_device[dtype](dtype *, dtype *, int, int, int,  dtype *,int)
     void geodesic_dilation_binary_on_device[dtype](dtype *, dtype *, int, int, int,  dtype *, int)
 
-def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int xsize, int ysize, int zsize,  int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                   int flag_verbose):
-    return erosion_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0],  xsize, ysize, zsize, &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
-                            flag_verbose)
+def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage,  
+                   int[:,:,:] kernel, 
+                   int flag_verbose,
+                   numpy.ndarray[numeric, ndim=3] hostOutput = None):
+    isize = Size(hostImage)
+    ksize = Size(kernel)
 
-def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int xsize, int ysize, int zsize, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                    int flag_verbose):
-    return dilation_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], xsize, ysize, zsize, &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
-                             flag_verbose)
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
 
-def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput,int xsize, int ysize, int zsize, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                    int flag_verbose):
-    return closing_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], xsize, ysize, zsize,  &kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
-                            flag_verbose)
+    erosion_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0],  isize.x, isize.y, isize.z, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, flag_verbose)
 
-def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int xsize, int ysize, int zsize, int[:,:,:] kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize, 
-                    int flag_verbose):
-    return opening_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], xsize, ysize, zsize,&kernel[0,0,0], kernel_xsize, kernel_ysize, kernel_zsize, 
-                             flag_verbose)
+    return hostOutput
+    
+def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
+                    int[:,:,:] kernel, 
+                    int flag_verbose, 
+                    numpy.ndarray[numeric, ndim=3] hostOutput = None):
+    isize = Size(hostImage)
+    ksize = Size(kernel)
+    
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
 
-def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int xsize, int ysize, int zsize, 
-                             numpy.ndarray[numeric, ndim=3] hostMask, int flag_verbose):
-    return geodesic_erosion_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], xsize, ysize, zsize,  &hostMask[0,0,0],
-                                             flag_verbose)
+    dilation_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, &kernel[0,0,0],ksize.x, ksize.y, ksize.z, flag_verbose)
 
-def geodesic_dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, numpy.ndarray[numeric, ndim=3] hostOutput, int xsize, int ysize, int zsize, 
-                             numpy.ndarray[numeric, ndim=3] hostMask, int flag_verbose):
-    return geodesic_dilation_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], xsize, ysize, zsize,  &hostMask[0,0,0], 
-                                              flag_verbose)
+    return hostOutput
+
+
+def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
+                   int[:,:,:] kernel, 
+                   int flag_verbose, 
+                   numpy.ndarray[numeric, ndim=3] hostOutput = None):
+    isize = Size(hostImage)
+    ksize = Size(kernel)
+    
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
+
+    closing_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z,  &kernel[0,0,0], ksize.x, ksize.y, ksize.z, flag_verbose)
+    return hostOutput
+
+def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
+                   int[:,:,:] kernel, 
+                   int flag_verbose, 
+                   numpy.ndarray[numeric, ndim=3] hostOutput = None):
+    isize = Size(hostImage)
+    ksize = Size(kernel)
+    
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
+
+    opening_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, flag_verbose)
+    return hostOutput
+
+def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
+                            numpy.ndarray[numeric, ndim=3] hostMask, 
+                            int flag_verbose, 
+                            numpy.ndarray[numeric, ndim=3] hostOutput = None):
+    isize = Size(hostImage)
+
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
+    
+    geodesic_erosion_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, &hostMask[0,0,0], flag_verbose)
+    return hostOutput
+
+def geodesic_dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
+                             numpy.ndarray[numeric, ndim=3] hostMask, 
+                             int flag_verbose, 
+                             numpy.ndarray[numeric, ndim=3] hostOutput = None):
+    isize = Size(hostImage)
+    
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
+
+    geodesic_dilation_binary_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, &hostMask[0,0,0], flag_verbose)
+    return hostOutput
 

@@ -1,7 +1,11 @@
 cimport numpy
-from libc.stdint cimport uint16_t, uint32_t
+import numpy as np
+
+from libc.stdint cimport uint16_t
 
 import numpy
+
+from harpia.common import Size
 
 ctypedef fused numeric:
     uint16_t
@@ -19,14 +23,11 @@ cdef extern from "../../include/morphology/reconstruction_binary.h":
                   MorphOp, const int )
 
 def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
-                          numpy.ndarray[numeric, ndim=3] hostOutput, 
-                          int xsize, 
-                          int ysize, 
-                          int zsize,
                           numpy.ndarray[numeric, ndim=3] hostMask,
-                         
                           int operation, 
-                          int flag_verbose):
+                          int flag_verbose, 
+                          numpy.ndarray[numeric, ndim=3] hostOutput = None ):
+    isize = Size(hostImage)
 
     cdef MorphOp morph_op
     if operation == 0:
@@ -36,21 +37,29 @@ def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage,
     else:
         raise ValueError("Invalid operation. Must be 0 (EROSION) or 1 (DILATION).")
     
-    return reconstruction_binary_on_device(&hostImage[0,0,0], 
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
+
+    reconstruction_binary_on_device(&hostImage[0,0,0], 
                                            &hostOutput[0,0,0], 
-                                           xsize, ysize, zsize, 
+                                           isize.x, isize.y, isize.z, 
                                            &hostMask[0,0,0],   
                                            morph_op, flag_verbose)
+    return hostOutput
 
 #reconstruction by erosion/dilation
 cdef extern from "../../include/morphology/fill_holes.h":
     void fill_holes_on_device[dtype](dtype *, dtype *, const int, const int, const int, const int )
 
 def fill_holes(numpy.ndarray[numeric, ndim=3] hostImage, 
-                      numpy.ndarray[numeric, ndim=3] hostOutput, 
-                      int xsize,
-                      int ysize, 
-                      int zsize,
-                      int flag_verbose):
+               int flag_verbose, 
+               numpy.ndarray[numeric, ndim=3] hostOutput = None ):
 
-    return fill_holes_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], xsize, ysize, zsize, flag_verbose)
+    isize = Size(hostImage)
+    
+    if hostOutput is None:
+        hostOutput = np.empty_like(hostImage)
+    
+    fill_holes_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, flag_verbose)
+
+    return hostOutput

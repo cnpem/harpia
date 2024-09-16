@@ -190,6 +190,7 @@ def get_extension_modules(basedir):
 # Create Extension objects for various submodules
 ext_modules = [
     *get_extension_modules("harpia"),
+    *get_extension_modules("harpia.common"),
     *get_extension_modules("harpia.morphology"),
     *get_extension_modules("harpia.filters"),
     *get_extension_modules("harpia.quantification"),
