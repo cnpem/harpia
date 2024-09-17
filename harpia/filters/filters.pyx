@@ -2,13 +2,13 @@ cimport cython
 cimport numpy as np
 from libcpp cimport bool
 
-# Define the fused type for numeric types: float, int, unsigned int
+#Define the fused type for numeric types : float, int, unsigned int
 ctypedef fused numeric:
     float
     int
     unsigned int
 
-# Extern declaration for the Gaussian filtering function from C/C++ library
+#Extern declaration for the Gaussian filtering function from C / C++ library
 cdef extern from "../../include/filters/gaussian_filter.h":
     void gaussian_filtering[numeric] (numeric* hostImage, float* hostOutput, int xsize, int ysize, int zsize, float sigma, bool type)
 
@@ -34,7 +34,7 @@ def gaussian(np.ndarray[numeric, ndim=3] hostImage, np.ndarray[np.float32_t, ndi
                               xsize, ysize, zsize,
                               sigma, type)
 
-# Extern declaration for the Mean filtering function from C/C++ library
+#Extern declaration for the Mean filtering function from C / C++ library
 cdef extern from "../../include/filters/mean_filter.h":
     void mean_filtering[numeric] (numeric* hostImage, float* hostOutput,
                                   int xsize, int ysize, int zsize,
@@ -65,7 +65,7 @@ def mean(np.ndarray[numeric, ndim=3] hostImage,
                           xsize, ysize, zsize,
                           nx, ny, nz)
 
-# Extern declaration for the LoG filtering function from C/C++ library
+#Extern declaration for the LoG filtering function from C / C++ library
 cdef extern from "../../include/filters/log_filter.h":
     void log_filtering[numeric] (numeric* hostImage, float* hostOutput,
                                  int xsize, int ysize, int zsize,
@@ -94,7 +94,7 @@ def LoG(np.ndarray[numeric, ndim=3] hostImage,
                          xsize, ysize, zsize,
                          type)
 
-# Extern declaration for the Unsharp Mask filtering function from C/C++ library
+#Extern declaration for the Unsharp Mask filtering function from C / C++ library
 cdef extern from "../../include/filters/unsharp_mask_filter.h":
     void unsharp_mask_filtering[numeric] (numeric* hostImage, float* hostOutput,
                                           int xsize, int ysize, int zsize,
@@ -126,7 +126,7 @@ def unsharp_mask(np.ndarray[numeric, ndim=3] hostImage,
                                   xsize, ysize, zsize,
                                   sigma, amount, threshold, type)
 
-# Extern declaration for the Sobel filtering function from C/C++ library
+#Extern declaration for the Sobel filtering function from C / C++ library
 cdef extern from "../../include/filters/sobel_filter.h":
     void sobel_filtering[numeric] (numeric* hostImage, float* hostOutput,
                                    int xsize, int ysize, int zsize, bool type)
@@ -152,7 +152,7 @@ def sobel(np.ndarray[numeric, ndim=3] hostImage,
                            &hostOutput[0,0,0],
                            xsize, ysize, zsize, type)
 
-# Extern declaration for the Prewitt filtering function from C/C++ library
+#Extern declaration for the Prewitt filtering function from C / C++ library
 cdef extern from "../../include/filters/prewitt_filter.h":
     void prewitt_filtering[numeric] (numeric* hostImage, float* hostOutput,
                                      int xsize, int ysize, int zsize, bool type)
@@ -178,7 +178,7 @@ def prewitt(np.ndarray[numeric, ndim=3] hostImage,
                              &hostOutput[0,0,0],
                              xsize, ysize, zsize, type)
 
-# Extern declaration for the Canny filtering function from C/C++ library
+#Extern declaration for the Canny filtering function from C / C++ library
 cdef extern from "../../include/filters/canny_filter.h":
     void canny_filtering[numeric] (numeric* hostImage, float* hostOutput,
                                    int xsize, int ysize, int zsize,
@@ -209,8 +209,7 @@ def canny(np.ndarray[numeric, ndim=3] hostImage,
                            xsize, ysize, zsize,
                            sigma, low_threshold, high_threshold)
 
-
-# Extern declaration for the median filtering function from C/C++ library
+#Extern declaration for the median filtering function from C / C++ library
 cdef extern from "../../include/filters/median_filter.h":
     void median_filtering[numeric] (numeric* hostImage, numeric* hostOutput,
                                   int xsize, int ysize, int zsize,
@@ -241,7 +240,7 @@ def median(np.ndarray[numeric, ndim=3] hostImage,
                           xsize, ysize, zsize,
                           nx, ny, nz)
 
-# Define the fused type for numeric types: float, double
+#Define the fused type for numeric types : float, double
 ctypedef fused real:
     float
     double
