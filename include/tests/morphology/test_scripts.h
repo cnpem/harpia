@@ -4,6 +4,7 @@
 #include <string>
 #include "../../morphology/morphology.h"
 
+int test_operations_on_host();
 int test_script1(MorphOp operation);
 int test_script2();
 int test_script3(MorphChain chain);

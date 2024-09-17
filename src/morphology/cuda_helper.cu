@@ -101,7 +101,8 @@ void checkGpuMem(size_t allocatedBytes) {
   allocated_g = static_cast<float>(allocatedBytes) / 1073741824.0f;
   // Print memory usage in GB
   printf(
-      "mem free: %f GB (%zu bytes) | mem total: %f GB (%zu bytes) | mem used: %f GB | mem "
-      "allocated: %f GB\n",
-      free_g, free_t, total_g, total_t, used_g, allocated_g);
+      // "mem free: %f GB (%zu bytes) | mem total: %f GB (%zu bytes) | mem used: %f GB | mem "
+      // "allocated: %f GB\n",
+      "mem free:%fGB  total:%fGB  used:%fGB  allocated:%fGB\n", free_g, free_t, total_g, total_t,
+      used_g, allocated_g);
 }

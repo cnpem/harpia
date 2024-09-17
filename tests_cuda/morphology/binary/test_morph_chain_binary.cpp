@@ -30,6 +30,10 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
                                        const int kernel_xsize, const int kernel_ysize,
                                        const int kernel_zsize, MorphChain chain,
                                        const int flag_check, const int flag_verbose) {
+
+  const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
+  printf("\nTest binary %s.\n", (closing_flag ? "closing" : "opening"));
+
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(int);
@@ -92,6 +96,9 @@ void test_morph_chain_binary_on_host(const std::string& filename, const int xsiz
                                      const int kernel_ysize, const int kernel_zsize,
                                      MorphChain chain, const int flag_show, const int flag_check,
                                      const int flag_verbose) {
+  const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
+  printf("\nTest binary %s on host\n", (closing_flag ? "closing" : "opening"));
+
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(int);

@@ -2,6 +2,7 @@
 #include "../../include/morphology/morphology.h"
 #include "../../include/morphology/structuring_elements.h"
 #include "../../include/tests/morphology/test_bottom_hat.h"
+#include "../../include/tests/morphology/test_complement_binary.h"
 #include "../../include/tests/morphology/test_fill_holes.h"
 #include "../../include/tests/morphology/test_image_processing.h"
 #include "../../include/tests/morphology/test_morph_binary.h"
@@ -18,7 +19,80 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <cstring>
-//#include <test_bottomHat.h>
+
+// Assure that operations check with opencv implementation or make visual sense according to the task
+// Tests of correctness - these tests are important to validate the operations on cuda.
+// It is important to have a cpu trustworth implementation to check if cuda operations are correct
+int test_operations_on_host() {
+  std::string filenameBinary = "./example_images/binary/blobs_355x321x1_16b.raw";
+  std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
+
+  // Create kernel - must be a 2D kernel, because openCV opearates slice by slice
+  int* kernel;
+  kernel = (int*)malloc(sizeof(int) * 27);  // Size to fit the horizontal line kernels 3x3x3
+  get_structuring_element_3D(kernel, 5, 5, 1);
+
+  int flag_show = 0;     // Whether to plot the result
+  int flag_check = 1;    // Whether to compare with OpenCV
+  int flag_verbose = 0;  // Whether to print status messages
+
+  MorphChain closing = {DILATION, EROSION};
+  MorphChain opening = {EROSION, DILATION};
+
+  // Check with opencv
+  printf("\nCompare operations on host results with OpenCV in 2D\n");
+
+  test_morph_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, EROSION, flag_show,
+                            flag_check, flag_verbose);
+
+  test_morph_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, DILATION, flag_show,
+                            flag_check, flag_verbose);
+
+  test_morph_chain_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, closing, flag_show,
+                                  flag_check, flag_verbose);
+
+  test_morph_chain_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, opening, flag_show,
+                                  flag_check, flag_verbose);
+
+  test_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, EROSION, flag_show,
+                               flag_check, flag_verbose);
+
+  test_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, DILATION,
+                               flag_show, flag_check, flag_verbose);
+
+  test_morph_chain_grayscale_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, closing,
+                                     flag_show, flag_check, flag_verbose);
+
+  test_morph_chain_grayscale_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, opening,
+                                     flag_show, flag_check, flag_verbose);
+
+  test_subtraction_on_host(filenameGrayscale, filenameGrayscale, 600, 1520, 1, flag_show,
+                           flag_check, flag_verbose);
+
+  test_top_hat_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, flag_show, flag_check,
+                       flag_verbose);
+
+  test_bottom_hat_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, flag_show, flag_check,
+                          flag_verbose);
+
+  // Visual tests
+  printf("\nVisualy evaluate operations on host in 2D\n");
+
+  test_complement_binary_on_host(filenameBinary, 355, 321, 1, flag_verbose);
+
+  filenameBinary = "./example_images/binary/eagle_275x183x1_16b.raw";
+  test_fill_holes_on_host(filenameBinary, 275, 183, 1, flag_verbose);
+
+  // TODO:
+  // test geodesic dilation and erosion (step of fill holes)
+  // test reconstruction by dilation or erosion (step of fill holes)
+  // test opening by reconstruction
+  // test Aviso topHat e BottomHat inspired implementation
+
+  free(kernel);
+
+  return 0;
+}
 
 /**
  * @brief Test erosion/dilation operations for 2D/3D, binary/grayscale images.
@@ -235,7 +309,7 @@ int test_script4() {
 
   printf("\nTest subtraction on host.\n");
   test_subtraction_on_host(filenameGrayscale, filenameGrayscale, 600, 1520, 2, flag_show,
-                           flag_verbose);
+                           flag_check, flag_verbose);
 
   printf("\nTest subtraction on device.\n");
   test_subtraction_on_device(filenameGrayscale, filenameGrayscale, 600, 1520, 500, flag_check,
@@ -300,7 +374,7 @@ int test_script6() {
   int flag_check = 1;    // Whether to compare with OpenCV erosion
   int flag_verbose = 0;  // Whether to print status messages
 
-  test_fill_holes_on_host(filenameBinary, 275, 183, 1, flag_show, 0, flag_verbose);
+  test_fill_holes_on_host(filenameBinary, 275, 183, 1, flag_verbose);
 
   test_fill_holes_on_device(filenameBinary, 355, 321, 1, flag_check, flag_verbose);
 
@@ -318,7 +392,7 @@ int test_script7() {
   get_structuring_element_3D(kernel, 5, 5, 5);
 
   int flag_check = 1;    // Whether to compare with OpenCV erosion
-  int flag_verbose = 0;  // Whether to print status messages
+  int flag_verbose = 1;  // Whether to print status messages
 
   test_morph_grayscale_on_device_wrapper(filenameGrayscale, 600, 1520, 500, kernel, 5, 5, 1,
                                          EROSION, flag_check, flag_verbose);

@@ -33,6 +33,8 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(int);
 
+  printf("\nTest binary %s\n", (operation ? "dilation" : "erosion"));
+
   if (flag_verbose)
     printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
@@ -86,6 +88,9 @@ void test_morph_binary_on_host(const std::string& filename, const int xsize, con
                                const int zsize, int* kernel, const int kernel_xsize,
                                const int kernel_ysize, const int kernel_zsize, MorphOp operation,
                                const int flag_show, const int flag_check, const int flag_verbose) {
+
+  printf("\nTest binary %s  on host\n", (operation ? "dilation" : "erosion"));
+
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(int);

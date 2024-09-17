@@ -5,13 +5,12 @@
 
 // Wrapper function
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutor(Func func, int ncopies, dtype* hostImage, dtype* hostOutput, const int xsize,
-                     const int ysize, const int zsize, Args... args) {
+void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* hostImage,
+                     dtype* hostOutput, const int xsize, const int ysize, const int zsize,
+                     const int verbose, Args... args) {
 
   dtype* i_ref = hostImage;
   dtype* o_ref = hostOutput;
-
-  const float safetyMargin = 0.2f;
 
   // Get memory allocated by the func
   int sliceSize = xsize * ysize;
@@ -24,7 +23,9 @@ void chunkedExecutor(Func func, int ncopies, dtype* hostImage, dtype* hostOutput
 
   // How many slices fit in the GPU?
   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
-  printf("MaxChunkSize:%d zsize:%d\n", chunkSize, zsize);
+  if (verbose) {
+    printf("MaxChunkSize:%d zsize:%d\n", chunkSize, zsize);
+  }
 
   if (chunkSize == 0) {
     fprintf(
@@ -33,7 +34,9 @@ void chunkedExecutor(Func func, int ncopies, dtype* hostImage, dtype* hostOutput
     return;
   } else if (chunkSize > zsize) {
     chunkSize = zsize;
-    printf("ActualChunkSize:%d zsize:%d\n", chunkSize, zsize);
+    if (verbose) {
+      printf("ActualChunkSize:%d\n", chunkSize);
+    }
   }
 
   int iz = 0;
@@ -47,8 +50,13 @@ void chunkedExecutor(Func func, int ncopies, dtype* hostImage, dtype* hostOutput
 
   // Process the remaining slices, if any
   int remaining = zsize - iz;
-  printf("\nremaining:%d \n", remaining);
+  if (verbose) {
+    printf("\nremaining:%d \n", remaining);
+  }
   if (remaining > 0) {
     func(i_ref, o_ref, xsize, ysize, remaining, args...);
+  }
+  if (verbose) {
+    printf("\nfineshed!\n");
   }
 }

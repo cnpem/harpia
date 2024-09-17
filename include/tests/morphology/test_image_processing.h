@@ -24,5 +24,4 @@ template <typename dtype, typename dtype2>
 void morphology_3D_openCV(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                           const int zsize, const int kernel_xsize, const int kernel_ysize,
                           dtype2 operation);
-
 #endif  // IMAGE_PROCESSING_H
