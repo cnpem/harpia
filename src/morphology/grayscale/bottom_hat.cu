@@ -46,12 +46,12 @@ void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
   // Closing operation
-  morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+  morph_grayscale(deviceImage, deviceTmp, xsize, ysize, zsize, deviceKernel, kernel_xsize,
                   kernel_ysize, kernel_zsize, DILATION, flag_verbose);
-  morph_grayscale(deviceOutput, deviceTmp, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+  morph_grayscale(deviceTmp, deviceOutput, xsize, ysize, zsize, deviceKernel, kernel_xsize,
                   kernel_ysize, kernel_zsize, EROSION, flag_verbose);
   // B_hat = closing - f
-  subtraction(deviceTmp, deviceImage, deviceOutput, xsize * ysize * zsize, flag_verbose);
+  subtraction(deviceImage, deviceOutput, xsize * ysize * zsize, flag_verbose);
 
   // Transfer data from the device to the host
   CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
@@ -91,25 +91,14 @@ void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
                         int kernel_zsize) {
   // Set input dimension
   int size = xsize * ysize * zsize;
-  size_t nBytes = size * sizeof(dtype);
-
-  // Allocate temporary memory
-  dtype* hostTmp;
-  hostTmp = (dtype*)malloc(nBytes);
-
-  // Set input data
-  memset(hostTmp, 0, nBytes);
 
   // Opening operation
   MorphChain closing = {DILATION, EROSION};
-  morph_chain_grayscale_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize,
+  morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
                                 kernel_ysize, kernel_zsize, closing);
 
   // B_hat = closing - f
-  subtraction_on_host(hostTmp, hostImage, hostOutput, size);
-
-  // Free temporary memory
-  free(hostTmp);
+  subtraction_on_host(hostImage, hostOutput, size);
 }
 // Template instantiations for specific types
 template void bottom_hat_on_host<int>(int*, int*, const int, const int, const int, int*, int, int,

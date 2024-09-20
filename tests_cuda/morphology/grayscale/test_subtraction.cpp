@@ -19,40 +19,38 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
   if (flag_verbose)
     printf("Matrix size:   %d (%d.%d.%d) \n", size, xsize, ysize, zsize);
 
-  float *host_A, *host_B, *device_ref;  //pointers for host memmory
-  host_B = (float*)malloc(nBytes);
+  float *host_A, *device_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
   device_ref = (float*)malloc(nBytes);
 
   // set input data
-  memset(host_B, 0, nBytes);
   memset(host_A, 0, nBytes);
   memset(device_ref, 0, nBytes);
 
   read_input(host_A, filename, size, flag_verbose);
-  read_input(host_B, filename2, size, flag_verbose);
+  read_input(device_ref, filename2, size, flag_verbose);
 
   // device erosion
   int ncopies = 3;
   chunkedExecutor(subtraction_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
-                  ysize, zsize, flag_verbose, host_B, flag_verbose);
-  show_image_3D(device_ref + 54 * xsize * ysize, xsize, ysize, 2, "device_ref");
+                  ysize, zsize, flag_verbose, flag_verbose);
+  //show_image_3D(device_ref + 54 * xsize * ysize, xsize, ysize, 2, "device_ref");
 
   if (flag_check) {
     float* host_ref;
     host_ref = (float*)malloc(nBytes);
     memset(host_ref, 0, nBytes);
+    read_input(host_ref, filename2, size, flag_verbose);
 
     // erosion
-    subtraction_on_host(host_A, host_B, host_ref, size);
-    show_image_3D(host_ref + 54 * xsize * ysize, xsize, ysize, 5, "host_ref");
-    cv::waitKey(0);
+    subtraction_on_host(host_A, host_ref, size);
+    //show_image_3D(host_ref + 54 * xsize * ysize, xsize, ysize, 5, "host_ref");
+    //cv::waitKey(0);
 
     check_result(host_ref, device_ref, xsize, ysize, zsize);
     free(host_ref);
   }
 
-  free(host_B);
   free(host_A);
   free(device_ref);
 }
@@ -70,23 +68,21 @@ void test_subtraction_on_host(const std::string& filename, const std::string& fi
     printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
   }
 
-  float *host_A, *host_B, *host_ref;  //pointers for host memmory
+  float *host_A, *host_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
-  host_B = (float*)malloc(nBytes);
   host_ref = (float*)malloc(nBytes);
 
   // set input data
   memset(host_A, 1, nBytes);
-  memset(host_B, 1, nBytes);
   memset(host_ref, 1, nBytes);
   read_input(host_A, filename, size, flag_verbose);
-  read_input(host_B, filename, size, flag_verbose);
+  read_input(host_ref, filename, size, flag_verbose);
   if (flag_show) {
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image A");
-    show_image_3D(host_B, xsize, ysize, zsize, "Input Image B");
+    show_image_3D(host_ref, xsize, ysize, zsize, "Input Image B");
   }
 
-  subtraction_on_host(host_A, host_B, host_ref, size);
+  subtraction_on_host(host_A, host_ref, size);
 
   if (flag_show) {
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
@@ -103,6 +99,5 @@ void test_subtraction_on_host(const std::string& filename, const std::string& fi
 
   //free host memory
   free(host_A);
-  free(host_B);
   free(host_ref);
 }

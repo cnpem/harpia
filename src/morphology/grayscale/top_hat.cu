@@ -35,11 +35,11 @@ void top_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, con
   size_t kernel_nBytes = kernel_size * sizeof(int);
 
   // Malloc device global memory
-  dtype *deviceImage, *deviceTmp, *deviceOutput;
+  dtype *deviceImage, *deviceTmp, *deviceAux;
   int* deviceKernel;
   CHECK(cudaMalloc((dtype**)&deviceImage, nBytes));
   CHECK(cudaMalloc((dtype**)&deviceTmp, nBytes));
-  CHECK(cudaMalloc((dtype**)&deviceOutput, nBytes));
+  CHECK(cudaMalloc((dtype**)&deviceAux, nBytes));
   CHECK(cudaMalloc((int**)&deviceKernel, kernel_nBytes));
 
   // Transfer data from the host to the device
@@ -47,21 +47,21 @@ void top_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, con
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
   // Opening operation: erosion followed by dilation
-  morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+  morph_grayscale(deviceImage, deviceAux, xsize, ysize, zsize, deviceKernel, kernel_xsize,
                   kernel_ysize, kernel_zsize, EROSION, flag_verbose);
-  morph_grayscale(deviceOutput, deviceTmp, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+  morph_grayscale(deviceAux, deviceTmp, xsize, ysize, zsize, deviceKernel, kernel_xsize,
                   kernel_ysize, kernel_zsize, DILATION, flag_verbose);
 
   // Top-hat: input - opening
-  subtraction(deviceImage, deviceTmp, deviceOutput, size, flag_verbose);
+  subtraction(deviceTmp, deviceImage, size, flag_verbose);
 
   // Transfer data from the device to the host
-  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
+  CHECK(cudaMemcpy(hostOutput, deviceImage, nBytes, cudaMemcpyDeviceToHost));
 
   // Free device memory
   cudaFree(deviceTmp);
   cudaFree(deviceImage);
-  cudaFree(deviceOutput);
+  cudaFree(deviceAux);
   cudaFree(deviceKernel);
 }
 // Template instantiations for specific types
@@ -112,7 +112,8 @@ void top_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const
   // 'opening' como 'marker', depois da convergênica da reconstrução, é feita a subtração!!
 
   // Top-hat: f - opening
-  subtraction_on_host(hostImage, host_tmp, hostOutput, size);
+  memcpy(hostOutput, hostImage, nBytes);
+  subtraction_on_host(host_tmp, hostOutput, size);
 
   // Free temporary memory
   free(host_tmp);
@@ -142,11 +143,11 @@ void top_hat_aviso_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
   size_t kernel_nBytes = kernel_size * sizeof(int);
 
   // Malloc device global memory
-  dtype *deviceImage, *deviceTmp, *deviceOutput;
+  dtype *deviceImage, *deviceTmp, *deviceAux;
   int* deviceKernel;
   CHECK(cudaMalloc((dtype**)&deviceImage, nBytes));
   CHECK(cudaMalloc((dtype**)&deviceTmp, nBytes));
-  CHECK(cudaMalloc((dtype**)&deviceOutput, nBytes));
+  CHECK(cudaMalloc((dtype**)&deviceAux, nBytes));
   CHECK(cudaMalloc((int**)&deviceKernel, kernel_nBytes));
 
   // Transfer data from the host to the device
@@ -154,24 +155,24 @@ void top_hat_aviso_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
   // Opening operation: erosion followed by dilation
-  morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+  morph_grayscale(deviceImage, deviceAux, xsize, ysize, zsize, deviceKernel, kernel_xsize,
                   kernel_ysize, kernel_zsize, EROSION, flag_verbose);
-  morph_grayscale(deviceOutput, deviceTmp, xsize, ysize, zsize, deviceKernel, kernel_xsize,
+  morph_grayscale(deviceAux, deviceTmp, xsize, ysize, zsize, deviceKernel, kernel_xsize,
                   kernel_ysize, kernel_zsize, DILATION, flag_verbose);
 
-  reconstruction_grayscale(deviceTmp, deviceOutput, xsize, ysize, zsize, deviceImage, DILATION,
+  reconstruction_grayscale(deviceTmp, deviceAux, xsize, ysize, zsize, deviceImage, DILATION,
                            flag_verbose);
 
   // Top-hat: input - opening
-  subtraction(deviceImage, deviceOutput, deviceOutput, size, flag_verbose);
+  subtraction(deviceAux, deviceImage, size, flag_verbose);
 
   // Transfer data from the device to the host
-  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
+  CHECK(cudaMemcpy(hostOutput, deviceImage, nBytes, cudaMemcpyDeviceToHost));
 
   // Free device memory
   cudaFree(deviceTmp);
   cudaFree(deviceImage);
-  cudaFree(deviceOutput);
+  cudaFree(deviceAux);
   cudaFree(deviceKernel);
 }
 // Template instantiations for specific types
@@ -199,7 +200,7 @@ void top_hat_aviso_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
 
   // Opening operation
   MorphChain opening = {EROSION, DILATION};
-  morph_chain_grayscale_on_host(hostImage, host_tmp, xsize, ysize, zsize, kernel, kernel_xsize,
+  morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
                                 kernel_ysize, kernel_zsize, opening);
 
   // Em vez de fazer apenas um openning, usa o opening simples como marker pra um opening by
@@ -207,10 +208,11 @@ void top_hat_aviso_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
   // TODO: substituir a subtraçõa por uma reconstrução geodésica p/ grayscale usando a imagem de
   // 'opening' como 'marker', depois da convergênica da reconstrução, é feita a subtração!!
 
-  reconstruction_grayscale_on_host(host_tmp, hostOutput, xsize, ysize, zsize, hostImage, DILATION);
+  reconstruction_grayscale_on_host(hostOutput, host_tmp, xsize, ysize, zsize, hostImage, DILATION);
 
   // Top-hat: f - opening
-  subtraction_on_host(hostImage, hostOutput, hostOutput, size);
+  memcpy(hostOutput, hostImage, nBytes);
+  subtraction_on_host(host_tmp, hostOutput, size);
 
   // Free temporary memory
   free(host_tmp);
