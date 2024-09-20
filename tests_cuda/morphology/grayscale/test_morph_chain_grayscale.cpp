@@ -4,11 +4,64 @@
 #include <cstring>
 #include <string>
 
+#include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/structuring_elements.h"
 #include "../../../include/tests/morphology/test_image_processing.h"
 #include "../../../include/tests/morphology/test_morph_chain_grayscale.h"
 #include "../../../include/tests/morphology/test_util.h"
+
+void test_morph_chain_grayscale_on_device(const std::string& filename, const int xsize,
+                                          const int ysize, const int zsize, int* kernel,
+                                          const int kernel_xsize, const int kernel_ysize,
+                                          const int kernel_zsize, MorphChain chain,
+                                          float memoryOccupancy, const int flag_check,
+                                          const int flag_verbose) {
+
+  const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
+  printf("\nTest grayscale %s on device\n", (closing_flag ? "closing" : "opening"));
+
+  // set input dimension
+  int size = xsize * ysize * zsize;
+
+  size_t nBytes = size * sizeof(float);
+
+  if (flag_verbose)
+    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+
+  float *host_A, *device_ref;  //pointers for host memory
+  host_A = (float*)malloc(nBytes);
+  device_ref = (float*)malloc(nBytes);
+
+  // set input data
+  memset(host_A, 0, nBytes);
+  memset(device_ref, 0, nBytes);
+
+  read_input(host_A, filename, size, flag_verbose);
+
+  // device erosion
+  int ncopies = 3;
+  chunkedExecutor(morph_chain_grayscale_on_device<float>, ncopies, memoryOccupancy, host_A,
+                  device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize,
+                  kernel_zsize, chain, flag_verbose);
+
+  if (flag_check) {
+    float* host_ref;
+    host_ref = (float*)malloc(nBytes);
+    memset(host_ref, 0, nBytes);
+
+    // erosion
+    morph_chain_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                                  kernel_ysize, kernel_zsize, chain);
+
+    check_result(host_ref, device_ref, xsize, ysize, zsize);
+
+    free(host_ref);
+  }
+
+  free(host_A);
+  free(device_ref);
+}
 
 void test_morph_chain_grayscale_on_host(const std::string& filename, const int xsize,
                                         const int ysize, const int zsize, int* kernel,
@@ -16,6 +69,7 @@ void test_morph_chain_grayscale_on_host(const std::string& filename, const int x
                                         const int kernel_zsize, MorphChain chain,
                                         const int flag_show, const int flag_check,
                                         const int flag_verbose) {
+
   const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
   printf("\nTest grayscale %s on host\n", (closing_flag ? "closing" : "opening"));
 
@@ -76,49 +130,4 @@ void test_morph_chain_grayscale_on_host(const std::string& filename, const int x
   //free host memory
   free(host_A);
   free(host_ref);
-}
-
-void test_morph_chain_grayscale_on_device(const std::string& filename, const int xsize,
-                                          const int ysize, const int zsize, int* kernel,
-                                          const int kernel_xsize, const int kernel_ysize,
-                                          const int kernel_zsize, MorphChain chain,
-                                          const int flag_check, const int flag_verbose) {
-  // set input dimension
-  int size = xsize * ysize * zsize;
-
-  size_t nBytes = size * sizeof(int);
-
-  if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
-
-  int *host_A, *device_ref;  //pointers for host memory
-  host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
-
-  // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-
-  read_input(host_A, filename, size, flag_verbose);
-
-  // device erosion
-  morph_chain_grayscale_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                                  kernel_ysize, kernel_zsize, chain, flag_verbose);
-
-  if (flag_check) {
-    int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
-
-    // erosion
-    morph_chain_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                                  kernel_ysize, kernel_zsize, chain);
-
-    check_result(host_ref, device_ref, xsize, ysize, zsize);
-
-    free(host_ref);
-  }
-
-  free(host_A);
-  free(device_ref);
 }

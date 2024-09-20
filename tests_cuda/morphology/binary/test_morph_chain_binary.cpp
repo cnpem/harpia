@@ -4,6 +4,7 @@
 #include <cstring>
 #include <string>
 
+#include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/morphology/morph_chain_binary.h"
 #include "../../../include/morphology/structuring_elements.h"
 #include "../../../include/tests/morphology/test_image_processing.h"
@@ -29,10 +30,11 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
                                        const int ysize, const int zsize, int* kernel,
                                        const int kernel_xsize, const int kernel_ysize,
                                        const int kernel_zsize, MorphChain chain,
-                                       const int flag_check, const int flag_verbose) {
+                                       float memoryOccupancy, const int flag_check,
+                                       const int flag_verbose) {
 
   const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
-  printf("\nTest binary %s.\n", (closing_flag ? "closing" : "opening"));
+  printf("\nTest binary %s on device\n", (closing_flag ? "closing" : "opening"));
 
   // Set input dimension
   int size = xsize * ysize * zsize;
@@ -53,8 +55,10 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
   read_input(host_A, filename, size, flag_verbose);
 
   // Apply morphological chain operations on the device (GPU)
-  morph_chain_binary_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                               kernel_ysize, kernel_zsize, chain, flag_verbose);
+  int ncopies = 3;
+  chunkedExecutor(morph_chain_binary_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref,
+                  xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize,
+                  kernel_zsize, chain, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
@@ -96,6 +100,7 @@ void test_morph_chain_binary_on_host(const std::string& filename, const int xsiz
                                      const int kernel_ysize, const int kernel_zsize,
                                      MorphChain chain, const int flag_show, const int flag_check,
                                      const int flag_verbose) {
+
   const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
   printf("\nTest binary %s on host\n", (closing_flag ? "closing" : "opening"));
 

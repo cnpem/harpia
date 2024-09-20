@@ -41,7 +41,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* ho
 
   int iz = 0;
   for (; iz <= zsize - chunkSize; iz += chunkSize) {
-    printf("\niz:%d \n", iz);
+    // printf("\niz:%d \n", iz);
     // Call the actual function with the rest of the arguments
     func(i_ref, o_ref, xsize, ysize, chunkSize, args...);
     i_ref += chunkSize * sliceSize;

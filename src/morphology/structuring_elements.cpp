@@ -14,6 +14,7 @@ void get_structuring_element_3D(int* kernel, int kernel_xsize, int kernel_ysize,
   int size = kernel_xsize * kernel_ysize * kernel_zsize;
 
   if (!kernel) {
+    printf("Failed to define kernel.\n");
     return;
   }
 
@@ -83,20 +84,22 @@ void vertical_line_kernel(int* kernel) {
  */
 void custum_kernel_3D(int* kernel) {
   if (!kernel) {
+    printf("Failed to define kernel.\n");
     return;
   }
 
+  int* ik = kernel;
   for (int i = 0; i < 3; i++) {
-    kernel[0] = 1;
-    kernel[1] = -1;
-    kernel[2] = -1;
-    kernel[3] = 1;
-    kernel[4] = -1;
-    kernel[5] = -1;
-    kernel[6] = 1;
-    kernel[7] = -1;
-    kernel[8] = -1;
+    ik[0] = 1;
+    ik[1] = 0;
+    ik[2] = -1;
+    ik[3] = 1;
+    ik[4] = 0;
+    ik[5] = -1;
+    ik[6] = 1;
+    ik[7] = 0;
+    ik[8] = -1;
 
-    kernel += 9;  // Repeat the defined slice along z axis
+    ik += 9;  // Repeat the defined slice along z axis
   }
 }

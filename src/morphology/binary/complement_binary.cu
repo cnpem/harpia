@@ -42,10 +42,11 @@ template void complement_binary<unsigned int>(unsigned int*, unsigned int*, cons
 template void complement_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int);
 
 template <typename dtype>
-void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int size,
-                                 const int flag_verbose) {
+void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
+                                 const int ysize, const int zsize, const int flag_verbose) {
 
   // Set input dimension
+  int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Malloc device global memory
@@ -68,10 +69,12 @@ void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int 
   cudaFree(deviceOutput);
 }
 // Template instantiations for specific types
-template void complement_binary_on_device<int>(int*, int*, const int, const int);
+template void complement_binary_on_device<int>(int*, int*, const int, const int, const int,
+                                               const int);
 template void complement_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                        const int);
-template void complement_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int);
+                                                        const int, const int, const int);
+template void complement_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
+                                                    const int, const int);
 
 template <typename dtype>
 void complement_binary_on_host(dtype* hostImage, dtype* hostOutput, const int size) {

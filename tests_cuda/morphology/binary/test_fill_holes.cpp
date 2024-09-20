@@ -4,14 +4,18 @@
 #include <cstring>
 #include <string>
 
-#include "../../../include/common/grid_block_sizes.h"
+#include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/morphology/fill_holes.h"
 #include "../../../include/tests/morphology/test_fill_holes.h"
 #include "../../../include/tests/morphology/test_image_processing.h"
 #include "../../../include/tests/morphology/test_util.h"
 
 void test_fill_holes_on_device(const std::string& filename, const int xsize, const int ysize,
-                               const int zsize, const int flag_check, const int flag_verbose) {
+                               const int zsize, float memoryOccupancy, const int flag_check,
+                               const int flag_verbose) {
+
+  printf("\nTest fill holes on device\n");
+
   // Set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(int);
@@ -29,7 +33,9 @@ void test_fill_holes_on_device(const std::string& filename, const int xsize, con
 
   read_input(host_A, filename, size, flag_verbose);
 
-  fill_holes_on_device(host_A, device_ref, xsize, ysize, zsize, flag_verbose);
+  int ncopies = 3;
+  chunkedExecutor(fill_holes_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
+                  ysize, zsize, flag_verbose, flag_verbose);
 
   if (flag_check) {
     int* host_ref;

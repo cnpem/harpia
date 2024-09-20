@@ -7,15 +7,66 @@
 #include "../../../include/tests/morphology/test_morph_grayscale.h"
 #include "../../../include/tests/morphology/test_util.h"
 
+void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize,
+                                    const int zsize, int* kernel, const int kernel_xsize,
+                                    const int kernel_ysize, const int kernel_zsize,
+                                    MorphOp operation, float memoryOccupancy, const int flag_check,
+                                    const int flag_verbose) {
+
+  printf("\nTest grayscale %s on device\n", (operation ? "dilation" : "erosion"));
+
+  // set input dimension
+  int size = xsize * ysize * zsize;
+
+  size_t nBytes = size * sizeof(float);
+
+  if (flag_verbose) {
+    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+  }
+
+  // pointers for host memory
+  float *host_A, *device_ref;
+  host_A = (float*)malloc(nBytes);
+  device_ref = (float*)malloc(nBytes);
+
+  //set input data
+  memset(host_A, 0, nBytes);
+  memset(device_ref, 0, nBytes);
+
+  read_input(host_A, filename, size, flag_verbose);
+
+  int ncopies = 2;
+  chunkedExecutor(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref,
+                  xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize,
+                  kernel_zsize, operation, flag_verbose);
+
+  if (flag_check) {
+    float* host_ref;
+    host_ref = (float*)malloc(nBytes);
+    memset(host_ref, 0, nBytes);
+
+    morph_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                            kernel_ysize, kernel_zsize, operation);
+
+    check_result(host_ref, device_ref, xsize, ysize, zsize);
+
+    free(host_ref);
+  }
+
+  free(host_A);
+  free(device_ref);
+}
+
 void test_morph_grayscale_on_host(const std::string& filename, const int xsize, const int ysize,
                                   const int zsize, int* kernel, const int kernel_xsize,
                                   const int kernel_ysize, const int kernel_zsize, MorphOp operation,
                                   const int flag_show, const int flag_check,
                                   const int flag_verbose) {
-  // set input dimension
-  int size = xsize * ysize * zsize;
 
   printf("\nTest grayscale %s on host\n", (operation ? "dilation" : "erosion"));
+
+  // set input dimension
+  int size = xsize * ysize * zsize;
 
   size_t nBytes = size * sizeof(float);
   if (flag_verbose)
@@ -73,140 +124,92 @@ void test_morph_grayscale_on_host(const std::string& filename, const int xsize, 
   free(host_ref);
 }
 
-void test_morph_grayscale_on_device_wrapper(const std::string& filename, const int xsize,
-                                            const int ysize, const int zsize, int* kernel,
-                                            const int kernel_xsize, const int kernel_ysize,
-                                            const int kernel_zsize, MorphOp operation,
-                                            const int flag_check, const int flag_verbose) {
-  // set input dimension
-  int size = xsize * ysize * zsize;
+// void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize,
+//                                     const int zsize, int* kernel, const int kernel_xsize,
+//                                     const int kernel_ysize, const int kernel_zsize,
+//                                     MorphOp operation, const int flag_check,
+//                                     const int flag_verbose) {
+//   // set input dimension
+//   int size = xsize * ysize * zsize;
 
-  size_t nBytes = size * sizeof(int);
+//   size_t nBytes = size * sizeof(int);
 
-  if (flag_verbose) {
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
-  }
+//   if (flag_verbose)
+//     printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-  // pointers for host memory
-  int *host_A, *device_ref;
-  host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
+//   int *host_A, *device_ref;  //pointers for host memory
+//   host_A = (int*)malloc(nBytes);
+//   device_ref = (int*)malloc(nBytes);
 
-  //set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
+//   // set input data
+//   memset(host_A, 0, nBytes);
+//   memset(device_ref, 0, nBytes);
 
-  read_input(host_A, filename, size, flag_verbose);
+//   read_input(host_A, filename, size, flag_verbose);
 
-  int ncopies = 2;
-  float safetyMargin = 0.9f;
-  chunkedExecutor(morph_grayscale_on_device<int>, ncopies, safetyMargin, host_A, device_ref, xsize,
-                  ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                  operation, flag_verbose);
+//   // device erosion
+//   morph_grayscale_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+//                             kernel_ysize, kernel_zsize, operation, flag_verbose);
 
-  if (flag_check) {
-    int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+//   if (flag_check) {
+//     int* host_ref;
+//     host_ref = (int*)malloc(nBytes);
+//     memset(host_ref, 0, nBytes);
 
-    morph_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                            kernel_ysize, kernel_zsize, operation);
+//     // erosion
+//     morph_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+//                             kernel_ysize, kernel_zsize, operation);
 
-    check_result(host_ref, device_ref, xsize, ysize, zsize);
+//     check_result(host_ref, device_ref, xsize, ysize, zsize);
 
-    free(host_ref);
-  }
+//     free(host_ref);
+//   }
 
-  free(host_A);
-  free(device_ref);
-}
+//   free(host_A);
+//   free(device_ref);
+// }
 
-void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize,
-                                    const int zsize, int* kernel, const int kernel_xsize,
-                                    const int kernel_ysize, const int kernel_zsize,
-                                    MorphOp operation, const int flag_check,
-                                    const int flag_verbose) {
-  // set input dimension
-  int size = xsize * ysize * zsize;
+// void test_morph_grayscale_on_device_time(const std::string& filename, const int xsize,
+//                                          const int ysize, const int zsize, int* kernel,
+//                                          const int kernel_xsize, const int kernel_ysize,
+//                                          const int kernel_zsize, MorphOp operation, int n) {
+//   int flag_check = 0;
+//   int flag_verbose = 0;
 
-  size_t nBytes = size * sizeof(int);
+//   double iStart, iElaps;
+//   iElaps = 0;
 
-  if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+//   for (int i = 0; i < n; i++) {
+//     iStart = cpu_second();
+//     test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize,
+//                                    kernel_ysize, kernel_zsize, operation, flag_check, flag_verbose);
+//     iElaps += cpu_second() - iStart;
+//   }
+//   iElaps = iElaps / n;
+//   printf("\nmorph_grayscale_on_device Mean time elapsed %f sec\n", iElaps);
+// }
 
-  int *host_A, *device_ref;  //pointers for host memory
-  host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
+// void test_morph_grayscale_time_compare(const std::string& filename, const int xsize,
+//                                        const int ysize, const int zsize, int* kernel,
+//                                        const int kernel_xsize, const int kernel_ysize,
+//                                        const int kernel_zsize, MorphOp operation) {
+//   int flag_show = 0;
+//   int flag_check = 0;
+//   int flag_verbose = 0;
 
-  // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
+//   double iStart, iElapsHostGrayscale, iElapsDeviceGrayscale;
+//   iElapsHostGrayscale = 0;
+//   iElapsDeviceGrayscale = 0;
 
-  read_input(host_A, filename, size, flag_verbose);
+//   iStart = cpu_second();
+//   test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+//                                  kernel_zsize, operation, flag_check, flag_verbose);
+//   iElapsDeviceGrayscale = cpu_second() - iStart;
+//   printf("\nmorph_grayscale_on_device Time elapsed %f sec\n", iElapsDeviceGrayscale);
 
-  // device erosion
-  morph_grayscale_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                            kernel_ysize, kernel_zsize, operation, flag_verbose);
-
-  if (flag_check) {
-    int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
-
-    // erosion
-    morph_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                            kernel_ysize, kernel_zsize, operation);
-
-    check_result(host_ref, device_ref, xsize, ysize, zsize);
-
-    free(host_ref);
-  }
-
-  free(host_A);
-  free(device_ref);
-}
-
-void test_morph_grayscale_on_device_time(const std::string& filename, const int xsize,
-                                         const int ysize, const int zsize, int* kernel,
-                                         const int kernel_xsize, const int kernel_ysize,
-                                         const int kernel_zsize, MorphOp operation, int n) {
-  int flag_check = 0;
-  int flag_verbose = 0;
-
-  double iStart, iElaps;
-  iElaps = 0;
-
-  for (int i = 0; i < n; i++) {
-    iStart = cpu_second();
-    test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize,
-                                   kernel_ysize, kernel_zsize, operation, flag_check, flag_verbose);
-    iElaps += cpu_second() - iStart;
-  }
-  iElaps = iElaps / n;
-  printf("\nmorph_grayscale_on_device Mean time elapsed %f sec\n", iElaps);
-}
-
-void test_morph_grayscale_time_compare(const std::string& filename, const int xsize,
-                                       const int ysize, const int zsize, int* kernel,
-                                       const int kernel_xsize, const int kernel_ysize,
-                                       const int kernel_zsize, MorphOp operation) {
-  int flag_show = 0;
-  int flag_check = 0;
-  int flag_verbose = 0;
-
-  double iStart, iElapsHostGrayscale, iElapsDeviceGrayscale;
-  iElapsHostGrayscale = 0;
-  iElapsDeviceGrayscale = 0;
-
-  iStart = cpu_second();
-  test_morph_grayscale_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                                 kernel_zsize, operation, flag_check, flag_verbose);
-  iElapsDeviceGrayscale = cpu_second() - iStart;
-  printf("\nmorph_grayscale_on_device Time elapsed %f sec\n", iElapsDeviceGrayscale);
-
-  iStart = cpu_second();
-  test_morph_grayscale_on_host(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                               kernel_zsize, operation, flag_show, flag_check, flag_verbose);
-  iElapsHostGrayscale = cpu_second() - iStart;
-  printf("\nmorph_grayscale_on_host Time elapsed %f sec\n", iElapsHostGrayscale);
-}
+//   iStart = cpu_second();
+//   test_morph_grayscale_on_host(filename, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+//                                kernel_zsize, operation, flag_show, flag_check, flag_verbose);
+//   iElapsHostGrayscale = cpu_second() - iStart;
+//   printf("\nmorph_grayscale_on_host Time elapsed %f sec\n", iElapsHostGrayscale);
+// }

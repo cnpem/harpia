@@ -7,7 +7,7 @@
 template <typename Func, typename dtype, typename... Args>
 void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* hostImage,
                      dtype* hostOutput, const int xsize, const int ysize, const int zsize,
-                     const int, Args... args);
+                     const int verbose, Args... args);
 
 // Include the implementation to avoid compilation linkage errors
 // (this is the same as defining the funcition in the header file)

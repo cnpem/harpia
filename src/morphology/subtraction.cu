@@ -66,9 +66,10 @@ template void subtraction<float>(float*, float*, float*, const int, const int);
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void subtraction_on_device(dtype* hostImage1, dtype* hostImage2, dtype* hostOutput, const int size,
-                           const int flag_verbose) {
+void subtraction_on_device(dtype* hostImage1, dtype* hostOutput, const int xsize, const int ysize,
+                           const int zsize, dtype* hostImage2, const int flag_verbose) {
   // Set input dimension
+  int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Malloc device global memory
@@ -93,12 +94,14 @@ void subtraction_on_device(dtype* hostImage1, dtype* hostImage2, dtype* hostOutp
   cudaFree(deviceOutput);
 }
 // Template instantiations for specific types
-template void subtraction_on_device<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
-                                              const int);
-template void subtraction_on_device<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
-                                                  const int, const int);
-template void subtraction_on_device<int>(int*, int*, int*, const int, const int);
-template void subtraction_on_device<float>(float*, float*, float*, const int, const int);
+template void subtraction_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
+                                              uint16_t*, const int);
+template void subtraction_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                  const int, const int, unsigned int*, const int);
+template void subtraction_on_device<int>(int*, int*, const int, const int, const int, int*,
+                                         const int);
+template void subtraction_on_device<float>(float*, float*, const int, const int, const int, float*,
+                                           const int);
 
 /**
  * @brief Perform pixel-wise subtraction of two images on the host.

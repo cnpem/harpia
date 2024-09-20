@@ -8,8 +8,8 @@ void complement_binary(dtype* deviceImage, dtype* deviceOutput, const int size,
 
 // Slide kernel and erosion operation over all input image pixels
 template <typename dtype>
-void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int size,
-                                 const int flag_verbose);
+void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
+                                 const int ysize, const int zsize, const int flag_verbose);
 
 // Slide kernel and erosion operation over all input image pixels
 template <typename dtype>

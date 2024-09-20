@@ -162,8 +162,6 @@ void morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xs
   int kernel_size = kernel_xsize * kernel_ysize * kernel_zsize;
   size_t kernel_nBytes = kernel_size * sizeof(int);
 
-  checkGpuMem(0);
-
   // Allocate device global memory
   dtype *deviceImage, *deviceOutput;
   int* deviceKernel;
@@ -174,8 +172,6 @@ void morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xs
   // Transfer data from the host to the device
   CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
-
-  checkGpuMem(nBytes * 2 + kernel_nBytes);
 
   // Device erosion/dilation
   morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, deviceKernel, kernel_xsize,

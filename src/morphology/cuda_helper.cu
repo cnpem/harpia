@@ -35,7 +35,6 @@ void test_check_device_info() {
   int dev = 0, driverVersion = 0, runtimeVersion = 0;
   CHECK(cudaSetDevice(dev));
   cudaDeviceProp deviceProp;
-  size_t free_mem, total_mem;
 
   CHECK(cudaGetDeviceProperties(&deviceProp, dev));
   printf("Device %d: \"%s\"\n", dev, deviceProp.name);
@@ -103,6 +102,6 @@ void checkGpuMem(size_t allocatedBytes) {
   printf(
       // "mem free: %f GB (%zu bytes) | mem total: %f GB (%zu bytes) | mem used: %f GB | mem "
       // "allocated: %f GB\n",
-      "mem free:%fGB  total:%fGB  used:%fGB  allocated:%fGB\n", free_g, free_t, total_g, total_t,
-      used_g, allocated_g);
+      "mem free:%fGB  total:%fGB  used:%fGB  allocated:%fGB\n", free_g, total_g, used_g,
+      allocated_g);
 }

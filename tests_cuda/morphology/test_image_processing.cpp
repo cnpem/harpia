@@ -72,7 +72,10 @@ template <typename dtype>
 void show_image_3D(dtype* hostImage, const int xsize, const int ysize, int zsize,
                    const std::string title) {
   dtype* himg = hostImage;
-
+  if (zsize > 10) {
+    printf("Too many windows to plot. Cannot plot %d windows.\n", zsize);
+    return;
+  }
   // Display each slice of the 3D image
   for (int slice = 0; slice < zsize; slice++) {
     show_image_2D(himg, xsize, ysize, title + " - slice " + std::to_string(slice));
