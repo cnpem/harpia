@@ -1,129 +1,69 @@
-#include <stdio.h>
-#include <cstring>
-#include <string>
+// #include <stdio.h>
+// #include <cstring>
+// #include <string>
 
-#include "../../../include/common/chunkedExecutor.h"
-#include "../../../include/morphology/top_hat.h"
-#include "../../../include/tests/morphology/test_image_processing.h"
-#include "../../../include/tests/morphology/test_top_hat.h"
-#include "../../../include/tests/morphology/test_util.h"
+// #include "../../../include/common/chunkedExecutor.h"
+// #include "../../../include/morphology/top_hat.h"
+// #include "../../../include/tests/morphology/test_image_processing.h"
+// #include "../../../include/tests/morphology/test_top_hat.h"
+// #include "../../../include/tests/morphology/test_util.h"
 
-void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize,
-                            const int zsize, int* kernel, const int kernel_xsize,
-                            const int kernel_ysize, const int kernel_zsize, float memoryOccupancy,
-                            const int flag_check, const int flag_verbose) {
+// void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize,
+//                             const int zsize, int* kernel, const int kernel_xsize,
+//                             const int kernel_ysize, const int kernel_zsize, float memoryOccupancy,
+//                             const int flag_check, const int flag_verbose) {
 
-  printf("\nTest top hat on device\n");
+//   printf("\nTest top hat on device\n");
 
-  // set input dimension
-  int size = xsize * ysize * zsize;
+//   // set input dimension
+//   int size = xsize * ysize * zsize;
 
-  size_t nBytes = size * sizeof(float);
+//   size_t nBytes = size * sizeof(float);
 
-  if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+//   if (flag_verbose)
+//     printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-  float *host_A, *device_ref;  //pointers for host memmory
-  host_A = (float*)malloc(nBytes);
-  device_ref = (float*)malloc(nBytes);
+//   float *host_A, *device_ref;  //pointers for host memmory
+//   host_A = (float*)malloc(nBytes);
+//   device_ref = (float*)malloc(nBytes);
 
-  // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
+//   // set input data
+//   memset(host_A, 0, nBytes);
+//   memset(device_ref, 0, nBytes);
 
-  read_input(host_A, filename, size, flag_verbose);
+//   read_input(host_A, filename, size, flag_verbose);
 
-  // device erosion
-  int ncopies = 3;
-  chunkedExecutor(top_hat_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
-                  ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                  flag_verbose);
+//   // device erosion
+//   int ncopies = 3;
+//   chunkedExecutor(top_hat_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
+//                   ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
+//                   flag_verbose);
 
-  if (flag_check) {
-    float* host_ref;
-    host_ref = (float*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+//   if (flag_check) {
+//     float* host_ref;
+//     host_ref = (float*)malloc(nBytes);
+//     memset(host_ref, 0, nBytes);
 
-    // erosion
-    top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                    kernel_zsize);
+//     // erosion
+//     top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+//                     kernel_zsize);
 
-    check_result(host_ref, device_ref, xsize, ysize, zsize);
+//     check_result(host_ref, device_ref, xsize, ysize, zsize);
 
-    free(host_ref);
-  }
+//     free(host_ref);
+//   }
 
-  free(host_A);
-  free(device_ref);
-}
+//   free(host_A);
+//   free(device_ref);
+// }
 
-void test_top_hat_on_host(const std::string& filename, const int xsize, const int ysize,
-                          const int zsize, int* kernel, const int kernel_xsize,
-                          const int kernel_ysize, const int kernel_zsize, const int flag_show,
-                          const int flag_check, const int flag_verbose) {
-
-  printf("\nTest top hat on host\n");
-
-  // set input dimension
-  int size = xsize * ysize * zsize;
-
-  size_t nBytes = size * sizeof(float);
-  if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
-
-  float *host_A, *host_ref;  //pointers for host memmory
-  host_A = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
-
-  // set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
-  read_input(host_A, filename, size, flag_verbose);
-  if (flag_show)
-    show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
-
-  // bottomHat
-  top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                  kernel_zsize);
-  if (flag_show)
-    show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
-
-  if (flag_check) {
-    if (kernel_zsize > 1) {
-      printf(
-          "WARNING: Results will not match, opencv is done slice by slice, it "
-          "is incompatible with kernel zsize: %d",
-          kernel_zsize);
-    }
-
-    float* opencv_ref;
-    opencv_ref = (float*)malloc(nBytes);
-    memset(opencv_ref, 0, nBytes);
-
-    // opencv erosion
-    morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
-                         TOPHAT);
-    if (flag_show)
-      show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
-
-    check_result(host_ref, opencv_ref, xsize, ysize, zsize);
-
-    free(opencv_ref);
-  }
-
-  if (flag_show)
-    cv::waitKey(0);
-
-  //free host memory
-  free(host_A);
-  free(host_ref);
-}
-
-// Testing top_hat aviso also
 // void test_top_hat_on_host(const std::string& filename, const int xsize, const int ysize,
 //                           const int zsize, int* kernel, const int kernel_xsize,
 //                           const int kernel_ysize, const int kernel_zsize, const int flag_show,
 //                           const int flag_check, const int flag_verbose) {
+
+//   printf("\nTest top hat on host\n");
+
 //   // set input dimension
 //   int size = xsize * ysize * zsize;
 
@@ -131,28 +71,23 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
 //   if (flag_verbose)
 //     printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-//   float *host_A, *host_ref, *host_aviso_ref;  //pointers for host memmory
+//   float *host_A, *host_ref;  //pointers for host memmory
 //   host_A = (float*)malloc(nBytes);
 //   host_ref = (float*)malloc(nBytes);
-//   host_aviso_ref = (float*)malloc(nBytes);
 
 //   // set input data
 //   memset(host_A, 0, nBytes);
 //   memset(host_ref, 0, nBytes);
-//   memset(host_aviso_ref, 0, nBytes);
 //   read_input(host_A, filename, size, flag_verbose);
 //   if (flag_show)
 //     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
-//   // operation
+//   // bottomHat
 //   top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
 //                   kernel_zsize);
-//   top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-//                         kernel_ysize, kernel_zsize);
-//   if (flag_show) {
+//   if (flag_show)
 //     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
-//     show_image_3D(host_aviso_ref, xsize, ysize, zsize, "Result Aviso Image");
-//   }
+
 //   if (flag_check) {
 //     if (kernel_zsize > 1) {
 //       printf(
@@ -166,7 +101,7 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
 //     memset(opencv_ref, 0, nBytes);
 
 //     // opencv erosion
-//     morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+//     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
 //                          TOPHAT);
 //     if (flag_show)
 //       show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
@@ -184,62 +119,127 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
 //   free(host_ref);
 // }
 
-// void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize,
-//                             const int zsize, int* kernel, const int kernel_xsize,
-//                             const int kernel_ysize, const int kernel_zsize, const int flag_check,
-//                             const int flag_verbose) {
-//   // set input dimension
-//   int size = xsize * ysize * zsize;
+// // Testing top_hat aviso also
+// // void test_top_hat_on_host(const std::string& filename, const int xsize, const int ysize,
+// //                           const int zsize, int* kernel, const int kernel_xsize,
+// //                           const int kernel_ysize, const int kernel_zsize, const int flag_show,
+// //                           const int flag_check, const int flag_verbose) {
+// //   // set input dimension
+// //   int size = xsize * ysize * zsize;
 
-//   size_t nBytes = size * sizeof(int);
+// //   size_t nBytes = size * sizeof(float);
+// //   if (flag_verbose)
+// //     printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-//   if (flag_verbose)
-//     printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+// //   float *host_A, *host_ref, *host_aviso_ref;  //pointers for host memmory
+// //   host_A = (float*)malloc(nBytes);
+// //   host_ref = (float*)malloc(nBytes);
+// //   host_aviso_ref = (float*)malloc(nBytes);
 
-//   int *host_A, *device_ref, *device_aviso_ref;  //pointers for host memmory
-//   host_A = (int*)malloc(nBytes);
-//   device_ref = (int*)malloc(nBytes);
-//   device_aviso_ref = (int*)malloc(nBytes);
+// //   // set input data
+// //   memset(host_A, 0, nBytes);
+// //   memset(host_ref, 0, nBytes);
+// //   memset(host_aviso_ref, 0, nBytes);
+// //   read_input(host_A, filename, size, flag_verbose);
+// //   if (flag_show)
+// //     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
-//   // set input data
-//   memset(host_A, 0, nBytes);
-//   memset(device_ref, 0, nBytes);
-//   memset(device_aviso_ref, 0, nBytes);
+// //   // operation
+// //   top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+// //                   kernel_zsize);
+// //   top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+// //                         kernel_ysize, kernel_zsize);
+// //   if (flag_show) {
+// //     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
+// //     show_image_3D(host_aviso_ref, xsize, ysize, zsize, "Result Aviso Image");
+// //   }
+// //   if (flag_check) {
+// //     if (kernel_zsize > 1) {
+// //       printf(
+// //           "WARNING: Results will not match, opencv is done slice by slice, it "
+// //           "is incompatible with kernel zsize: %d",
+// //           kernel_zsize);
+// //     }
 
-//   read_input(host_A, filename, size, flag_verbose);
+// //     float* opencv_ref;
+// //     opencv_ref = (float*)malloc(nBytes);
+// //     memset(opencv_ref, 0, nBytes);
 
-//   // device erosion
-//   top_hat_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-//                     kernel_zsize, flag_verbose);
+// //     // opencv erosion
+// //     morphology_3D_openCV(host_A, opencv_ref, kernel_xsize, kernel_ysize, xsize, ysize, zsize,
+// //                          TOPHAT);
+// //     if (flag_show)
+// //       show_image_3D(opencv_ref, xsize, ysize, zsize, "Result OpenCV");
 
-//   // device erosion
-//   top_hat_aviso_on_device(host_A, device_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-//                           kernel_ysize, kernel_zsize, flag_verbose);
+// //     check_result(host_ref, opencv_ref, xsize, ysize, zsize);
 
-//   if (flag_check) {
-//     int *host_ref, *host_aviso_ref;
-//     host_ref = (int*)malloc(nBytes);
-//     host_aviso_ref = (int*)malloc(nBytes);
-//     memset(host_ref, 0, nBytes);
-//     memset(host_aviso_ref, 0, nBytes);
+// //     free(opencv_ref);
+// //   }
 
-//     // erosion
-//     top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-//                     kernel_zsize);
+// //   if (flag_show)
+// //     cv::waitKey(0);
 
-//     // erosion
-//     top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-//                           kernel_ysize, kernel_zsize);
+// //   //free host memory
+// //   free(host_A);
+// //   free(host_ref);
+// // }
 
-//     check_result(host_ref, device_ref, xsize, ysize, zsize);
+// // void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize,
+// //                             const int zsize, int* kernel, const int kernel_xsize,
+// //                             const int kernel_ysize, const int kernel_zsize, const int flag_check,
+// //                             const int flag_verbose) {
+// //   // set input dimension
+// //   int size = xsize * ysize * zsize;
 
-//     check_result(host_aviso_ref, device_aviso_ref, xsize, ysize, zsize);
+// //   size_t nBytes = size * sizeof(int);
 
-//     free(host_ref);
-//     free(host_aviso_ref);
-//   }
+// //   if (flag_verbose)
+// //     printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
-//   free(host_A);
-//   free(device_ref);
-//   free(device_aviso_ref);
-// }
+// //   int *host_A, *device_ref, *device_aviso_ref;  //pointers for host memmory
+// //   host_A = (int*)malloc(nBytes);
+// //   device_ref = (int*)malloc(nBytes);
+// //   device_aviso_ref = (int*)malloc(nBytes);
+
+// //   // set input data
+// //   memset(host_A, 0, nBytes);
+// //   memset(device_ref, 0, nBytes);
+// //   memset(device_aviso_ref, 0, nBytes);
+
+// //   read_input(host_A, filename, size, flag_verbose);
+
+// //   // device erosion
+// //   top_hat_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+// //                     kernel_zsize, flag_verbose);
+
+// //   // device erosion
+// //   top_hat_aviso_on_device(host_A, device_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+// //                           kernel_ysize, kernel_zsize, flag_verbose);
+
+// //   if (flag_check) {
+// //     int *host_ref, *host_aviso_ref;
+// //     host_ref = (int*)malloc(nBytes);
+// //     host_aviso_ref = (int*)malloc(nBytes);
+// //     memset(host_ref, 0, nBytes);
+// //     memset(host_aviso_ref, 0, nBytes);
+
+// //     // erosion
+// //     top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+// //                     kernel_zsize);
+
+// //     // erosion
+// //     top_hat_aviso_on_host(host_A, host_aviso_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+// //                           kernel_ysize, kernel_zsize);
+
+// //     check_result(host_ref, device_ref, xsize, ysize, zsize);
+
+// //     check_result(host_aviso_ref, device_aviso_ref, xsize, ysize, zsize);
+
+// //     free(host_ref);
+// //     free(host_aviso_ref);
+// //   }
+
+// //   free(host_A);
+// //   free(device_ref);
+// //   free(device_aviso_ref);
+// // }

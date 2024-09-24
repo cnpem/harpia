@@ -36,9 +36,9 @@ void test_morph_grayscale_on_device(const std::string& filename, const int xsize
   read_input(host_A, filename, size, flag_verbose);
 
   int ncopies = 2;
-  chunkedExecutor(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref,
-                  xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize,
-                  kernel_zsize, operation, flag_verbose);
+  chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, host_A,
+                        device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
+                        kernel_ysize, kernel_zsize, operation, flag_verbose);
 
   if (flag_check) {
     float* host_ref;

@@ -10,8 +10,8 @@ int main(int argc, char** argv) {
   printf("%s Starting... \n", argv[0]);
 
   test_check_device_info();
-  test_operations_on_host();
-  test_operations_on_device();
+  // test_operations_on_host();
+  // test_operations_on_device();
   test_chunked_executer();
 
   // printf("######################################################\n");

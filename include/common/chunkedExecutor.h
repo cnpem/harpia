@@ -9,6 +9,12 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* ho
                      dtype* hostOutput, const int xsize, const int ysize, const int zsize,
                      const int verbose, Args... args);
 
+template <typename Func, typename dtype, typename... Args>
+void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, dtype* hostImage,
+                           dtype* hostOutput, const int xsize, const int ysize, const int zsize,
+                           int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
+                           const int verbose, Args... args);
+
 // Include the implementation to avoid compilation linkage errors
 // (this is the same as defining the funcition in the header file)
 #include "../../src/chunkedExecutor.cu"

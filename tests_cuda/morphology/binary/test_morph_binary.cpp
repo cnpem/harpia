@@ -51,9 +51,9 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
   read_input(host_A, filename, size, flag_verbose);
 
   int ncopies = 2;
-  chunkedExecutor(morph_binary_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
-                  ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                  operation, flag_verbose);
+  chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref,
+                        xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize,
+                        kernel_zsize, operation, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
@@ -62,7 +62,6 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
     // Perform binary morphology on host for comparison
     morph_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
                          kernel_zsize, operation);
-
     check_result(host_ref, device_ref, xsize, ysize, zsize);
     free(host_ref);
   }
