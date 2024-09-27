@@ -5,13 +5,13 @@
 #include <iostream>
 
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* hostImage,
-                     dtype* hostOutput, const int xsize, const int ysize, const int zsize,
-                     const int verbose, Args... args);
+void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* image, dtype* output,
+                     const int xsize, const int ysize, const int zsize, const int verbose,
+                     Args... args);
 
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, dtype* hostImage,
-                           dtype* hostOutput, const int xsize, const int ysize, const int zsize,
+void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, dtype* image,
+                           dtype* output, const int xsize, const int ysize, const int zsize,
                            int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
                            const int verbose, Args... args);
 

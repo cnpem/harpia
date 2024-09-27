@@ -178,8 +178,8 @@ def get_extension_modules(basedir):
             library_dirs=[CUDA["lib64"]],
             runtime_library_dirs=[CUDA["lib64"]],
             extra_compile_args={
-                "gcc": [],
-                "nvcc": ["--ptxas-options=-v", "-c", "--compiler-options", "'-fPIC'"],
+                "gcc": ["-fPIC"],
+                "nvcc": ["--ptxas-options=-v", "-c", "--compiler-options", "-fPIC"],
             },
         )
         for file in files

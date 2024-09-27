@@ -34,7 +34,7 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
   // device erosion
   int ncopies = 2;
   chunkedExecutor(complement_binary_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref,
-                  xsize, ysize, zsize, flag_verbose, flag_verbose);
+                  xsize, ysize, zsize, flag_verbose);
 
   if (flag_check) {
     int* host_ref;

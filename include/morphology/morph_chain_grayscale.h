@@ -5,9 +5,9 @@
 
 template <typename dtype>
 void morph_chain_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                     const int ysize, const int zsize, int* kernel,
-                                     int kernel_xsize, int kernel_ysize, int kernel_zsize,
-                                     MorphChain chain, const int flag_verbose);
+                                     const int ysize, const int zsize, const int flag_verbose,
+                                     int* kernel, int kernel_xsize, int kernel_ysize,
+                                     int kernel_zsize, MorphChain chain);
 
 template <typename dtype>
 void morph_chain_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,

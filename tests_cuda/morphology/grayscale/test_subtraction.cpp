@@ -12,6 +12,9 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
                                 const int xsize, const int ysize, const int zsize,
                                 float memoryOccupancy, const int flag_check,
                                 const int flag_verbose) {
+
+  printf("\nTest subtraction on device\n");
+
   int size = xsize * ysize * zsize;
   // set input dimension
   size_t nBytes = size * sizeof(float);
@@ -31,9 +34,9 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
   read_input(device_ref, filename2, size, flag_verbose);
 
   // device erosion
-  int ncopies = 3;
+  int ncopies = 2;
   chunkedExecutor(subtraction_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
-                  ysize, zsize, flag_verbose, flag_verbose);
+                  ysize, zsize, flag_verbose);
   //show_image_3D(device_ref + 54 * xsize * ysize, xsize, ysize, 2, "device_ref");
 
   if (flag_check) {

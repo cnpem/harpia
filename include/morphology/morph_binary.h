@@ -5,16 +5,16 @@
 
 template <typename dtype>
 void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, const int ysize,
-                  const int zsize, const int padding_bottom, const int padding_top, int* kernel,
-                  int kernel_xsize, int kernel_ysize, int kernel_zsize, MorphOp operation,
-                  const int flag_verbose);
+                  const int zsize, const int flag_verbose, const int padding_bottom,
+                  const int padding_top, int* deviceKernel, int kernel_xsize, int kernel_ysize,
+                  int kernel_zsize, MorphOp operation);
 
 // Slide kernel and morphological operation over all input image pixels on the device
 template <typename dtype>
 void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
-                            const int zsize, const int padding_bottom, const int padding_top,
-                            int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
-                            MorphOp operation, const int flag_verbose);
+                            const int zsize, const int flag_verbose, const int padding_bottom,
+                            const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
+                            int kernel_zsize, MorphOp operation);
 
 // Slide kernel and morphological operation over all input image pixels on host
 template <typename dtype>

@@ -4,12 +4,6 @@
 #include <string>
 #include "../../morphology/morphology.h"
 
-// void test_morph_grayscale_on_device_wrapper(const std::string& filename, const int xsize,
-//                                             const int ysize, const int zsize, int* kernel,
-//                                             const int kernel_xsize, const int kernel_ysize,
-//                                             const int kernel_zsize, MorphOp operation,
-//                                             const int flag_check, const int flag_verbose);
-
 void test_morph_grayscale_on_device(const std::string& filename, const int xsize, const int ysize,
                                     const int zsize, int* kernel, const int kernel_xsize,
                                     const int kernel_ysize, const int kernel_zsize,

@@ -53,12 +53,11 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
 
   // Read input data from file
   read_input(host_A, filename, size, flag_verbose);
+  show_image_3D(host_A, xsize, ysize, 5, "Input");
 
   // Apply morphological chain operations on the device (GPU)
-  int ncopies = 3;
-  chunkedExecutorKernel(morph_chain_binary_on_device<int>, ncopies, memoryOccupancy, host_A,
-                        device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
-                        kernel_ysize, kernel_zsize, chain, flag_verbose);
+  morph_chain_binary_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, chain, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
@@ -68,9 +67,8 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
     // Apply morphological chain operations on the host (CPU) for comparison
     morph_chain_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
                                kernel_ysize, kernel_zsize, chain);
-    show_image_3D(host_A, xsize, ysize, 5, "Input");
-    show_image_3D(host_ref, xsize, ysize, 5, "Host Result");
-    show_image_3D(device_ref, xsize, ysize, 5, "Device Result");
+    show_image_3D(host_ref, xsize, ysize, 5, "Host");
+    show_image_3D(device_ref, xsize, ysize, 5, "Device");
     cv::waitKey(0);
     // Check results for correctness
     check_result(host_ref, device_ref, xsize, ysize, zsize);

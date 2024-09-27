@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <cstdint>  // For uint16_t, unsigned int
+#include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/common/grid_block_sizes.h"
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/morphology/morph_binary.h"
@@ -23,8 +24,7 @@
  */
 template <typename dtype>
 void morph_chain_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                  const int ysize, const int zsize, const int padding_bottom,
-                                  const int padding_top, int* kernel, int kernel_xsize,
+                                  const int ysize, const int zsize, int* kernel, int kernel_xsize,
                                   int kernel_ysize, int kernel_zsize, MorphChain chain,
                                   const int flag_verbose) {
 
@@ -48,25 +48,19 @@ void morph_chain_binary_on_device(dtype* hostImage, dtype* hostOutput, const int
   CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
+  const int padding_bottom = 0;
+  const int padding_top = 0;
   // morphChain operation
-  morph_binary(deviceImage, deviceTmp, xsize, ysize, zsize, padding_bottom, padding_top,
-               deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, chain.operation1,
-               flag_verbose);
+  morph_binary(deviceImage, deviceTmp, xsize, ysize, zsize, flag_verbose, padding_bottom,
+               padding_top, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
+               chain.operation1);
 
-  morph_binary(deviceTmp, deviceOutput, xsize, ysize, zsize, padding_bottom, padding_top,
-               deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, chain.operation2,
-               flag_verbose);
+  morph_binary(deviceTmp, deviceOutput, xsize, ysize, zsize, flag_verbose, padding_bottom,
+               padding_top, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
+               chain.operation2);
 
   // transfer data from the device to the host
-  size_t padding_nBytes = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
-  size_t output_nBytes = nBytes - padding_nBytes;
-
-  dtype* i_hostOutput = hostOutput;
-  dtype* i_deviceOutput = deviceOutput;
-  i_hostOutput += padding_bottom * xsize * ysize;
-  i_deviceOutput += padding_bottom * xsize * ysize;
-
-  CHECK(cudaMemcpy(i_hostOutput, i_deviceOutput, output_nBytes, cudaMemcpyDeviceToHost));
+  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 
   // free device memory
   cudaFree(deviceTmp);
@@ -76,16 +70,14 @@ void morph_chain_binary_on_device(dtype* hostImage, dtype* hostOutput, const int
 }
 
 // Template instantiations for specific types
-template void morph_chain_binary_on_device<int>(int*, int*, const int, const int, const int,
-                                                const int, const int, int*, int, int, int,
-                                                MorphChain, const int);
+template void morph_chain_binary_on_device<int>(int*, int*, const int, const int, const int, int*,
+                                                int, int, int, MorphChain, const int);
 template void morph_chain_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                         const int, const int, const int, const int,
-                                                         int*, int, int, int, MorphChain,
-                                                         const int);
+                                                         const int, const int, int*, int, int, int,
+                                                         MorphChain, const int);
 template void morph_chain_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
-                                                     const int, const int, const int, int*, int,
-                                                     int, int, MorphChain, const int);
+                                                     const int, int*, int, int, int, MorphChain,
+                                                     const int);
 
 /**
  * @brief Performs a morphological chain operation on a binary image using the CPU.
@@ -108,7 +100,7 @@ void morph_chain_binary_on_host(dtype* hostImage, dtype* hostOutput, const int x
                                 int kernel_ysize, int kernel_zsize, MorphChain chain) {
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // allocate temporary memory
