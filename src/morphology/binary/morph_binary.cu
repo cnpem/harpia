@@ -142,9 +142,9 @@ void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, cons
   }
 
   // device erosion/dialation
-  morph_binary_kernel<<<grid, block>>>(deviceImage, deviceOutput, xsize, ysize, zsize, padding_top,
-                                       padding_bottom, deviceKernel, kernel_xsize, kernel_ysize,
-                                       kernel_zsize, operation);
+  morph_binary_kernel<<<grid, block>>>(deviceImage, deviceOutput, xsize, ysize, zsize,
+                                       padding_bottom, padding_top, deviceKernel, kernel_xsize,
+                                       kernel_ysize, kernel_zsize, operation);
   cudaDeviceSynchronize();  //assures all gpu threads are fineshed
 }
 template void morph_binary<int>(int*, int*, const int, const int, const int, const int, const int,
@@ -205,8 +205,8 @@ void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize
   deviceImage = i_deviceImage + padding_bottom * xsize * ysize;
 
   // device erosion/dialation
-  morph_binary(deviceImage, deviceOutput, xsize, ysize, zsize, flag_verbose, padding_top,
-               padding_bottom, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, operation);
+  morph_binary(deviceImage, deviceOutput, xsize, ysize, zsize, flag_verbose, padding_bottom,
+               padding_top, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, operation);
 
   CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 

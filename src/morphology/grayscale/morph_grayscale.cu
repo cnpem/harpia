@@ -128,7 +128,7 @@ void morph_grayscale(dtype* deviceImage, dtype* deviceOutput, const int xsize, c
 
   // Device erosion/dilation
   morph_grayscale_kernel<<<grid, block>>>(deviceImage, deviceOutput, xsize, ysize, zsize,
-                                          padding_top, padding_bottom, deviceKernel, kernel_xsize,
+                                          padding_bottom, padding_top, deviceKernel, kernel_xsize,
                                           kernel_ysize, kernel_zsize, operation);
   cudaDeviceSynchronize();  // Assures all GPU threads are finished
 }
@@ -194,9 +194,8 @@ void morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xs
   deviceImage = i_deviceImage + padding_bottom * xsize * ysize;
 
   // device erosion/dialation
-  morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, flag_verbose, padding_top,
-                  padding_bottom, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize,
-                  operation);
+  morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, flag_verbose, padding_bottom,
+                  padding_top, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, operation);
 
   CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 

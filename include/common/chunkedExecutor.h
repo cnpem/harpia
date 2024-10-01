@@ -10,10 +10,16 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
                      Args... args);
 
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, dtype* image,
-                           dtype* output, const int xsize, const int ysize, const int zsize,
-                           int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
-                           const int verbose, Args... args);
+void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, const int flag_chain,
+                           dtype* image, dtype* output, const int xsize, const int ysize,
+                           const int zsize, const int verbose, int* kernel, int kernel_xsize,
+                           int kernel_ysize, int kernel_zsize, Args... args);
+
+template <typename Func, typename dtype, typename... Args>
+void chunkedExecutorChain(Func func, int ncopies, const float safetyMargin, dtype* image,
+                          dtype* output, const int xsize, const int ysize, const int zsize,
+                          const int verbose, int* kernel, int kernel_xsize, int kernel_ysize,
+                          int kernel_zsize, Args... args);
 
 // Include the implementation to avoid compilation linkage errors
 // (this is the same as defining the funcition in the header file)

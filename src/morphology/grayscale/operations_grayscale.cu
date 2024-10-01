@@ -119,8 +119,8 @@ void closing_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int 
                                  int kernel_ysize, int kernel_zsize, const int flag_verbose) {
   MorphChain closing = {DILATION, EROSION};
 
-  morph_chain_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
-                                  kernel_xsize, kernel_ysize, kernel_zsize, closing);
+  morph_chain_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0,
+                                  kernel, kernel_xsize, kernel_ysize, kernel_zsize, closing);
 }
 // Template instantiations for specific types
 template void closing_grayscale_on_device<int>(int*, int*, const int, const int, const int, int*,
@@ -171,8 +171,8 @@ void opening_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int 
                                  int kernel_ysize, int kernel_zsize, const int flag_verbose) {
   MorphChain opening = {EROSION, DILATION};
 
-  morph_chain_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
-                                  kernel_xsize, kernel_ysize, kernel_zsize, opening);
+  morph_chain_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0,
+                                  kernel, kernel_xsize, kernel_ysize, kernel_zsize, opening);
 }
 // Template instantiations for specific types
 template void opening_grayscale_on_device<int>(int*, int*, const int, const int, const int, int*,

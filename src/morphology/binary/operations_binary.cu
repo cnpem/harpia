@@ -114,8 +114,8 @@ void closing_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsi
 
   MorphChain closing = {DILATION, EROSION};
 
-  morph_chain_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
-                               kernel_ysize, kernel_zsize, closing, flag_verbose);
+  morph_chain_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0,
+                               kernel, kernel_xsize, kernel_ysize, kernel_zsize, closing);
 }
 template void closing_binary_on_device<int>(int*, int*, const int, const int, const int, int*, int,
                                             int, int, const int);
@@ -164,8 +164,8 @@ void opening_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsi
 
   MorphChain opening = {EROSION, DILATION};
 
-  morph_chain_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
-                               kernel_ysize, kernel_zsize, opening, flag_verbose);
+  morph_chain_binary_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0,
+                               kernel, kernel_xsize, kernel_ysize, kernel_zsize, opening);
 }
 template void opening_binary_on_device<int>(int*, int*, const int, const int, const int, int*, int,
                                             int, int, const int);

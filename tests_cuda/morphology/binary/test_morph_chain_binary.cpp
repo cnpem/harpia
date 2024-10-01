@@ -55,9 +55,11 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
   read_input(host_A, filename, size, flag_verbose);
   show_image_3D(host_A, xsize, ysize, 5, "Input");
 
-  // Apply morphological chain operations on the device (GPU)
-  morph_chain_binary_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
-                               kernel_ysize, kernel_zsize, chain, flag_verbose);
+  int ncopies = 3;
+  int flag_chain = 1;
+  chunkedExecutorKernel(morph_chain_binary_on_device<int>, ncopies, memoryOccupancy, flag_chain,
+                        host_A, device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
+                        kernel_ysize, kernel_zsize, chain);
 
   if (flag_check) {
     int* host_ref;

@@ -41,9 +41,10 @@ void test_morph_chain_grayscale_on_device(const std::string& filename, const int
 
   // device erosion
   int ncopies = 3;
-  chunkedExecutor(morph_chain_grayscale_on_device<float>, ncopies, memoryOccupancy, host_A,
-                  device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize,
-                  kernel_zsize, chain);
+  int flag_chain = 1;
+  chunkedExecutorKernel(morph_chain_grayscale_on_device<float>, ncopies, memoryOccupancy,
+                        flag_chain, host_A, device_ref, xsize, ysize, zsize, flag_verbose, kernel,
+                        kernel_xsize, kernel_ysize, kernel_zsize, chain);
 
   if (flag_check) {
     float* host_ref;
