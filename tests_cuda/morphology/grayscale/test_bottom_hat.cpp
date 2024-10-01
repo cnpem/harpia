@@ -36,8 +36,10 @@ void test_bottom_hat_on_device(const std::string& filename, const int xsize, con
 
   // device erosion
   int ncopies = 3;
-  chunkedExecutor(bottom_hat_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
-                  ysize, zsize, flag_verbose, kernel, kernel_xsize, kernel_ysize, kernel_zsize);
+  int flag_chain = 1;
+  chunkedExecutorKernel(bottom_hat_on_device<float>, ncopies, memoryOccupancy, flag_chain, host_A,
+                        device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
+                        kernel_ysize, kernel_zsize);
 
   if (flag_check) {
     float* host_ref;
