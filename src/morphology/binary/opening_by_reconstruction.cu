@@ -4,7 +4,6 @@
 #include <iostream>
 #include "../../../include/common/grid_block_sizes.h"
 #include "../../../include/morphology/cuda_helper.h"
-#include "../../../include/morphology/geodesic_morph_binary.h"
 #include "../../../include/morphology/morph_binary.h"
 #include "../../../include/morphology/reconstruction_binary.h"
 
@@ -62,7 +61,7 @@ void opening_by_reconstruction_on_device(dtype* hostImage, dtype* hostOutput, in
   morph_binary(deviceMask, deviceMarker, xsize, ysize, zsize, flag_verbose, 0, 0, deviceKernel,
                kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
 
-  reconstruction_binary(deviceMarker, deviceOutput, xsize, ysize, zsize, deviceMask, operation,
+  reconstruction_binary(deviceMarker, deviceMask, deviceOutput, xsize, ysize, zsize, operation,
                         flag_verbose);
 
   // transfer data from the device to the host

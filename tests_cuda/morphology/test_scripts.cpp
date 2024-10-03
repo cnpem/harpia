@@ -128,54 +128,54 @@ int test_operations_on_device() {
 
   // Binary operations
 
-  // test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                             kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
-  //                             flag_verbose);
+  test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                              kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
+                              flag_verbose);
 
-  // test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                             kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
-  //                             flag_verbose);
+  test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                              kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
+                              flag_verbose);
 
-  // test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                                   kernel_ysize, kernel_zsize, closing, memoryOccupancy,
-  //                                   flag_check, flag_verbose);
+  test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                                    kernel_ysize, kernel_zsize, closing, memoryOccupancy,
+                                    flag_check, flag_verbose);
 
-  // test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                                   kernel_ysize, kernel_zsize, opening, memoryOccupancy,
-  //                                   flag_check, flag_verbose);
+  test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                                    kernel_ysize, kernel_zsize, opening, memoryOccupancy,
+                                    flag_check, flag_verbose);
 
-  // test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
-  //                                  flag_verbose);
+  test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
+                                   flag_verbose);
 
-  // test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
-  //                           flag_verbose);
+  test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
+                            flag_verbose);
 
   // // Grayscale operations
 
-  // test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                                kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
-  //                                flag_verbose);
+  test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                 kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
+                                 flag_verbose);
 
-  // test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                                kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
-  //                                flag_verbose);
+  test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                 kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
+                                 flag_verbose);
 
-  // test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                                      kernel_ysize, kernel_zsize, closing, memoryOccupancy,
-  //                                      flag_check, flag_verbose);
+  test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                       kernel_ysize, kernel_zsize, closing, memoryOccupancy,
+                                       flag_check, flag_verbose);
 
-  // test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                                      kernel_ysize, kernel_zsize, opening, memoryOccupancy,
-  //                                      flag_check, flag_verbose);
+  test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                       kernel_ysize, kernel_zsize, opening, memoryOccupancy,
+                                       flag_check, flag_verbose);
 
-  // test_subtraction_on_device(filenameGrayscale, filenameGrayscale, xsize, ysize, zsize,
-  //                            memoryOccupancy, flag_check, flag_verbose);
+  test_subtraction_on_device(filenameGrayscale, filenameGrayscale, xsize, ysize, zsize,
+                             memoryOccupancy, flag_check, flag_verbose);
 
   test_top_hat_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
                          kernel_zsize, memoryOccupancy, flag_check, flag_verbose);
 
-  // test_bottom_hat_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
-  //                           kernel_ysize, kernel_zsize, memoryOccupancy, flag_check, flag_verbose);
+  test_bottom_hat_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                            kernel_ysize, kernel_zsize, memoryOccupancy, flag_check, flag_verbose);
 
   free(kernel);
 
@@ -189,14 +189,22 @@ int test_chunked_executer() {
   std::string filenameBinary = "./example_images/binary/ILSIMG_600x1520x1520_16bits.raw";
   std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
 
+  int xsize = 600;
+  int ysize = 1520;
+  int zsize = 250;
+
+  int kernel_xsize = 3;
+  int kernel_ysize = 3;
+  int kernel_zsize = 3;
+
   // Create kernel - must be a 2D kernel, because openCV opearates slice by slice
   int* kernel;
-  kernel = (int*)malloc(sizeof(int) * 125);  // Size to fit the horizontal line kernels 3x3x3
-  get_structuring_element_3D(kernel, 5, 5, 5);
+  kernel = (int*)malloc(sizeof(int) * kernel_xsize * kernel_ysize *
+                        kernel_zsize);  // Size to fit the horizontal line kernels 3x3x3
+  get_structuring_element_3D(kernel, kernel_xsize, kernel_ysize, kernel_zsize);
 
   int flag_check = 1;    // Whether to compare with host (Deactivate for Huge zsize values!!!)
   int flag_verbose = 1;  // Whether to print status messages
-  int zsize = 250;
 
   MorphChain closing = {DILATION, EROSION};
   MorphChain opening = {EROSION, DILATION};
@@ -208,46 +216,54 @@ int test_chunked_executer() {
 
   // Binary operations
 
-  // test_morph_binary_on_device(filenameBinary, 600, 1520, zsize, kernel, 3, 3, 3, EROSION,
-  //                             memoryOccupancy, flag_check, flag_verbose);
+  test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                              kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
+                              flag_verbose);
 
-  // test_morph_binary_on_device(filenameBinary, 600, 1520, zsize, kernel, 3, 3, 3, DILATION,
-  //                             memoryOccupancy, flag_check, flag_verbose);
+  test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                              kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
+                              flag_verbose);
 
-  // test_morph_chain_binary_on_device(filenameBinary, 600, 1520, zsize, kernel, 3, 3, 3, closing,
-  //                                   memoryOccupancy, flag_check, flag_verbose);
+  test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                                    kernel_ysize, kernel_zsize, closing, memoryOccupancy,
+                                    flag_check, flag_verbose);
 
-  // test_morph_chain_binary_on_device(filenameBinary, 600, 1520, zsize, kernel, 3, 3, 3, opening,
-  //                                   memoryOccupancy, flag_check, flag_verbose);
+  test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                                    kernel_ysize, kernel_zsize, opening, memoryOccupancy,
+                                    flag_check, flag_verbose);
 
-  // test_complement_binary_on_device(filenameBinary, 600, 1520, zsize, memoryOccupancy, flag_check,
-  //                                  flag_verbose);
+  test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
+                                   flag_verbose);
 
-  // test_fill_holes_on_device(filenameBinary, 600, 1520, zsize, memoryOccupancy, flag_check,
+  // test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
   //                           flag_verbose);
 
   // // Grayscale operations
 
-  // test_morph_grayscale_on_device(filenameGrayscale, 600, 1520, zsize, kernel, 3, 3, 3, EROSION,
-  //                                memoryOccupancy, flag_check, flag_verbose);
+  test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                 kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
+                                 flag_verbose);
 
-  // test_morph_grayscale_on_device(filenameGrayscale, 600, 1520, zsize, kernel, 3, 3, 3, DILATION,
-  //                                memoryOccupancy, flag_check, flag_verbose);
+  test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                 kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
+                                 flag_verbose);
 
-  // test_morph_chain_grayscale_on_device(filenameGrayscale, 600, 1520, zsize, kernel, 3, 3, 3, closing,
-  //                                      memoryOccupancy, flag_check, flag_verbose);
+  test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                       kernel_ysize, kernel_zsize, closing, memoryOccupancy,
+                                       flag_check, flag_verbose);
 
-  // test_morph_chain_grayscale_on_device(filenameGrayscale, 600, 1520, zsize, kernel, 3, 3, 3, opening,
-  //                                      memoryOccupancy, flag_check, flag_verbose);
+  test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                                       kernel_ysize, kernel_zsize, opening, memoryOccupancy,
+                                       flag_check, flag_verbose);
 
-  // test_subtraction_on_device(filenameGrayscale, filenameGrayscale, 600, 1520, zsize,
-  //                            memoryOccupancy, flag_check, flag_verbose);
+  test_subtraction_on_device(filenameGrayscale, filenameGrayscale, xsize, ysize, zsize,
+                             memoryOccupancy, flag_check, flag_verbose);
 
-  test_top_hat_on_device(filenameGrayscale, 600, 1520, zsize, kernel, 3, 3, 3, memoryOccupancy,
-                         flag_check, flag_verbose);
+  test_top_hat_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                         kernel_zsize, memoryOccupancy, flag_check, flag_verbose);
 
-  // test_bottom_hat_on_device(filenameGrayscale, 600, 1520, zsize, kernel, 3, 3, 3, memoryOccupancy,
-  //                           flag_check, flag_verbose);
+  test_bottom_hat_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                            kernel_ysize, kernel_zsize, memoryOccupancy, flag_check, flag_verbose);
 
   free(kernel);
 

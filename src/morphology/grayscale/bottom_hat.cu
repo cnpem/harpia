@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "../../../include/common/grid_block_sizes.h"
+#include "../../../include/morphology/bottom_hat.h"
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/morph_grayscale.h"

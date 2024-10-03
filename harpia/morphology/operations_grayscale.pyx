@@ -2,6 +2,7 @@ cimport numpy
 import numpy as np
 
 from libc.stdint cimport uint32_t
+from libcpp cimport bool
 
 import numpy
 
@@ -12,95 +13,101 @@ ctypedef fused numeric:
     int
     unsigned int
  
-# basic operations ---------------------------------------------------------------------------------
 cdef extern from "../../include/morphology/operations_grayscale.h":
-    void erosion_grayscale_on_device[dtype](dtype *, dtype *, int, int, int, int *, int, int, int, 
-                                            int)
-    void dilation_grayscale_on_device[dtype](dtype *, dtype *, int, int, int,int *, int, int, int, 
-                                             int)
-    void closing_grayscale_on_device[dtype](dtype *, dtype *, int, int, int, int *, int, int, int, 
-                                            int)
-    void opening_grayscale_on_device[dtype](dtype *, dtype *, int, int, int, int *,int, int, int, 
-                                            int)
+    void _erosion_grayscale "erosion_grayscale"[dtype](dtype*, dtype*, int, int, int, int, int*, 
+                                                       int, int, int, bool)
+    void _dilation_grayscale "dilation_grayscale"[dtype](dtype*, dtype*, int, int, int, int, int*, 
+                                                         int, int, int, bool)
+    void _closing_grayscale "closing_grayscale"[dtype](dtype*, dtype*, int, int, int, int, int*, 
+                                                       int, int, int, bool)
+    void _opening_grayscale "opening_grayscale"[dtype](dtype*, dtype*, int, int, int, int, int*, 
+                                                       int, int, int, bool)
+    void _bottom_hat "bottom_hat"[dtype](dtype*, dtype*, int, int, int, int, int*, int, int, int, 
+                                         bool)       
+    void _top_hat "top_hat"[dtype](dtype*, dtype*, int, int, int, int, int*, int, int, int, bool)
 
-def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, int flag_verbose, 
-                      numpy.ndarray[numeric, ndim=3] hostOutput = None):
+
+def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
+                      numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
+                      bool gpu = True):
+
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
         hostOutput = np.empty_like(hostImage)
 
-    erosion_grayscale_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                                &kernel[0,0,0], ksize.x, ksize.y, ksize.z, flag_verbose)
+    _erosion_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
+                       &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+
     return hostOutput
 
 def dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
-                       int flag_verbose, numpy.ndarray[numeric, ndim=3] hostOutput = None):
+                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
+                       bool gpu = True):
+
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
         hostOutput = np.empty_like(hostImage)
 
-    dilation_grayscale_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                                 &kernel[0,0,0], ksize.x, ksize.y, ksize.z, flag_verbose)
+    _dilation_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
+                        &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+
     return hostOutput
 
-def closing_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, int flag_verbose, 
-                      numpy.ndarray[numeric, ndim=3] hostOutput = None):
+def closing_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
+                      numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
+                      bool gpu = True):
+
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
         hostOutput = np.empty_like(hostImage)
     
-    closing_grayscale_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                                &kernel[0,0,0], ksize.x, ksize.y, ksize.z, flag_verbose)
+    _closing_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose,
+                       &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+
     return hostOutput
 
-def opening_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, int flag_verbose, 
-                      numpy.ndarray[numeric, ndim=3] hostOutput = None):
+def opening_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
+                      numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
+                      bool gpu = True):
     isize = Size(hostImage)
     ksize = Size(kernel)
 
     if hostOutput is None:
         hostOutput = np.empty_like(hostImage)
     
-    opening_grayscale_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z,
-                                &kernel[0,0,0], ksize.x, ksize.y, ksize.z, flag_verbose)
+    _opening_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose,
+                       &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+
     return hostOutput
 
-# top_hat ------------------------------------------------------------------------------------------
-cdef extern from "../../include/morphology/top_hat.h":
-    void top_hat_on_device[dtype](dtype *, dtype *, const int, const int, const int,  int *, int, 
-                                  int, int, const int)
-
-def top_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, const int flag_verbose, 
-            numpy.ndarray[numeric, ndim=3] hostOutput = None):
+def top_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
+            numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, bool gpu = True):
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
         hostOutput = np.empty_like(hostImage)
 
-    top_hat_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                      &kernel[0,0,0], ksize.x, ksize.y, ksize.z,  flag_verbose)
+    _top_hat(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
+             &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+
     return hostOutput
 
-# bottom_hat ---------------------------------------------------------------------------------------
-cdef extern from "../../include/morphology/bottom_hat.h":
-    void bottom_hat_on_device[dtype](dtype *, dtype *, const int, const int, const int, int *, int, 
-                                     int, int, const int)
 
-def bottom_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, const int flag_verbose, 
-               numpy.ndarray[numeric, ndim=3] hostOutput = None):
+def bottom_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
+               numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, bool gpu = True):
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
         hostOutput = np.empty_like(hostImage)
 
-    bottom_hat_on_device(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                         &kernel[0,0,0], ksize.x, ksize.y, ksize.z,  flag_verbose)             
+    _bottom_hat(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
+                &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)             
     return hostOutput

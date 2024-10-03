@@ -23,8 +23,8 @@
  * @param operation Morphological operation (EROSION or DILATION).
  */
 template <typename dtype>
-CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* output, const int xsize,
-                                                 const int ysize, const int zsize, dtype* mask,
+CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtype* output,
+                                                 const int xsize, const int ysize, const int zsize,
                                                  int centerIdx, int centerIdy, int centerIdz,
                                                  int kernel_xsize, int kernel_ysize,
                                                  int kernel_zsize, MorphOp operation) {
@@ -80,17 +80,17 @@ CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* output, co
         (aux < mask[centerIndex]) ? aux : mask[centerIndex];  // Dilation: output is the min value
   }
 }
-template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<int>(int*, int*, const int, const int,
-                                                               const int, int*, int, int, int, int,
-                                                               int, int, MorphOp);
+template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<int>(int*, int*, int*, const int,
+                                                               const int, const int, int, int, int,
+                                                               int, int, int, MorphOp);
 template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<unsigned int>(
-    unsigned int*, unsigned int*, const int, const int, const int, unsigned int*, int, int, int,
+    unsigned int*, unsigned int*, unsigned int*, const int, const int, const int, int, int, int,
     int, int, int, MorphOp);
 //template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<uint16_t>(uint16_t *, uint16_t *,
 //uint16_t *, int, int, int, int, int, int, const int, const int, const int, MorphOp);
-template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<float>(float*, float*, const int,
-                                                                 const int, const int, float*, int,
-                                                                 int, int, int, int, int, MorphOp);
+template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<float>(float*, float*, float*, const int,
+                                                                 const int, const int, int, int,
+                                                                 int, int, int, int, MorphOp);
 
 /**
  * @brief Kernel function to perform geodesic erosion/dilation operation on the entire image.
@@ -108,9 +108,9 @@ template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<float>(float*, float*,
  * @param operation Morphological operation (EROSION or DILATION).
  */
 template <typename dtype>
-__global__ void geodesic_morph_grayscale_kernel(dtype* deviceImage, dtype* deviceOutput,
-                                                const int xsize, const int ysize, const int zsize,
-                                                dtype* deviceMask, int kernel_xsize,
+__global__ void geodesic_morph_grayscale_kernel(dtype* deviceImage, dtype* deviceMask,
+                                                dtype* deviceOutput, const int xsize,
+                                                const int ysize, const int zsize, int kernel_xsize,
                                                 int kernel_ysize, int kernel_zsize,
                                                 MorphOp operation) {
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -118,27 +118,27 @@ __global__ void geodesic_morph_grayscale_kernel(dtype* deviceImage, dtype* devic
   int idz = threadIdx.z + blockIdx.z * blockDim.z;
 
   if (idx < xsize && idy < ysize && idz < zsize) {
-    geodesic_morph_grayscale_pixel(deviceImage, deviceOutput, xsize, ysize, zsize, deviceMask, idx,
+    geodesic_morph_grayscale_pixel(deviceImage, deviceMask, deviceOutput, xsize, ysize, zsize, idx,
                                    idy, idz, kernel_xsize, kernel_ysize, kernel_zsize, operation);
   }
 }
-template __global__ void geodesic_morph_grayscale_kernel<int>(int*, int*, const int, const int,
-                                                              const int, int*, int, int, int,
+template __global__ void geodesic_morph_grayscale_kernel<int>(int*, int*, int*, const int,
+                                                              const int, const int, int, int, int,
                                                               MorphOp);
 template __global__ void geodesic_morph_grayscale_kernel<unsigned int>(unsigned int*, unsigned int*,
-                                                                       const int, const int,
-                                                                       const int, unsigned int*,
-                                                                       int, int, int, MorphOp);
-//template __global__ void geodesic_morph_grayscale_kernel<uint16_t>(uint16_t *, uint16_t *,
-//uint16_t *, int, int, int, const int, const int, const int, MorphOp);
-template __global__ void geodesic_morph_grayscale_kernel<float>(float*, float*, const int,
-                                                                const int, const int, float*, int,
-                                                                int, int, MorphOp);
+                                                                       unsigned int*, const int,
+                                                                       const int, const int, int,
+                                                                       int, int, MorphOp);
+//template __global__ void geodesic_morph_grayscale_kernel<uint16_t>(uint16_t *, /uint16_t *,uint16_t *,
+// int, int, int, const int, const int, const int, MorphOp);
+template __global__ void geodesic_morph_grayscale_kernel<float>(float*, float*, float*, const int,
+                                                                const int, const int, int, int, int,
+                                                                MorphOp);
 
 template <typename dtype>
-void geodesic_morph_grayscale(dtype* deviceImage, dtype* deviceOutput, const int xsize,
-                              const int ysize, const int zsize, dtype* deviceMask,
-                              MorphOp operation, const int flag_verbose) {
+void geodesic_morph_grayscale(dtype* deviceImage, dtype* deviceMask, dtype* deviceOutput,
+                              const int xsize, const int ysize, const int zsize,
+                              const int flag_verbose, MorphOp operation) {
   //define connectivity kernel size for images of any dimension
   int kernel_xsize = (xsize > 2) ? 3 : xsize;
   int kernel_ysize = (ysize > 2) ? 3 : ysize;
@@ -159,20 +159,20 @@ void geodesic_morph_grayscale(dtype* deviceImage, dtype* deviceOutput, const int
   }
 
   // device erosion/dialation
-  geodesic_morph_grayscale_kernel<<<grid, block>>>(deviceImage, deviceOutput, xsize, ysize, zsize,
-                                                   deviceMask, kernel_xsize, kernel_ysize,
+  geodesic_morph_grayscale_kernel<<<grid, block>>>(deviceImage, deviceMask, deviceOutput, xsize,
+                                                   ysize, zsize, kernel_xsize, kernel_ysize,
                                                    kernel_zsize, operation);
   cudaDeviceSynchronize();  //assures all gpu threads are fineshed
 }
-template void geodesic_morph_grayscale<int>(int*, int*, const int, const int, const int, int*,
-                                            MorphOp, const int);
-template void geodesic_morph_grayscale<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                     const int, const int, unsigned int*, MorphOp,
-                                                     const int);
-//template void geodesic_morph_grayscale<uint16_t>(uint16_t *, uint16_t *,  const int,
-//const int, const int,uint16_t *, MorphOp, const int);
-template void geodesic_morph_grayscale<float>(float*, float*, const int, const int, const int,
-                                              float*, MorphOp, const int);
+template void geodesic_morph_grayscale<int>(int*, int*, int*, const int, const int, const int,
+                                            const int, MorphOp);
+template void geodesic_morph_grayscale<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
+                                                     const int, const int, const int, const int,
+                                                     MorphOp);
+//template void geodesic_morph_grayscale<uint16_t>(uint16_t *,uint16_t *, uint16_t *,  const int,
+//const int, const int, MorphOp, const int);
+template void geodesic_morph_grayscale<float>(float*, float*, float*, const int, const int,
+                                              const int, const int, MorphOp);
 
 /**
  * @brief Perform geodesic erosion/dilation operation on the entire image using the GPU. This
@@ -190,10 +190,9 @@ template void geodesic_morph_grayscale<float>(float*, float*, const int, const i
  * @param flag_verbose Verbose flag to print grid and block dimensions.
  */
 template <typename dtype>
-void geodesic_morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                        const int ysize, const int zsize, dtype* hostMask,
-
-                                        MorphOp operation, const int flag_verbose) {
+void geodesic_morph_grayscale_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
+                                        const int xsize, const int ysize, const int zsize,
+                                        const int flag_verbose, MorphOp operation) {
   // set input dimension
   int size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
@@ -209,8 +208,8 @@ void geodesic_morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, con
   CHECK(cudaMemcpy(deviceMask, hostMask, nBytes, cudaMemcpyHostToDevice));
 
   // device erosion/dialation
-  geodesic_morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, deviceMask, operation,
-                           flag_verbose);
+  geodesic_morph_grayscale(deviceImage, deviceMask, deviceOutput, xsize, ysize, zsize, flag_verbose,
+                           operation);
   // transfer data from the device to the host
   CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 
@@ -218,15 +217,15 @@ void geodesic_morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, con
   cudaFree(deviceImage);
   cudaFree(deviceOutput);
 }
-template void geodesic_morph_grayscale_on_device<int>(int*, int*, const int, const int, const int,
-                                                      int*, MorphOp, const int);
+template void geodesic_morph_grayscale_on_device<int>(int*, int*, int*, const int, const int,
+                                                      const int, const int, MorphOp);
 template void geodesic_morph_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*,
-                                                               const int, const int, const int,
-                                                               unsigned int*, MorphOp, const int);
-//template void geodesic_morph_grayscale_on_device<uint16_t>(uint16_t *, uint16_t *, const int, const int, const int, uint16_t *,
-// MorphOp, const int);
-template void geodesic_morph_grayscale_on_device<float>(float*, float*, const int, const int,
-                                                        const int, float*, MorphOp, const int);
+                                                               unsigned int*, const int, const int,
+                                                               const int, const int, MorphOp);
+//template void geodesic_morph_grayscale_on_device<uint16_t>(uint16_t *,uint16_t *, uint16_t *, const int, const int, const int, const int,
+// MorphOp);
+template void geodesic_morph_grayscale_on_device<float>(float*, float*, float*, const int,
+                                                        const int, const int, const int, MorphOp);
 
 /**
  * @brief Perform geodesic erosion/dilation operation on the entire image using the CPU. This
@@ -242,8 +241,8 @@ template void geodesic_morph_grayscale_on_device<float>(float*, float*, const in
  * @param operation Morphological operation (EROSION or DILATION).
  */
 template <typename dtype>
-void geodesic_morph_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                      const int ysize, const int zsize, dtype* hostMask,
+void geodesic_morph_grayscale_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
+                                      const int xsize, const int ysize, const int zsize,
                                       MorphOp operation) {
 
   //define connectivity kernel size for images of any dimension
@@ -255,19 +254,19 @@ void geodesic_morph_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const
     for (int idy = 0; idy < ysize; idy++) {
       for (int idx = 0; idx < xsize; idx++) {
 
-        geodesic_morph_grayscale_pixel(hostImage, hostOutput, xsize, ysize, zsize, hostMask, idx,
+        geodesic_morph_grayscale_pixel(hostImage, hostMask, hostOutput, xsize, ysize, zsize, idx,
                                        idy, idz, kernel_xsize, kernel_ysize, kernel_zsize,
                                        operation);
       }
     }
   }  // slide over image
 }
-template void geodesic_morph_grayscale_on_host<int>(int*, int*, const int, const int, const int,
-                                                    int*, MorphOp);
+template void geodesic_morph_grayscale_on_host<int>(int*, int*, int*, const int, const int,
+                                                    const int, MorphOp);
 template void geodesic_morph_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*,
-                                                             const int, const int, const int,
-                                                             unsigned int*, MorphOp);
-//template void geodesic_morph_grayscale_on_host<uint16_t>(uint16_t *, uint16_t *,const int, const int, const int,uint16_t *,
+                                                             unsigned int*, const int, const int,
+                                                             const int, MorphOp);
+//template void geodesic_morph_grayscale_on_host<uint16_t>(uint16_t *, uint16_t *,uint16_t *,const int, const int, const int,
 // MorphOp);
-template void geodesic_morph_grayscale_on_host<float>(float*, float*, const int, const int,
-                                                      const int, float*, MorphOp);
+template void geodesic_morph_grayscale_on_host<float>(float*, float*, float*, const int, const int,
+                                                      const int, MorphOp);

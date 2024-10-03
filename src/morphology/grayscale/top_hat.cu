@@ -134,11 +134,6 @@ void top_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const
   morph_chain_grayscale_on_host(hostImage, host_tmp, xsize, ysize, zsize, kernel, kernel_xsize,
                                 kernel_ysize, kernel_zsize, opening);
 
-  // Em vez de fazer apenas um openning, usa o opening simples como marker pra um opening by
-  // reconstruction
-  // TODO: substituir a subtraçõa por uma reconstrução geodésica p/ grayscale usando a imagem de
-  // 'opening' como 'marker', depois da convergênica da reconstrução, é feita a subtração!!
-
   // Top-hat: f - opening
   memcpy(hostOutput, hostImage, nBytes);
   subtraction_on_host(host_tmp, hostOutput, size);
@@ -188,7 +183,7 @@ void top_hat_aviso_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
   morph_grayscale(deviceAux, deviceTmp, xsize, ysize, zsize, flag_verbose, 0, 0, deviceKernel,
                   kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
 
-  reconstruction_grayscale(deviceTmp, deviceAux, xsize, ysize, zsize, deviceImage, DILATION,
+  reconstruction_grayscale(deviceTmp, deviceImage, deviceAux, xsize, ysize, zsize, DILATION,
                            flag_verbose);
 
   // Top-hat: input - opening
@@ -231,12 +226,7 @@ void top_hat_aviso_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
   morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
                                 kernel_ysize, kernel_zsize, opening);
 
-  // Em vez de fazer apenas um openning, usa o opening simples como marker pra um opening by
-  // reconstruction
-  // TODO: substituir a subtraçõa por uma reconstrução geodésica p/ grayscale usando a imagem de
-  // 'opening' como 'marker', depois da convergênica da reconstrução, é feita a subtração!!
-
-  reconstruction_grayscale_on_host(hostOutput, host_tmp, xsize, ysize, zsize, hostImage, DILATION);
+  reconstruction_grayscale_on_host(hostOutput, hostImage, host_tmp, xsize, ysize, zsize, DILATION);
 
   // Top-hat: f - opening
   memcpy(hostOutput, hostImage, nBytes);

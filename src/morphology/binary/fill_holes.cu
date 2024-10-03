@@ -91,7 +91,7 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
   complement_binary(deviceAux, deviceMask, size, flag_verbose);
 
   // Reconstruction + Complement
-  reconstruction_binary(deviceMarker, deviceAux, xsize, ysize, zsize, deviceMask, DILATION,
+  reconstruction_binary(deviceMarker, deviceMask, deviceAux, xsize, ysize, zsize, DILATION,
                         flag_verbose);
   complement_binary(deviceAux, deviceAux, size, flag_verbose);
 
@@ -163,7 +163,7 @@ void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
   complement_binary_on_host(hostImage, hostMask, size);
 
   // // Reconstruction + Complement
-  reconstruction_binary_on_host(hostMarker, hostOutput, xsize, ysize, zsize, hostMask, DILATION);
+  reconstruction_binary_on_host(hostMarker, hostMask, hostOutput, xsize, ysize, zsize, DILATION);
   complement_binary_on_host(hostOutput, hostOutput, size);
   free(hostMarker);
   free(hostMask);

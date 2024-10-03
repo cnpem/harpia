@@ -1,6 +1,9 @@
+#include "../../../include/common/chunkedExecutor.h"
+#include "../../../include/morphology/bottom_hat.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/operations_grayscale.h"
+#include "../../../include/morphology/top_hat.h"
 
 /**
  * @brief Perform erosion operation on a grayscale image.
@@ -17,36 +20,32 @@
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  */
-template <typename dtype>
-void erosion_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                 const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                                 int kernel_ysize, int kernel_zsize, const int flag_verbose) {
-  morph_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0, kernel,
-                            kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
-}
-// Template instantiations for specific types
-template void erosion_grayscale_on_device<int>(int*, int*, const int, const int, const int, int*,
-                                               int, int, int, const int);
-template void erosion_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                        const int, const int, int*, int, int, int,
-                                                        const int);
-template void erosion_grayscale_on_device<float>(float*, float*, const int, const int, const int,
-                                                 int*, int, int, int, const int);
 
 template <typename dtype>
-void erosion_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
-                               const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize) {
-  morph_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
-                          kernel_ysize, kernel_zsize, EROSION);
+void erosion_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                       const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                       int kernel_ysize, int kernel_zsize, bool gpu) {
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 2;
+    int flag_chain = 0;
+    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, memoryOccupancy, flag_chain,
+                          hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
+                          kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
+  }
+
+  else {
+    morph_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                            kernel_ysize, kernel_zsize, EROSION);
+  }
 }
 // Template instantiations for specific types
-template void erosion_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*, int,
-                                             int, int);
-template void erosion_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                      const int, const int, int*, int, int, int);
-template void erosion_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                               int*, int, int, int);
+template void erosion_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
+                                     int, int, int, bool);
+template void erosion_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                              const int, const int, int*, int, int, int, bool);
+template void erosion_grayscale<float>(float*, float*, const int, const int, const int, const int,
+                                       int*, int, int, int, bool);
 
 /**
  * @brief Perform dilation operation on a grayscale image.
@@ -64,37 +63,31 @@ template void erosion_grayscale_on_host<float>(float*, float*, const int, const 
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void dilation_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                  const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                                  int kernel_ysize, int kernel_zsize,
+void dilation_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                        const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                        int kernel_ysize, int kernel_zsize, bool gpu) {
 
-                                  const int flag_verbose) {
-  morph_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0, kernel,
-                            kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 2;
+    int flag_chain = 0;
+    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, memoryOccupancy, flag_chain,
+                          hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
+                          kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
+  }
+
+  else {
+    morph_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                            kernel_ysize, kernel_zsize, DILATION);
+  }
 }
 // Template instantiations for specific types
-template void dilation_grayscale_on_device<int>(int*, int*, const int, const int, const int, int*,
-                                                int, int, int, const int);
-template void dilation_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                         const int, const int, int*, int, int, int,
-                                                         const int);
-template void dilation_grayscale_on_device<float>(float*, float*, const int, const int, const int,
-                                                  int*, int, int, int, const int);
-
-template <typename dtype>
-void dilation_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                                int kernel_ysize, int kernel_zsize) {
-  morph_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
-                          kernel_ysize, kernel_zsize, DILATION);
-}
-// Template instantiations for specific types
-template void dilation_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*,
-                                              int, int, int);
-template void dilation_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                       const int, const int, int*, int, int, int);
-template void dilation_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                                int*, int, int, int);
+template void dilation_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
+                                      int, int, int, bool);
+template void dilation_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                               const int, const int, int*, int, int, int, bool);
+template void dilation_grayscale<float>(float*, float*, const int, const int, const int, const int,
+                                        int*, int, int, int, bool);
 
 /**
  * @brief Perform closing operation on a grayscale image.
@@ -114,39 +107,31 @@ template void dilation_grayscale_on_host<float>(float*, float*, const int, const
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void closing_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                 const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                                 int kernel_ysize, int kernel_zsize, const int flag_verbose) {
+void closing_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                       const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                       int kernel_ysize, int kernel_zsize, bool gpu) {
   MorphChain closing = {DILATION, EROSION};
 
-  morph_chain_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0,
-                                  kernel, kernel_xsize, kernel_ysize, kernel_zsize, closing);
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    int flag_chain = 1;
+    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, memoryOccupancy,
+                          flag_chain, hostImage, hostOutput, xsize, ysize, zsize, flag_verbose,
+                          kernel, kernel_xsize, kernel_ysize, kernel_zsize, closing);
+
+  } else {
+    morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                                  kernel_ysize, kernel_zsize, closing);
+  }
 }
 // Template instantiations for specific types
-template void closing_grayscale_on_device<int>(int*, int*, const int, const int, const int, int*,
-                                               int, int, int, const int);
-template void closing_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                        const int, const int, int*, int, int, int,
-                                                        const int);
-template void closing_grayscale_on_device<float>(float*, float*, const int, const int, const int,
-                                                 int*, int, int, int, const int);
-
-template <typename dtype>
-void closing_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
-                               const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize) {
-  MorphChain closing = {DILATION, EROSION};
-
-  morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
-                                kernel_ysize, kernel_zsize, closing);
-}
-// Template instantiations for specific types
-template void closing_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*, int,
-                                             int, int);
-template void closing_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                      const int, const int, int*, int, int, int);
-template void closing_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                               int*, int, int, int);
+template void closing_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
+                                     int, int, int, bool);
+template void closing_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                              const int, const int, int*, int, int, int, bool);
+template void closing_grayscale<float>(float*, float*, const int, const int, const int, const int,
+                                       int*, int, int, int, bool);
 
 /**
  * @brief Perform opening operation on a grayscale image.
@@ -166,36 +151,78 @@ template void closing_grayscale_on_host<float>(float*, float*, const int, const 
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void opening_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                 const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                                 int kernel_ysize, int kernel_zsize, const int flag_verbose) {
+void opening_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                       const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                       int kernel_ysize, int kernel_zsize, bool gpu) {
+
   MorphChain opening = {EROSION, DILATION};
 
-  morph_chain_grayscale_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, 0, 0,
-                                  kernel, kernel_xsize, kernel_ysize, kernel_zsize, opening);
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    int flag_chain = 1;
+    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, memoryOccupancy,
+                          flag_chain, hostImage, hostOutput, xsize, ysize, zsize, flag_verbose,
+                          kernel, kernel_xsize, kernel_ysize, kernel_zsize, opening);
+  } else {
+    morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                                  kernel_ysize, kernel_zsize, opening);
+  }
 }
 // Template instantiations for specific types
-template void opening_grayscale_on_device<int>(int*, int*, const int, const int, const int, int*,
-                                               int, int, int, const int);
-template void opening_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                        const int, const int, int*, int, int, int,
-                                                        const int);
-template void opening_grayscale_on_device<float>(float*, float*, const int, const int, const int,
-                                                 int*, int, int, int, const int);
+template void opening_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
+                                     int, int, int, bool);
+template void opening_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                              const int, const int, int*, int, int, int, bool);
+template void opening_grayscale<float>(float*, float*, const int, const int, const int, const int,
+                                       int*, int, int, int, bool);
 
 template <typename dtype>
-void opening_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
-                               const int ysize, const int zsize, int* kernel, int kernel_xsize,
-                               int kernel_ysize, int kernel_zsize) {
-  MorphChain opening = {EROSION, DILATION};
+void bottom_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                int kernel_ysize, int kernel_zsize, bool gpu) {
 
-  morph_chain_grayscale_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
-                                kernel_ysize, kernel_zsize, opening);
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    int flag_chain = 1;
+    chunkedExecutorKernel(bottom_hat_on_device<dtype>, ncopies, memoryOccupancy, flag_chain,
+                          hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
+                          kernel_xsize, kernel_ysize, kernel_zsize);
+  } else {
+    // bottom hat operation
+    bottom_hat_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                       kernel_ysize, kernel_zsize);
+  }
 }
-// Template instantiations for specific types
-template void opening_grayscale_on_host<int>(int*, int*, const int, const int, const int, int*, int,
-                                             int, int);
-template void opening_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                      const int, const int, int*, int, int, int);
-template void opening_grayscale_on_host<float>(float*, float*, const int, const int, const int,
-                                               int*, int, int, int);
+template void bottom_hat<int>(int*, int*, const int, const int, const int, const int, int*, int,
+                              int, int, bool);
+template void bottom_hat<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                       const int, const int, int*, int, int, int, bool);
+template void bottom_hat<float>(float*, float*, const int, const int, const int, const int, int*,
+                                int, int, int, bool);
+
+template <typename dtype>
+void top_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize, const int zsize,
+             const int flag_verbose, int* kernel, int kernel_xsize, int kernel_ysize,
+             int kernel_zsize, bool gpu) {
+
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    int flag_chain = 1;
+    chunkedExecutorKernel(top_hat_on_device<dtype>, ncopies, memoryOccupancy, flag_chain, hostImage,
+                          hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
+                          kernel_ysize, kernel_zsize);
+  } else {
+    // bottom hat operation
+    top_hat_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
+                    kernel_zsize);
+  }
+}
+template void top_hat<int>(int*, int*, const int, const int, const int, const int, int*, int, int,
+                           int, bool);
+template void top_hat<unsigned int>(unsigned int*, unsigned int*, const int, const int, const int,
+                                    const int, int*, int, int, int, bool);
+template void top_hat<float>(float*, float*, const int, const int, const int, const int, int*, int,
+                             int, int, bool);

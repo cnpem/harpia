@@ -9,8 +9,8 @@
 #include "../../../include/morphology/reconstruction_binary.h"
 
 template <typename dtype>
-void reconstruction_binary(dtype* deviceMarker, dtype* deviceOutput, const int xsize,
-                           const int ysize, const int zsize, dtype* deviceMask, MorphOp operation,
+void reconstruction_binary(dtype* deviceMarker, dtype* deviceMask, dtype* deviceOutput,
+                           const int xsize, const int ysize, const int zsize, MorphOp operation,
                            const int flag_verbose) {
   // set input dimension
   int size = xsize * ysize * zsize;
@@ -24,8 +24,8 @@ void reconstruction_binary(dtype* deviceMarker, dtype* deviceOutput, const int x
 
   do {
     //Reconstruction step
-    geodesic_morph_binary(deviceMarker, deviceOutput, xsize, ysize, zsize, deviceMask, operation,
-                          flag_verbose);
+    geodesic_morph_binary(deviceMarker, deviceMask, deviceOutput, xsize, ysize, zsize, flag_verbose,
+                          operation);
 
     //Check convergency
     cudaMemset(deviceFlagConverged, 1,
@@ -37,13 +37,13 @@ void reconstruction_binary(dtype* deviceMarker, dtype* deviceOutput, const int x
     CHECK(cudaMemcpy(&hostFlagConverged, deviceFlagConverged, sizeof(int), cudaMemcpyDeviceToHost));
   } while (!hostFlagConverged);
 }
-template void reconstruction_binary<int>(int*, int*, const int, const int, const int, int*, MorphOp,
+template void reconstruction_binary<int>(int*, int*, int*, const int, const int, const int, MorphOp,
                                          const int);
-template void reconstruction_binary<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                  const int, const int, unsigned int*, MorphOp,
+template void reconstruction_binary<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
+                                                  const int, const int, const int, MorphOp,
                                                   const int);
-template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
-                                              uint16_t*, MorphOp, const int);
+template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int, const int,
+                                              const int, MorphOp, const int);
 
 /**
  * @brief Perform recosntruction by erosion/dilation operation on the entire image using the GPU.
@@ -61,9 +61,8 @@ template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, const int, c
  * @param flag_verbose Verbose flag to print grid and block dimensions.
  */
 template <typename dtype>
-void reconstruction_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                     const int ysize, const int zsize, dtype* hostMask,
-
+void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
+                                     const int xsize, const int ysize, const int zsize,
                                      MorphOp operation, const int flag_verbose) {
   // set input dimension
   int size = xsize * ysize * zsize;
@@ -80,7 +79,7 @@ void reconstruction_binary_on_device(dtype* hostImage, dtype* hostOutput, const 
                    cudaMemcpyHostToDevice));  //the initial marker is the input image
   CHECK(cudaMemcpy(deviceMask, hostMask, nBytes, cudaMemcpyHostToDevice));
 
-  reconstruction_binary(deviceMarker, deviceOutput, xsize, ysize, zsize, deviceMask, operation,
+  reconstruction_binary(deviceMarker, deviceMask, deviceOutput, xsize, ysize, zsize, operation,
                         flag_verbose);
 
   // transfer data from the device to the host
@@ -90,13 +89,13 @@ void reconstruction_binary_on_device(dtype* hostImage, dtype* hostOutput, const 
   cudaFree(deviceMarker);
   cudaFree(deviceOutput);
 }
-template void reconstruction_binary_on_device<int>(int*, int*, const int, const int, const int,
-                                                   int*, MorphOp, const int);
-template void reconstruction_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                            const int, const int, unsigned int*,
-                                                            MorphOp, const int);
-template void reconstruction_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
-                                                        const int, uint16_t*, MorphOp, const int);
+template void reconstruction_binary_on_device<int>(int*, int*, int*, const int, const int,
+                                                   const int, MorphOp, const int);
+template void reconstruction_binary_on_device<unsigned int>(unsigned int*, unsigned int*,
+                                                            unsigned int*, const int, const int,
+                                                            const int, MorphOp, const int);
+template void reconstruction_binary_on_device<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
+                                                        const int, const int, MorphOp, const int);
 
 /**
  * @brief Perform recosntruction by erosion/dilation operation on the entire image using the CPU.
@@ -112,8 +111,8 @@ template void reconstruction_binary_on_device<uint16_t>(uint16_t*, uint16_t*, co
  * @param operation Morphological operation (EROSION or DILATION).
  */
 template <typename dtype>
-void reconstruction_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
-                                   const int ysize, const int zsize, dtype* hostMask,
+void reconstruction_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
+                                   const int xsize, const int ysize, const int zsize,
                                    MorphOp operation) {
 
   int flagConverged = 0;
@@ -128,7 +127,7 @@ void reconstruction_binary_on_host(dtype* hostImage, dtype* hostOutput, const in
   memcpy(marker, hostImage, nBytes);
 
   do {
-    geodesic_morph_binary_on_host(marker, hostOutput, xsize, ysize, zsize, hostMask, operation);
+    geodesic_morph_binary_on_host(marker, hostMask, hostOutput, xsize, ysize, zsize, operation);
 
     compare_arrays_binary_on_host(marker, hostOutput, &flagConverged, size);
     memcpy(marker, hostOutput, nBytes);
@@ -138,10 +137,10 @@ void reconstruction_binary_on_host(dtype* hostImage, dtype* hostOutput, const in
   // free host memorys
   free(marker);
 }
-template void reconstruction_binary_on_host<int>(int*, int*, const int, const int, const int, int*,
+template void reconstruction_binary_on_host<int>(int*, int*, int*, const int, const int, const int,
                                                  MorphOp);
-template void reconstruction_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                          const int, const int, unsigned int*,
-                                                          MorphOp);
-template void reconstruction_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
-                                                      const int, uint16_t*, MorphOp);
+template void reconstruction_binary_on_host<unsigned int>(unsigned int*, unsigned int*,
+                                                          unsigned int*, const int, const int,
+                                                          const int, MorphOp);
+template void reconstruction_binary_on_host<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
+                                                      const int, const int, MorphOp);

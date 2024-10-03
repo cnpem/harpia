@@ -154,89 +154,96 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
   }
 }
 
-// // Wrapper function
-// // Designed for functions that concatenate TWO kernel morphological operations
-// template <typename Func, typename dtype, typename... Args>
-// void chunkedExecutorChain(Func func, int ncopies, const float safetyMargin, dtype* image,
-//                            dtype* output, const int xsize, const int ysize, const int zsize,
-//                            const int verbose, int* kernel, int kernel_xsize, int kernel_ysize,
-//                            int kernel_zsize, Args... args){
+// chunkedExecutorKernel version for functions with two inputs, image and mask
+template <typename Func, typename dtype, typename... Args>
+void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const int flag_chain,
+                         dtype* image, dtype* mask, dtype* output, const int xsize, const int ysize,
+                         const int zsize, const int verbose, int* kernel, int kernel_xsize,
+                         int kernel_ysize, int kernel_zsize, Args... args) {
 
-//   dtype* i_ref = image;
-//   dtype* o_ref = output;
+  dtype* i_ref = image;
+  dtype* m_ref = mask;
+  dtype* o_ref = output;
 
-//   // Get memory allocated by the func
-//   int sliceSize = xsize * ysize;
-//   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
+  // Get memory allocated by the func
+  int sliceSize = xsize * ysize;
+  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
-//   // Get free memory on the GPU in bytes
-//   size_t freeBytes;
-//   size_t totalBytes;
-//   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
+  // Get free memory on the GPU in bytes
+  size_t freeBytes;
+  size_t totalBytes;
+  CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
-//   // How many slices fit in the GPU?
-//   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
-//   int padding = (kernel_zsize/2) * 2; //assure an even padding size
-//   int padding_top = 0;
-//   int padding_bottom = 0;
+  // How many slices fit in the GPU?
+  int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
+  int padding;
+  if (flag_chain) {
+    padding = (kernel_zsize / 2) * 2;  //assure an even padding size
+  } else {
+    padding = kernel_zsize / 2;
+  }
+  int padding_top = 0;
+  int padding_bottom = 0;
 
-//   // CASE: Not even one slice fits GPU mmemory
-//   if (chunkSize == 0) {
-//     fprintf(
-//         stderr,
-//         "Error: Not enough memory to fit even one slice. Adjust slice size or free up memory.\n");
-//     return;
+  // CASE: Not even one slice fits GPU mmemory
+  if (chunkSize == 0) {
+    fprintf(
+        stderr,
+        "Error: Not enough memory to fit even one slice. Adjust slice size or free up memory.\n");
+    return;
 
-//     // CASE: intire input fits GPU memory (no padding)
-//   } else if (chunkSize >= zsize) {
-//     func(i_ref, o_ref, xsize, ysize, zsize, verbose, padding_bottom, padding_top, kernel,
-//          kernel_xsize, kernel_ysize, kernel_zsize, args...);
-//     if (verbose) {
-//       printf("\nFinished processing!\n");
-//     }
-//     return;
-//   } else {
-//     chunkSize = (chunkSize - 2 * padding > 1) ? chunkSize - 2 * padding : 1;
-//   }
-//   if (verbose) {
-//     printf("MaxChunkSize:%d zsize:%d\n", chunkSize, zsize);
-//   }
+    // CASE: intire input fits GPU memory (no padding)
+  } else if (chunkSize >= zsize) {
+    func(i_ref, m_ref, o_ref, xsize, ysize, zsize, verbose, padding_bottom, padding_top, kernel,
+         kernel_xsize, kernel_ysize, kernel_zsize, args...);
+    if (verbose) {
+      printf("\nFinished processing!\n");
+    }
+    return;
+  } else {
+    chunkSize = (chunkSize - 2 * padding > 1) ? chunkSize - 2 * padding : 1;
+  }
+  if (verbose) {
+    printf("MaxChunkSize:%d zsize:%d\n", chunkSize, zsize);
+  }
 
-//   // CASE: break input into chunks (padding)
+  // CASE: break input into chunks (padding)
 
-//   // First chunk: padding only at the end
-//   padding_bottom = 0;
-//   padding_top = padding;
+  // First chunk: padding only at the end
+  padding_bottom = 0;
+  padding_top = padding;
 
-//   func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
-//        kernel_xsize, kernel_ysize, kernel_zsize, args...);
-//   i_ref += chunkSize * sliceSize;
-//   o_ref += chunkSize * sliceSize;
+  func(i_ref, m_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
+       kernel_xsize, kernel_ysize, kernel_zsize, args...);
+  i_ref += chunkSize * sliceSize;
+  m_ref += chunkSize * sliceSize;
+  o_ref += chunkSize * sliceSize;
 
-//   // Middle chunks: padding at the beginning and at the end
-//   padding_bottom = padding;
-//   int iz = 0;
-//   for (iz = chunkSize; iz <= zsize - chunkSize; iz += chunkSize) {
-//     int remaining = zsize - iz - chunkSize;  // Check if this is the last chunk
-//     if (remaining <= 0) {
-//       // Possible last chunk: padding only at the begining
-//       padding_top = 0;
-//     }
-//     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
-//          kernel_xsize, kernel_ysize, kernel_zsize, args...);
-//     i_ref += chunkSize * sliceSize;  // Move to the next chunk
-//     o_ref += chunkSize * sliceSize;
-//   }
+  // Middle chunks: padding at the beginning and at the end
+  padding_bottom = padding;
+  int iz = 0;
+  for (iz = chunkSize; iz <= zsize - chunkSize; iz += chunkSize) {
+    int remaining = zsize - iz - chunkSize;  // Check if this is the last chunk
+    if (remaining <= 0) {
+      // Possible last chunk: padding only at the begining
+      padding_top = 0;
+    }
+    func(i_ref, m_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
+         kernel_xsize, kernel_ysize, kernel_zsize, args...);
+    i_ref += chunkSize * sliceSize;  // Move to the next chunk
+    m_ref += chunkSize * sliceSize;  // Move to the next chunk
+    o_ref += chunkSize * sliceSize;
+  }
 
-//   // Last chunk: padding only at the begining
-//   int remaining = zsize - iz;
-//   if (remaining > 0) {
-//     padding_top = 0;
-//     func(i_ref, o_ref, xsize, ysize, remaining, verbose, padding_bottom, padding_top, kernel,
-//          kernel_xsize, kernel_ysize, kernel_zsize, args...);
-//   }
+  // Last chunk: padding only at the begining
+  int remaining = zsize - iz;
+  if (remaining > 0) {
+    padding_top = 0;
+    func(i_ref, m_ref, o_ref, xsize, ysize, remaining, verbose, padding_bottom, padding_top, kernel,
+         kernel_xsize, kernel_ysize, kernel_zsize, args...);
+  }
 
-//   if (verbose) {
-//     printf("\nFinished processing all chunks!\n");
-//   }
-// }
+  if (verbose) {
+    printf("\nFinished processing all chunks!\n");
+  }
+}

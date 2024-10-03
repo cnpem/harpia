@@ -33,9 +33,7 @@ void test_fill_holes_on_device(const std::string& filename, const int xsize, con
 
   read_input(host_A, filename, size, flag_verbose);
 
-  int ncopies = 3;
-  chunkedExecutor(fill_holes_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
-                  ysize, zsize, flag_verbose);
+  fill_holes_on_device(host_A, device_ref, xsize, ysize, zsize, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
