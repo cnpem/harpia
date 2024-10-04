@@ -61,29 +61,27 @@ template void erosion_binary<uint16_t>(uint16_t*, uint16_t*, const int, const in
  * @param flag_verbose Flag for verbose output.
  */
 template <typename dtype>
-void dilation_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
-                               const int ysize, const int zsize, const int flag_verbose,
-                               int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
-                               bool gpu) {
+void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                     int kernel_ysize, int kernel_zsize, bool gpu) {
   if (gpu) {
     float memoryOccupancy = 0.9;
     int ncopies = 2;
     int flag_chain = 0;
     chunkedExecutorKernel(morph_binary_on_device<dtype>, ncopies, memoryOccupancy, flag_chain,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
-                          kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
+                          kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
   } else {
     morph_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
-                         kernel_ysize, kernel_zsize, EROSION);
+                         kernel_ysize, kernel_zsize, DILATION);
   }
 }
-template void dilation_binary_on_device<int>(int*, int*, const int, const int, const int, const int,
-                                             int*, int, int, int, bool);
-template void dilation_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
-                                                      const int, const int, const int, int*, int,
-                                                      int, int, bool);
-template void dilation_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
-                                                  const int, const int, int*, int, int, int, bool);
+template void dilation_binary<int>(int*, int*, const int, const int, const int, const int, int*,
+                                   int, int, int, bool);
+template void dilation_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                            const int, const int, int*, int, int, int, bool);
+template void dilation_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
+                                        const int, int*, int, int, int, bool);
 
 /**
  * @brief Performs binary closing on the input image.
@@ -102,9 +100,8 @@ template void dilation_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const in
  */
 template <typename dtype>
 void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
-                    const int zsize, const int flag_verbose, const int padding_bottom,
-                    const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
-                    int kernel_zsize, bool gpu) {
+                    const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                    int kernel_ysize, int kernel_zsize, bool gpu) {
 
   MorphChain closing = {DILATION, EROSION};
   if (gpu) {
@@ -119,13 +116,12 @@ void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
                                kernel_ysize, kernel_zsize, closing);
   }
 }
-template void closing_binary<int>(int*, int*, const int, const int, const int, const int, const int,
-                                  const int, int*, int, int, int, bool);
+template void closing_binary<int>(int*, int*, const int, const int, const int, const int, int*, int,
+                                  int, int, bool);
 template void closing_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
-                                           const int, const int, const int, const int, int*, int,
-                                           int, int, bool);
+                                           const int, const int, int*, int, int, int, bool);
 template void closing_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
-                                       const int, const int, const int, int*, int, int, int, bool);
+                                       const int, int*, int, int, int, bool);
 
 /**
  * @brief Performs binary openig on the input image.
@@ -144,13 +140,11 @@ template void closing_binary<uint16_t>(uint16_t*, uint16_t*, const int, const in
  */
 template <typename dtype>
 void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
-                    const int zsize, const int flag_verbose, const int padding_bottom,
-                    const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
-                    int kernel_zsize, bool gpu) {
+                    const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                    int kernel_ysize, int kernel_zsize, bool gpu) {
   MorphChain opening = {EROSION, DILATION};
 
   if (gpu) {
-
     float memoryOccupancy = 0.9;
     int ncopies = 3;
     int flag_chain = 1;
@@ -162,13 +156,12 @@ void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
                                kernel_ysize, kernel_zsize, opening);
   }
 }
-template void opening_binary<int>(int*, int*, const int, const int, const int, const int, const int,
-                                  const int, int*, int, int, int, bool);
+template void opening_binary<int>(int*, int*, const int, const int, const int, const int, int*, int,
+                                  int, int, bool);
 template void opening_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
-                                           const int, const int, const int, const int, int*, int,
-                                           int, int, bool);
+                                           const int, const int, int*, int, int, int, bool);
 template void opening_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
-                                       const int, const int, const int, int*, int, int, int, bool);
+                                       const int, int*, int, int, int, bool);
 
 /**
  * @brief Perform geodesic erosion operation on the entire image using the GPU. This function is
