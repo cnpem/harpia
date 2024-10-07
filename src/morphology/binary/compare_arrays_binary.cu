@@ -39,8 +39,11 @@ __global__ void compare_arrays_binary_kernel(dtype* deviceImage1, dtype* deviceI
 template __global__ void compare_arrays_binary_kernel<int>(int*, int*, int*, const int);
 template __global__ void compare_arrays_binary_kernel<unsigned int>(unsigned int*, unsigned int*,
                                                                     int*, const int);
+template __global__ void compare_arrays_binary_kernel<int16_t>(int16_t*, int16_t*, int*, const int);
 template __global__ void compare_arrays_binary_kernel<uint16_t>(uint16_t*, uint16_t*, int*,
                                                                 const int);
+template __global__ void compare_arrays_binary_kernel<int8_t>(int8_t*, int8_t*, int*, const int);
+template __global__ void compare_arrays_binary_kernel<uint8_t>(uint8_t*, uint8_t*, int*, const int);
 
 template <typename dtype>
 void compare_arrays_binary(dtype* deviceImage1, dtype* deviceImage2, int* deviceOutput,
@@ -64,7 +67,10 @@ void compare_arrays_binary(dtype* deviceImage1, dtype* deviceImage2, int* device
 template void compare_arrays_binary<int>(int*, int*, int*, const int, const int);
 template void compare_arrays_binary<unsigned int>(unsigned int*, unsigned int*, int*, const int,
                                                   const int);
+template void compare_arrays_binary<int16_t>(int16_t*, int16_t*, int*, const int, const int);
 template void compare_arrays_binary<uint16_t>(uint16_t*, uint16_t*, int*, const int, const int);
+template void compare_arrays_binary<int8_t>(int8_t*, int8_t*, int*, const int, const int);
+template void compare_arrays_binary<uint8_t>(uint8_t*, uint8_t*, int*, const int, const int);
 
 template <typename dtype>
 void compare_arrays_binary_on_device(dtype* hostImage1, dtype* hostImage2, int* hostOutput,
@@ -99,8 +105,13 @@ void compare_arrays_binary_on_device(dtype* hostImage1, dtype* hostImage2, int* 
 template void compare_arrays_binary_on_device<int>(int*, int*, int*, const int, const int);
 template void compare_arrays_binary_on_device<unsigned int>(unsigned int*, unsigned int*, int*,
                                                             const int, const int);
+template void compare_arrays_binary_on_device<int16_t>(int16_t*, int16_t*, int*, const int,
+                                                       const int);
 template void compare_arrays_binary_on_device<uint16_t>(uint16_t*, uint16_t*, int*, const int,
                                                         const int);
+template void compare_arrays_binary_on_device<int8_t>(int8_t*, int8_t*, int*, const int, const int);
+template void compare_arrays_binary_on_device<uint8_t>(uint8_t*, uint8_t*, int*, const int,
+                                                       const int);
 
 /**
  * @brief Function to perform pixel-wise comparison to check if two arrays are equal on the host 
@@ -131,4 +142,7 @@ void compare_arrays_binary_on_host(dtype* hostImage1, dtype* hostImage2, int* ho
 template void compare_arrays_binary_on_host<int>(int*, int*, int*, const int);
 template void compare_arrays_binary_on_host<unsigned int>(unsigned int*, unsigned int*, int*,
                                                           const int);
+template void compare_arrays_binary_on_host<int16_t>(int16_t*, int16_t*, int*, const int);
 template void compare_arrays_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, const int);
+template void compare_arrays_binary_on_host<int8_t>(int8_t*, int8_t*, int*, const int);
+template void compare_arrays_binary_on_host<uint8_t>(uint8_t*, uint8_t*, int*, const int);

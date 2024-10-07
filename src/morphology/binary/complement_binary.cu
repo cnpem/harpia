@@ -16,7 +16,10 @@ __global__ void complement_binary_kernel(dtype* deviceImage, dtype* deviceOutput
 template __global__ void complement_binary_kernel<int>(int*, int*, const int);
 template __global__ void complement_binary_kernel<unsigned int>(unsigned int*, unsigned int*,
                                                                 const int);
+template __global__ void complement_binary_kernel<int16_t>(int16_t*, int16_t*, const int);
 template __global__ void complement_binary_kernel<uint16_t>(uint16_t*, uint16_t*, const int);
+template __global__ void complement_binary_kernel<int8_t>(int8_t*, int8_t*, const int);
+template __global__ void complement_binary_kernel<uint8_t>(uint8_t*, uint8_t*, const int);
 
 template <typename dtype>
 void complement_binary(dtype* deviceImage, dtype* deviceOutput, const int size,
@@ -39,7 +42,10 @@ void complement_binary(dtype* deviceImage, dtype* deviceOutput, const int size,
 // Template instantiations for specific types
 template void complement_binary<int>(int*, int*, const int, const int);
 template void complement_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int);
+template void complement_binary<int16_t>(int16_t*, int16_t*, const int, const int);
 template void complement_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int);
+template void complement_binary<int8_t>(int8_t*, int8_t*, const int, const int);
+template void complement_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int);
 
 template <typename dtype>
 void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
@@ -73,8 +79,14 @@ template void complement_binary_on_device<int>(int*, int*, const int, const int,
                                                const int);
 template void complement_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
                                                         const int, const int, const int);
+template void complement_binary_on_device<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                   const int, const int);
 template void complement_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                     const int, const int);
+template void complement_binary_on_device<int8_t>(int8_t*, int8_t*, const int, const int, const int,
+                                                  const int);
+template void complement_binary_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                   const int, const int);
 
 template <typename dtype>
 void complement_binary_on_host(dtype* hostImage, dtype* hostOutput, const int size) {
@@ -85,4 +97,7 @@ void complement_binary_on_host(dtype* hostImage, dtype* hostOutput, const int si
 // Template instantiations for specific types
 template void complement_binary_on_host<int>(int*, int*, const int);
 template void complement_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int);
+template void complement_binary_on_host<int16_t>(int16_t*, int16_t*, const int);
 template void complement_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int);
+template void complement_binary_on_host<int8_t>(int8_t*, int8_t*, const int);
+template void complement_binary_on_host<uint8_t>(uint8_t*, uint8_t*, const int);

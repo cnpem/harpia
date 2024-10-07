@@ -40,7 +40,7 @@ void read_input(dtype* image, const std::string& filename, const int size, const
     return;
   }
 
-  // Read the uint16_t raw data into dtype pointer
+  // Read the uint16_t raw data into dtype pointer. The test images are all unit16
   uint16_t* data = new uint16_t[size];
   file.read(reinterpret_cast<char*>(data), size * sizeof(uint16_t));
   file.close();
@@ -57,9 +57,13 @@ void read_input(dtype* image, const std::string& filename, const int size, const
   // Clean up
   delete[] data;
 }
-template void read_input<int>(int*, const std::string&, const int, const int);
-template void read_input<uint16_t>(uint16_t*, const std::string&, const int, const int);
 template void read_input<float>(float*, const std::string&, const int, const int);
+template void read_input<int>(int*, const std::string&, const int, const int);
+template void read_input<unsigned int>(unsigned int*, const std::string&, const int, const int);
+template void read_input<int16_t>(int16_t*, const std::string&, const int, const int);
+template void read_input<uint16_t>(uint16_t*, const std::string&, const int, const int);
+template void read_input<int8_t>(int8_t*, const std::string&, const int, const int);
+template void read_input<uint8_t>(uint8_t*, const std::string&, const int, const int);
 
 /**
  * @brief Print a 3D matrix.
@@ -89,8 +93,13 @@ void show_matrix_3D(dtype* image, const int xsize, const int ysize, const int zs
     std::cout << "\n";
   }
 }
-template void show_matrix_3D<int>(int*, const int, const int, const int);
 template void show_matrix_3D<float>(float*, const int, const int, const int);
+template void show_matrix_3D<int>(int*, const int, const int, const int);
+template void show_matrix_3D<unsigned int>(unsigned int*, const int, const int, const int);
+template void show_matrix_3D<int16_t>(int16_t*, const int, const int, const int);
+template void show_matrix_3D<uint16_t>(uint16_t*, const int, const int, const int);
+template void show_matrix_3D<int8_t>(int8_t*, const int, const int, const int);
+template void show_matrix_3D<uint8_t>(uint8_t*, const int, const int, const int);
 
 /**
  * @brief Check if two matrices match.

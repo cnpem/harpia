@@ -27,7 +27,6 @@ CUDA_HOSTDEV void morph_binary_pinned_pixel(dtype* image, dtype* output, const i
                                             const int ysize, const int zsize, int centerIdx,
                                             int centerIdy, int centerIdz, int* kernel,
                                             int kernel_xsize, int kernel_ysize, int kernel_zsize,
-
                                             MorphOp operation) {
   dtype* im = image;
   int* ik = kernel;
@@ -80,9 +79,18 @@ template CUDA_HOSTDEV void morph_binary_pinned_pixel<unsigned int>(unsigned int*
                                                                    const int, const int, const int,
                                                                    int, int, int, int*, int, int,
                                                                    int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pinned_pixel<int16_t>(int16_t*, int16_t*, const int,
+                                                              const int, const int, int, int, int,
+                                                              int*, int, int, int, MorphOp);
 template CUDA_HOSTDEV void morph_binary_pinned_pixel<uint16_t>(uint16_t*, uint16_t*, const int,
                                                                const int, const int, int, int, int,
                                                                int*, int, int, int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pinned_pixel<int8_t>(int8_t*, int8_t*, const int, const int,
+                                                             const int, int, int, int, int*, int,
+                                                             int, int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pinned_pixel<uint8_t>(uint8_t*, uint8_t*, const int,
+                                                              const int, const int, int, int, int,
+                                                              int*, int, int, int, MorphOp);
 
 /**
  * @brief Kernel function to perform erosion/dilation operation on the entire image.
@@ -119,9 +127,18 @@ template __global__ void morph_binary_pinned_kernel<int>(int*, int*, const int, 
 template __global__ void morph_binary_pinned_kernel<unsigned int>(unsigned int*, unsigned int*,
                                                                   const int, const int, const int,
                                                                   int*, int, int, int, MorphOp);
+template __global__ void morph_binary_pinned_kernel<int16_t>(int16_t*, int16_t*, const int,
+                                                             const int, const int, int*, int, int,
+                                                             int, MorphOp);
 template __global__ void morph_binary_pinned_kernel<uint16_t>(uint16_t*, uint16_t*, const int,
                                                               const int, const int, int*, int, int,
                                                               int, MorphOp);
+template __global__ void morph_binary_pinned_kernel<int8_t>(int8_t*, int8_t*, const int, const int,
+                                                            const int, int*, int, int, int,
+                                                            MorphOp);
+template __global__ void morph_binary_pinned_kernel<uint8_t>(uint8_t*, uint8_t*, const int,
+                                                             const int, const int, int*, int, int,
+                                                             int, MorphOp);
 
 template <typename dtype>
 void morph_binary_pinned(dtype* deviceImage, dtype* deviceOutput, const int xsize, const int ysize,
@@ -151,8 +168,14 @@ template void morph_binary_pinned<int>(int*, int*, const int, const int, const i
                                        int, MorphOp, const int);
 template void morph_binary_pinned<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                                 const int, int*, int, int, int, MorphOp, const int);
+template void morph_binary_pinned<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                           int*, int, int, int, MorphOp, const int);
 template void morph_binary_pinned<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                             int*, int, int, int, MorphOp, const int);
+template void morph_binary_pinned<int8_t>(int8_t*, int8_t*, const int, const int, const int, int*,
+                                          int, int, int, MorphOp, const int);
+template void morph_binary_pinned<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                           int*, int, int, int, MorphOp, const int);
 
 /**
  * @brief Perform erosion/dilation operation on the entire image using the GPU. This function is 
@@ -216,9 +239,18 @@ template void morph_binary_pinned_on_device<int>(int*, int*, const int, const in
 template void morph_binary_pinned_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
                                                           const int, const int, int*, int, int, int,
                                                           MorphOp, const int);
+template void morph_binary_pinned_on_device<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                     const int, int*, int, int, int, MorphOp,
+                                                     const int);
 template void morph_binary_pinned_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                       const int, int*, int, int, int, MorphOp,
                                                       const int);
+template void morph_binary_pinned_on_device<int8_t>(int8_t*, int8_t*, const int, const int,
+                                                    const int, int*, int, int, int, MorphOp,
+                                                    const int);
+template void morph_binary_pinned_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                     const int, int*, int, int, int, MorphOp,
+                                                     const int);
 
 /**
  * @brief Perform erosion/dilation operation on the entire image using the CPU. This function is 
@@ -256,5 +288,11 @@ template void morph_binary_pinned_on_host<int>(int*, int*, const int, const int,
 template void morph_binary_pinned_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
                                                         const int, const int, int*, int, int, int,
                                                         MorphOp);
+template void morph_binary_pinned_on_host<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                   const int, int*, int, int, int, MorphOp);
 template void morph_binary_pinned_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                     const int, int*, int, int, int, MorphOp);
+template void morph_binary_pinned_on_host<int8_t>(int8_t*, int8_t*, const int, const int, const int,
+                                                  int*, int, int, int, MorphOp);
+template void morph_binary_pinned_on_host<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                   const int, int*, int, int, int, MorphOp);

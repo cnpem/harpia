@@ -87,11 +87,21 @@ template CUDA_HOSTDEV void geodesic_morph_binary_pixel<unsigned int>(unsigned in
                                                                      unsigned int*, const int,
                                                                      const int, const int, int, int,
                                                                      int, int, int, int, MorphOp);
+template CUDA_HOSTDEV void geodesic_morph_binary_pixel<int16_t>(int16_t*, int16_t*, int16_t*,
+                                                                const int, const int, const int,
+                                                                int, int, int, int, int, int,
+                                                                MorphOp);
 template CUDA_HOSTDEV void geodesic_morph_binary_pixel<uint16_t>(uint16_t*, uint16_t*, uint16_t*,
                                                                  const int, const int, const int,
                                                                  int, int, int, int, int, int,
-
                                                                  MorphOp);
+template CUDA_HOSTDEV void geodesic_morph_binary_pixel<int8_t>(int8_t*, int8_t*, int8_t*, const int,
+                                                               const int, const int, int, int, int,
+                                                               int, int, int, MorphOp);
+template CUDA_HOSTDEV void geodesic_morph_binary_pixel<uint8_t>(uint8_t*, uint8_t*, uint8_t*,
+                                                                const int, const int, const int,
+                                                                int, int, int, int, int, int,
+                                                                MorphOp);
 
 /**
  * @brief Kernel function to perform geodesic erosion/dilation operation on the entire image.
@@ -128,9 +138,18 @@ template __global__ void geodesic_morph_binary_kernel<unsigned int>(unsigned int
                                                                     unsigned int*, const int,
                                                                     const int, const int, int, int,
                                                                     int, MorphOp);
+template __global__ void geodesic_morph_binary_kernel<int16_t>(int16_t*, int16_t*, int16_t*,
+                                                               const int, const int, const int, int,
+                                                               int, int, MorphOp);
 template __global__ void geodesic_morph_binary_kernel<uint16_t>(uint16_t*, uint16_t*, uint16_t*,
                                                                 const int, const int, const int,
                                                                 int, int, int, MorphOp);
+template __global__ void geodesic_morph_binary_kernel<int8_t>(int8_t*, int8_t*, int8_t*, const int,
+                                                              const int, const int, int, int, int,
+                                                              MorphOp);
+template __global__ void geodesic_morph_binary_kernel<uint8_t>(uint8_t*, uint8_t*, uint8_t*,
+                                                               const int, const int, const int, int,
+                                                               int, int, MorphOp);
 
 template <typename dtype>
 void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceOutput,
@@ -166,8 +185,14 @@ template void geodesic_morph_binary<int>(int*, int*, int*, const int, const int,
 template void geodesic_morph_binary<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
                                                   const int, const int, const int, const int,
                                                   MorphOp);
+template void geodesic_morph_binary<int16_t>(int16_t*, int16_t*, int16_t*, const int, const int,
+                                             const int, const int, MorphOp);
 template void geodesic_morph_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int, const int,
                                               const int, const int, MorphOp);
+template void geodesic_morph_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
+                                            const int, const int, MorphOp);
+template void geodesic_morph_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
+                                             const int, const int, MorphOp);
 
 /**
  * @brief Perform geodesic erosion/dilation operation on the entire image using the GPU. This
@@ -218,8 +243,14 @@ template void geodesic_morph_binary_on_device<int>(int*, int*, int*, const int, 
 template void geodesic_morph_binary_on_device<unsigned int>(unsigned int*, unsigned int*,
                                                             unsigned int*, const int, const int,
                                                             const int, const int, MorphOp);
+template void geodesic_morph_binary_on_device<int16_t>(int16_t*, int16_t*, int16_t*, const int,
+                                                       const int, const int, const int, MorphOp);
 template void geodesic_morph_binary_on_device<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                         const int, const int, const int, MorphOp);
+template void geodesic_morph_binary_on_device<int8_t>(int8_t*, int8_t*, int8_t*, const int,
+                                                      const int, const int, const int, MorphOp);
+template void geodesic_morph_binary_on_device<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int,
+                                                       const int, const int, const int, MorphOp);
 
 /**
  * @brief Perform geodesic erosion/dilation operation on the entire image using the CPU. This
@@ -259,5 +290,11 @@ template void geodesic_morph_binary_on_host<int>(int*, int*, int*, const int, co
 template void geodesic_morph_binary_on_host<unsigned int>(unsigned int*, unsigned int*,
                                                           unsigned int*, const int, const int,
                                                           const int, MorphOp);
+template void geodesic_morph_binary_on_host<int16_t>(int16_t*, int16_t*, int16_t*, const int,
+                                                     const int, const int, MorphOp);
 template void geodesic_morph_binary_on_host<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                       const int, const int, MorphOp);
+template void geodesic_morph_binary_on_host<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
+                                                    const int, MorphOp);
+template void geodesic_morph_binary_on_host<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int,
+                                                     const int, const int, MorphOp);

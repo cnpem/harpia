@@ -51,9 +51,13 @@ void show_image_2D(dtype* hostImage, const int xsize, const int ysize, const std
 }
 
 // Explicit template instantiations for different data types
-template void show_image_2D<int>(int*, const int, const int, const std::string);
-template void show_image_2D<uint16_t>(uint16_t*, const int, const int, const std::string);
 template void show_image_2D<float>(float*, const int, const int, const std::string);
+template void show_image_2D<int>(int*, const int, const int, const std::string);
+template void show_image_2D<unsigned int>(unsigned int*, const int, const int, const std::string);
+template void show_image_2D<int16_t>(int16_t*, const int, const int, const std::string);
+template void show_image_2D<uint16_t>(uint16_t*, const int, const int, const std::string);
+template void show_image_2D<int8_t>(int8_t*, const int, const int, const std::string);
+template void show_image_2D<uint8_t>(uint8_t*, const int, const int, const std::string);
 
 /**
  * @brief Displays a 3D image by showing each slice as a 2D image.
@@ -84,8 +88,14 @@ void show_image_3D(dtype* hostImage, const int xsize, const int ysize, int zsize
 }
 
 // Explicit template instantiations for different data types
-template void show_image_3D<int>(int*, const int, const int, int, const std::string);
 template void show_image_3D<float>(float*, const int, const int, int, const std::string);
+template void show_image_3D<int>(int*, const int, const int, int, const std::string);
+template void show_image_3D<unsigned int>(unsigned int*, const int, const int, int,
+                                          const std::string);
+template void show_image_3D<int16_t>(int16_t*, const int, const int, int, const std::string);
+template void show_image_3D<uint16_t>(uint16_t*, const int, const int, int, const std::string);
+template void show_image_3D<int8_t>(int8_t*, const int, const int, int, const std::string);
+template void show_image_3D<uint8_t>(uint8_t*, const int, const int, int, const std::string);
 
 /**
  * @brief Performs morphological operations on a 2D image using OpenCV.

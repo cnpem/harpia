@@ -79,9 +79,18 @@ template CUDA_HOSTDEV void morph_binary_pixel<unsigned int>(unsigned int*, unsig
                                                             const int, const int, const int,
                                                             const int, int, int, int, int*, int,
                                                             int, int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                       const int, const int, const int, int, int,
+                                                       int, int*, int, int, int, MorphOp);
 template CUDA_HOSTDEV void morph_binary_pixel<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                         const int, const int, const int, int, int,
                                                         int, int*, int, int, int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<int8_t>(int8_t*, int8_t*, const int, const int,
+                                                      const int, const int, const int, int, int,
+                                                      int, int*, int, int, int, MorphOp);
+template CUDA_HOSTDEV void morph_binary_pixel<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                       const int, const int, const int, int, int,
+                                                       int, int*, int, int, int, MorphOp);
 
 /**
  * @brief Kernel function to perform erosion/dilation operation on the entire image.
@@ -118,9 +127,18 @@ template __global__ void morph_binary_kernel<int>(int*, int*, const int, const i
 template __global__ void morph_binary_kernel<unsigned int>(unsigned int*, unsigned int*, const int,
                                                            const int, const int, const int,
                                                            const int, int*, int, int, int, MorphOp);
+template __global__ void morph_binary_kernel<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                      const int, const int, const int, int*, int,
+                                                      int, int, MorphOp);
 template __global__ void morph_binary_kernel<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                        const int, const int, const int, int*, int,
                                                        int, int, MorphOp);
+template __global__ void morph_binary_kernel<int8_t>(int8_t*, int8_t*, const int, const int,
+                                                     const int, const int, const int, int*, int,
+                                                     int, int, MorphOp);
+template __global__ void morph_binary_kernel<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                      const int, const int, const int, int*, int,
+                                                      int, int, MorphOp);
 
 template <typename dtype>
 void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, const int ysize,
@@ -152,8 +170,14 @@ template void morph_binary<int>(int*, int*, const int, const int, const int, con
 template void morph_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                          const int, const int, const int, const int, int*, int, int,
                                          int, MorphOp);
+template void morph_binary<int16_t>(int16_t*, int16_t*, const int, const int, const int, const int,
+                                    const int, const int, int*, int, int, int, MorphOp);
 template void morph_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                      const int, const int, const int, int*, int, int, int, MorphOp);
+template void morph_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
+                                   const int, const int, int*, int, int, int, MorphOp);
+template void morph_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int,
+                                    const int, const int, int*, int, int, int, MorphOp);
 
 /**
  * @brief Perform erosion/dilation operation on the entire image using the GPU. This function is 
@@ -220,9 +244,18 @@ template void morph_binary_on_device<int>(int*, int*, const int, const int, cons
 template void morph_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
                                                    const int, const int, const int, const int,
                                                    const int, int*, int, int, int, MorphOp);
+template void morph_binary_on_device<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                              const int, const int, const int, int*, int, int, int,
+                                              MorphOp);
 template void morph_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                const int, const int, const int, const int, int*,
                                                int, int, int, MorphOp);
+template void morph_binary_on_device<int8_t>(int8_t*, int8_t*, const int, const int, const int,
+                                             const int, const int, const int, int*, int, int, int,
+                                             MorphOp);
+template void morph_binary_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                              const int, const int, const int, int*, int, int, int,
+                                              MorphOp);
 
 /**
  * @brief Perform erosion/dilation operation on the entire image using the CPU. This function is 
@@ -259,5 +292,11 @@ template void morph_binary_on_host<int>(int*, int*, const int, const int, const 
                                         int, MorphOp);
 template void morph_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                                  const int, int*, int, int, int, MorphOp);
+template void morph_binary_on_host<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                            int*, int, int, int, MorphOp);
 template void morph_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                              int*, int, int, int, MorphOp);
+template void morph_binary_on_host<int8_t>(int8_t*, int8_t*, const int, const int, const int, int*,
+                                           int, int, int, MorphOp);
+template void morph_binary_on_host<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                            int*, int, int, int, MorphOp);

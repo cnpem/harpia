@@ -78,6 +78,15 @@ template void opening_by_reconstruction_on_device<int>(int*, int*, int*, int, in
 template void opening_by_reconstruction_on_device<unsigned int>(unsigned int*, unsigned int*, int*,
                                                                 int, int, int, const int, const int,
                                                                 const int, MorphOp, const int);
+template void opening_by_reconstruction_on_device<int16_t>(int16_t*, int16_t*, int*, int, int, int,
+                                                           const int, const int, const int, MorphOp,
+                                                           const int);
 template void opening_by_reconstruction_on_device<uint16_t>(uint16_t*, uint16_t*, int*, int, int,
                                                             int, const int, const int, const int,
                                                             MorphOp, const int);
+template void opening_by_reconstruction_on_device<int8_t>(int8_t*, int8_t*, int*, int, int, int,
+                                                          const int, const int, const int, MorphOp,
+                                                          const int);
+template void opening_by_reconstruction_on_device<uint8_t>(uint8_t*, uint8_t*, int*, int, int, int,
+                                                           const int, const int, const int, MorphOp,
+                                                           const int);

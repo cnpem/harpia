@@ -96,9 +96,18 @@ template void morph_chain_binary_on_device<unsigned int>(unsigned int*, unsigned
                                                          const int, const int, const int, const int,
                                                          const int, int*, int, int, int,
                                                          MorphChain);
+template void morph_chain_binary_on_device<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                    const int, const int, const int, const int,
+                                                    int*, int, int, int, MorphChain);
 template void morph_chain_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                      const int, const int, const int, const int,
                                                      int*, int, int, int, MorphChain);
+template void morph_chain_binary_on_device<int8_t>(int8_t*, int8_t*, const int, const int,
+                                                   const int, const int, const int, const int, int*,
+                                                   int, int, int, MorphChain);
+template void morph_chain_binary_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                    const int, const int, const int, const int,
+                                                    int*, int, int, int, MorphChain);
 
 /**
  * @brief Performs a morphological chain operation on a binary image using the CPU.
@@ -147,5 +156,11 @@ template void morph_chain_binary_on_host<int>(int*, int*, const int, const int, 
 template void morph_chain_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const int,
                                                        const int, const int, int*, int, int, int,
                                                        MorphChain);
+template void morph_chain_binary_on_host<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                  const int, int*, int, int, int, MorphChain);
 template void morph_chain_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                    const int, int*, int, int, int, MorphChain);
+template void morph_chain_binary_on_host<int8_t>(int8_t*, int8_t*, const int, const int, const int,
+                                                 int*, int, int, int, MorphChain);
+template void morph_chain_binary_on_host<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                  const int, int*, int, int, int, MorphChain);

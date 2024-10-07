@@ -40,8 +40,14 @@ __global__ void fill_holes_marker(dtype* deviceImage, dtype* deviceOutput, const
 template __global__ void fill_holes_marker<unsigned int>(unsigned int*, unsigned int*, const int,
                                                          const int, const int);
 template __global__ void fill_holes_marker<int>(int*, int*, const int, const int, const int);
+template __global__ void fill_holes_marker<int16_t>(int16_t*, int16_t*, const int, const int,
+                                                    const int);
 template __global__ void fill_holes_marker<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                      const int);
+template __global__ void fill_holes_marker<int8_t>(int8_t*, int8_t*, const int, const int,
+                                                   const int);
+template __global__ void fill_holes_marker<uint8_t>(uint8_t*, uint8_t*, const int, const int,
+                                                    const int);
 
 /**
  * @brief Performs the bottom-hat transformation on the input image on the device (GPU).
@@ -107,8 +113,14 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
 template void fill_holes_on_device<int>(int*, int*, const int, const int, const int, const int);
 template void fill_holes_on_device<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                                  const int, const int);
+template void fill_holes_on_device<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                            const int);
 template void fill_holes_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                              const int);
+template void fill_holes_on_device<int8_t>(int8_t*, int8_t*, const int, const int, const int,
+                                           const int);
+template void fill_holes_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                            const int);
 
 /**
  * @brief Performs the bottom-hat transformation on the input image on the host (CPU).
@@ -172,4 +184,7 @@ void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
 template void fill_holes_on_host<int>(int*, int*, const int, const int, const int);
 template void fill_holes_on_host<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                                const int);
+template void fill_holes_on_host<int16_t>(int16_t*, int16_t*, const int, const int, const int);
 template void fill_holes_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int);
+template void fill_holes_on_host<int8_t>(int8_t*, int8_t*, const int, const int, const int);
+template void fill_holes_on_host<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int);

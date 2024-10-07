@@ -42,8 +42,14 @@ template void erosion_binary<int>(int*, int*, const int, const int, const int, c
                                   int, int, bool);
 template void erosion_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                            const int, const int, int*, int, int, int, bool);
+template void erosion_binary<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                      const int, int*, int, int, int, bool);
 template void erosion_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, bool);
+template void erosion_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
+                                     int*, int, int, int, bool);
+template void erosion_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                      const int, int*, int, int, int, bool);
 
 /**
  * @brief Performs binary dilation on the input image.
@@ -80,8 +86,14 @@ template void dilation_binary<int>(int*, int*, const int, const int, const int, 
                                    int, int, int, bool);
 template void dilation_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                             const int, const int, int*, int, int, int, bool);
+template void dilation_binary<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                       const int, int*, int, int, int, bool);
 template void dilation_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                         const int, int*, int, int, int, bool);
+template void dilation_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
+                                      int*, int, int, int, bool);
+template void dilation_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                       const int, int*, int, int, int, bool);
 
 /**
  * @brief Performs binary closing on the input image.
@@ -120,8 +132,14 @@ template void closing_binary<int>(int*, int*, const int, const int, const int, c
                                   int, int, bool);
 template void closing_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                            const int, const int, int*, int, int, int, bool);
+template void closing_binary<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                      const int, int*, int, int, int, bool);
 template void closing_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, bool);
+template void closing_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
+                                     int*, int, int, int, bool);
+template void closing_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                      const int, int*, int, int, int, bool);
 
 /**
  * @brief Performs binary openig on the input image.
@@ -160,8 +178,14 @@ template void opening_binary<int>(int*, int*, const int, const int, const int, c
                                   int, int, bool);
 template void opening_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                            const int, const int, int*, int, int, int, bool);
+template void opening_binary<int16_t>(int16_t*, int16_t*, const int, const int, const int,
+                                      const int, int*, int, int, int, bool);
 template void opening_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, bool);
+template void opening_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
+                                     int*, int, int, int, bool);
+template void opening_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
+                                      const int, int*, int, int, int, bool);
 
 /**
  * @brief Perform geodesic erosion operation on the entire image using the GPU. This function is
@@ -192,8 +216,14 @@ template void geodesic_erosion_binary<int>(int*, int*, int*, const int, const in
 template void geodesic_erosion_binary<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
                                                     const int, const int, const int, const int,
                                                     bool);
+template void geodesic_erosion_binary<int16_t>(int16_t*, int16_t*, int16_t*, const int, const int,
+                                               const int, const int, bool);
 template void geodesic_erosion_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                 const int, const int, const int, bool);
+template void geodesic_erosion_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
+                                              const int, const int, bool);
+template void geodesic_erosion_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
+                                               const int, const int, bool);
 
 /**
  * @brief Perform geodesic dilation operation on the entire image using the GPU. This function is
@@ -224,8 +254,14 @@ template void geodesic_dilation_binary<int>(int*, int*, int*, const int, const i
 template void geodesic_dilation_binary<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
                                                      const int, const int, const int, const int,
                                                      bool);
+template void geodesic_dilation_binary<int16_t>(int16_t*, int16_t*, int16_t*, const int, const int,
+                                                const int, const int, bool);
 template void geodesic_dilation_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                  const int, const int, const int, bool);
+template void geodesic_dilation_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
+                                               const int, const int, bool);
+template void geodesic_dilation_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
+                                                const int, const int, bool);
 
 template <typename dtype>
 void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
@@ -244,8 +280,14 @@ template void reconstruction_binary<int>(int*, int*, int*, const int, const int,
 template void reconstruction_binary<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
                                                   const int, const int, const int, const int,
                                                   MorphOp, bool);
+template void reconstruction_binary<int16_t>(int16_t*, int16_t*, int16_t*, const int, const int,
+                                             const int, const int, MorphOp, bool);
 template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int, const int,
                                               const int, const int, MorphOp, bool);
+template void reconstruction_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
+                                            const int, const int, MorphOp, bool);
+template void reconstruction_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
+                                             const int, const int, MorphOp, bool);
 
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -261,5 +303,11 @@ void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int 
 template void fill_holes<int>(int*, int*, const int, const int, const int, const int, bool);
 template void fill_holes<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                        const int, const int, bool);
+template void fill_holes<int16_t>(int16_t*, int16_t*, const int, const int, const int, const int,
+                                  bool);
 template void fill_holes<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int, const int,
                                    bool);
+template void fill_holes<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
+                                 bool);
+template void fill_holes<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int,
+                                  bool);
