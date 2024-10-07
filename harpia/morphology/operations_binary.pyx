@@ -1,11 +1,9 @@
 cimport numpy
 
-import numpy as np
+import numpy
 
 from libc.stdint cimport int8_t, int16_t, uint8_t, uint16_t
 from libcpp cimport bool
-
-import numpy
 
 from harpia.common import Size
 
@@ -24,129 +22,129 @@ cdef extern from "../../include/morphology/morphology.h":
 
 cdef extern from "../../include/morphology/operations_binary.h":
     void _erosion_binary "erosion_binary" [dtype](dtype*, dtype*, int, int, int, int, int*, int, 
-                                                  int, int, bool)
+                                                  int, int, float, bool)
     void _dilation_binary "dilation_binary" [dtype](dtype*, dtype*, int, int, int, int, int*, int, 
-                                                    int, int, bool)
+                                                    int, int, float, bool)
     void _closing_binary "closing_binary"[dtype](dtype*, dtype*, int, int, int, int, int*, int, int, 
-                                                 int, bool)
+                                                 int, float, bool)
     void _opening_binary "opening_binary"[dtype](dtype*, dtype*, int, int, int, int, int*, int, int, 
-                                                 int, bool)
+                                                 int, float, bool)
     void _geodesic_erosion_binary "geodesic_erosion_binary"[dtype](dtype*, dtype*, dtype*, int, int, 
-                                                                   int, int, bool)
+                                                                   int, int, float, bool)
     void _geodesic_dilation_binary "geodesic_dilation_binary"[dtype](dtype*, dtype*, dtype*, int, 
-                                                                     int, int, int, bool)
+                                                                     int, int, int, float, bool)
     void _reconstruction_binary "reconstruction_binary"[dtype](dtype*, dtype*, dtype*, int, int, 
                                                                int, int, MorphOp, bool)
     void _fill_holes "fill_holes"[dtype](dtype*, dtype*, int, int, int, int, bool)
 
 def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   bool gpu = True):
+                   float gpuMemory = 0.9, bool gpu = True):
 
     isize = Size(hostImage)
     ksize = Size(kernel)
 
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
 
     _erosion_binary(&hostImage[0,0,0], &hostOutput[0,0,0],  isize.x, isize.y, isize.z, 
-                    verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+                    verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
 
     return hostOutput
     
 def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                     numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                    bool gpu = True):
+                    float gpuMemory = 0.9, bool gpu = True):
 
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
 
     _dilation_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                     verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+                     verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
 
     return hostOutput
 
 
 def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   bool gpu = True):
+                   float gpuMemory = 0.9, bool gpu = True):
 
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
 
     _closing_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                    verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+                    verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
 
     return hostOutput
 
 def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   bool gpu = True):
+                   float gpuMemory = 0.9, bool gpu = True):
 
     isize = Size(hostImage)
     ksize = Size(kernel)
     
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
 
     _opening_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
-                    verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+                    verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
 
     return hostOutput
 
 def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                             numpy.ndarray[numeric, ndim=3] hostMask, 
                             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                            bool gpu = True):
+                            float gpuMemory = 0.9, bool gpu = True):
 
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
     
     _geodesic_erosion_binary(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
-                             isize.y, isize.z, verbose, gpu)
+                             isize.y, isize.z, verbose, gpuMemory, gpu)
 
     return hostOutput
 
 def geodesic_dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                              numpy.ndarray[numeric, ndim=3] hostMask, 
                              numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                             bool gpu = True):
+                             float gpuMemory = 0.9, bool gpu = True):
 
     isize = Size(hostImage)
     
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
 
     _geodesic_dilation_binary(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
-                              isize.y, isize.z, verbose, gpu)
+                              isize.y, isize.z, verbose, gpuMemory, gpu)
 
     return hostOutput
 
 def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
-                          numpy.ndarray[numeric, ndim=3] hostMask, int operation, 
+                          numpy.ndarray[numeric, ndim=3] hostMask, str operation, 
                           numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                           bool gpu = True):
     
     isize = Size(hostImage)
 
     cdef MorphOp morph_op
-    if operation == 0:
+    if operation == "erosion":
         morph_op = EROSION
-    elif operation == 1:
+    elif operation == "dilation":
         morph_op = DILATION
     else:
-        raise ValueError("Invalid operation. Must be 0 (EROSION) or 1 (DILATION).")
+        raise ValueError("Invalid operation. Must be 'erosion' or 'dilation'.")
     
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
 
     _reconstruction_binary(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
                            isize.y, isize.z, verbose, morph_op, gpu)
@@ -159,7 +157,7 @@ def fill_holes(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
     
     if hostOutput is None:
-        hostOutput = np.empty_like(hostImage)
+        hostOutput = numpy.empty_like(hostImage)
     
     _fill_holes(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, gpu)
 

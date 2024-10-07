@@ -172,6 +172,12 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
   // How many slices fit in the GPU?
+  if (safetyMargin > 1 || safetyMargin < 0) {
+    fprintf(stderr,
+            "Error: GPU %.2f memory occupancy is invalid. Choose a value between 0 and 1 (100%).\n",
+            safetyMargin);
+    return;
+  }
   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
   int padding;
   if (zsize == 1) {
