@@ -1,6 +1,8 @@
 cimport numpy
+
 import numpy as np
-from libc.stdint cimport uint16_t
+
+from libc.stdint cimport int8_t, int16_t, uint8_t, uint16_t
 from libcpp cimport bool
 
 import numpy
@@ -8,9 +10,12 @@ import numpy
 from harpia.common import Size
 
 ctypedef fused numeric:
-    uint16_t
     int
     unsigned int
+    int16_t
+    uint16_t
+    int8_t
+    uint8_t
 
 cdef extern from "../../include/morphology/morphology.h":
     ctypedef enum MorphOp:

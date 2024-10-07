@@ -6,12 +6,14 @@
 template <typename dtype>
 void geodesic_morph_grayscale(dtype* deviceImage, dtype* deviceMask, dtype* deviceOutput,
                               const int xsize, const int ysize, const int zsize,
-                              const int flag_verbose, MorphOp operation);
+                              const int flag_verbose, const int padding_bottom,
+                              const int padding_top, MorphOp operation);
 
 template <typename dtype>
 void geodesic_morph_grayscale_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                         const int xsize, const int ysize, const int zsize,
-                                        const int flag_verbose, MorphOp operation);
+                                        const int flag_verbose, const int padding_bottom,
+                                        const int padding_top, MorphOp operation);
 
 template <typename dtype>
 void geodesic_morph_grayscale_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,

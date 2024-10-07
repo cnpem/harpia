@@ -17,8 +17,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
   // Get free memory on the GPU in bytes
-  size_t freeBytes;
-  size_t totalBytes;
+  size_t freeBytes, totalBytes;
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
   // How many slices fit in the GPU?
@@ -78,8 +77,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
   // Get free memory on the GPU in bytes
-  size_t freeBytes;
-  size_t totalBytes;
+  size_t freeBytes, totalBytes;
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
   // How many slices fit in the GPU?
@@ -154,12 +152,12 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
   }
 }
 
-// chunkedExecutorKernel version for functions with two inputs, image and mask
+// Designed for geodesic operations which have an 8-connectivity fixed kerenl of ones and
+// two inputs, image and mask
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const int flag_chain,
-                         dtype* image, dtype* mask, dtype* output, const int xsize, const int ysize,
-                         const int zsize, const int verbose, int* kernel, int kernel_xsize,
-                         int kernel_ysize, int kernel_zsize, Args... args) {
+void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, dtype* image,
+                             dtype* mask, dtype* output, const int xsize, const int ysize,
+                             const int zsize, const int verbose, Args... args) {
 
   dtype* i_ref = image;
   dtype* m_ref = mask;
@@ -170,17 +168,16 @@ void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
   // Get free memory on the GPU in bytes
-  size_t freeBytes;
-  size_t totalBytes;
+  size_t freeBytes, totalBytes;
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
   // How many slices fit in the GPU?
   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
   int padding;
-  if (flag_chain) {
-    padding = (kernel_zsize / 2) * 2;  //assure an even padding size
+  if (zsize == 1) {
+    padding = 0;
   } else {
-    padding = kernel_zsize / 2;
+    padding = 2;
   }
   int padding_top = 0;
   int padding_bottom = 0;
@@ -194,8 +191,7 @@ void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const
 
     // CASE: intire input fits GPU memory (no padding)
   } else if (chunkSize >= zsize) {
-    func(i_ref, m_ref, o_ref, xsize, ysize, zsize, verbose, padding_bottom, padding_top, kernel,
-         kernel_xsize, kernel_ysize, kernel_zsize, args...);
+    func(i_ref, m_ref, o_ref, xsize, ysize, zsize, verbose, padding_bottom, padding_top, args...);
     if (verbose) {
       printf("\nFinished processing!\n");
     }
@@ -213,8 +209,7 @@ void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const
   padding_bottom = 0;
   padding_top = padding;
 
-  func(i_ref, m_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
-       kernel_xsize, kernel_ysize, kernel_zsize, args...);
+  func(i_ref, m_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, args...);
   i_ref += chunkSize * sliceSize;
   m_ref += chunkSize * sliceSize;
   o_ref += chunkSize * sliceSize;
@@ -228,8 +223,8 @@ void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const
       // Possible last chunk: padding only at the begining
       padding_top = 0;
     }
-    func(i_ref, m_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
-         kernel_xsize, kernel_ysize, kernel_zsize, args...);
+    func(i_ref, m_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top,
+         args...);
     i_ref += chunkSize * sliceSize;  // Move to the next chunk
     m_ref += chunkSize * sliceSize;  // Move to the next chunk
     o_ref += chunkSize * sliceSize;
@@ -239,8 +234,8 @@ void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const
   int remaining = zsize - iz;
   if (remaining > 0) {
     padding_top = 0;
-    func(i_ref, m_ref, o_ref, xsize, ysize, remaining, verbose, padding_bottom, padding_top, kernel,
-         kernel_xsize, kernel_ysize, kernel_zsize, args...);
+    func(i_ref, m_ref, o_ref, xsize, ysize, remaining, verbose, padding_bottom, padding_top,
+         args...);
   }
 
   if (verbose) {

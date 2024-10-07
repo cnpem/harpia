@@ -1,6 +1,8 @@
 #ifndef MORPH_binary_on_device_OPS_H
 #define MORPH_binary_on_device_OPS_H
 
+#include "morphology.h"
+
 template <typename dtype>
 void erosion_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,

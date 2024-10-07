@@ -204,8 +204,11 @@ template <typename dtype>
 void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                              const int ysize, const int zsize, const int flag_verbose, bool gpu) {
   if (gpu) {
-    geodesic_morph_binary_on_device(hostImage, hostMask, hostOutput, xsize, ysize, zsize,
-                                    flag_verbose, EROSION);
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    chunkedExecutorGeodesic(geodesic_morph_binary_on_device<dtype>, ncopies, memoryOccupancy,
+                            hostImage, hostMask, hostOutput, xsize, ysize, zsize, flag_verbose,
+                            EROSION);
 
   } else {
     geodesic_morph_binary_on_host(hostImage, hostMask, hostOutput, xsize, ysize, zsize, EROSION);
@@ -241,10 +244,13 @@ template void geodesic_erosion_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, con
 template <typename dtype>
 void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                               const int ysize, const int zsize, const int flag_verbose, bool gpu) {
-  if (gpu) {
-    geodesic_morph_binary_on_device(hostImage, hostMask, hostOutput, xsize, ysize, zsize,
-                                    flag_verbose, DILATION);
 
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    chunkedExecutorGeodesic(geodesic_morph_binary_on_device<dtype>, ncopies, memoryOccupancy,
+                            hostImage, hostMask, hostOutput, xsize, ysize, zsize, flag_verbose,
+                            DILATION);
   } else {
     geodesic_morph_binary_on_host(hostImage, hostMask, hostOutput, xsize, ysize, zsize, DILATION);
   }

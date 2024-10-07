@@ -25,7 +25,7 @@ void reconstruction_binary(dtype* deviceMarker, dtype* deviceMask, dtype* device
   do {
     //Reconstruction step
     geodesic_morph_binary(deviceMarker, deviceMask, deviceOutput, xsize, ysize, zsize, flag_verbose,
-                          operation);
+                          0, 0, operation);
 
     //Check convergency
     cudaMemset(deviceFlagConverged, 1,

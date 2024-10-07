@@ -1,8 +1,10 @@
 #include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/morphology/bottom_hat.h"
+#include "../../../include/morphology/geodesic_morph_grayscale.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/operations_grayscale.h"
+#include "../../../include/morphology/reconstruction_grayscale.h"
 #include "../../../include/morphology/top_hat.h"
 
 /**
@@ -176,6 +178,99 @@ template void opening_grayscale<unsigned int>(unsigned int*, unsigned int*, cons
                                               const int, const int, int*, int, int, int, bool);
 template void opening_grayscale<float>(float*, float*, const int, const int, const int, const int,
                                        int*, int, int, int, bool);
+
+/**
+ * @brief Perform geodesic erosion operation on the entire image using the GPU. This function is
+ * meant to be called from host and slide the morph_grayscale kerel function through all pixels.
+ *
+ * @tparam dtype The data type of the image.
+ * @param hostImage Input image on the host (corresponds to the marker image).
+ * @param hostOutput Output image on the host.
+ * @param hostMask Mask image on the host.
+ * @param xsize Size of the image in the x-dimension.
+ * @param ysize Size of the image in the y-dimension.
+ * @param zsize Size of the image in the z-dimension.
+ * @param flag_verbose Verbose flag to print grid and block dimensions.
+ */
+template <typename dtype>
+void geodesic_erosion_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
+                                const int xsize, const int ysize, const int zsize,
+                                const int flag_verbose, bool gpu) {
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    chunkedExecutorGeodesic(geodesic_morph_grayscale_on_device<dtype>, ncopies, memoryOccupancy,
+                            hostImage, hostMask, hostOutput, xsize, ysize, zsize, flag_verbose,
+                            EROSION);
+
+  } else {
+    geodesic_morph_grayscale_on_host(hostImage, hostMask, hostOutput, xsize, ysize, zsize, EROSION);
+  }
+}
+template void geodesic_erosion_grayscale<int>(int*, int*, int*, const int, const int, const int,
+                                              const int, bool);
+template void geodesic_erosion_grayscale<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
+                                                       const int, const int, const int, const int,
+                                                       bool);
+template void geodesic_erosion_grayscale<float>(float*, float*, float*, const int, const int,
+                                                const int, const int, bool);
+
+/**
+ * @brief Perform geodesic dilation operation on the entire image using the GPU. This function is
+ * meant to be called from host and slide the morph_grayscale kerel function through all pixels.
+ *
+ * @tparam dtype The data type of the image.
+ * @param hostImage Input image on the host (corresponds to the marker image).
+ * @param hostOutput Output image on the host.
+ * @param hostMask Mask image on the host.
+ * @param xsize Size of the image in the x-dimension.
+ * @param ysize Size of the image in the y-dimension.
+ * @param zsize Size of the image in the z-dimension.
+ * @param flag_verbose Verbose flag to print grid and block dimensions.
+ */
+template <typename dtype>
+void geodesic_dilation_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
+                                 const int xsize, const int ysize, const int zsize,
+                                 const int flag_verbose, bool gpu) {
+  if (gpu) {
+    float memoryOccupancy = 0.9;
+    int ncopies = 3;
+    chunkedExecutorGeodesic(geodesic_morph_grayscale_on_device<dtype>, ncopies, memoryOccupancy,
+                            hostImage, hostMask, hostOutput, xsize, ysize, zsize, flag_verbose,
+                            DILATION);
+  } else {
+    geodesic_morph_grayscale_on_host(hostImage, hostMask, hostOutput, xsize, ysize, zsize,
+                                     DILATION);
+  }
+}
+template void geodesic_dilation_grayscale<int>(int*, int*, int*, const int, const int, const int,
+                                               const int, bool);
+template void geodesic_dilation_grayscale<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
+                                                        const int, const int, const int, const int,
+                                                        bool);
+template void geodesic_dilation_grayscale<float>(float*, float*, float*, const int, const int,
+                                                 const int, const int, bool);
+
+template <typename dtype>
+void reconstruction_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
+                              const int ysize, const int zsize, const int flag_verbose,
+                              MorphOp operation, bool gpu) {
+
+  if (gpu) {
+    reconstruction_grayscale_on_device(hostImage, hostMask, hostOutput, xsize, ysize, zsize,
+                                       operation, flag_verbose);
+  } else {
+    reconstruction_grayscale_on_host(hostImage, hostMask, hostOutput, xsize, ysize, zsize,
+                                     operation);
+  }
+}
+template void reconstruction_grayscale<int>(int*, int*, int*, const int, const int, const int,
+                                            const int, MorphOp, bool);
+template void reconstruction_grayscale<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
+                                                     const int, const int, const int, const int,
+                                                     MorphOp, bool);
+template void reconstruction_grayscale<float>(float*, float*, float*, const int, const int,
+                                              const int, const int, MorphOp, bool);
 
 template <typename dtype>
 void bottom_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,

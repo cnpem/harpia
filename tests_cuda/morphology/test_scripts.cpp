@@ -150,7 +150,7 @@ int test_operations_on_device() {
   test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
                             flag_verbose);
 
-  // // Grayscale operations
+  // Grayscale operations
 
   test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
                                  kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,

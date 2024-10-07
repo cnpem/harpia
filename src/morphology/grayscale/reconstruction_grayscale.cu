@@ -25,7 +25,7 @@ void reconstruction_grayscale(dtype* deviceMarker, dtype* deviceMask, dtype* dev
   do {
     //Reconstruction step
     geodesic_morph_grayscale(deviceMarker, deviceMask, deviceOutput, xsize, ysize, zsize,
-                             flag_verbose, operation);
+                             flag_verbose, 0, 0, operation);
 
     //Check convergency
     cudaMemset(deviceFlagConverged, 1,
