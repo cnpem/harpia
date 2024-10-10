@@ -16,14 +16,25 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   int sliceSize = xsize * ysize;
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
-  // Get free memory on the GPU in bytes
-  size_t freeBytes, totalBytes;
+  // Get available devices
+  int ngpus;
+  CHECK(cudaGetDeviceCount(&ngpus));
+
+  // Get free memory on the GPU with less memory in bytes
+  size_t freeBytes, totalBytes, freeGpuBytes;
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
+
+  for (int i = 1; i < ngpus; i++) {
+    CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
+    if (freeGpuBytes < freeBytes) {
+      freeBytes = freeGpuBytes;
+    }
+  }
 
   // How many slices fit in the GPU?
   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
   if (verbose) {
-    printf("MaxChunkSize:%d zsize:%d\n", chunkSize, zsize);
+    printf("MaxChunkSize:%d zsize:%d ngpus:%d\n", chunkSize, zsize, ngpus);
   }
 
   if (chunkSize == 0) {
@@ -39,25 +50,30 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   }
 
   int iz = 0;
+  int deviceCount = 0;
+  int selectedDevice;
   for (; iz <= zsize - chunkSize; iz += chunkSize) {
+    selectedDevice = deviceCount % ngpus;
+    CHECK(cudaSetDevice(selectedDevice));
     if (verbose) {
-      printf("\niz:%d \n", iz);
+      printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
     i_ref += chunkSize * sliceSize;
     o_ref += chunkSize * sliceSize;
+    deviceCount += 1;
   }
 
   // Process the remaining slices, if any
   int remaining = zsize - iz;
   if (verbose) {
-    printf("\nremaining:%d \n", remaining);
+    printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
   if (remaining > 0) {
     func(i_ref, o_ref, xsize, ysize, remaining, verbose, args...);
   }
   if (verbose) {
-    printf("\nfineshed!\n");
+    printf("\nFinished processing all chunks!\n");
   }
 }
 
@@ -76,9 +92,20 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
   int sliceSize = xsize * ysize;
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
-  // Get free memory on the GPU in bytes
-  size_t freeBytes, totalBytes;
+  // Get available devices
+  int ngpus;
+  CHECK(cudaGetDeviceCount(&ngpus));
+
+  // Get free memory on the GPU with less memory in bytes
+  size_t freeBytes, totalBytes, freeGpuBytes;
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
+
+  for (int i = 1; i < ngpus; i++) {
+    CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
+    if (freeGpuBytes < freeBytes) {
+      freeBytes = freeGpuBytes;
+    }
+  }
 
   // How many slices fit in the GPU?
   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
@@ -110,12 +137,18 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
     chunkSize = (chunkSize - 2 * padding > 1) ? chunkSize - 2 * padding : 1;
   }
   if (verbose) {
-    printf("MaxChunkSize:%d zsize:%d\n", chunkSize, zsize);
+    printf("MaxChunkSize:%d zsize:%d ngpus:%d\n", chunkSize, zsize, ngpus);
   }
 
   // CASE: break input into chunks (padding)
 
   // First chunk: padding only at the end
+  int deviceCount = 0;
+  int selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
+  if (verbose) {
+    printf("\niz:0 gpu:%d deviceCount:%d\n", selectedDevice, deviceCount);
+  }
   padding_bottom = 0;
   padding_top = padding;
 
@@ -123,24 +156,34 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
        kernel_xsize, kernel_ysize, kernel_zsize, args...);
   i_ref += chunkSize * sliceSize;
   o_ref += chunkSize * sliceSize;
+  deviceCount += 1;
 
   // Middle chunks: padding at the beginning and at the end
   padding_bottom = padding;
   int iz = 0;
   for (iz = chunkSize; iz <= zsize - chunkSize; iz += chunkSize) {
+    selectedDevice = deviceCount % ngpus;
+    CHECK(cudaSetDevice(selectedDevice));
+    if (verbose) {
+      printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
+    }
     int remaining = zsize - iz - chunkSize;  // Check if this is the last chunk
     if (remaining <= 0) {
-      // Possible last chunk: padding only at the begining
+      // Last chunk: padding only at the begining
       padding_top = 0;
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
          kernel_xsize, kernel_ysize, kernel_zsize, args...);
     i_ref += chunkSize * sliceSize;  // Move to the next chunk
     o_ref += chunkSize * sliceSize;
+    deviceCount += 1;
   }
 
   // Last chunk: padding only at the begining
   int remaining = zsize - iz;
+  if (verbose) {
+    printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
+  }
   if (remaining > 0) {
     padding_top = 0;
     func(i_ref, o_ref, xsize, ysize, remaining, verbose, padding_bottom, padding_top, kernel,
@@ -167,9 +210,20 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   int sliceSize = xsize * ysize;
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
-  // Get free memory on the GPU in bytes
-  size_t freeBytes, totalBytes;
+  // Get available devices
+  int ngpus;
+  CHECK(cudaGetDeviceCount(&ngpus));
+
+  // Get free memory on the GPU with less memory in bytes
+  size_t freeBytes, totalBytes, freeGpuBytes;
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
+
+  for (int i = 1; i < ngpus; i++) {
+    CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
+    if (freeGpuBytes < freeBytes) {
+      freeBytes = freeGpuBytes;
+    }
+  }
 
   // How many slices fit in the GPU?
   if (safetyMargin > 1 || safetyMargin < 0) {
@@ -206,12 +260,18 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
     chunkSize = (chunkSize - 2 * padding > 1) ? chunkSize - 2 * padding : 1;
   }
   if (verbose) {
-    printf("MaxChunkSize:%d zsize:%d\n", chunkSize, zsize);
+    printf("MaxChunkSize:%d zsize:%d ngpus:%d\n", chunkSize, zsize, ngpus);
   }
 
   // CASE: break input into chunks (padding)
 
   // First chunk: padding only at the end
+  int deviceCount = 0;
+  int selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
+  if (verbose) {
+    printf("\niz:0 gpu:%d deviceCount:%d\n", selectedDevice, deviceCount);
+  }
   padding_bottom = 0;
   padding_top = padding;
 
@@ -219,11 +279,17 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   i_ref += chunkSize * sliceSize;
   m_ref += chunkSize * sliceSize;
   o_ref += chunkSize * sliceSize;
+  deviceCount += 1;
 
   // Middle chunks: padding at the beginning and at the end
   padding_bottom = padding;
   int iz = 0;
   for (iz = chunkSize; iz <= zsize - chunkSize; iz += chunkSize) {
+    selectedDevice = deviceCount % ngpus;
+    CHECK(cudaSetDevice(selectedDevice));
+    if (verbose) {
+      printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
+    }
     int remaining = zsize - iz - chunkSize;  // Check if this is the last chunk
     if (remaining <= 0) {
       // Possible last chunk: padding only at the begining
@@ -234,10 +300,14 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
     i_ref += chunkSize * sliceSize;  // Move to the next chunk
     m_ref += chunkSize * sliceSize;  // Move to the next chunk
     o_ref += chunkSize * sliceSize;
+    deviceCount += 1;
   }
 
   // Last chunk: padding only at the begining
   int remaining = zsize - iz;
+  if (verbose) {
+    printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
+  }
   if (remaining > 0) {
     padding_top = 0;
     func(i_ref, m_ref, o_ref, xsize, ysize, remaining, verbose, padding_bottom, padding_top,
