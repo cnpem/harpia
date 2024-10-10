@@ -53,20 +53,24 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
   read_input(hostMask, filename, size, flag_verbose);
 
   //create marker image
-  int* kernel_marker;
-  kernel_marker = (int*)malloc(sizeof(int) * 27);
+  int* kernel;
+  kernel = (int*)malloc(sizeof(int) * 27);
 
+  int ncopies = 2;
+  int flag_chain = 0;
   if (operation == EROSION) {
-    get_structuring_element_3D(kernel_marker, 3, 3, 3);
-    morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel_marker, 3, 3, 3,
-                            DILATION);
+    get_structuring_element_3D(kernel, 3, 3, 3);
+    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, flag_chain,
+                          hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
+                          DILATION);
   } else {
-    horizontal_line_kernel(kernel_marker);
-    morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel_marker, 3, 3, 3,
-                            EROSION);
+    horizontal_line_kernel(kernel);
+    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, flag_chain,
+                          hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
+                          EROSION);
   }
 
-  int ncopies = 3;
+  ncopies = 3;
   chunkedExecutorGeodesic(geodesic_morph_grayscale_on_device<float>, ncopies, memoryOccupancy,
                           hostMarker, hostMask, device_ref, xsize, ysize, zsize, flag_verbose,
                           operation);
@@ -84,7 +88,7 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
   free(hostMarker);
   free(hostMask);
   free(device_ref);
-  free(kernel_marker);
+  free(kernel);
 }
 
 /**
@@ -129,17 +133,15 @@ void test_geodesic_morph_grayscale_on_host(const std::string& filename, const in
   read_input(hostMask, filename, size, flag_verbose);
 
   //create marker image
-  int* kernel_marker;
-  kernel_marker = (int*)malloc(sizeof(int) * 27);
+  int* kernel;
+  kernel = (int*)malloc(sizeof(int) * 27);
 
   if (operation == EROSION) {
-    get_structuring_element_3D(kernel_marker, 3, 3, 3);
-    morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel_marker, 3, 3, 3,
-                            DILATION);
+    get_structuring_element_3D(kernel, 3, 3, 3);
+    morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel, 3, 3, 3, DILATION);
   } else {
-    horizontal_line_kernel(kernel_marker);
-    morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel_marker, 3, 3, 3,
-                            EROSION);
+    horizontal_line_kernel(kernel);
+    morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel, 3, 3, 3, EROSION);
   }
 
   int ncopies = 3;
@@ -154,5 +156,5 @@ void test_geodesic_morph_grayscale_on_host(const std::string& filename, const in
   free(hostMarker);
   free(hostMask);
   free(host_ref);
-  free(kernel_marker);
+  free(kernel);
 }
