@@ -220,7 +220,7 @@ int test_chunked_executer() {
 
   int xsize = 600;
   int ysize = 1520;
-  int zsize = 250;
+  int zsize = 1520;
 
   int kernel_xsize = 3;
   int kernel_ysize = 3;
@@ -238,7 +238,7 @@ int test_chunked_executer() {
   MorphChain closing = {DILATION, EROSION};
   MorphChain opening = {EROSION, DILATION};
 
-  float memoryOccupancy = 0.1f;
+  float memoryOccupancy = 0.01f;
 
   // Check with host implementation
   printf("\nCompare chunked operations on device with host results in 3D\n");

@@ -66,6 +66,8 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
 
   // Process the remaining slices, if any
   int remaining = zsize - iz;
+  selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
   if (verbose) {
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
@@ -181,6 +183,8 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
 
   // Last chunk: padding only at the begining
   int remaining = zsize - iz;
+  selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
   if (verbose) {
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
@@ -305,6 +309,8 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
 
   // Last chunk: padding only at the begining
   int remaining = zsize - iz;
+  selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
   if (verbose) {
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
