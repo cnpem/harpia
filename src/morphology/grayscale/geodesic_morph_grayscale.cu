@@ -30,12 +30,9 @@ CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtyp
                                                  int kernel_xsize, int kernel_ysize,
                                                  int kernel_zsize, MorphOp operation) {
   dtype* im = image;
-  dtype aux;
-  if (operation == EROSION) {
-    aux = 1;  //erosion operation
-  } else {
-    aux = 0;  //dilation operation
-  }
+
+  // Initialize auxiliary value with the central pixel
+  dtype aux = im[centerIdz * xsize * ysize + centerIdy * xsize + centerIdx];
 
   int startIdx = centerIdx - kernel_xsize / 2;
   int startIdy = centerIdy - kernel_ysize / 2;
@@ -122,8 +119,8 @@ __global__ void geodesic_morph_grayscale_kernel(dtype* deviceImage, dtype* devic
   int idz = threadIdx.z + blockIdx.z * blockDim.z;
 
   if (idx < xsize && idy < ysize && idz < zsize) {
-    geodesic_morph_grayscale_pixel(deviceImage, deviceMask, deviceOutput, xsize, ysize, zsize, idx,
-                                   padding_bottom, padding_top, idy, idz, kernel_xsize,
+    geodesic_morph_grayscale_pixel(deviceImage, deviceMask, deviceOutput, xsize, ysize, zsize,
+                                   padding_bottom, padding_top, idx, idy, idz, kernel_xsize,
                                    kernel_ysize, kernel_zsize, operation);
   }
 }
@@ -135,7 +132,7 @@ template __global__ void geodesic_morph_grayscale_kernel<unsigned int>(unsigned 
                                                                        const int, const int,
                                                                        const int, const int, int,
                                                                        int, int, MorphOp);
-//template __global__ void geodesic_morph_grayscale_kernel<uint16_t>(uint16_t *, /uint16_t *,uint16_t *,
+// template __global__ void geodesic_morph_grayscale_kernel<uint16_t>(uint16_t *, /uint16_t *,uint16_t *,
 // int, int, int, const int, const int, const int, const int, const int, MorphOp);
 template __global__ void geodesic_morph_grayscale_kernel<float>(float*, float*, float*, const int,
                                                                 const int, const int, const int,

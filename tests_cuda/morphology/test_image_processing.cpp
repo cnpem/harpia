@@ -22,17 +22,24 @@ void show_image_2D(dtype* hostImage, const int xsize, const int ysize, const std
 
   // Find the maximum value in the image for normalization
   // max is set for at least 1 to avoid floating point exception
-  int max = 1;
-  for (int i = 0; i < size; i++) {
+  dtype max = hostImage[0];
+  dtype min = hostImage[0];
+  for (int i = 1; i < size; i++) {
     if (hostImage[i] > max) {
       max = hostImage[i];
+    } else if (hostImage[i] < min) {
+      min = hostImage[i];
     }
+  }
+
+  if ((max - min) == 0) {
+    max += 1;  //avoid zero division
   }
 
   // Normalize the image data to range [0, 255] and convert to uint8_t
   uint8_t* data = new uint8_t[size];
   for (int i = 0; i < size; ++i) {
-    data[i] = static_cast<uint8_t>(hostImage[i] * 255 / max);
+    data[i] = static_cast<uint8_t>((hostImage[i] - min) * 255 / (max - min));
   }
 
   // Create a cv::Mat object for OpenCV

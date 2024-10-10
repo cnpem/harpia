@@ -63,10 +63,6 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
     morph_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
                          kernel_zsize, operation);
     check_result(host_ref, device_ref, xsize, ysize, zsize);
-    show_image_3D(host_A, xsize, ysize, 3, "Input");
-    show_image_3D(host_ref, xsize, ysize, 3, "Host");
-    show_image_3D(device_ref, xsize, ysize, 3, "Device");
-    cv::waitKey(0);
     free(host_ref);
   }
 

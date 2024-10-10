@@ -4,6 +4,8 @@
 #include "../../include/tests/morphology/test_bottom_hat.h"
 #include "../../include/tests/morphology/test_complement_binary.h"
 #include "../../include/tests/morphology/test_fill_holes.h"
+#include "../../include/tests/morphology/test_geodesic_morph_binary.h"
+#include "../../include/tests/morphology/test_geodesic_morph_grayscale.h"
 #include "../../include/tests/morphology/test_image_processing.h"
 #include "../../include/tests/morphology/test_morph_binary.h"
 #include "../../include/tests/morphology/test_morph_binary_pinned.h"
@@ -49,6 +51,7 @@ int test_operations_on_host() {
   // Check with opencv
   printf("\nCompare operations on host results with OpenCV in 2D\n");
 
+  //Binary
   test_morph_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, EROSION, flag_show,
                             flag_check, flag_verbose);
 
@@ -61,6 +64,7 @@ int test_operations_on_host() {
   test_morph_chain_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, opening, flag_show,
                                   flag_check, flag_verbose);
 
+  //Grayscale
   test_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, EROSION, flag_show,
                                flag_check, flag_verbose);
 
@@ -85,6 +89,16 @@ int test_operations_on_host() {
   // Visual tests
   printf("\nVisualy evaluate operations on host in 2D\n");
 
+  test_geodesic_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, EROSION, flag_verbose);
+
+  test_geodesic_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, DILATION, flag_verbose);
+
+  test_top_hat_avizo_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, flag_verbose);
+
+  test_geodesic_morph_binary_on_host(filenameBinary, 355, 321, 1, EROSION, flag_verbose);
+
+  test_geodesic_morph_binary_on_host(filenameBinary, 355, 321, 1, DILATION, flag_verbose);
+
   test_complement_binary_on_host(filenameBinary, 355, 321, 1, flag_verbose);
 
   filenameBinary = "./example_images/binary/eagle_275x183x1_16b.raw";
@@ -103,7 +117,7 @@ int test_operations_on_device() {
 
   int xsize = 600;
   int ysize = 1520;
-  int zsize = 30;
+  int zsize = 5;
 
   int kernel_xsize = 3;
   int kernel_ysize = 3;
@@ -136,6 +150,12 @@ int test_operations_on_device() {
                               kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
                               flag_verbose);
 
+  test_geodesic_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, EROSION,
+                                       memoryOccupancy, flag_check, flag_verbose);
+
+  test_geodesic_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, DILATION,
+                                       memoryOccupancy, flag_check, flag_verbose);
+
   test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
                                     kernel_ysize, kernel_zsize, closing, memoryOccupancy,
                                     flag_check, flag_verbose);
@@ -160,6 +180,12 @@ int test_operations_on_device() {
                                  kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
                                  flag_verbose);
 
+  test_geodesic_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, EROSION,
+                                          memoryOccupancy, flag_check, flag_verbose);
+
+  test_geodesic_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, DILATION,
+                                          memoryOccupancy, flag_check, flag_verbose);
+
   test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
                                        kernel_ysize, kernel_zsize, closing, memoryOccupancy,
                                        flag_check, flag_verbose);
@@ -176,6 +202,9 @@ int test_operations_on_device() {
 
   test_bottom_hat_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
                             kernel_ysize, kernel_zsize, memoryOccupancy, flag_check, flag_verbose);
+
+  test_top_hat_avizo_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, flag_check, flag_verbose);
 
   free(kernel);
 
@@ -214,8 +243,6 @@ int test_chunked_executer() {
   // Check with host implementation
   printf("\nCompare chunked operations on device with host results in 3D\n");
 
-  // Binary operations
-
   test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
                               kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
                               flag_verbose);
@@ -223,6 +250,12 @@ int test_chunked_executer() {
   test_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
                               kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
                               flag_verbose);
+
+  test_geodesic_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, EROSION,
+                                       memoryOccupancy, flag_check, flag_verbose);
+
+  test_geodesic_morph_binary_on_device(filenameBinary, xsize, ysize, zsize, DILATION,
+                                       memoryOccupancy, flag_check, flag_verbose);
 
   test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
                                     kernel_ysize, kernel_zsize, closing, memoryOccupancy,
@@ -235,10 +268,7 @@ int test_chunked_executer() {
   test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
                                    flag_verbose);
 
-  // test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
-  //                           flag_verbose);
-
-  // // Grayscale operations
+  // Grayscale operations
 
   test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
                                  kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,
@@ -247,6 +277,12 @@ int test_chunked_executer() {
   test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
                                  kernel_ysize, kernel_zsize, DILATION, memoryOccupancy, flag_check,
                                  flag_verbose);
+
+  test_geodesic_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, EROSION,
+                                          memoryOccupancy, flag_check, flag_verbose);
+
+  test_geodesic_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, DILATION,
+                                          memoryOccupancy, flag_check, flag_verbose);
 
   test_morph_chain_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
                                        kernel_ysize, kernel_zsize, closing, memoryOccupancy,

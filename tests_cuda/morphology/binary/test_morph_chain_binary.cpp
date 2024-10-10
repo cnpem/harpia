@@ -53,7 +53,6 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
 
   // Read input data from file
   read_input(host_A, filename, size, flag_verbose);
-  show_image_3D(host_A, xsize, ysize, 5, "Input");
 
   int ncopies = 3;
   int flag_chain = 1;
@@ -66,14 +65,10 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
     host_ref = (int*)malloc(nBytes);
     memset(host_ref, 0, nBytes);
 
-    // Apply morphological chain operations on the host (CPU) for comparison
     morph_chain_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
                                kernel_ysize, kernel_zsize, chain);
-    show_image_3D(host_ref, xsize, ysize, 5, "Host");
-    show_image_3D(device_ref, xsize, ysize, 5, "Device");
-    cv::waitKey(0);
-    // Check results for correctness
     check_result(host_ref, device_ref, xsize, ysize, zsize);
+
     free(host_ref);
   }
 

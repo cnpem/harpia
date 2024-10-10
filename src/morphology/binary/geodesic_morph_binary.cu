@@ -190,7 +190,7 @@ void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceO
   geodesic_morph_binary_kernel<<<grid, block>>>(deviceImage, deviceMask, deviceOutput, xsize, ysize,
                                                 zsize, padding_bottom, padding_top, kernel_xsize,
                                                 kernel_ysize, kernel_zsize, operation);
-  cudaDeviceSynchronize();  //assures all gpu threads are fineshed
+  CHECK(cudaDeviceSynchronize());  //assures all gpu threads are fineshed
 }
 template void geodesic_morph_binary<int>(int*, int*, int*, const int, const int, const int,
                                          const int, const int, const int, MorphOp);

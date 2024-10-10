@@ -180,6 +180,7 @@ void top_hat_aviso_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
   // Opening operation: erosion followed by dilation
   morph_grayscale(deviceImage, deviceAux, xsize, ysize, zsize, flag_verbose, 0, 0, deviceKernel,
                   kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
+
   morph_grayscale(deviceAux, deviceTmp, xsize, ysize, zsize, flag_verbose, 0, 0, deviceKernel,
                   kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
 
