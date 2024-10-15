@@ -44,6 +44,7 @@ void top_hat_reconstruction_on_device(dtype* hostImage, dtype* hostOutput, const
   morph_grayscale(deviceAux, deviceTmp, xsize, ysize, zsize, flag_verbose, 0, 0, deviceKernel,
                   kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
 
+  // Opening by reconstruction with opening as the marker image
   reconstruction_grayscale(deviceTmp, deviceImage, deviceAux, xsize, ysize, zsize, DILATION,
                            flag_verbose);
 

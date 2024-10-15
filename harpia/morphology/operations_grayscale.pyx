@@ -38,6 +38,9 @@ cdef extern from "../../include/morphology/operations_grayscale.h":
                                    bool)
     void _top_hat_reconstruction "top_hat_reconstruction"[dtype](dtype*, dtype*, int, int, int, int, 
                                                                  int*, int, int, int, bool)
+    void _bottom_hat_reconstruction "bottom_hat_reconstruction"[dtype](dtype*, dtype*, int, int, 
+                                                                       int, int, int*, int, int, 
+                                                                       int, bool)
 
 def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
@@ -189,5 +192,19 @@ def top_hat_reconstruction(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] 
 
     _top_hat_reconstruction(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
              &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
+
+    return hostOutput
+
+def bottom_hat_reconstruction(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
+                              numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
+                              bool gpu = True):
+    isize = Size(hostImage)
+    ksize = Size(kernel)
+    
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
+
+    _bottom_hat_reconstruction(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
+                               verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
 
     return hostOutput

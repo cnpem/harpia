@@ -2,6 +2,7 @@
 #include "../../include/morphology/morphology.h"
 #include "../../include/morphology/structuring_elements.h"
 #include "../../include/tests/morphology/test_bottom_hat.h"
+#include "../../include/tests/morphology/test_bottom_hat_reconstruction.h"
 #include "../../include/tests/morphology/test_complement_binary.h"
 #include "../../include/tests/morphology/test_fill_holes.h"
 #include "../../include/tests/morphology/test_geodesic_morph_binary.h"
@@ -93,6 +94,9 @@ int test_operations_on_host() {
 
   test_top_hat_reconstruction_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1,
                                       flag_verbose);
+
+  test_bottom_hat_reconstruction_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1,
+                                         flag_verbose);
 
   test_geodesic_morph_binary_on_host(filenameBinary, 355, 321, 1, EROSION, flag_verbose);
 
@@ -205,6 +209,10 @@ int test_operations_on_device() {
   test_top_hat_reconstruction_on_device(filenameGrayscale, xsize, ysize, zsize, kernel,
                                         kernel_xsize, kernel_ysize, kernel_zsize, flag_check,
                                         flag_verbose);
+
+  test_bottom_hat_reconstruction_on_device(filenameGrayscale, xsize, ysize, zsize, kernel,
+                                           kernel_xsize, kernel_ysize, kernel_zsize, flag_check,
+                                           flag_verbose);
 
   free(kernel);
 

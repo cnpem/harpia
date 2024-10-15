@@ -1,5 +1,6 @@
 #include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/morphology/bottom_hat.h"
+#include "../../../include/morphology/bottom_hat_reconstruction.h"
 #include "../../../include/morphology/geodesic_morph_grayscale.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/morph_grayscale.h"
@@ -339,3 +340,25 @@ template void top_hat_reconstruction<unsigned int>(unsigned int*, unsigned int*,
                                                    int, bool);
 template void top_hat_reconstruction<float>(float*, float*, const int, const int, const int,
                                             const int, int*, int, int, int, bool);
+
+template <typename dtype>
+void bottom_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize,
+                               const int ysize, const int zsize, const int flag_verbose,
+                               int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
+                               bool gpu) {
+
+  if (gpu) {
+    bottom_hat_reconstruction_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose,
+                                        kernel, kernel_xsize, kernel_ysize, kernel_zsize);
+  } else {
+    bottom_hat_reconstruction_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel,
+                                      kernel_xsize, kernel_ysize, kernel_zsize);
+  }
+}
+template void bottom_hat_reconstruction<int>(int*, int*, const int, const int, const int, const int,
+                                             int*, int, int, int, bool);
+template void bottom_hat_reconstruction<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                      const int, const int, const int, int*, int,
+                                                      int, int, bool);
+template void bottom_hat_reconstruction<float>(float*, float*, const int, const int, const int,
+                                               const int, int*, int, int, int, bool);
