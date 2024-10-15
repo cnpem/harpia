@@ -69,12 +69,10 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           EROSION);
   }
-
   ncopies = 3;
   chunkedExecutorGeodesic(geodesic_morph_grayscale_on_device<float>, ncopies, memoryOccupancy,
                           hostMarker, hostMask, device_ref, xsize, ysize, zsize, flag_verbose,
                           operation);
-
   if (flag_check) {
     float* host_ref;
     host_ref = (float*)malloc(nBytes);

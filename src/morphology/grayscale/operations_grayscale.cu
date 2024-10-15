@@ -6,6 +6,7 @@
 #include "../../../include/morphology/operations_grayscale.h"
 #include "../../../include/morphology/reconstruction_grayscale.h"
 #include "../../../include/morphology/top_hat.h"
+#include "../../../include/morphology/top_hat_reconstruction.h"
 
 /**
  * @brief Perform erosion operation on a grayscale image.
@@ -317,3 +318,24 @@ template void top_hat<unsigned int>(unsigned int*, unsigned int*, const int, con
                                     const int, int*, int, int, int, float, bool);
 template void top_hat<float>(float*, float*, const int, const int, const int, const int, int*, int,
                              int, int, float, bool);
+
+template <typename dtype>
+void top_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                            const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                            int kernel_ysize, int kernel_zsize, bool gpu) {
+
+  if (gpu) {
+    top_hat_reconstruction_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose,
+                                     kernel, kernel_xsize, kernel_ysize, kernel_zsize);
+  } else {
+    top_hat_reconstruction_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                                   kernel_ysize, kernel_zsize);
+  }
+}
+template void top_hat_reconstruction<int>(int*, int*, const int, const int, const int, const int,
+                                          int*, int, int, int, bool);
+template void top_hat_reconstruction<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                   const int, const int, const int, int*, int, int,
+                                                   int, bool);
+template void top_hat_reconstruction<float>(float*, float*, const int, const int, const int,
+                                            const int, int*, int, int, int, bool);
