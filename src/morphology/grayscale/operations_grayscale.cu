@@ -31,8 +31,8 @@ void erosion_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
                        int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu) {
   if (gpu) {
     int ncopies = 2;
-    int flag_chain = 0;
-    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 1;
+    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
   }
@@ -73,8 +73,8 @@ void dilation_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, co
 
   if (gpu) {
     int ncopies = 2;
-    int flag_chain = 0;
-    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 1;
+    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
   }
@@ -118,8 +118,8 @@ void closing_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 2;
+    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, closing);
 
@@ -163,8 +163,8 @@ void opening_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 2;
+    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, opening);
   } else {
@@ -279,8 +279,8 @@ void bottom_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int 
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(bottom_hat_on_device<dtype>, ncopies, gpuMemory, flag_chain, hostImage,
+    int operations = 2;
+    chunkedExecutorKernel(bottom_hat_on_device<dtype>, ncopies, gpuMemory, operations, hostImage,
                           hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize);
   } else {
@@ -303,8 +303,8 @@ void top_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysi
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(top_hat_on_device<dtype>, ncopies, gpuMemory, flag_chain, hostImage,
+    int operations = 2;
+    chunkedExecutorKernel(top_hat_on_device<dtype>, ncopies, gpuMemory, operations, hostImage,
                           hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize);
   } else {

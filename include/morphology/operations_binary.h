@@ -24,6 +24,11 @@ void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
                     int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
 
 template <typename dtype>
+void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                   const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                   int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+
+template <typename dtype>
 void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                              const int ysize, const int zsize, const int flag_verbose,
                              float gpuMemory, bool gpu);

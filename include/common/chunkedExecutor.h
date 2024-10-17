@@ -10,10 +10,10 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
                      Args... args);
 
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, const int flag_chain,
-                           dtype* image, dtype* output, const int xsize, const int ysize,
-                           const int zsize, const int verbose, int* kernel, int kernel_xsize,
-                           int kernel_ysize, int kernel_zsize, Args... args);
+void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
+                           const int kernelOperations, dtype* image, dtype* output, const int xsize,
+                           const int ysize, const int zsize, const int verbose, int* kernel,
+                           int kernel_xsize, int kernel_ysize, int kernel_zsize, Args... args);
 
 template <typename Func, typename dtype, typename... Args>
 void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const int flag_chain,

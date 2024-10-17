@@ -57,15 +57,15 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
   kernel = (int*)malloc(sizeof(int) * 27);
 
   int ncopies = 2;
-  int flag_chain = 0;
+  int operations = 1;
   if (operation == EROSION) {
     get_structuring_element_3D(kernel, 3, 3, 3);
-    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, flag_chain,
+    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           DILATION);
   } else {
     horizontal_line_kernel(kernel);
-    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, flag_chain,
+    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           EROSION);
   }

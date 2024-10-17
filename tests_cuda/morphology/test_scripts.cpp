@@ -14,6 +14,7 @@
 #include "../../include/tests/morphology/test_morph_chain_grayscale.h"
 #include "../../include/tests/morphology/test_morph_grayscale.h"
 #include "../../include/tests/morphology/test_morph_grayscale_pinned.h"
+#include "../../include/tests/morphology/test_smooth_binary.h"
 #include "../../include/tests/morphology/test_subtraction.h"
 #include "../../include/tests/morphology/test_top_hat.h"
 #include "../../include/tests/morphology/test_top_hat_reconstruction.h"
@@ -62,6 +63,9 @@ int test_operations_on_host() {
 
   test_morph_chain_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, opening, flag_show,
                                   flag_check, flag_verbose);
+
+  test_smooth_binary_on_host(filenameBinary, 355, 321, 1, kernel, 5, 5, 1, flag_show, flag_check,
+                             flag_verbose);
 
   //Grayscale
   test_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1, EROSION, flag_show,
@@ -167,6 +171,10 @@ int test_operations_on_device() {
                                     kernel_ysize, kernel_zsize, opening, memoryOccupancy,
                                     flag_check, flag_verbose);
 
+  test_smooth_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, memoryOccupancy, flag_check,
+                               flag_verbose);
+
   test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
                                    flag_verbose);
 
@@ -228,7 +236,7 @@ int test_chunked_executer() {
 
   int xsize = 600;
   int ysize = 1520;
-  int zsize = 1520;
+  int zsize = 100;
 
   int kernel_xsize = 3;
   int kernel_ysize = 3;
@@ -240,13 +248,13 @@ int test_chunked_executer() {
                         kernel_zsize);  // Size to fit the horizontal line kernels 3x3x3
   get_structuring_element_3D(kernel, kernel_xsize, kernel_ysize, kernel_zsize);
 
-  int flag_check = 0;    // Whether to compare with host (Deactivate for Huge zsize values!!!)
+  int flag_check = 1;    // Whether to compare with host (Deactivate for Huge zsize values!!!)
   int flag_verbose = 1;  // Whether to print status messages
 
   MorphChain closing = {DILATION, EROSION};
   MorphChain opening = {EROSION, DILATION};
 
-  float memoryOccupancy = 0.9f;
+  float memoryOccupancy = 0.1f;
 
   // Check with host implementation
   printf("\nCompare chunked operations on device with host results in 3D\n");
@@ -274,6 +282,10 @@ int test_chunked_executer() {
   test_morph_chain_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
                                     kernel_ysize, kernel_zsize, opening, memoryOccupancy,
                                     flag_check, flag_verbose);
+
+  test_smooth_binary_on_device(filenameBinary, xsize, ysize, zsize, kernel, kernel_xsize,
+                               kernel_ysize, kernel_zsize, memoryOccupancy, flag_check,
+                               flag_verbose);
 
   test_morph_grayscale_on_device(filenameGrayscale, xsize, ysize, zsize, kernel, kernel_xsize,
                                  kernel_ysize, kernel_zsize, EROSION, memoryOccupancy, flag_check,

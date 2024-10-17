@@ -34,8 +34,8 @@ void test_morph_grayscale_on_device(const std::string& filename, const int xsize
   read_input(host_A, filename, size, flag_verbose);
 
   int ncopies = 2;
-  int flag_chain = 0;
-  chunkedExecutorKernel(morph_grayscale_on_device<int>, ncopies, memoryOccupancy, flag_chain,
+  int operations = 1;
+  chunkedExecutorKernel(morph_grayscale_on_device<int>, ncopies, memoryOccupancy, operations,
                         host_A, device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                         kernel_ysize, kernel_zsize, operation);
 

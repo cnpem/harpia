@@ -57,15 +57,15 @@ void test_geodesic_morph_binary_on_device(const std::string& filename, const int
   kernel = (int*)malloc(sizeof(int) * 27);
 
   int ncopies = 2;
-  int flag_chain = 0;
+  int operations = 1;
   if (operation == EROSION) {
     get_structuring_element_3D(kernel, 3, 3, 3);
-    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, flag_chain,
+    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           DILATION);
   } else {
     horizontal_line_kernel(kernel);
-    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, flag_chain,
+    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           EROSION);
   }
