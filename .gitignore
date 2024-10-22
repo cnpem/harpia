@@ -20,3 +20,7 @@ dist/
 #ignore cyhton generated fiels (be cafeful with c++/cuda test files, they can be ignored also)
 #**.cpp
 ignore/
+
+#ignore jupyter notebook files
+#.ipynb_checkpoints/
+
