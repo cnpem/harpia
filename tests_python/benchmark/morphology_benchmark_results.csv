@@ -1,0 +1,6 @@
+Operation,Module Time (s),Scikit-Image Time (s),Accuracy
+erosion_binary,0.49057594407349825,3.0531281158328056,False
+dilation_binary,0.49664886202663183,13.273285688832402,False
+closing_binary,0.522771785967052,15.78661778010428,False
+opening_binary,0.5246370136737823,15.20734757417813,False
+smooth_binary,0.5891403392888606,N/A,N/A
