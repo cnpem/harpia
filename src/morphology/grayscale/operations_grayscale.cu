@@ -1,11 +1,13 @@
 #include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/morphology/bottom_hat.h"
+#include "../../../include/morphology/bottom_hat_reconstruction.h"
 #include "../../../include/morphology/geodesic_morph_grayscale.h"
 #include "../../../include/morphology/morph_chain_grayscale.h"
 #include "../../../include/morphology/morph_grayscale.h"
 #include "../../../include/morphology/operations_grayscale.h"
 #include "../../../include/morphology/reconstruction_grayscale.h"
 #include "../../../include/morphology/top_hat.h"
+#include "../../../include/morphology/top_hat_reconstruction.h"
 
 /**
  * @brief Perform erosion operation on a grayscale image.
@@ -29,8 +31,8 @@ void erosion_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
                        int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu) {
   if (gpu) {
     int ncopies = 2;
-    int flag_chain = 0;
-    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 1;
+    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, EROSION);
   }
@@ -71,8 +73,8 @@ void dilation_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, co
 
   if (gpu) {
     int ncopies = 2;
-    int flag_chain = 0;
-    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 1;
+    chunkedExecutorKernel(morph_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, DILATION);
   }
@@ -116,8 +118,8 @@ void closing_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 2;
+    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, closing);
 
@@ -161,8 +163,8 @@ void opening_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 2;
+    chunkedExecutorKernel(morph_chain_grayscale_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, opening);
   } else {
@@ -277,8 +279,8 @@ void bottom_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int 
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(bottom_hat_on_device<dtype>, ncopies, gpuMemory, flag_chain, hostImage,
+    int operations = 2;
+    chunkedExecutorKernel(bottom_hat_on_device<dtype>, ncopies, gpuMemory, operations, hostImage,
                           hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize);
   } else {
@@ -301,8 +303,8 @@ void top_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysi
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(top_hat_on_device<dtype>, ncopies, gpuMemory, flag_chain, hostImage,
+    int operations = 2;
+    chunkedExecutorKernel(top_hat_on_device<dtype>, ncopies, gpuMemory, operations, hostImage,
                           hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize);
   } else {
@@ -317,3 +319,46 @@ template void top_hat<unsigned int>(unsigned int*, unsigned int*, const int, con
                                     const int, int*, int, int, int, float, bool);
 template void top_hat<float>(float*, float*, const int, const int, const int, const int, int*, int,
                              int, int, float, bool);
+
+template <typename dtype>
+void top_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                            const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                            int kernel_ysize, int kernel_zsize, bool gpu) {
+
+  if (gpu) {
+    top_hat_reconstruction_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose,
+                                     kernel, kernel_xsize, kernel_ysize, kernel_zsize);
+  } else {
+    top_hat_reconstruction_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                                   kernel_ysize, kernel_zsize);
+  }
+}
+template void top_hat_reconstruction<int>(int*, int*, const int, const int, const int, const int,
+                                          int*, int, int, int, bool);
+template void top_hat_reconstruction<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                   const int, const int, const int, int*, int, int,
+                                                   int, bool);
+template void top_hat_reconstruction<float>(float*, float*, const int, const int, const int,
+                                            const int, int*, int, int, int, bool);
+
+template <typename dtype>
+void bottom_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize,
+                               const int ysize, const int zsize, const int flag_verbose,
+                               int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
+                               bool gpu) {
+
+  if (gpu) {
+    bottom_hat_reconstruction_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose,
+                                        kernel, kernel_xsize, kernel_ysize, kernel_zsize);
+  } else {
+    bottom_hat_reconstruction_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel,
+                                      kernel_xsize, kernel_ysize, kernel_zsize);
+  }
+}
+template void bottom_hat_reconstruction<int>(int*, int*, const int, const int, const int, const int,
+                                             int*, int, int, int, bool);
+template void bottom_hat_reconstruction<unsigned int>(unsigned int*, unsigned int*, const int,
+                                                      const int, const int, const int, int*, int,
+                                                      int, int, bool);
+template void bottom_hat_reconstruction<float>(float*, float*, const int, const int, const int,
+                                               const int, int*, int, int, int, bool);

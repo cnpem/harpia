@@ -29,6 +29,8 @@ cdef extern from "../../include/morphology/operations_binary.h":
                                                  int, float, bool)
     void _opening_binary "opening_binary"[dtype](dtype*, dtype*, int, int, int, int, int*, int, int, 
                                                  int, float, bool)
+    void _smooth_binary "smooth_binary"[dtype](dtype*, dtype*, int, int, int, int, int*, int, int, 
+                                               int, float, bool)
     void _geodesic_erosion_binary "geodesic_erosion_binary"[dtype](dtype*, dtype*, dtype*, int, int, 
                                                                    int, int, float, bool)
     void _geodesic_dilation_binary "geodesic_dilation_binary"[dtype](dtype*, dtype*, dtype*, int, 
@@ -95,6 +97,21 @@ def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
     _opening_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
                     verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
+
+    return hostOutput
+
+def smooth_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
+                   numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
+                   float gpuMemory = 0.9, bool gpu = True):
+
+    isize = Size(hostImage)
+    ksize = Size(kernel)
+    
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
+
+    _smooth_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
+                   &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
 
     return hostOutput
 

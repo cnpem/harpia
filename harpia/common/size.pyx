@@ -10,9 +10,9 @@ cdef class Size:
     def __init__(self, input_array):
         size = input_array.shape
 
-        self.y = size[0] #ysize
-        self.x = size[1] #xsize
-        self.z = size[2] #zsize
-
-        '''xsize is the number of elements in the x direction. In np.ndarray it is equivalent to 
-        the number of columns and is represented as the second dimension in the shape.'''
+        if(len(size)==3): 
+            self.x = size[2] #xsize
+            self.y = size[1] #ysize
+            self.z = size[0] #zsize
+        else:
+            raise ValueError(f"Incompatible size. Expected 3 dimensions, but received array with {len(size)} dimensions.")

@@ -6,6 +6,7 @@
 #include "../../../include/morphology/morph_chain_binary.h"
 #include "../../../include/morphology/operations_binary.h"
 #include "../../../include/morphology/reconstruction_binary.h"
+#include "../../../include/morphology/smooth_binary.h"
 
 /**
  * @brief Performs binary erosion on the input image.
@@ -28,8 +29,8 @@ void erosion_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
                     int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu) {
   if (gpu) {
     int ncopies = 2;
-    int flag_chain = 0;
-    chunkedExecutorKernel(morph_binary_on_device<dtype>, ncopies, gpuMemory, flag_chain, hostImage,
+    int operations = 1;
+    chunkedExecutorKernel(morph_binary_on_device<dtype>, ncopies, gpuMemory, operations, hostImage,
                           hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize, EROSION);
   } else {
@@ -71,8 +72,8 @@ void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const
                      int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu) {
   if (gpu) {
     int ncopies = 2;
-    int flag_chain = 0;
-    chunkedExecutorKernel(morph_binary_on_device<dtype>, ncopies, gpuMemory, flag_chain, hostImage,
+    int operations = 1;
+    chunkedExecutorKernel(morph_binary_on_device<dtype>, ncopies, gpuMemory, operations, hostImage,
                           hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize, DILATION);
   } else {
@@ -116,8 +117,8 @@ void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
   MorphChain closing = {DILATION, EROSION};
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(morph_chain_binary_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 2;
+    chunkedExecutorKernel(morph_chain_binary_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, closing);
   } else {
@@ -161,8 +162,8 @@ void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
 
   if (gpu) {
     int ncopies = 3;
-    int flag_chain = 1;
-    chunkedExecutorKernel(morph_chain_binary_on_device<dtype>, ncopies, gpuMemory, flag_chain,
+    int operations = 2;
+    chunkedExecutorKernel(morph_chain_binary_on_device<dtype>, ncopies, gpuMemory, operations,
                           hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, kernel,
                           kernel_xsize, kernel_ysize, kernel_zsize, opening);
   } else {
@@ -182,6 +183,35 @@ template void opening_binary<int8_t>(int8_t*, int8_t*, const int, const int, con
                                      int*, int, int, int, float, bool);
 template void opening_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
                                       const int, int*, int, int, int, float, bool);
+
+template <typename dtype>
+void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
+                   const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
+                   int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu) {
+
+  if (gpu) {
+    int ncopies = 2;
+    int operations = 4;
+    chunkedExecutorKernel(smooth_binary_on_device<dtype>, ncopies, gpuMemory, operations, hostImage,
+                          hostOutput, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
+                          kernel_ysize, kernel_zsize);
+  } else {
+    smooth_binary_on_host(hostImage, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize,
+                          kernel_ysize, kernel_zsize);
+  }
+}
+template void smooth_binary<int>(int*, int*, const int, const int, const int, const int, int*, int,
+                                 int, int, float, bool);
+template void smooth_binary<unsigned int>(unsigned int*, unsigned int*, const int, const int,
+                                          const int, const int, int*, int, int, int, float, bool);
+template void smooth_binary<int16_t>(int16_t*, int16_t*, const int, const int, const int, const int,
+                                     int*, int, int, int, float, bool);
+template void smooth_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
+                                      const int, int*, int, int, int, float, bool);
+template void smooth_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
+                                    int*, int, int, int, float, bool);
+template void smooth_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int,
+                                     int*, int, int, int, float, bool);
 
 /**
  * @brief Perform geodesic erosion operation on the entire image using the GPU. This function is

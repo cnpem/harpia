@@ -82,10 +82,10 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
 // Wrapper function
 //Designed for functions that execute ONE or TWO kernel morphological operations
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, const int flag_chain,
-                           dtype* image, dtype* output, const int xsize, const int ysize,
-                           const int zsize, const int verbose, int* kernel, int kernel_xsize,
-                           int kernel_ysize, int kernel_zsize, Args... args) {
+void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
+                           const int kernelOperations, dtype* image, dtype* output, const int xsize,
+                           const int ysize, const int zsize, const int verbose, int* kernel,
+                           int kernel_xsize, int kernel_ysize, int kernel_zsize, Args... args) {
 
   dtype* i_ref = image;
   dtype* o_ref = output;
@@ -111,12 +111,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, con
 
   // How many slices fit in the GPU?
   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
-  int padding;
-  if (flag_chain) {
-    padding = (kernel_zsize / 2) * 2;  //assure an even padding size
-  } else {
-    padding = kernel_zsize / 2;
-  }
+  int padding = kernel_zsize / 2 * kernelOperations;
   int padding_top = 0;
   int padding_bottom = 0;
 
