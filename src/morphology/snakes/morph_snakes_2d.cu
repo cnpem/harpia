@@ -68,7 +68,7 @@ CUDA_HOSTDEV void smoothing_pixel(bool* levelSet, bool* output,
 
 template<typename dtype>
 CUDA_HOSTDEV Gradient nabla(dtype* image, int centerIdx, int centerIdy, const int xsize) {
-    Gradient result;
+    GGradient result = {0.0f, 0.0f};
 
     // Calculate gradients (1/2 factor included)
     result.dx = 0.5f * (static_cast<float>(image[centerIdy * xsize + (centerIdx + 1)]) - 
@@ -160,12 +160,10 @@ void apply_smoothing_kernels(bool* &deviceInitLs, bool* &deviceOutput, const int
     for (int mu = 0; mu < smoothing; mu++) {
         // Smoothing kernel is applied twice (ISdoSId or SIdoISd)
         smoothing_kernel<<<grid, block>>>(deviceInitLs, deviceOutput, xsize, ysize, isISd);
-        cudaDeviceSynchronize();
         std::swap(deviceInitLs, deviceOutput);
 
         isISd = !isISd;
         smoothing_kernel<<<grid, block>>>(deviceInitLs, deviceOutput, xsize, ysize, isISd);
-        cudaDeviceSynchronize();
         std::swap(deviceInitLs, deviceOutput);
     }
 }
@@ -231,11 +229,8 @@ void apply_scalar_inside_outside(float* &deviceC1, float* &deviceC2, int* &devic
                                                   deviceC1, deviceC2,
                                                   deviceCount1, deviceCount2,
                                                   xsize, ysize);
-    cudaDeviceSynchronize();
-
     // Normalize the accumulated values
     normalize_kernel<<<1, 1>>>(deviceC1, deviceC2, deviceCount1, deviceCount2);
-    cudaDeviceSynchronize();
 }
 
 void morph_geodesic_active_contour(bool* hostImage, bool* initLs, const int iterations, const float balloonForce, const int smoothing, bool* hostOutput,
@@ -292,24 +287,24 @@ void morph_geodesic_active_contour(bool* hostImage, bool* initLs, const int iter
             // input (initial level set), the mask for geodesic operation and the output of the operation
             geodesic_morph_grayscale_kernel<<<grid, block>>>(deviceInitLs, deviceImage, deviceOutput, xsize, ysize, 1, 0, 0,
             kernel_xsize, kernel_ysize, 1, operation);
-            cudaDeviceSynchronize();
             std::swap(deviceInitLs, deviceOutput);
         }
 
         //attraction_force
         attraction_force_kernel<<<grid, block>>>(deviceImage, deviceInitLs, deviceOutput,
                                       xsize, ysize);
-        cudaDeviceSynchronize();
+        cudaGetLastError();
         std::swap(deviceInitLs, deviceOutput);
 
         // smoothing force
         apply_smoothing_kernels(deviceInitLs, deviceOutput, xsize, ysize, smoothing, isIsd, grid, block);
-
+        cudaGetLastError();
     }
 
+
+    cudaDeviceSynchronize();
     // Copy result back to host
     CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes_out, cudaMemcpyDeviceToHost));
-
     // Clean up
     cudaFree(deviceImage);
     cudaFree(deviceOutput);
@@ -362,19 +357,19 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
         apply_scalar_inside_outside(deviceC1, deviceC2, deviceCount1, deviceCount2, deviceInitLs, deviceImage, grid, block, xsize, ysize);
 
 
-        cudaDeviceSynchronize();
         std::swap(deviceInitLs, deviceOutput);
 
         image_attachment_kernel<<<grid, block>>>(deviceInitLs, deviceImage, deviceOutput,
                                       deviceC1, deviceC2,
                                       lambda1, lambda2,
                                       xsize, ysize);
-        cudaDeviceSynchronize();
+        cudaGetLastError();                              
+        
         std::swap(deviceInitLs, deviceOutput);
 
         // smoothing force
         apply_smoothing_kernels(deviceInitLs, deviceOutput, xsize, ysize, smoothing, isIsd, grid, block);
-
+        cudaGetLastError();
 
     }
 
