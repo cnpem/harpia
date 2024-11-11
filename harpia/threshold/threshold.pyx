@@ -1,5 +1,7 @@
 cimport cython
+from cython.parallel import prange
 cimport numpy as np
+import numpy as np
 from libcpp cimport bool
 
 #Define the fused type for numeric types : float, int, unsigned int
@@ -139,3 +141,26 @@ def sauvola(np.ndarray[numeric, ndim=3] image,
                              weight, range,
                              rows, cols, depth,
                              rows_kernel, cols_kernel, depth_kernel)
+
+
+# Otsu Threshold
+cdef extern from "../../include/threshold/otsu.h":
+    int otsu_threshold_value(int *histogramCounts, int nbins)
+
+def otsu(np.ndarray[int, ndim=1] histogramCounts, int nbins):
+    """
+    Apply the Otsu threshold to a 1D histogram and compute the optimal threshold.
+
+    Parameters:
+        histogram (np.ndarray[int32_t, ndim=1]): Input 1D histogram array.
+        bins (int): Number of bins in the histogram.
+        a (float): Minimum value of the range.
+        b (float): Maximum value of the range.
+        totalPixels (int): Total number of pixels in the image.
+
+    Returns:
+        int: The optimal threshold value.
+    """
+
+    # Call the Otsu thresholding function
+    return otsu_threshold_value(&histogramCounts[0], nbins)
