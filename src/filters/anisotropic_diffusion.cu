@@ -8,29 +8,29 @@ template <typename dtype>
 __global__ void anisotropicDiffusion2DKernel(dtype* hostImage, dtype* outputImage, float deltaT,
                                              float kappa, int diffusionOption, int xsize,
                                              int ysize) {
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;  // x-axis
+  int idy = blockIdx.y * blockDim.y + threadIdx.y;  // y-axis
 
-  if (idy < xsize && idx < ysize) {
+  if (idx < xsize && idy < ysize) {  // Check within bounds for ysize (y-axis) and xsize (x-axis)
 
     // Compute indices for the neighboring cells with boundary checks
-    int idyNorth = min(idy + 1, xsize - 1);
+    int idyNorth = min(idy + 1, ysize - 1);
     int idySouth = max(idy - 1, 0);
-    int idxEast = min(idx + 1, ysize - 1);
+    int idxEast = min(idx + 1, xsize - 1);
     int idxWest = max(idx - 1, 0);
 
-    dtype center = hostImage[idy * ysize + idx];
+    dtype center = hostImage[idy * xsize + idx];
     dtype nabla[8];
     double_t diffusionCoefficients[8];
 
-    nabla[0] = hostImage[idyNorth * ysize + idx] - center;      // North
-    nabla[1] = hostImage[idySouth * ysize + idx] - center;      // South
-    nabla[2] = hostImage[idy * ysize + idxWest] - center;       // West
-    nabla[3] = hostImage[idy * ysize + idxEast] - center;       // East
-    nabla[4] = hostImage[idyNorth * ysize + idxWest] - center;  // Northwest
-    nabla[5] = hostImage[idyNorth * ysize + idxEast] - center;  // Northeast
-    nabla[6] = hostImage[idySouth * ysize + idxWest] - center;  // Southwest
-    nabla[7] = hostImage[idySouth * ysize + idxEast] - center;  // Southeast
+    nabla[0] = hostImage[idyNorth * xsize + idx] - center;      // North
+    nabla[1] = hostImage[idySouth * xsize + idx] - center;      // South
+    nabla[2] = hostImage[idy * xsize + idxWest] - center;       // West
+    nabla[3] = hostImage[idy * xsize + idxEast] - center;       // East
+    nabla[4] = hostImage[idyNorth * xsize + idxWest] - center;  // Northwest
+    nabla[5] = hostImage[idyNorth * xsize + idxEast] - center;  // Northeast
+    nabla[6] = hostImage[idySouth * xsize + idxWest] - center;  // Southwest
+    nabla[7] = hostImage[idySouth * xsize + idxEast] - center;  // Southeast
 
     double_t diffusionSum = 0;
 
@@ -47,7 +47,7 @@ __global__ void anisotropicDiffusion2DKernel(dtype* hostImage, dtype* outputImag
       diffusionSum += diffusionCoefficients[i];
     }
 
-    outputImage[idy * ysize + idx] = hostImage[idy * ysize + idx] + deltaT * diffusionSum;
+    outputImage[idy * xsize + idx] = hostImage[idy * xsize + idx] + deltaT * diffusionSum;
   }
 }
 
@@ -64,10 +64,9 @@ void anisotropicDiffusion2DGPU(dtype* hostImage, int totalIterations, float delt
   cudaMemcpy(deviceImage, hostImage, numBytes, cudaMemcpyHostToDevice);
 
   dim3 blockSize(16, 16);
-  dim3 gridSize((ysize + blockSize.x - 1) / blockSize.x, (xsize + blockSize.y - 1) / blockSize.y);
+  dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
   for (int iter = 0; iter < totalIterations; iter++) {
-
     anisotropicDiffusion2DKernel<dtype><<<gridSize, blockSize>>>(
         deviceImage, deviceTmp, deltaT, kappa, diffusionOption, xsize, ysize);
 
@@ -90,56 +89,44 @@ template <typename dtype>
 __global__ void anisotropicDiffusion3DKernel(dtype* hostImage, dtype* outputImage, float deltaT,
                                              float kappa, int diffusionOption, int xsize, int ysize,
                                              int zsize) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  int idy = blockIdx.y * blockDim.y + threadIdx.y;
-  int idz = blockIdx.z * blockDim.z + threadIdx.z;
+    if (idx < xsize && idy < ysize && idz < zsize) {
+        int idx_center = idx + idy * xsize + idz * xsize * ysize;
+        dtype center = hostImage[idx_center];
+        double_t diffusionSum = 0;
 
-  if (idy < xsize && idx < ysize && idz < zsize) {
-
-    int idx_center = idz * xsize * ysize + idy * ysize + idx;
-
-    dtype center = hostImage[idx_center];
-    double_t nabla[27];
-
-    int idx_nabla = 0;
-    double_t diffusionSum = 0;
-
-    for (int dz = -1; dz <= 1; dz++) {
-      for (int dy = -1; dy <= 1; dy++) {
-        for (int dx = -1; dx <= 1; dx++) {
-
-          int currentidz = idz + dz;
-          int currentidy = idy + dy;
-          int currentidx = idx + dx;
-
-          //checks for boundaries.
-          if (currentidy >= 0 && currentidy < xsize && currentidx >= 0 && currentidx < ysize &&
-              currentidz >= 0 && currentidz < zsize) {
-            nabla[idx_nabla] =
-                hostImage[currentidz * xsize * ysize + currentidy * ysize + currentidx] - center;
-
-            double scaledDiff = pow(nabla[idx_nabla] / kappa, 2);
-
-            if (diffusionOption == 1) {
-              diffusionSum += nabla[idx_nabla] * exp(-scaledDiff);
-            } else if (diffusionOption == 2) {
-              diffusionSum += nabla[idx_nabla] / (1 + scaledDiff);
-            } else {
-              diffusionSum += nabla[idx_nabla] * (1 - tanh(scaledDiff));
+        // Process 6-neighborhood (face neighbors)
+        int offsets[6][3] = {{0,0,1}, {0,0,-1}, {0,1,0}, {0,-1,0}, {1,0,0}, {-1,0,0}};
+        
+        for (int i = 0; i < 6; i++) {
+            int currentidz = idz + offsets[i][0];
+            int currentidy = idy + offsets[i][1];
+            int currentidx = idx + offsets[i][2];
+            
+            if (currentidx >= 0 && currentidx < xsize && 
+                currentidy >= 0 && currentidy < ysize && 
+                currentidz >= 0 && currentidz < zsize) {
+                
+                dtype nabla = hostImage[currentidx + currentidy * xsize + 
+                                      currentidz * xsize * ysize] - center;
+                
+                double scaledDiff = pow(nabla / kappa, 2);
+                
+                if (diffusionOption == 1) {
+                    diffusionSum += nabla * exp(-scaledDiff);
+                } else if (diffusionOption == 2) {
+                    diffusionSum += nabla / (1 + scaledDiff);
+                } else {
+                    diffusionSum += nabla * (1 - tanh(scaledDiff));
+                }
             }
-          } else {
-            nabla[idx_nabla] = 0;
-          }
-
-          //update the index of nabla
-          idx_nabla++;
         }
-      }
-    }
 
-    outputImage[idx_center] = hostImage[idx_center] + deltaT * diffusionSum;
-  }
+        outputImage[idx_center] = center + deltaT * diffusionSum;
+    }
 }
 
 template <typename dtype>
@@ -155,11 +142,10 @@ void anisotropicDiffusion3DGPU(dtype* hostImage, int totalIterations, float delt
   cudaMemcpy(deviceImage, hostImage, numBytes, cudaMemcpyHostToDevice);
 
   dim3 blockSize(8, 8, 8);
-  dim3 gridSize((ysize + blockSize.x - 1) / blockSize.x, (xsize + blockSize.y - 1) / blockSize.y,
+  dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
                 (zsize + blockSize.z - 1) / blockSize.z);
 
   for (int iter = 0; iter < totalIterations; iter++) {
-
     anisotropicDiffusion3DKernel<dtype><<<gridSize, blockSize>>>(
         deviceImage, deviceTmp, deltaT, kappa, diffusionOption, xsize, ysize, zsize);
 
