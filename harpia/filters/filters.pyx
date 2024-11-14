@@ -262,8 +262,8 @@ def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterat
         The diffused image is applied at the input image.
     """
 
-    cdef int xsize = hostImage.shape[0]
-    cdef int ysize = hostImage.shape[1]
+    cdef int ysize = hostImage.shape[0]
+    cdef int xsize = hostImage.shape[1]
 
     anisotropicDiffusion2DGPU(&hostImage[0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize)
 
@@ -299,10 +299,9 @@ def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterat
     None
         The diffused image is applied at the input image.
     """
-
-    cdef int xsize = hostImage.shape[0]
+    cdef int xsize = hostImage.shape[2]
     cdef int ysize = hostImage.shape[1]
-    cdef int zsize = hostImage.shape[2]
+    cdef int zsize = hostImage.shape[0]
 
     anisotropicDiffusion3DGPU(&hostImage[0,0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize, zsize)
 
