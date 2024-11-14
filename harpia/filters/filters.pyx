@@ -305,3 +305,31 @@ def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterat
     cdef int zsize = hostImage.shape[2]
 
     anisotropicDiffusion3DGPU(&hostImage[0,0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize, zsize)
+
+
+# Extern declaration for the non-local means filtering function from C/C++ library
+cdef extern from "../../include/filters/non_local_means.h":
+    void nlmeans_filtering[numeric] (numeric* hostImage, double* hostOutput,
+                                     int xsize, int ysize,
+                                     int small_window, int big_window, double h, double sigma)
+
+def non_local_means(np.ndarray[numeric, ndim=2] hostImage,
+                    np.ndarray[np.float64_t, ndim=2] hostOutput,
+                    int xsize, int ysize,
+                    int small_window, int big_window, double h, double sigma = 0):
+    """
+    Apply a non-local means filter to a 2D hostImage.
+
+    Parameters:
+        hostImage (np.ndarray[numeric, ndim=2]): Input 2D hostImage array.
+        hostOutput (np.ndarray[np.float64_t, ndim=2]): hostOutput 2D array to store the filtered result.
+        xsize (int): Number of rows in the hostImage.
+        ysize (int): Number of columns in the hostImage.
+        small_window (int): Size of the small window for patch comparison.
+        big_window (int): Size of the big window for neighborhood search.
+        h (double): Filter parameter for controlling the degree of smoothing.
+    """
+    nlmeans_filtering(&hostImage[0,0],
+                      &hostOutput[0,0],
+                      xsize, ysize,
+                      small_window, big_window, h, sigma)
