@@ -90,14 +90,14 @@ __device__ void balloon_force_pixel(float* image, bool* levelSet, bool* output, 
     }
 }
 
-__global__ void balloon_force_kernel(float* deviceImage, bool* deviceLevelSet, bool* deviceOutput, const float threshold, const float balloonForce, const int xsize,
+__global__ void balloon_force_kernel(float* deviceImage, bool* deviceLevelSet, bool* deviceTemp, const float threshold, const float balloonForce, const int xsize,
                                     const int ysize) {
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
   int idy = threadIdx.y + blockIdx.y * blockDim.y;
 
   // Skip border pixels and check bounds
   if (idx > 1 && idx < xsize-2 && idy > 1 && idy < ysize-2) {
-    balloon_force_pixel(deviceImage, deviceLevelSet, deviceOutput, threshold, balloonForce,
+    balloon_force_pixel(deviceImage, deviceLevelSet, deviceTemp, threshold, balloonForce,
                        idx, idy, xsize, ysize);
   }
 }
@@ -167,19 +167,19 @@ __device__ void image_attachment_pixel(bool* deviceLevelSet, float* image, bool*
 }
 
 // Kernel functions
-__global__ void attraction_force_kernel(float* deviceImage, bool* deviceLevelSet, bool* deviceOutput,
+__global__ void attraction_force_kernel(float* deviceImage, bool* deviceLevelSet, bool* deviceTemp,
                                       const int xsize, const int ysize) {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     int idy = threadIdx.y + blockIdx.y * blockDim.y;
     
     // Skip border pixels and check bounds
     if (idx > 0 && idx < xsize-1 && idy > 0 && idy < ysize-1) {
-        attraction_force_pixel(deviceImage, deviceLevelSet, deviceOutput,
+        attraction_force_pixel(deviceImage, deviceLevelSet, deviceTemp,
                              idx, idy, xsize, ysize);
     }
 }
 
-__global__ void smoothing_kernel(bool* initLevelSet, bool* deviceOutput,
+__global__ void smoothing_kernel(bool* initLevelSet, bool* deviceTemp,
                                const int xsize, const int ysize,
                                bool isISd) {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -187,27 +187,27 @@ __global__ void smoothing_kernel(bool* initLevelSet, bool* deviceOutput,
 
     // Skip border pixels and check bounds
     if (idx > 0 && idx < xsize-1 && idy > 0 && idy < ysize-1) {
-        smoothing_pixel(initLevelSet, deviceOutput, xsize, ysize,
+        smoothing_pixel(initLevelSet, deviceTemp, xsize, ysize,
                        idx, idy, isISd);
     }
 }
 
 // New helper function for applying smoothing repeatedly
-void apply_smoothing_kernels(bool* &deviceInitLs, bool* &deviceOutput, const int xsize, const int ysize, const int smoothing, bool &isISd, dim3 grid, dim3 block) {
+void apply_smoothing_kernels(bool* &deviceLevelSet, bool* &deviceTemp, const int xsize, const int ysize, const int smoothing, bool &isISd, dim3 grid, dim3 block) {
     
     for (int mu = 0; mu < smoothing; mu++) {
         // Smoothing kernel is applied twice (ISdoSId or SIdoISd)
-        smoothing_kernel<<<grid, block>>>(deviceInitLs, deviceOutput, xsize, ysize, isISd);
-        std::swap(deviceInitLs, deviceOutput);
+        smoothing_kernel<<<grid, block>>>(deviceLevelSet, deviceTemp, xsize, ysize, isISd);
+        std::swap(deviceLevelSet, deviceTemp);
 
         isISd = !isISd;
 
-        smoothing_kernel<<<grid, block>>>(deviceInitLs, deviceOutput, xsize, ysize, isISd);
-        std::swap(deviceInitLs, deviceOutput);
+        smoothing_kernel<<<grid, block>>>(deviceLevelSet, deviceTemp, xsize, ysize, isISd);
+        std::swap(deviceLevelSet, deviceTemp);
     }
 }
 
-__global__ void image_attachment_kernel(bool* deviceLevelSet, float* deviceImage, bool* deviceOutput,
+__global__ void image_attachment_kernel(bool* deviceLevelSet, float* deviceImage, bool* deviceTemp,
                                       float* deviceC1, float* deviceC2,
                                       float lambda1, float lambda2,
                                       const int xsize, const int ysize) {
@@ -216,7 +216,7 @@ __global__ void image_attachment_kernel(bool* deviceLevelSet, float* deviceImage
 
     // Skip border pixels and check bounds
     if (idx > 0 && idx < xsize-1 && idy > 0 && idy < ysize-1) {
-        image_attachment_pixel(deviceLevelSet, deviceImage, deviceOutput,
+        image_attachment_pixel(deviceLevelSet, deviceImage, deviceTemp,
                             deviceC1, deviceC2, lambda1, lambda2,
                             idx, idy, xsize, ysize);
     }
@@ -391,15 +391,15 @@ void morph_geodesic_active_contour(float* hostImage, bool* initLs, const int ite
     size_t nBytes_out = size * sizeof(bool);
     // Allocate device memory
     float *deviceImage;
-    bool *deviceOutput, *deviceInitLs;
+    bool *deviceTemp, *deviceLevelSet;
     CHECK(cudaMalloc((float**)&deviceImage,  nBytes));
-    CHECK(cudaMalloc((bool**)&deviceOutput, nBytes_out));
-    CHECK(cudaMalloc((bool**)&deviceInitLs, nBytes_out));
+    CHECK(cudaMalloc((bool**)&deviceTemp, nBytes_out));
+    CHECK(cudaMalloc((bool**)&deviceLevelSet, nBytes_out));
 
     // Copy input data to device
     CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(deviceInitLs, initLs, nBytes_out, cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(deviceOutput, initLs, nBytes_out, cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(deviceLevelSet, initLs, nBytes_out, cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(deviceTemp, initLs, nBytes_out, cudaMemcpyHostToDevice));
 
     // Set up execution configuration
     dim3 block(BLOCK_2D, BLOCK_2D, 1);
@@ -416,29 +416,29 @@ void morph_geodesic_active_contour(float* hostImage, bool* initLs, const int ite
     for (int iter = 0; iter < iterations; iter++) {
         //baloon force
         if (applyBalloonForce) {
-            balloon_force_kernel<<<grid, block>>>(deviceImage, deviceInitLs, deviceOutput, threshold, balloonForce, xsize,
+            balloon_force_kernel<<<grid, block>>>(deviceImage, deviceLevelSet, deviceTemp, threshold, balloonForce, xsize,
                                     ysize);
             cudaGetLastError();
-            std::swap(deviceInitLs, deviceOutput);
+            std::swap(deviceLevelSet, deviceTemp);
         }
 
         //attraction_force
-        attraction_force_kernel<<<grid, block>>>(deviceImage, deviceInitLs, deviceOutput, xsize, ysize);
+        attraction_force_kernel<<<grid, block>>>(deviceImage, deviceLevelSet, deviceTemp, xsize, ysize);
         cudaGetLastError();
-        std::swap(deviceInitLs, deviceOutput);
+        std::swap(deviceLevelSet, deviceTemp);
 
 
         // smoothing force
-        apply_smoothing_kernels(deviceInitLs, deviceOutput, xsize, ysize, smoothing, isIsd, grid, block);
+        apply_smoothing_kernels(deviceLevelSet, deviceTemp, xsize, ysize, smoothing, isIsd, grid, block);
         cudaGetLastError();
     }
     cudaDeviceSynchronize();
     // Copy result back to host
-    CHECK(cudaMemcpy(hostOutput, deviceInitLs, nBytes_out, cudaMemcpyDeviceToHost));
+    CHECK(cudaMemcpy(hostOutput, deviceLevelSet, nBytes_out, cudaMemcpyDeviceToHost));
     // Clean up
     cudaFree(deviceImage);
-    cudaFree(deviceOutput);
-    cudaFree(deviceInitLs);
+    cudaFree(deviceTemp);
+    cudaFree(deviceLevelSet);
 }
 
 void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const float lambda1, const float lambda2, const int smoothing, bool* hostOutput,
@@ -451,15 +451,15 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
 
     // Allocate device memory
     float *deviceImage;
-    bool *deviceOutput, *deviceInitLs;
+    bool *deviceTemp, *deviceLevelSet;
     CHECK(cudaMalloc((float**)&deviceImage, nBytes));
-    CHECK(cudaMalloc((bool**)&deviceOutput, nBytes_out));
-    CHECK(cudaMalloc((bool**)&deviceInitLs, nBytes_out));
+    CHECK(cudaMalloc((bool**)&deviceTemp, nBytes_out));
+    CHECK(cudaMalloc((bool**)&deviceLevelSet, nBytes_out));
 
     // Copy input data to device
     CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(deviceInitLs, initLs, nBytes_out, cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(deviceOutput, initLs, nBytes_out, cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(deviceLevelSet, initLs, nBytes_out, cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(deviceTemp, initLs, nBytes_out, cudaMemcpyHostToDevice));
 
     // Set up execution configuration
     dim3 block(BLOCK_2D, BLOCK_2D, 1);
@@ -482,34 +482,32 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
 
     for (int iter = 0; iter < iterations; iter++) {
         // Launch the reduction kernels to calculate C1, C2, Count1, and Count2
-        launch_scalar_inside_outside_kernels(deviceInitLs, deviceImage, deviceC1, deviceC2, deviceCount1, deviceCount2, xsize, ysize, block);
+        launch_scalar_inside_outside_kernels(deviceLevelSet, deviceImage, deviceC1, deviceC2, deviceCount1, deviceCount2, xsize, ysize, block);
 
         // Image attachment step using computed C1 and C2
-        image_attachment_kernel<<<grid, block>>>(deviceInitLs, deviceImage, deviceOutput,
+        image_attachment_kernel<<<grid, block>>>(deviceLevelSet, deviceImage, deviceTemp,
                                       deviceC1, deviceC2,
                                       lambda1, lambda2,
                                       xsize, ysize);
         cudaGetLastError();
         
         // Swap level sets
-        std::swap(deviceInitLs, deviceOutput);
+        std::swap(deviceLevelSet, deviceTemp);
 
         // Smoothing force
-        apply_smoothing_kernels(deviceInitLs, deviceOutput, xsize, ysize, smoothing, isIsd, grid, block);
+        apply_smoothing_kernels(deviceLevelSet, deviceTemp, xsize, ysize, smoothing, isIsd, grid, block);
         cudaGetLastError();
     }
 
     // Copy result back to host
-    CHECK(cudaMemcpy(hostOutput, deviceInitLs, nBytes_out, cudaMemcpyDeviceToHost));
+    CHECK(cudaMemcpy(hostOutput, deviceLevelSet, nBytes_out, cudaMemcpyDeviceToHost));
 
     // Clean up
     cudaFree(deviceImage);
-    cudaFree(deviceOutput);
-    cudaFree(deviceInitLs);
+    cudaFree(deviceTemp);
+    cudaFree(deviceLevelSet);
     cudaFree(deviceC1);
     cudaFree(deviceC2);
     cudaFree(deviceCount1);
     cudaFree(deviceCount2);
 }
-
-
