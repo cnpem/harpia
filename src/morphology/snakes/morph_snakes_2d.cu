@@ -138,7 +138,7 @@ __device__ void attraction_force_pixel(float* gimage, bool* levelSet, bool* outp
 }
 
 __device__ void image_attachment_pixel(bool* deviceLevelSet, float* image, bool* output,
-                                       double* deviceC1, double* deviceC2,
+                                       float* deviceC1, float* deviceC2,
                                        float lambda1, float lambda2,
                                        int centerIdx, int centerIdy,
                                        const int xsize, const int ysize) {
@@ -153,8 +153,8 @@ __device__ void image_attachment_pixel(bool* deviceLevelSet, float* image, bool*
     float du_abs = fabsf(du.dx) + fabsf(du.dy);
 
     // Calculate squared differences
-    double diff1 = static_cast<double>(image[centerIndex]) - *deviceC1;
-    double diff2 = static_cast<double>(image[centerIndex]) - *deviceC2;
+    float diff1 = static_cast<double>(image[centerIndex]) - static_cast<double>(*deviceC1);
+    float diff2 = static_cast<double>(image[centerIndex]) - static_cast<double>(*deviceC2);
     double factor = lambda1 * diff1 * diff1 - lambda2 * diff2 * diff2;
 
     if (factor == 0 || du_abs < 0.1) {
@@ -208,7 +208,7 @@ void apply_smoothing_kernels(bool* &deviceInitLs, bool* &deviceOutput, const int
 }
 
 __global__ void image_attachment_kernel(bool* deviceLevelSet, float* deviceImage, bool* deviceOutput,
-                                      double* deviceC1, double* deviceC2,
+                                      float* deviceC1, float* deviceC2,
                                       float lambda1, float lambda2,
                                       const int xsize, const int ysize) {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -222,59 +222,164 @@ __global__ void image_attachment_kernel(bool* deviceLevelSet, float* deviceImage
     }
 }
 
-__global__ void scalar_inside_outside_kernel(const bool* deviceLevelSet, const float* deviceImage, 
-                                             double* deviceC1, double* deviceC2,
-                                             int* deviceCount1, int* deviceCount2,
-                                             const int xsize, const int ysize) {
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    int idy = threadIdx.y + blockIdx.y * blockDim.y;
-    // Check bounds
-    if (idx < xsize && idy < ysize) {
-        int centerIndex = idy * xsize + idx;
-        // Use atomic operations to accumulate values
-        if (deviceLevelSet[centerIndex]) {
-            atomicAdd(deviceC1, static_cast<double>(deviceImage[centerIndex]) );
-            atomicAdd(deviceCount1, 1);
-        } else {
-            atomicAdd(deviceC2, static_cast<double>(deviceImage[centerIndex]) );
-            atomicAdd(deviceCount2, 1);
-        }
-    }
-}
-
 // Kernel to normalize the accumulated values
-__global__ void normalize_kernel(double* deviceC1, double* deviceC2, int* deviceCount1, int* deviceCount2) {
+__global__ void normalize_kernel(float* deviceC1, float* deviceC2, int* deviceCount1, int* deviceCount2) {
     if (threadIdx.x == 0 && blockIdx.x == 0) {
         // Normalize C1 and C2 by their respective counts
         if (*deviceCount1 > 0) {
             *deviceC1 /= (*deviceCount1 * 1.0f);
         }
         if (*deviceCount2 > 0) {
-            *deviceC2 /= (*deviceCount2 * 1.0f);  // Corrected this line to use deviceCount2
+            *deviceC2 /= (*deviceCount2 * 1.0f);
         }
     }
 }
 
-// New helper function for calculating and normalizing scalar values
-void apply_scalar_inside_outside(double* &deviceC1, double* &deviceC2, int* &deviceCount1, int* &deviceCount2, bool* &deviceInitLs, float* &deviceImage, dim3 grid, dim3 block, const int xsize, const int ysize) {
-    // Reset c1 and c2 on the device to zero for each iteration
-    cudaMemset(deviceC1, 0, sizeof(double));
-    cudaMemset(deviceC2, 0, sizeof(double));
+__global__ void reduce_kernel(const bool* deviceLevelSet, const float* deviceImage,
+                              double* partialC1, double* partialC2,
+                              int* partialCount1, int* partialCount2,
+                              const int xsize, const int ysize) {
+    extern __shared__ double sharedData[];
+    double* sharedC1 = sharedData;
+    double* sharedC2 = sharedData + blockDim.x * blockDim.y;
+    int* sharedCount1 = (int*)(sharedData + 2 * blockDim.x * blockDim.y);
+    int* sharedCount2 = sharedCount1 + blockDim.x * blockDim.y;
+
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    int idy = threadIdx.y + blockIdx.y * blockDim.y;
+    int tid = threadIdx.y * blockDim.x + threadIdx.x;
+
+    // Initialize shared memory
+    sharedC1[tid] = 0.0;
+    sharedC2[tid] = 0.0;
+    sharedCount1[tid] = 0;
+    sharedCount2[tid] = 0;
+
+    __syncthreads();
+
+    // Check bounds
+    if (idx < xsize && idy < ysize) {
+        int centerIndex = idy * xsize + idx;
+        if (deviceLevelSet[centerIndex]) {
+            sharedC1[tid] += static_cast<double>(deviceImage[centerIndex]);
+            sharedCount1[tid] += 1;
+        } else {
+            sharedC2[tid] += static_cast<double>(deviceImage[centerIndex]);
+            sharedCount2[tid] += 1;
+        }
+    }
+
+    __syncthreads();
+
+    // Perform reduction within the block
+    for (int s = blockDim.x * blockDim.y / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            sharedC1[tid] += sharedC1[tid + s];
+            sharedC2[tid] += sharedC2[tid + s];
+            sharedCount1[tid] += sharedCount1[tid + s];
+            sharedCount2[tid] += sharedCount2[tid + s];
+        }
+        __syncthreads();
+    }
+
+    // Write the result for this block to global memory
+    if (tid == 0) {
+        partialC1[blockIdx.x + gridDim.x * blockIdx.y] = sharedC1[0];
+        partialC2[blockIdx.x + gridDim.x * blockIdx.y] = sharedC2[0];
+        partialCount1[blockIdx.x + gridDim.x * blockIdx.y] = sharedCount1[0];
+        partialCount2[blockIdx.x + gridDim.x * blockIdx.y] = sharedCount2[0];
+    }
+}
+
+// Second kernel to finalize reduction
+__global__ void final_reduce_kernel(double* partialC1, double* partialC2,
+                                    int* partialCount1, int* partialCount2,
+                                    float* deviceC1, float* deviceC2,
+                                    int* deviceCount1, int* deviceCount2,
+                                    int numElements) {
+    extern __shared__ double sharedData[];
+    double* sharedC1 = sharedData;
+    double* sharedC2 = sharedData + blockDim.x;
+    int* sharedCount1 = (int*)(sharedData + 2 * blockDim.x);
+    int* sharedCount2 = sharedCount1 + blockDim.x;
+
+    int tid = threadIdx.x;
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Load elements into shared memory
+    sharedC1[tid] = (i < numElements) ? partialC1[i] : 0.0;
+    sharedC2[tid] = (i < numElements) ? partialC2[i] : 0.0;
+    sharedCount1[tid] = (i < numElements) ? partialCount1[i] : 0;
+    sharedCount2[tid] = (i < numElements) ? partialCount2[i] : 0;
+
+    __syncthreads();
+
+    // Reduction within block
+    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            sharedC1[tid] += sharedC1[tid + s];
+            sharedC2[tid] += sharedC2[tid + s];
+            sharedCount1[tid] += sharedCount1[tid + s];
+            sharedCount2[tid] += sharedCount2[tid + s];
+        }
+        __syncthreads();
+    }
+
+    // Write result to global memory
+    if (tid == 0) {
+        atomicAdd(deviceC1, static_cast<float>(sharedC1[0]));
+        atomicAdd(deviceC2, static_cast<float>(sharedC2[0]));
+        atomicAdd(deviceCount1, sharedCount1[0]);
+        atomicAdd(deviceCount2, sharedCount2[0]);
+    }
+}
+
+void launch_scalar_inside_outside_kernels(const bool* deviceLevelSet, const float* deviceImage,
+                                          float* deviceC1, float* deviceC2,
+                                          int* deviceCount1, int* deviceCount2,
+                                          const int xsize, const int ysize,
+                                          dim3 blockSize) {
+    // Calculate grid size based on input block size
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
+    int numBlocks = gridSize.x * gridSize.y;
+
+    // Allocate memory for partial results
+    double *partialC1, *partialC2;
+    int *partialCount1, *partialCount2;
+    cudaMalloc(&partialC1, numBlocks * sizeof(double));
+    cudaMalloc(&partialC2, numBlocks * sizeof(double));
+    cudaMalloc(&partialCount1, numBlocks * sizeof(int));
+    cudaMalloc(&partialCount2, numBlocks * sizeof(int));
+
+    // Initialize output variables
+    cudaMemset(deviceC1, 0, sizeof(float));
+    cudaMemset(deviceC2, 0, sizeof(float));
     cudaMemset(deviceCount1, 0, sizeof(int));
     cudaMemset(deviceCount2, 0, sizeof(int));
-    
-    // Calculate integral
-    scalar_inside_outside_kernel<<<grid, block>>>(deviceInitLs, deviceImage, 
-                                                  deviceC1, deviceC2,
-                                                  deviceCount1, deviceCount2,
-                                                  xsize, ysize);
 
+    // Launch the first kernel
+    int sharedMemSize = 2 * blockSize.x * blockSize.y * sizeof(double) + 2 * blockSize.x * blockSize.y * sizeof(int);
+    reduce_kernel<<<gridSize, blockSize, sharedMemSize>>>(deviceLevelSet, deviceImage, partialC1, partialC2, partialCount1, partialCount2, xsize, ysize);
+
+    // Determine grid and block size for the final reduction kernel
+    int finalBlockSize = 256;
+    int finalGridSize = (numBlocks + finalBlockSize - 1) / finalBlockSize;
+    int finalSharedMemSize = 2 * finalBlockSize * sizeof(double) + 2 * finalBlockSize * sizeof(int);
+
+    // Launch the second kernel
+    final_reduce_kernel<<<finalGridSize, finalBlockSize, finalSharedMemSize>>>(partialC1, partialC2, partialCount1, partialCount2, deviceC1, deviceC2, deviceCount1, deviceCount2, numBlocks);
+    
     cudaDeviceSynchronize();
     // Normalize the accumulated values
     normalize_kernel<<<1, 1>>>(deviceC1, deviceC2, deviceCount1, deviceCount2);
-    cudaDeviceSynchronize();
 
+    // Free partial result memory
+    cudaFree(partialC1);
+    cudaFree(partialC2);
+    cudaFree(partialCount1);
+    cudaFree(partialCount2);
 }
+
 
 void morph_geodesic_active_contour(float* hostImage, bool* initLs, const int iterations, const float balloonForce, const float threshold, const int smoothing, bool* hostOutput,
                         const int xsize, const int ysize,
@@ -306,10 +411,11 @@ void morph_geodesic_active_contour(float* hostImage, bool* initLs, const int ite
     }
 
     bool isIsd = true;
+    bool applyBalloonForce = (balloonForce != 0.0f);
 
     for (int iter = 0; iter < iterations; iter++) {
         //baloon force
-        if (fabsf(balloonForce) > 1e-6f) {
+        if (applyBalloonForce) {
             balloon_force_kernel<<<grid, block>>>(deviceImage, deviceInitLs, deviceOutput, threshold, balloonForce, xsize,
                                     ysize);
             cudaGetLastError();
@@ -342,6 +448,7 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
     int size = xsize * ysize;
     size_t nBytes = size * sizeof(float);
     size_t nBytes_out = size * sizeof(bool);
+
     // Allocate device memory
     float *deviceImage;
     bool *deviceOutput, *deviceInitLs;
@@ -350,9 +457,10 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
     CHECK(cudaMalloc((bool**)&deviceInitLs, nBytes_out));
 
     // Copy input data to device
-    CHECK(cudaMemcpy(deviceImage,  hostImage, nBytes,     cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(deviceInitLs, initLs,    nBytes_out, cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(deviceOutput, initLs,    nBytes_out, cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(deviceImage, hostImage, nBytes, cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(deviceInitLs, initLs, nBytes_out, cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(deviceOutput, initLs, nBytes_out, cudaMemcpyHostToDevice));
+
     // Set up execution configuration
     dim3 block(BLOCK_2D, BLOCK_2D, 1);
     dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y, 1);
@@ -362,34 +470,33 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
         printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
     }
 
-    bool isIsd = true;
-
-    // Allocate memory for c1 and c2 on the device
-    double *deviceC1, *deviceC2;
-    CHECK(cudaMalloc(&deviceC1, sizeof(double)));
-    CHECK(cudaMalloc(&deviceC2, sizeof(double)));
-    // Need to normalize c1 and c2 by counting pixels
-    int *deviceCount1, *deviceCount2; //for 3D it will need bigger values
+    // Allocate memory for c1, c2, and counts on the device
+    float *deviceC1, *deviceC2;
+    int *deviceCount1, *deviceCount2;
+    CHECK(cudaMalloc(&deviceC1, sizeof(float)));
+    CHECK(cudaMalloc(&deviceC2, sizeof(float)));
     CHECK(cudaMalloc(&deviceCount1, sizeof(int)));
     CHECK(cudaMalloc(&deviceCount2, sizeof(int)));
 
+    bool isIsd = true;
+
     for (int iter = 0; iter < iterations; iter++) {
+        // Launch the reduction kernels to calculate C1, C2, Count1, and Count2
+        launch_scalar_inside_outside_kernels(deviceInitLs, deviceImage, deviceC1, deviceC2, deviceCount1, deviceCount2, xsize, ysize, block);
 
-        // Apply scalar inside/outside and normalize
-        apply_scalar_inside_outside(deviceC1, deviceC2, deviceCount1, deviceCount2, deviceInitLs, deviceImage, grid, block, xsize, ysize);
-
+        // Image attachment step using computed C1 and C2
         image_attachment_kernel<<<grid, block>>>(deviceInitLs, deviceImage, deviceOutput,
                                       deviceC1, deviceC2,
                                       lambda1, lambda2,
                                       xsize, ysize);
-        cudaGetLastError();                              
+        cudaGetLastError();
         
+        // Swap level sets
         std::swap(deviceInitLs, deviceOutput);
 
-        // smoothing force
+        // Smoothing force
         apply_smoothing_kernels(deviceInitLs, deviceOutput, xsize, ysize, smoothing, isIsd, grid, block);
         cudaGetLastError();
-
     }
 
     // Copy result back to host
@@ -404,6 +511,5 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
     cudaFree(deviceCount1);
     cudaFree(deviceCount2);
 }
-
 
 
