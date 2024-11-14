@@ -178,9 +178,10 @@ def get_extension_modules(basedir):
             library_dirs=[CUDA["lib64"]],
             runtime_library_dirs=[CUDA["lib64"]],
             extra_compile_args={
-                "gcc": ["-fPIC"],
+                "gcc": ["-fPIC","-fopenmp"],
                 "nvcc": ["--ptxas-options=-v", "-c", "--compiler-options", "-fPIC"],
             },
+            extra_link_args=['-fopenmp'],  # Link against OpenMP
         )
         for file in files
     ]
@@ -192,10 +193,12 @@ def get_extension_modules(basedir):
 ext_modules = [
     *get_extension_modules("harpia"),
     *get_extension_modules("harpia.common"),
-    *get_extension_modules("harpia.morphology"),
+    #*get_extension_modules("harpia.morphology"),
     *get_extension_modules("harpia.filters"),
     *get_extension_modules("harpia.quantification"),
     *get_extension_modules("harpia.threshold"),
+    *get_extension_modules("harpia.watershed"),
+    *get_extension_modules("harpia.distanceTransform"),
 ]
 
 print(cuda_sources)
