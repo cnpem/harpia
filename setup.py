@@ -206,9 +206,9 @@ print(files)
 print(ext_modules)
 setup(
     name="harpia",
-    version=versioneer.get_version(),
+    #version=versioneer.get_version(),
     #   cmdclass=versioneer.get_cmdclass(),
-    #   version=version['__version__'],
+    version=version['__version__'],
     description="CUDA extension for Python",
     script_args=["build_ext", "--inplace", "bdist_wheel"],
     ext_modules=cythonize(
