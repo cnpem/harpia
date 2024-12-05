@@ -122,3 +122,17 @@ def labelling(numpy.int32_t[:,:,:] image,
     cdef int* output_ptr = <int*>&output[0,0,0]
 
     return connectedComponents(image_ptr, output_ptr, xsize, ysize, zsize,type)
+
+
+cdef extern from "../../include/quantification/remove_islands.h":
+    void remove_islands(int* image, int* output, int threshold, int xsize, int ysize, int zsize, bool type)
+
+def removeIslands(numpy.int32_t[:,:,:] image,
+                   numpy.int32_t[:,:,:] output,
+                   int threshold,
+                   int xsize, int ysize, int zsize):
+
+    cdef int* image_ptr = <int*>&image[0,0,0]
+    cdef int* output_ptr = <int*>&output[0,0,0]
+
+    return remove_islands(image_ptr, output_ptr, threshold, xsize, ysize, zsize,type)
