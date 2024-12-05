@@ -79,7 +79,7 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
     cudaMemcpy(deviceKernel, kernel, nx * ny * sizeof(float), cudaMemcpyHostToDevice);
 
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -112,7 +112,7 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
     cudaMemcpy(deviceKernel, kernel, nx * ny * nz * sizeof(float), cudaMemcpyHostToDevice);
 
     dim3 blockSize(8, 8, 8);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x,
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
                   (zsize + blockSize.z - 1) / blockSize.z);
 
     auto start = std::chrono::high_resolution_clock::now();

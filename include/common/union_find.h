@@ -108,3 +108,8 @@ __device__ inline void union_gpu(int* set, int a, int b)
     
 
 }
+
+__device__ inline bool HasBit(int bitmask, int bit)
+{
+    return (bitmask & (1 << bit)) != 0;
+}

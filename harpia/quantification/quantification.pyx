@@ -110,3 +110,15 @@ def compute_volume(numpy.int32_t[:,:,:] image,
     cdef unsigned int* output_ptr = <unsigned int*>&output[0,0,0]
 
     return volume(image_ptr, output_ptr, xsize, ysize, zsize)
+
+cdef extern from "../../include/quantification/connected_components.h":
+    void connectedComponents(int* image, int* output, int xsize, int ysize, int zsize, bool type)
+
+def labelling(numpy.int32_t[:,:,:] image,
+                   numpy.int32_t[:,:,:] output,
+                   int xsize, int ysize, int zsize):
+
+    cdef int* image_ptr = <int*>&image[0,0,0]
+    cdef int* output_ptr = <int*>&output[0,0,0]
+
+    return connectedComponents(image_ptr, output_ptr, xsize, ysize, zsize,type)
