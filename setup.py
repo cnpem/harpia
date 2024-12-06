@@ -1,6 +1,8 @@
 import glob
 import os
 from os.path import join as pjoin
+from concurrent.futures import ThreadPoolExecutor
+import multiprocessing
 
 import numpy
 from Cython.Build import cythonize
@@ -115,11 +117,11 @@ def customize_compiler_for_nvcc(self):
 
 # Run the customize_compiler function
 class custom_build_ext(build_ext):
+    """Customize and build the extensions using the nvcc compiler for CUDA files."""
     def build_extensions(self):
-        """Customize and build the extensions using the nvcc compiler for CUDA files."""
         customize_compiler_for_nvcc(self.compiler)
-        build_ext.build_extensions(self)
-
+        with ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+            executor.map(self.build_extension, self.extensions)
 
 # Global variables to be used by get_extension_modules()
 CUDA = locate_cuda()
@@ -188,15 +190,24 @@ def get_extension_modules(basedir):
     return ext
 
 
-# Create Extension objects for various submodules
-ext_modules = [
-    *get_extension_modules("harpia"),
-    *get_extension_modules("harpia.common"),
-    *get_extension_modules("harpia.morphology"),
-    *get_extension_modules("harpia.filters"),
-    *get_extension_modules("harpia.quantification"),
-    *get_extension_modules("harpia.threshold"),
-]
+def get_all_extension_modules():
+    submodules = [
+        "harpia",
+        "harpia.common",
+        "harpia.morphology",
+        "harpia.filters",
+        "harpia.quantification",
+        "harpia.threshold",
+    ]
+    ext_modules = []
+    with ThreadPoolExecutor() as executor:
+        results = executor.map(get_extension_modules, submodules)
+        for result in results:
+            ext_modules.extend(result)
+    return ext_modules
+
+
+ext_modules = get_all_extension_modules()
 
 print(cuda_sources)
 print(files)
