@@ -84,6 +84,9 @@ def morph_2D_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] hostImage,
            Transactions on Pattern Analysis and Machine Intelligence (PAMI),
            2014, DOI 10.1109/TPAMI.2013.106
     """
+    #apply padding
+    hostImage = np.pad(hostImage, pad_width=1, mode="edge")
+    initLs = np.pad(initLs, pad_width=1, mode="edge")
     # Ensure input arrays are C-contiguous
     hostImage = np.ascontiguousarray(hostImage, dtype=np.float32)
     initLs = np.ascontiguousarray(initLs, dtype=np.bool_)
@@ -99,8 +102,10 @@ def morph_2D_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] hostImage,
         &hostImage[0, 0], &initLs[0, 0], iterations, balloonForce, threshold, smoothing,
         &hostOutput[0, 0], isize.x, isize.y, flag_verbose
     )
+    #remove padding
+    hostImage = hostImage[1:-1, 1:-1]
 
-    return hostOutput
+    return hostOutput[1:-1, 1:-1]
 
 def morph_2D_chan_vese(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bool, ndim=2] initLs, int iterations, float lambda1, float lambda2, int smoothing, int flag_verbose=0):
     """Morphological Active Contours without Edges (MorphACWE)
@@ -163,6 +168,11 @@ def morph_2D_chan_vese(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bo
            Transactions on Pattern Analysis and Machine Intelligence (PAMI),
            2014, DOI 10.1109/TPAMI.2013.106
     """
+
+    #apply padding
+    hostImage = np.pad(hostImage, pad_width=1, mode="edge")
+    initLs = np.pad(initLs, pad_width=1, mode="edge")
+
     # Ensure input arrays are C-contiguous
     hostImage = np.ascontiguousarray(hostImage, dtype=np.float32)
     initLs = np.ascontiguousarray(initLs, dtype=np.bool_)
@@ -179,4 +189,7 @@ def morph_2D_chan_vese(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bo
         &hostOutput[0, 0], isize.x, isize.y, flag_verbose
     )
 
-    return hostOutput
+    #remove padding
+    hostImage = hostImage[1:-1, 1:-1]
+
+    return hostOutput[1:-1, 1:-1]
