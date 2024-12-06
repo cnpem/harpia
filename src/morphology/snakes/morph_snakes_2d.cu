@@ -3,8 +3,9 @@
 #include "../../../include/common/grid_block_sizes.h"
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/morphology/morph_snakes_2d.h"
+#include <vector>     // For std::vector
+#include <numeric>    // For std::accumulate
 
-// Structure to hold neighbor offsets
 struct Neighbor {
     int dx, dy;
 };
@@ -96,7 +97,7 @@ __global__ void balloon_force_kernel(float* deviceImage, bool* deviceLevelSet, b
   int idy = threadIdx.y + blockIdx.y * blockDim.y;
 
   // Skip border pixels and check bounds
-  if (idx > 1 && idx < xsize-2 && idy > 1 && idy < ysize-2) {
+  if (idx > 0 && idx < xsize-1 && idy > 0 && idy < ysize-1) {
     balloon_force_pixel(deviceImage, deviceLevelSet, deviceTemp, threshold, balloonForce,
                        idx, idy, xsize, ysize);
   }
@@ -112,7 +113,6 @@ __device__ Gradient nabla(dtype* image, int centerIdx, int centerIdy, const int 
     result.dy = 0.5f * (static_cast<float>(image[(centerIdy + 1) * xsize + centerIdx]) - 
                         static_cast<float>(image[(centerIdy - 1) * xsize + centerIdx]));
 
-    
     return result;
 }
 
@@ -143,8 +143,6 @@ __device__ void image_attachment_pixel(bool* deviceLevelSet, float* image, bool*
                                        int centerIdx, int centerIdy,
                                        const int xsize, const int ysize) {
     int centerIndex = centerIdy * xsize + centerIdx;
-    //float c1 = *deviceC1;
-    //float c2 = *deviceC2;
 
     // Calculate gradient
     Gradient du = nabla(deviceLevelSet, centerIdx, centerIdy, xsize, ysize);
@@ -153,12 +151,12 @@ __device__ void image_attachment_pixel(bool* deviceLevelSet, float* image, bool*
     float du_abs = fabsf(du.dx) + fabsf(du.dy);
 
     // Calculate squared differences
-    float diff1 = static_cast<double>(image[centerIndex]) - static_cast<double>(*deviceC1);
-    float diff2 = static_cast<double>(image[centerIndex]) - static_cast<double>(*deviceC2);
+    double diff1 = static_cast<double>(image[centerIndex]) - static_cast<double>(*deviceC1);
+    double diff2 = static_cast<double>(image[centerIndex]) - static_cast<double>(*deviceC2);
     double factor = lambda1 * diff1 * diff1 - lambda2 * diff2 * diff2;
 
-    if (factor == 0 || du_abs < 0.1) {
-        //output[centerIndex] = deviceLevelSet[centerIndex];
+    if (factor == 0 || du_abs < 0.001) {
+        output[centerIndex] = deviceLevelSet[centerIndex];
     } else if (factor > 0) {
         output[centerIndex] = false;
     } else {
@@ -222,56 +220,43 @@ __global__ void image_attachment_kernel(bool* deviceLevelSet, float* deviceImage
     }
 }
 
-// Kernel to normalize the accumulated values
-__global__ void normalize_kernel(float* deviceC1, float* deviceC2, int* deviceCount1, int* deviceCount2) {
-    if (threadIdx.x == 0 && blockIdx.x == 0) {
-        // Normalize C1 and C2 by their respective counts
-        if (*deviceCount1 > 0) {
-            *deviceC1 /= (*deviceCount1 * 1.0f);
-        }
-        if (*deviceCount2 > 0) {
-            *deviceC2 /= (*deviceCount2 * 1.0f);
-        }
-    }
-}
-
 __global__ void reduce_kernel(const bool* deviceLevelSet, const float* deviceImage,
                               double* partialC1, double* partialC2,
                               int* partialCount1, int* partialCount2,
                               const int xsize, const int ysize) {
     extern __shared__ double sharedData[];
-    double* sharedC1 = sharedData;
-    double* sharedC2 = sharedData + blockDim.x * blockDim.y;
-    int* sharedCount1 = (int*)(sharedData + 2 * blockDim.x * blockDim.y);
-    int* sharedCount2 = sharedCount1 + blockDim.x * blockDim.y;
 
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    int idy = threadIdx.y + blockIdx.y * blockDim.y;
     int tid = threadIdx.y * blockDim.x + threadIdx.x;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    int centerIndex = idy * xsize + idx;
+
+    // Shared memory buffers for this block
+    double* sharedC1 = sharedData;
+    double* sharedC2 = sharedC1 + blockDim.x * blockDim.y;
+    int* sharedCount1 = (int*)(sharedC2 + blockDim.x * blockDim.y);
+    int* sharedCount2 = sharedCount1 + blockDim.x * blockDim.y;
 
     // Initialize shared memory
     sharedC1[tid] = 0.0;
     sharedC2[tid] = 0.0;
     sharedCount1[tid] = 0;
     sharedCount2[tid] = 0;
-
     __syncthreads();
 
-    // Check bounds
+    // Boundary check
     if (idx < xsize && idy < ysize) {
-        int centerIndex = idy * xsize + idx;
         if (deviceLevelSet[centerIndex]) {
-            sharedC1[tid] += static_cast<double>(deviceImage[centerIndex]);
-            sharedCount1[tid] += 1;
+            sharedC1[tid] += deviceImage[centerIndex];
+            sharedCount1[tid]++;
         } else {
-            sharedC2[tid] += static_cast<double>(deviceImage[centerIndex]);
-            sharedCount2[tid] += 1;
+            sharedC2[tid] += deviceImage[centerIndex];
+            sharedCount2[tid]++;
         }
     }
-
     __syncthreads();
 
-    // Perform reduction within the block
+    // Block-wide reduction
     for (int s = blockDim.x * blockDim.y / 2; s > 0; s >>= 1) {
         if (tid < s) {
             sharedC1[tid] += sharedC1[tid + s];
@@ -282,20 +267,22 @@ __global__ void reduce_kernel(const bool* deviceLevelSet, const float* deviceIma
         __syncthreads();
     }
 
-    // Write the result for this block to global memory
+    // Output block results
     if (tid == 0) {
-        partialC1[blockIdx.x + gridDim.x * blockIdx.y] = sharedC1[0];
-        partialC2[blockIdx.x + gridDim.x * blockIdx.y] = sharedC2[0];
-        partialCount1[blockIdx.x + gridDim.x * blockIdx.y] = sharedCount1[0];
-        partialCount2[blockIdx.x + gridDim.x * blockIdx.y] = sharedCount2[0];
+        int blockIndex = blockIdx.x + gridDim.x * blockIdx.y;
+        partialC1[blockIndex] = sharedC1[0];
+        partialC2[blockIndex] = sharedC2[0];
+        partialCount1[blockIndex] = sharedCount1[0];
+        partialCount2[blockIndex] = sharedCount2[0];
     }
 }
+
 
 // Second kernel to finalize reduction
 __global__ void final_reduce_kernel(double* partialC1, double* partialC2,
                                     int* partialCount1, int* partialCount2,
-                                    float* deviceC1, float* deviceC2,
-                                    int* deviceCount1, int* deviceCount2,
+                                    double* outputC1, double* outputC2,
+                                    int* outputCount1, int* outputCount2,
                                     int numElements) {
     extern __shared__ double sharedData[];
     double* sharedC1 = sharedData;
@@ -325,25 +312,24 @@ __global__ void final_reduce_kernel(double* partialC1, double* partialC2,
         __syncthreads();
     }
 
-    // Write result to global memory
+    // Write block's final result to global output arrays (no atomic operations needed)
     if (tid == 0) {
-        atomicAdd(deviceC1, static_cast<float>(sharedC1[0]));
-        atomicAdd(deviceC2, static_cast<float>(sharedC2[0]));
-        atomicAdd(deviceCount1, sharedCount1[0]);
-        atomicAdd(deviceCount2, sharedCount2[0]);
+        outputC1[blockIdx.x] = sharedC1[0];
+        outputC2[blockIdx.x] = sharedC2[0];
+        outputCount1[blockIdx.x] = sharedCount1[0];
+        outputCount2[blockIdx.x] = sharedCount2[0];
     }
 }
 
+// Launch function
 void launch_scalar_inside_outside_kernels(const bool* deviceLevelSet, const float* deviceImage,
                                           float* deviceC1, float* deviceC2,
                                           int* deviceCount1, int* deviceCount2,
                                           const int xsize, const int ysize,
                                           dim3 blockSize) {
-    // Calculate grid size based on input block size
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
     int numBlocks = gridSize.x * gridSize.y;
 
-    // Allocate memory for partial results
     double *partialC1, *partialC2;
     int *partialCount1, *partialCount2;
     cudaMalloc(&partialC1, numBlocks * sizeof(double));
@@ -351,33 +337,64 @@ void launch_scalar_inside_outside_kernels(const bool* deviceLevelSet, const floa
     cudaMalloc(&partialCount1, numBlocks * sizeof(int));
     cudaMalloc(&partialCount2, numBlocks * sizeof(int));
 
-    // Initialize output variables
+    double *outputC1, *outputC2;
+    int *outputCount1, *outputCount2;
+    int finalGridSize = (numBlocks + 255) / 256;
+    cudaDeviceSynchronize();
+    cudaMalloc(&outputC1, finalGridSize * sizeof(double));
+    cudaMalloc(&outputC2, finalGridSize * sizeof(double));
+    cudaMalloc(&outputCount1, finalGridSize * sizeof(int));
+    cudaMalloc(&outputCount2, finalGridSize * sizeof(int));
+
     cudaMemset(deviceC1, 0, sizeof(float));
     cudaMemset(deviceC2, 0, sizeof(float));
     cudaMemset(deviceCount1, 0, sizeof(int));
     cudaMemset(deviceCount2, 0, sizeof(int));
 
-    // Launch the first kernel
     int sharedMemSize = 2 * blockSize.x * blockSize.y * sizeof(double) + 2 * blockSize.x * blockSize.y * sizeof(int);
     reduce_kernel<<<gridSize, blockSize, sharedMemSize>>>(deviceLevelSet, deviceImage, partialC1, partialC2, partialCount1, partialCount2, xsize, ysize);
-
-    // Determine grid and block size for the final reduction kernel
-    int finalBlockSize = 256;
-    int finalGridSize = (numBlocks + finalBlockSize - 1) / finalBlockSize;
-    int finalSharedMemSize = 2 * finalBlockSize * sizeof(double) + 2 * finalBlockSize * sizeof(int);
-
-    // Launch the second kernel
-    final_reduce_kernel<<<finalGridSize, finalBlockSize, finalSharedMemSize>>>(partialC1, partialC2, partialCount1, partialCount2, deviceC1, deviceC2, deviceCount1, deviceCount2, numBlocks);
-    
     cudaDeviceSynchronize();
-    // Normalize the accumulated values
-    normalize_kernel<<<1, 1>>>(deviceC1, deviceC2, deviceCount1, deviceCount2);
 
-    // Free partial result memory
+    int finalBlockSize = 256;
+    int finalSharedMemSize = 2 * finalBlockSize * sizeof(double) + 2 * finalBlockSize * sizeof(int);
+    final_reduce_kernel<<<finalGridSize, finalBlockSize, finalSharedMemSize>>>(partialC1, partialC2, partialCount1, partialCount2, outputC1, outputC2, outputCount1, outputCount2, numBlocks);
+    cudaDeviceSynchronize();
+
+    std::vector<double> hostC1(finalGridSize), hostC2(finalGridSize);
+    std::vector<int> hostCount1(finalGridSize), hostCount2(finalGridSize);
+    cudaMemcpy(hostC1.data(), outputC1, finalGridSize * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(hostC2.data(), outputC2, finalGridSize * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(hostCount1.data(), outputCount1, finalGridSize * sizeof(int), cudaMemcpyDeviceToHost);
+    cudaMemcpy(hostCount2.data(), outputCount2, finalGridSize * sizeof(int), cudaMemcpyDeviceToHost);
+
+    double finalC1 = std::accumulate(hostC1.begin(), hostC1.end(), 0.0);
+    double finalC2 = std::accumulate(hostC2.begin(), hostC2.end(), 0.0);
+    int finalCount1 = std::accumulate(hostCount1.begin(), hostCount1.end(), 0);
+    int finalCount2 = std::accumulate(hostCount2.begin(), hostCount2.end(), 0);
+
+    finalC1 = finalC1/static_cast<double>(finalCount1);
+    finalC2 = finalC2/static_cast<double>(finalCount2);
+    
+    float finalC1f = static_cast<float>(finalC1);
+    float finalC2f = static_cast<float>(finalC2);
+    cudaDeviceSynchronize();
+
+    cudaMemcpy(deviceC1, &finalC1f, sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(deviceC2, &finalC2f, sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(deviceCount1, &finalCount1, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(deviceCount2, &finalCount2, sizeof(int), cudaMemcpyHostToDevice);
+
     cudaFree(partialC1);
     cudaFree(partialC2);
     cudaFree(partialCount1);
     cudaFree(partialCount2);
+    cudaFree(outputC1);
+    cudaFree(outputC2);
+    cudaFree(outputCount1);
+    cudaFree(outputCount2);
+    cudaDeviceSynchronize();
+
+
 }
 
 
@@ -490,7 +507,6 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
                                       lambda1, lambda2,
                                       xsize, ysize);
         cudaGetLastError();
-        
         // Swap level sets
         std::swap(deviceLevelSet, deviceTemp);
 
@@ -498,7 +514,7 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
         apply_smoothing_kernels(deviceLevelSet, deviceTemp, xsize, ysize, smoothing, isIsd, grid, block);
         cudaGetLastError();
     }
-
+    cudaDeviceSynchronize();
     // Copy result back to host
     CHECK(cudaMemcpy(hostOutput, deviceLevelSet, nBytes_out, cudaMemcpyDeviceToHost));
 
@@ -511,3 +527,5 @@ void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const
     cudaFree(deviceCount1);
     cudaFree(deviceCount2);
 }
+
+

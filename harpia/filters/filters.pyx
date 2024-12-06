@@ -1,6 +1,9 @@
 cimport cython
 cimport numpy as np
+import numpy as np
+
 from libcpp cimport bool
+from harpia.common import Size
 
 #Define the fused type for numeric types : float, int, unsigned int
 ctypedef fused numeric:
@@ -223,11 +226,13 @@ ctypedef fused real:
     double
 
 cdef extern from '../../include/filters/anisotropic_diffusion.h':
-    void anisotropicDiffusion2DGPU[dtype](dtype* hostImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int xsize, int ysize)
 
-    void anisotropicDiffusion3DGPU[dtype](dtype* hostImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int xsize, int ysize, int zsize)
+    void anisotropicDiffusion2DGPU[dtype](dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
+                               int diffusionOption, int xsize, int ysize)                        
+
+    void anisotropicDiffusion3D[dtype](dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
+                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, bool gpu)
+
 
 def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterations,
                           float delta_t, float kappa, int diffusion_option):
@@ -258,17 +263,22 @@ def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterat
 
     Returns:
     --------
-    None
-        The diffused image is applied at the input image.
+    output_image
+        The diffused image in the same data type as the input..
     """
 
-    cdef int ysize = hostImage.shape[0]
-    cdef int xsize = hostImage.shape[1]
+    # Define variables
+    isize = Size(hostImage)
+    
+    # Create the output array
+    cdef np.ndarray[real, ndim=2] hostOutput = np.empty_like(hostImage)
 
-    anisotropicDiffusion2DGPU(&hostImage[0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize)
+    anisotropicDiffusion2DGPU(&hostImage[0,0], &hostOutput[0,0], total_iterations, delta_t, kappa, diffusion_option, isize.x, isize.y)
+
+    return hostOutput
 
 def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterations,
-                          float delta_t, float kappa, int diffusion_option):
+                          float delta_t, float kappa, int diffusion_option, int flag_verbose, float gpuMemory, bool gpu):
     """
     Performs anisotropic diffusion on a 3D image.
 
@@ -296,15 +306,19 @@ def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterat
 
     Returns:
     --------
-    None
-        The diffused image is applied at the input image.
+    output_image
+        The diffused image in the same data type as the input.
     """
-    cdef int xsize = hostImage.shape[2]
-    cdef int ysize = hostImage.shape[1]
-    cdef int zsize = hostImage.shape[0]
+    # Define variables
+    isize = Size(hostImage)
+    
+    # Create the output array
+    cdef np.ndarray[real, ndim=3] hostOutput = np.empty_like(hostImage)
 
-    anisotropicDiffusion3DGPU(&hostImage[0,0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize, zsize)
+    anisotropicDiffusion3D(&hostImage[0,0,0], &hostOutput[0,0,0], total_iterations, delta_t, kappa, 
+    diffusion_option, isize.x, isize.y, isize.z, flag_verbose, gpuMemory, gpu)
 
+    return hostOutput
 
 # Extern declaration for the non-local means filtering function from C/C++ library
 cdef extern from "../../include/filters/non_local_means.h":
