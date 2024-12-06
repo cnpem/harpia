@@ -3,9 +3,12 @@
 #include <iostream>
 #include <numeric>
 #include "../../include/filters/anisotropic_diffusion.h"
+#include "../../include/common/chunkedExecutor.h"
+#include "../../include/common/grid_block_sizes.h"
+#include "../../include/morphology/cuda_helper.h"
 
 template <typename dtype>
-__global__ void anisotropicDiffusion2DKernel(dtype* hostImage, dtype* outputImage, float deltaT,
+__global__ void anisotropicDiffusion2DKernel(dtype* deviceImage, dtype* outputImage, float deltaT,
                                              float kappa, int diffusionOption, int xsize,
                                              int ysize) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;  // x-axis
@@ -19,18 +22,18 @@ __global__ void anisotropicDiffusion2DKernel(dtype* hostImage, dtype* outputImag
     int idxEast = min(idx + 1, xsize - 1);
     int idxWest = max(idx - 1, 0);
 
-    dtype center = hostImage[idy * xsize + idx];
+    dtype center = deviceImage[idy * xsize + idx];
     dtype nabla[8];
     double_t diffusionCoefficients[8];
 
-    nabla[0] = hostImage[idyNorth * xsize + idx] - center;      // North
-    nabla[1] = hostImage[idySouth * xsize + idx] - center;      // South
-    nabla[2] = hostImage[idy * xsize + idxWest] - center;       // West
-    nabla[3] = hostImage[idy * xsize + idxEast] - center;       // East
-    nabla[4] = hostImage[idyNorth * xsize + idxWest] - center;  // Northwest
-    nabla[5] = hostImage[idyNorth * xsize + idxEast] - center;  // Northeast
-    nabla[6] = hostImage[idySouth * xsize + idxWest] - center;  // Southwest
-    nabla[7] = hostImage[idySouth * xsize + idxEast] - center;  // Southeast
+    nabla[0] = deviceImage[idyNorth * xsize + idx] - center;      // North
+    nabla[1] = deviceImage[idySouth * xsize + idx] - center;      // South
+    nabla[2] = deviceImage[idy * xsize + idxWest] - center;       // West
+    nabla[3] = deviceImage[idy * xsize + idxEast] - center;       // East
+    nabla[4] = deviceImage[idyNorth * xsize + idxWest] - center;  // Northwest
+    nabla[5] = deviceImage[idyNorth * xsize + idxEast] - center;  // Northeast
+    nabla[6] = deviceImage[idySouth * xsize + idxWest] - center;  // Southwest
+    nabla[7] = deviceImage[idySouth * xsize + idxEast] - center;  // Southeast
 
     double_t diffusionSum = 0;
 
@@ -47,12 +50,12 @@ __global__ void anisotropicDiffusion2DKernel(dtype* hostImage, dtype* outputImag
       diffusionSum += diffusionCoefficients[i];
     }
 
-    outputImage[idy * xsize + idx] = hostImage[idy * xsize + idx] + deltaT * diffusionSum;
+    outputImage[idy * xsize + idx] = deviceImage[idy * xsize + idx] + deltaT * diffusionSum;
   }
 }
 
 template <typename dtype>
-void anisotropicDiffusion2DGPU(dtype* hostImage, int totalIterations, float deltaT, float kappa,
+void anisotropicDiffusion2DGPU(dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
                                int diffusionOption, int xsize, int ysize) {
   dtype *deviceImage, *deviceTmp;
   size_t numBytes = xsize * ysize * sizeof(dtype);
@@ -75,27 +78,29 @@ void anisotropicDiffusion2DGPU(dtype* hostImage, int totalIterations, float delt
     std::swap(deviceImage, deviceTmp);
   }
 
-  cudaMemcpy(hostImage, deviceImage, numBytes, cudaMemcpyDeviceToHost);
+  cudaMemcpy(hostOutput, deviceImage, numBytes, cudaMemcpyDeviceToHost);
 
   cudaFree(deviceImage);
   cudaFree(deviceTmp);
 }
 
-template void anisotropicDiffusion2DGPU<float>(float*, int, float, float, int, int, int);
-template void anisotropicDiffusion2DGPU<double>(double*, int, float, float, int, int, int);
+
+template void anisotropicDiffusion2DGPU<float>(float*, float*, int, float, float, int, int, int);
+template void anisotropicDiffusion2DGPU<double>(double*, double*, int, float, float, int, int, int);
 
 // on device, change name
 template <typename dtype>
-__global__ void anisotropicDiffusion3DKernel(dtype* hostImage, dtype* outputImage, float deltaT,
-                                             float kappa, int diffusionOption, int xsize, int ysize,
-                                             int zsize) {
+__global__ void anisotropicDiffusion3DKernel(dtype* deviceImage, dtype* outputImage, float deltaT,
+                                             float kappa, int diffusionOption,
+                                             int xsize, int ysize, int zsize) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     int idy = blockIdx.y * blockDim.y + threadIdx.y;
     int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
+
     if (idx < xsize && idy < ysize && idz < zsize) {
         int idx_center = idx + idy * xsize + idz * xsize * ysize;
-        dtype center = hostImage[idx_center];
+        dtype center = deviceImage[idx_center];
         double_t diffusionSum = 0;
 
         // Process 6-neighborhood (face neighbors)
@@ -105,12 +110,12 @@ __global__ void anisotropicDiffusion3DKernel(dtype* hostImage, dtype* outputImag
             int currentidz = idz + offsets[i][0];
             int currentidy = idy + offsets[i][1];
             int currentidx = idx + offsets[i][2];
-            
+
             if (currentidx >= 0 && currentidx < xsize && 
                 currentidy >= 0 && currentidy < ysize && 
                 currentidz >= 0 && currentidz < zsize) {
                 
-                dtype nabla = hostImage[currentidx + currentidy * xsize + 
+                dtype nabla = deviceImage[currentidx + currentidy * xsize + 
                                       currentidz * xsize * ysize] - center;
                 
                 double scaledDiff = pow(nabla / kappa, 2);
@@ -130,23 +135,31 @@ __global__ void anisotropicDiffusion3DKernel(dtype* hostImage, dtype* outputImag
 }
 
 template <typename dtype>
-void anisotropicDiffusion3DGPU(dtype* hostImage, int totalIterations, float deltaT, float kappa,
-                               int diffusionOption, int xsize, int ysize, int zsize) {
-  dtype *deviceImage, *deviceTmp;
+void anisotropicDiffusion3DGPU(dtype* hostImage, dtype* hostOutput, int xsize, int ysize, int zsize, int flag_verbose,
+                               int totalIterations, float deltaT, float kappa, int diffusionOption) {
+
   size_t numBytes = xsize * ysize * zsize * sizeof(dtype);
 
   // Allocate memory for the input image on the device
-  cudaMalloc((void**)&deviceImage, numBytes);
-  cudaMalloc((void**)&deviceTmp, numBytes);
+  dtype *deviceImage, *deviceTmp;
+  CHECK(cudaMalloc((void**)&deviceImage, numBytes));
+  CHECK(cudaMalloc((void**)&deviceTmp, numBytes));
 
-  cudaMemcpy(deviceImage, hostImage, numBytes, cudaMemcpyHostToDevice);
-
-  dim3 blockSize(8, 8, 8);
-  dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
-                (zsize + blockSize.z - 1) / blockSize.z);
+  CHECK(cudaMemcpy(deviceImage, hostImage, numBytes, cudaMemcpyHostToDevice));
+  //set up execution configuration
+  dim3 block(BLOCK_3D, BLOCK_3D, BLOCK_3D);
+  if (zsize == 1)
+    block = dim3(BLOCK_2D, BLOCK_2D, 1);
+  dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y,
+            (zsize + block.z - 1) / block.z);
+  // check grid and block dimension from host side
+  if (flag_verbose==1) {
+    printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
+    printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+  }
 
   for (int iter = 0; iter < totalIterations; iter++) {
-    anisotropicDiffusion3DKernel<dtype><<<gridSize, blockSize>>>(
+    anisotropicDiffusion3DKernel<dtype><<<grid, block>>>(
         deviceImage, deviceTmp, deltaT, kappa, diffusionOption, xsize, ysize, zsize);
 
     cudaDeviceSynchronize();  // Synchronous barrier at each time step iteration
@@ -154,11 +167,28 @@ void anisotropicDiffusion3DGPU(dtype* hostImage, int totalIterations, float delt
     std::swap(deviceImage, deviceTmp);
   }
 
-  cudaMemcpy(hostImage, deviceImage, numBytes, cudaMemcpyDeviceToHost);
+  CHECK(cudaMemcpy(hostOutput, deviceImage, numBytes, cudaMemcpyDeviceToHost));
 
   cudaFree(deviceImage);
   cudaFree(deviceTmp);
 }
 
-template void anisotropicDiffusion3DGPU<float>(float*, int, float, float, int, int, int, int);
-template void anisotropicDiffusion3DGPU<double>(double*, int, float, float, int, int, int, int);
+template void anisotropicDiffusion3DGPU<float>(float* , float*    , int, int, int, int, int, float, float, int);
+template void anisotropicDiffusion3DGPU<double>(double* , double* , int, int, int, int, int, float, float, int);
+
+template <typename dtype>
+void anisotropicDiffusion3D(dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
+                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, bool gpu) {
+    if (gpu) {
+    int ncopies = 2;
+    chunkedExecutor(anisotropicDiffusion3DGPU<dtype>, ncopies, gpuMemory, hostImage,
+                          hostOutput, xsize, ysize, zsize, flag_verbose, totalIterations, deltaT, kappa, diffusionOption);
+  } else {
+    throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D. "
+                                 "Please ensure a GPU is available to execute this function.");
+  }
+}
+
+template void anisotropicDiffusion3D<float>(float*, float*,    int, float, float, int, int, int, int, int, float, bool);
+template void anisotropicDiffusion3D<double>(double*, double*, int, float, float, int, int, int, int, int, float, bool);
+
