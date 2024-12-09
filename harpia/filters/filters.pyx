@@ -278,7 +278,7 @@ def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterat
     return hostOutput
 
 def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterations,
-                          float delta_t, float kappa, int diffusion_option, int flag_verbose, float gpuMemory, bool gpu):
+                          float delta_t, float kappa, int diffusion_option, int flag_verbose, float gpuMemory, bool gpu = True):
     """
     Performs anisotropic diffusion on a 3D image.
 
@@ -303,6 +303,12 @@ def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterat
           Option 3 is a faster implementation based on:
           Mbarki, Zouhair, et al. "A new rapid auto-adapting diffusion function for adaptive anisotropic 
           image de-noising and sharply conserved edges." Computers & Mathematics with Applications 74.8 (2017): 1751-1768.
+    flag_verbose: int
+        Verbose for number of chuncks in execution
+    gpuMemmory: bool
+        Percentage of memmory occupied in the GPU (if using the gpu function). With cython value, working value is of 0.4 (40%).
+    gpu: bool
+        True for using the gpu function, false for using the cpu function (not implemented).
 
     Returns:
     --------
