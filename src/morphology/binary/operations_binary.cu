@@ -321,23 +321,25 @@ template void reconstruction_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const
 
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
-                const int zsize, const int flag_verbose, bool gpu) {
+                const int zsize, int padding, const int flag_verbose, float gpuMemory, bool gpu) {
 
   if (gpu) {
-    fill_holes_on_device(hostImage, hostOutput, xsize, ysize, zsize, flag_verbose);
+    int ncopies = 3
+    chunkedExecutorFillHoles(fill_holes_on_device<dtype>, ncopies, gpuMemory, hostImage, hostOutput,
+                             padding, xsize, ysize, zsize, flag_verbose)
   } else {
     fill_holes_on_host(hostImage, hostOutput, xsize, ysize, zsize);
   }
 }
 // Template instantiations for specific types
-template void fill_holes<int>(int*, int*, const int, const int, const int, const int, bool);
+template void fill_holes<int>(int*, int*, const int, const int, const int, const int, float, bool);
 template void fill_holes<unsigned int>(unsigned int*, unsigned int*, const int, const int,
-                                       const int, const int, bool);
-template void fill_holes<int16_t>(int16_t*, int16_t*, const int, const int, const int, const int,
-                                  bool);
-template void fill_holes<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int, const int,
-                                   bool);
-template void fill_holes<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                 bool);
-template void fill_holes<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int,
-                                  bool);
+                                       const int, const int, float, bool);
+template void fill_holes<int16_t>(int16_t*, int16_t*, const int, const int, const int, const int, 
+                                  float, bool);
+template void fill_holes<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int, const int, 
+                                   float, bool);
+template void fill_holes<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int, 
+                                 float, bool);
+template void fill_holes<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int, 
+                                  float, bool);
