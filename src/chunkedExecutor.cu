@@ -319,3 +319,85 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
     printf("\nFinished processing all chunks!\n");
   }
 }
+
+// Wrapper function
+// ToDo: decidir qual métodos vou implementar, terminar o chunked fillholes 
+// vou resolver só no annotat3ed? e a memória? a operação 'or' faço aqui ou no arquivo operations?
+// tem que chamar mais um chunked executor lá
+template <typename Func, typename dtype, typename... Args>
+void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, dtype* image, dtype* output1,
+                              dtype* output2, const int xsize, const int ysize, const int zsize, const int verbose,
+                              Args... args) {
+
+  dtype* i_ref = image;
+  dtype* o_ref1 = output1;
+  dtype* o_ref2 = output2;
+
+  // Get memory allocated by the func
+  int sliceSize = xsize * ysize;
+  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
+
+  // Get available devices
+  int ngpus;
+  CHECK(cudaGetDeviceCount(&ngpus));
+
+  // Get free memory on the GPU with less memory in bytes
+  size_t freeBytes, totalBytes, freeGpuBytes;
+  CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
+
+  for (int i = 1; i < ngpus; i++) {
+    CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
+    if (freeGpuBytes < freeBytes) {
+      freeBytes = freeGpuBytes;
+    }
+  }
+
+  // How many slices fit in the GPU?
+  int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
+  if (verbose) {
+    printf("MaxChunkSize:%d zsize:%d ngpus:%d\n", chunkSize, zsize, ngpus);
+  }
+
+  if (chunkSize == 0) {
+    fprintf(
+        stderr,
+        "Error: Not enough memory to fit even one slice. Adjust slice size or free up memory.\n");
+    return;
+  } else if (chunkSize > zsize) {
+    chunkSize = zsize;
+    if (verbose) {
+      printf("ActualChunkSize:%d\n", chunkSize);
+    }
+  }
+
+  int iz = 0;
+  int deviceCount = 0;
+  int selectedDevice;
+  for (; iz <= zsize - chunkSize; iz += chunkSize) {
+    selectedDevice = deviceCount % ngpus;
+    CHECK(cudaSetDevice(selectedDevice));
+    if (verbose) {
+      printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
+    }
+    func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
+    i_ref += chunkSize * sliceSize;
+    o_ref += chunkSize * sliceSize;
+    deviceCount += 1;
+  }
+
+  // Process the remaining slices, if any
+  int remaining = zsize - iz;
+  selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
+  if (verbose) {
+    printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
+  }
+  if (remaining > 0) {
+    func(i_ref, o_ref, xsize, ysize, remaining, verbose, args...);
+  }
+  if (verbose) {
+    printf("\nFinished processing all chunks!\n");
+  }
+
+
+}
