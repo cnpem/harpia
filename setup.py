@@ -193,9 +193,9 @@ ext_modules = [
     *get_extension_modules("harpia"),
     *get_extension_modules("harpia.common"),
     *get_extension_modules("harpia.morphology"),
-    *get_extension_modules("harpia.filters"),
-    *get_extension_modules("harpia.quantification"),
-    *get_extension_modules("harpia.threshold"),
+#    *get_extension_modules("harpia.filters"),
+#    *get_extension_modules("harpia.quantification"),
+#    *get_extension_modules("harpia.threshold"),
 ]
 
 print(cuda_sources)

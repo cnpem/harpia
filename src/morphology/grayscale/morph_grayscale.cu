@@ -194,13 +194,15 @@ void morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xs
   deviceImage = i_deviceImage + padding_bottom * xsize * ysize;
 
   // device erosion/dialation
+
   morph_grayscale(deviceImage, deviceOutput, xsize, ysize, zsize, flag_verbose, padding_bottom,
                   padding_top, deviceKernel, kernel_xsize, kernel_ysize, kernel_zsize, operation);
 
   CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 
   // free host memorys
-  cudaFree(i_deviceImage);
+
+  cudaFree(i_deviceImage);  
   cudaFree(deviceOutput);
   cudaFree(deviceKernel);
 }

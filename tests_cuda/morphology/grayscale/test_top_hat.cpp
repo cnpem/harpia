@@ -30,9 +30,7 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
   // set input data
   memset(host_A, 0, nBytes);
   memset(device_ref, 0, nBytes);
-  printf("here 1\n");
   read_input(host_A, filename, size, flag_verbose);
-  printf("here 2\n");
 
   // device erosion
   int ncopies = 3;

@@ -148,12 +148,13 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
   }
   padding_bottom = 0;
   padding_top = padding;
-
+  cudaDeviceSynchronize();
   func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
        kernel_xsize, kernel_ysize, kernel_zsize, args...);
   i_ref += chunkSize * sliceSize;
   o_ref += chunkSize * sliceSize;
   deviceCount += 1;
+  cudaDeviceSynchronize();
 
   // Middle chunks: padding at the beginning and at the end
   padding_bottom = padding;

@@ -2,12 +2,14 @@ import numpy as np
 
 cimport numpy as np
 
-
 cdef class Size:
     # Available in Python-space, but only for reading:
     cdef readonly int x, y, z  # Declare x, y, z as class attributes
     
     def __init__(self, input_array):
+        if input_array is None or input_array.size == 0:
+            raise ValueError("Input array is None or empty. Expected a 3-dimensional array.")
+            
         size = input_array.shape
 
         if(len(size)==3): 
