@@ -241,13 +241,13 @@ int test_chunked_executer() {
                         kernel_zsize);  // Size to fit the horizontal line kernels 3x3x3
   get_structuring_element_3D(kernel, kernel_xsize, kernel_ysize, kernel_zsize);
 
-  int flag_check = 0;    // Whether to compare with host (Deactivate for Huge zsize values!!!)
+  int flag_check = 1;    // Whether to compare with host (Deactivate for Huge zsize values!!!)
   int flag_verbose = 1;  // Whether to print status messages
 
   MorphChain closing = {DILATION, EROSION};
   MorphChain opening = {EROSION, DILATION};
 
-  float memoryOccupancy = 0.9f;
+  float memoryOccupancy = 0.1f;
 
   printf("\nCompare chunked operations on device with host results in 3D\n");
 

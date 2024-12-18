@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <cstdint>  // For uint16_t, unsigned int
 #include "../../../include/common/grid_block_sizes.h"
-#include "../../../include/morphology/logical_or.h"
+#include "../../../include/morphology/logical_or_binary.h"
 #include "../../../include/morphology/cuda_helper.h"
 
 template <typename dtype>

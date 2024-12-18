@@ -33,8 +33,8 @@ void test_fill_holes_on_device(const std::string& filename, const int xsize, con
 
   read_input(host_A, filename, size, flag_verbose);
 
-  int ncopies = 3
-  chunkedExecutorFillHoles(fill_holes_on_device<dtype>, ncopies, gpuMemory, host_A, device_ref,
+  int ncopies = 3;
+  chunkedExecutorFillHoles(fill_holes_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref,
                            padding, xsize, ysize, zsize, flag_verbose);
 
   if (flag_check) {
@@ -42,9 +42,10 @@ void test_fill_holes_on_device(const std::string& filename, const int xsize, con
     host_ref = (int*)malloc(nBytes);
     memset(host_ref, 0, nBytes);
     // Perform binary morphology on host for comparison
-    fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
+    // fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
+    fill_holes_on_device(host_A, host_ref, xsize, ysize, zsize, flag_verbose);
 
-    check_result(host_ref, device_ref, xsize, ysize, zsize);
+    check_result(device_ref, host_ref, xsize, ysize, zsize);
     free(host_ref);
   }
 

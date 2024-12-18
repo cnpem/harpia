@@ -333,7 +333,8 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
   // set output initial data
   size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
-  margins = (dtype*)malloc(nBytes);
+
+  dtype* margins = (dtype*)malloc(nBytes);
 
   dtype* i_ref = image;
   dtype* o_ref = output;
@@ -372,11 +373,12 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
         stderr,
         "Error: Not enough memory to fit even one slice. Adjust slice size or free up memory.\n");
     return;
-  } else if (chunkSize > zsize) {
-    chunkSize = zsize;
+  } else if (chunkSize >= zsize) {
+    func(i_ref, o_ref, xsize, ysize, zsize, 0, args...);
     if (verbose) {
-      printf("ActualChunkSize:%d\n", chunkSize);
+      printf("\nFinished processing!\n");
     }
+    return;
   }
 
   //Execute output
@@ -390,7 +392,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
     if (verbose) {
       printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
     }
-    func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
+    func(i_ref, o_ref, xsize, ysize, chunkSize, 0, args...);
     i_ref += chunkSize * sliceSize;
     o_ref += chunkSize * sliceSize;
     deviceCount += 1;
@@ -404,7 +406,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
   if (remaining > 0) {
-    func(i_ref, o_ref, xsize, ysize, remaining, verbose, args...);
+    func(i_ref, o_ref, xsize, ysize, remaining, 0, args...);
     deviceCount += 1;
   }
   if (verbose) {
@@ -414,14 +416,18 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
   //Execute margins
 
   padding = (padding < chunkSize/2) ? padding : chunkSize/2;
-  int iz = chunkSize-padding;
+  iz = chunkSize-padding;
+  //reset pointers
+  i_ref = image;
+  i_ref += iz * sliceSize;
+  m_ref += iz * sliceSize;
   for (; iz <= zsize - chunkSize - padding; iz += chunkSize) {
     selectedDevice = deviceCount % ngpus;
     CHECK(cudaSetDevice(selectedDevice));
     if (verbose) {
       printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
     }
-    func(i_ref, m_ref, xsize, ysize, 2*padding, verbose, args...);
+    func(i_ref, m_ref, xsize, ysize, 2*padding, 0, args...);
     i_ref += chunkSize * sliceSize;
     m_ref += chunkSize * sliceSize;
     deviceCount += 1;
@@ -435,7 +441,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining+padding, selectedDevice, deviceCount);
   }
   if (remaining > 0) {
-    func(i_ref, m_ref, xsize, ysize, remaining+padding, verbose, args...);
+    func(i_ref, m_ref, xsize, ysize, remaining+padding, 0, args...);
   }
   if (verbose) {
     printf("\nFinished processing all margins!\n");
@@ -452,8 +458,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
   }
 
   // Unite output and margins
-  int ncopies = 2;
-  chunkedExecutor(logical_or_on_device<dtype>, ncopies, safetyMargin, margins, output,
-                  xsize, ysize, zsize, verbose);
+  chunkedExecutor(logical_or_on_device<dtype>, 2, safetyMargin, margins, output,
+                  xsize, ysize, zsize, 0);
 
 }

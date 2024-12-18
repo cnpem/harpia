@@ -5,7 +5,7 @@ import numpy
 from libc.stdint cimport int8_t, int16_t, uint8_t, uint16_t
 from libcpp cimport bool
 
-from harpia.common import Size, ensure_contiguous
+from harpia.common import Size
 
 ctypedef fused numeric:
     int
@@ -37,7 +37,7 @@ cdef extern from "../../include/morphology/operations_binary.h":
                                                                      int, int, int, float, bool)
     void _reconstruction_binary "reconstruction_binary"[dtype](dtype*, dtype*, dtype*, int, int, 
                                                                int, int, MorphOp, bool)
-    void _fill_holes "fill_holes"[dtype](dtype*, dtype*, int, int, int, int, bool)
+    void _fill_holes "fill_holes"[dtype](dtype*, dtype*, int, int, int, int, int, float, bool)
 
 def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
@@ -169,13 +169,15 @@ def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage,
     return hostOutput
 
 def fill_holes(numpy.ndarray[numeric, ndim=3] hostImage, 
-               numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, bool gpu = True):
+               numpy.ndarray[numeric, ndim=3] hostOutput = None,  int padding = 50, int verbose = 0, 
+               float gpuMemory = 0.9, bool gpu = True):
     
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
 
     isize = Size(hostImage)
     
-    _fill_holes(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, gpu)
+    _fill_holes(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, padding, verbose, 
+                gpuMemory, gpu)
 
     return hostOutput
