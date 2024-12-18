@@ -7,9 +7,41 @@
 #include "../common/kernels.h"
 // Function declarations for kernel generation
 void get_prewitt_horizontal_kernel_2d(float** kernel);
+
+/**
+ * @brief Retrieves the 2D vertical Prewitt kernel.
+ *
+ * This function initializes the 2D vertical Prewitt kernel used for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 2D vertical Prewitt kernel will be stored.
+ */
 void get_prewitt_vertical_kernel_2d(float** kernel);
+
+/**
+ * @brief Retrieves the 3D horizontal Prewitt kernel.
+ *
+ * This function initializes the 3D horizontal Prewitt kernel used for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 3D horizontal Prewitt kernel will be stored.
+ */
 void get_prewitt_horizontal_kernel_3d(float** kernel);
+
+/**
+ * @brief Retrieves the 3D vertical Prewitt kernel.
+ *
+ * This function initializes the 3D vertical Prewitt kernel used for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 3D vertical Prewitt kernel will be stored.
+ */
 void get_prewitt_vertical_kernel_3d(float** kernel);
+
+/**
+ * @brief Retrieves the 3D depth Prewitt kernel.
+ *
+ * This function initializes the 3D depth Prewitt kernel used for edge detection.
+ *
+ * @param[out] kernel Pointer to the location where the 3D depth Prewitt kernel will be stored.
+ */
 void get_prewitt_depth_kernel_3d(float** kernel);
 
 // Function declarations for CUDA kernels

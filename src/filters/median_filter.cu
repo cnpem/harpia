@@ -192,11 +192,11 @@ template __global__ void median_filter_kernel_2d<float>(float* image, float* out
                                                         int xsize, int ysize, int idz, int nx,
                                                         int ny);
 
-template __global__ void median_filter_kernel_3d<int>(int* image, int* output, int* kernel,
+template __global__ void median_filter_kernel_3d<int>(int* deviceImage, int* deviceOutput, int* deviceKernel,
                                                       int xsize, int ysize, int zsize, int idz,
                                                       int nx, int ny, int nz);
 
-template __global__ void median_filter_kernel_3d<float>(float* image, float* output, float* kernel,
+template __global__ void median_filter_kernel_3d<float>(float* deviceImage, float* deviceOutput, float* deviceKernel,
                                                         int xsize, int ysize, int zsize, int idz,
                                                         int nx, int ny, int nz);
 

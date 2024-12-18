@@ -172,7 +172,7 @@ int test_operations_on_device() {
   test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
                                    flag_verbose);
 
-  test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,
+  test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, 0, memoryOccupancy, flag_check,
                             flag_verbose);
 
   // Grayscale operations
@@ -250,6 +250,10 @@ int test_chunked_executer() {
   float memoryOccupancy = 0.9f;
 
   printf("\nCompare chunked operations on device with host results in 3D\n");
+
+  //ChunkedExecutorFillHoles
+  test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, 50, memoryOccupancy, flag_check,
+                            flag_verbose);
 
   // ChunkedExecutor
   test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,

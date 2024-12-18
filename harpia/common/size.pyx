@@ -16,5 +16,9 @@ cdef class Size:
             self.x = size[2] #xsize
             self.y = size[1] #ysize
             self.z = size[0] #zsize
+        elif(len(size)==2):
+            self.x = size[1] #xsize
+            self.y = size[0] #ysize
+            self.z = 1       #zsize
         else:
-            raise ValueError(f"Incompatible size. Expected 3 dimensions, but received array with {len(size)} dimensions.")
+            raise ValueError(f"Incompatible size. Expected 3 or 2 dimensions, but received array with {len(size)} dimensions.")

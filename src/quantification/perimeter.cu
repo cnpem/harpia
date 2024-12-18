@@ -80,7 +80,7 @@ int main()
 
     u_int output[xsize*ysize*zsize];
 
-    int image[xsize*ysize*zsize] = 
+    int hostImage[xsize*ysize*zsize] = 
     {
          0, 0, 0, 0, 0, 0, 0, 0,
          0, 0, 0, 1, 1, 1, 0, 0,
@@ -101,7 +101,7 @@ int main()
          0, 0, 0, 2, 2, 2, 0, 0
     };
 
-    perimeter(image,output,xsize,ysize,zsize);
+    perimeter(hostImage,output,xsize,ysize,zsize);
 
     for (int i = 0; i < xsize*ysize*zsize; i++)
     {

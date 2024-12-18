@@ -45,6 +45,6 @@ void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
 
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
-                const int zsize, const int flag_verbose, bool gpu);
+                const int zsize, int padding, const int flag_verbose, float gpuMemory, bool gpu);
 
 #endif  // MORPH_binary_on_device_OPS_H

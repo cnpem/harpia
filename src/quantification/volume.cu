@@ -58,7 +58,7 @@ int main()
 
     unsigned int output[xsize * ysize * zsize] = {0};
 
-    int image[xsize * ysize * zsize] = 
+    int hostImage[xsize * ysize * zsize] = 
     {
          0, 0, 0, 0, 0, 0, 0, 0,
          0, 0, 0, 0, 0, 0, 0, 0,
@@ -70,7 +70,7 @@ int main()
          0, 0, 0, 0, 0, 0, 0, 0,
     };
 
-    volume(image, output, xsize, ysize, zsize);
+    volume(hostImage, output, xsize, ysize, zsize);
 
     for (int i = 0; i < ysize; i++) {
         for (int j = 0; j < xsize; j++) {

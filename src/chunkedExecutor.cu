@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "../include/morphology/cuda_helper.h"
+#include "../include/morphology/logical_or_binary.h"
 
 // Wrapper function
 template <typename Func, typename dtype, typename... Args>
@@ -319,4 +320,140 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   if (verbose) {
     printf("\nFinished processing all chunks!\n");
   }
+}
+
+// Wrapper function
+// ToDo: vou resolver só no annotat3ed? e a memória? a operação 'or' faço aqui ou no arquivo operations?
+// tem que chamar mais um chunked executor lá
+template <typename Func, typename dtype, typename... Args>
+void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, dtype* image, dtype* output,
+                              int padding, const int xsize, const int ysize, const int zsize, const int verbose,
+                              Args... args) {
+
+  // set output initial data
+  size_t size = xsize * ysize * zsize;
+  size_t nBytes = size * sizeof(dtype);
+  margins = (dtype*)malloc(nBytes);
+
+  dtype* i_ref = image;
+  dtype* o_ref = output;
+  dtype* m_ref = margins;
+
+  memset(o_ref, 0, nBytes);
+  memset(m_ref, 0, nBytes);
+
+  // Get memory allocated by the func
+  int sliceSize = xsize * ysize;
+  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
+
+  // Get available devices
+  int ngpus;
+  CHECK(cudaGetDeviceCount(&ngpus));
+
+  // Get free memory on the GPU with less memory in bytes
+  size_t freeBytes, totalBytes, freeGpuBytes;
+  CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
+
+  for (int i = 1; i < ngpus; i++) {
+    CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
+    if (freeGpuBytes < freeBytes) {
+      freeBytes = freeGpuBytes;
+    }
+  }
+
+  // How many slices fit in the GPU?
+  int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
+  if (verbose) {
+    printf("MaxChunkSize:%d zsize:%d ngpus:%d\n", chunkSize, zsize, ngpus);
+  }
+
+  if (chunkSize == 0) {
+    fprintf(
+        stderr,
+        "Error: Not enough memory to fit even one slice. Adjust slice size or free up memory.\n");
+    return;
+  } else if (chunkSize > zsize) {
+    chunkSize = zsize;
+    if (verbose) {
+      printf("ActualChunkSize:%d\n", chunkSize);
+    }
+  }
+
+  //Execute output
+
+  int iz = 0;
+  int deviceCount = 0;
+  int selectedDevice;
+  for (; iz <= zsize - chunkSize; iz += chunkSize) {
+    selectedDevice = deviceCount % ngpus;
+    CHECK(cudaSetDevice(selectedDevice));
+    if (verbose) {
+      printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
+    }
+    func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
+    i_ref += chunkSize * sliceSize;
+    o_ref += chunkSize * sliceSize;
+    deviceCount += 1;
+  }
+
+  // Process the remaining slices, if any
+  int remaining = zsize - iz;
+  selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
+  if (verbose) {
+    printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
+  }
+  if (remaining > 0) {
+    func(i_ref, o_ref, xsize, ysize, remaining, verbose, args...);
+    deviceCount += 1;
+  }
+  if (verbose) {
+    printf("\nFinished processing all chunks!\n");
+  }
+
+  //Execute margins
+
+  padding = (padding < chunkSize/2) ? padding : chunkSize/2;
+  int iz = chunkSize-padding;
+  for (; iz <= zsize - chunkSize - padding; iz += chunkSize) {
+    selectedDevice = deviceCount % ngpus;
+    CHECK(cudaSetDevice(selectedDevice));
+    if (verbose) {
+      printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
+    }
+    func(i_ref, m_ref, xsize, ysize, 2*padding, verbose, args...);
+    i_ref += chunkSize * sliceSize;
+    m_ref += chunkSize * sliceSize;
+    deviceCount += 1;
+  }
+
+  // Process the remaining margins, if any
+  // Use previous calculated remaining value
+  selectedDevice = deviceCount % ngpus;
+  CHECK(cudaSetDevice(selectedDevice));
+  if (verbose) {
+    printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining+padding, selectedDevice, deviceCount);
+  }
+  if (remaining > 0) {
+    func(i_ref, m_ref, xsize, ysize, remaining+padding, verbose, args...);
+  }
+  if (verbose) {
+    printf("\nFinished processing all margins!\n");
+  }
+
+  // Synchronize all devices first
+  for (int i = 0; i < deviceCount; ++i) {
+        cudaSetDevice(i); // Set the current device
+        cudaError_t err = cudaDeviceSynchronize(); // Synchronize the device
+        if (err != cudaSuccess) {
+            std::cerr << "Error synchronizing device " << i << ": " 
+                      << cudaGetErrorString(err) << std::endl;
+        }
+  }
+
+  // Unite output and margins
+  int ncopies = 2;
+  chunkedExecutor(logical_or_on_device<dtype>, ncopies, safetyMargin, margins, output,
+                  xsize, ysize, zsize, verbose);
+
 }

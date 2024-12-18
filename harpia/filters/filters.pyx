@@ -1,6 +1,9 @@
 cimport cython
 cimport numpy as np
+import numpy as np
+
 from libcpp cimport bool
+from harpia.common import Size
 
 #Define the fused type for numeric types : float, int, unsigned int
 ctypedef fused numeric:
@@ -26,13 +29,10 @@ def gaussian(np.ndarray[numeric, ndim=3] hostImage, np.ndarray[np.float32_t, ndi
         zsize (int): Number of slices in the hostImage.
         sigma (float): Standard deviation for Gaussian kernel.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return gaussian_filtering(&hostImage[0,0,0], &hostOutput[0,0,0],
-                              xsize, ysize, zsize,
-                              sigma, type)
+    gaussian_filtering(&hostImage[0,0,0], &hostOutput[0,0,0],
+                        xsize, ysize, zsize,
+                        sigma, type)
 
 #Extern declaration for the Mean filtering function from C / C++ library
 cdef extern from "../../include/filters/mean_filter.h":
@@ -56,14 +56,11 @@ def mean(np.ndarray[numeric, ndim=3] hostImage,
         nx (int): Number of rows in the kernel.
         ny (int): Number of columns in the kernel.
         nz (int): Number of slices in the kernel.
-
-    Returns:
-        None
     """
-    return mean_filtering(&hostImage[0,0,0],
-                          &hostOutput[0,0,0],
-                          xsize, ysize, zsize,
-                          nx, ny, nz)
+    mean_filtering(&hostImage[0,0,0],
+                   &hostOutput[0,0,0],
+                   xsize, ysize, zsize,
+                   nx, ny, nz)
 
 #Extern declaration for the LoG filtering function from C / C++ library
 cdef extern from "../../include/filters/log_filter.h":
@@ -86,13 +83,11 @@ def LoG(np.ndarray[numeric, ndim=3] hostImage,
         zsize (int): Number of slices in the hostImage.
         type (bool): Type of filtering (specific to implementation).
 
-    Returns:
-        None
     """
-    return log_filtering(&hostImage[0,0,0],
-                         &hostOutput[0,0,0],
-                         xsize, ysize, zsize,
-                         type)
+    log_filtering(&hostImage[0,0,0],
+                  &hostOutput[0,0,0],
+                  xsize, ysize, zsize,
+                  type)
 
 #Extern declaration for the Unsharp Mask filtering function from C / C++ library
 cdef extern from "../../include/filters/unsharp_mask_filter.h":
@@ -117,14 +112,11 @@ def unsharp_mask(np.ndarray[numeric, ndim=3] hostImage,
         amount (float): Amount of the unsharp mask.
         threshold (float): Threshold for the unsharp mask.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return unsharp_mask_filtering(&hostImage[0,0,0],
-                                  &hostOutput[0,0,0],
-                                  xsize, ysize, zsize,
-                                  sigma, amount, threshold, type)
+    unsharp_mask_filtering(&hostImage[0,0,0],
+                           &hostOutput[0,0,0],
+                           xsize, ysize, zsize,
+                           sigma, amount, threshold, type)
 
 #Extern declaration for the Sobel filtering function from C / C++ library
 cdef extern from "../../include/filters/sobel_filter.h":
@@ -144,13 +136,10 @@ def sobel(np.ndarray[numeric, ndim=3] hostImage,
         ysize (int): Number of columns in the hostImage.
         zsize (int): Number of slices in the hostImage.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return sobel_filtering(&hostImage[0,0,0],
-                           &hostOutput[0,0,0],
-                           xsize, ysize, zsize, type)
+    sobel_filtering(&hostImage[0,0,0],
+                    &hostOutput[0,0,0],
+                    xsize, ysize, zsize, type)
 
 #Extern declaration for the Prewitt filtering function from C / C++ library
 cdef extern from "../../include/filters/prewitt_filter.h":
@@ -170,13 +159,10 @@ def prewitt(np.ndarray[numeric, ndim=3] hostImage,
         ysize (int): Number of columns in the hostImage.
         zsize (int): Number of slices in the hostImage.
         type (bool): Type of filtering (specific to implementation).
-
-    Returns:
-        None
     """
-    return prewitt_filtering(&hostImage[0,0,0],
-                             &hostOutput[0,0,0],
-                             xsize, ysize, zsize, type)
+    prewitt_filtering(&hostImage[0,0,0],
+                      &hostOutput[0,0,0],
+                      xsize, ysize, zsize, type)
 
 #Extern declaration for the Canny filtering function from C / C++ library
 cdef extern from "../../include/filters/canny_filter.h":
@@ -200,14 +186,11 @@ def canny(np.ndarray[numeric, ndim=3] hostImage,
         sigma (float): Standard deviation for Gaussian kernel.
         low_threshold (float): Lower threshold for the hysteresis procedure.
         high_threshold (float): Upper threshold for the hysteresis procedure.
-
-    Returns:
-        None
     """
-    return canny_filtering(&hostImage[0,0,0],
-                           &hostOutput[0,0,0],
-                           xsize, ysize, zsize,
-                           sigma, low_threshold, high_threshold)
+    canny_filtering(&hostImage[0,0,0],
+                    &hostOutput[0,0,0],
+                    xsize, ysize, zsize,
+                    sigma, low_threshold, high_threshold)
 
 #Extern declaration for the median filtering function from C / C++ library
 cdef extern from "../../include/filters/median_filter.h":
@@ -231,9 +214,6 @@ def median(np.ndarray[numeric, ndim=3] hostImage,
         nx (int): Number of rows in the kernel.
         ny (int): Number of columns in the kernel.
         nz (int): Number of slices in the kernel.
-
-    Returns:
-        None
     """
     return median_filtering(&hostImage[0,0,0],
                           &hostOutput[0,0,0],
@@ -246,11 +226,13 @@ ctypedef fused real:
     double
 
 cdef extern from '../../include/filters/anisotropic_diffusion.h':
-    void anisotropicDiffusion2DGPU[dtype](dtype* hostImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int xsize, int ysize)
 
-    void anisotropicDiffusion3DGPU[dtype](dtype* hostImage, int totalIterations, float deltaT, 
-                            float kappa, int diffusionOption, int xsize, int ysize, int zsize)
+    void anisotropicDiffusion2DGPU[dtype](dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
+                               int diffusionOption, int xsize, int ysize)                        
+
+    void anisotropicDiffusion3D[dtype](dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
+                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, bool gpu)
+
 
 def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterations,
                           float delta_t, float kappa, int diffusion_option):
@@ -281,17 +263,22 @@ def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterat
 
     Returns:
     --------
-    None
-        The diffused image is applied at the input image.
+    output_image
+        The diffused image in the same data type as the input..
     """
 
-    cdef int xsize = hostImage.shape[0]
-    cdef int ysize = hostImage.shape[1]
+    # Define variables
+    isize = Size(hostImage)
+    
+    # Create the output array
+    cdef np.ndarray[real, ndim=2] hostOutput = np.empty_like(hostImage)
 
-    anisotropicDiffusion2DGPU(&hostImage[0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize)
+    anisotropicDiffusion2DGPU(&hostImage[0,0], &hostOutput[0,0], total_iterations, delta_t, kappa, diffusion_option, isize.x, isize.y)
+
+    return hostOutput
 
 def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterations,
-                          float delta_t, float kappa, int diffusion_option):
+                          float delta_t, float kappa, int diffusion_option, int flag_verbose, float gpuMemory, bool gpu = True):
     """
     Performs anisotropic diffusion on a 3D image.
 
@@ -316,15 +303,52 @@ def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterat
           Option 3 is a faster implementation based on:
           Mbarki, Zouhair, et al. "A new rapid auto-adapting diffusion function for adaptive anisotropic 
           image de-noising and sharply conserved edges." Computers & Mathematics with Applications 74.8 (2017): 1751-1768.
+    flag_verbose: int
+        Verbose for number of chuncks in execution
+    gpuMemmory: bool
+        Percentage of memmory occupied in the GPU (if using the gpu function). With cython value, working value is of 0.4 (40%).
+    gpu: bool
+        True for using the gpu function, false for using the cpu function (not implemented).
 
     Returns:
     --------
-    None
-        The diffused image is applied at the input image.
+    output_image
+        The diffused image in the same data type as the input.
     """
+    # Define variables
+    isize = Size(hostImage)
+    
+    # Create the output array
+    cdef np.ndarray[real, ndim=3] hostOutput = np.empty_like(hostImage)
 
-    cdef int xsize = hostImage.shape[0]
-    cdef int ysize = hostImage.shape[1]
-    cdef int zsize = hostImage.shape[2]
+    anisotropicDiffusion3D(&hostImage[0,0,0], &hostOutput[0,0,0], total_iterations, delta_t, kappa, 
+    diffusion_option, isize.x, isize.y, isize.z, flag_verbose, gpuMemory, gpu)
 
-    anisotropicDiffusion3DGPU(&hostImage[0,0,0], total_iterations, delta_t, kappa, diffusion_option, xsize, ysize, zsize)
+    return hostOutput
+
+# Extern declaration for the non-local means filtering function from C/C++ library
+cdef extern from "../../include/filters/non_local_means.h":
+    void nlmeans_filtering[numeric] (numeric* hostImage, double* hostOutput,
+                                     int xsize, int ysize,
+                                     int small_window, int big_window, double h, double sigma)
+
+def non_local_means(np.ndarray[numeric, ndim=2] hostImage,
+                    np.ndarray[np.float64_t, ndim=2] hostOutput,
+                    int xsize, int ysize,
+                    int small_window, int big_window, double h, double sigma = 0):
+    """
+    Apply a non-local means filter to a 2D hostImage.
+
+    Parameters:
+        hostImage (np.ndarray[numeric, ndim=2]): Input 2D hostImage array.
+        hostOutput (np.ndarray[np.float64_t, ndim=2]): hostOutput 2D array to store the filtered result.
+        xsize (int): Number of rows in the hostImage.
+        ysize (int): Number of columns in the hostImage.
+        small_window (int): Size of the small window for patch comparison.
+        big_window (int): Size of the big window for neighborhood search.
+        h (double): Filter parameter for controlling the degree of smoothing.
+    """
+    nlmeans_filtering(&hostImage[0,0],
+                      &hostOutput[0,0],
+                      xsize, ysize,
+                      small_window, big_window, h, sigma)

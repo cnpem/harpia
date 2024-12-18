@@ -8,7 +8,7 @@
 void get_laplacian_kernel_2d(float** kernel) {
   /*
 
-        Laplacian kernel has the form:
+        Laplacian hostKernel has the form:
 
           +-----------------+
           |   -1  -1  -1    |
@@ -40,7 +40,7 @@ void get_laplacian_kernel_2d(float** kernel) {
 void get_laplacian_kernel_3d(float** kernel) {
   /*
 
-        Laplacian kernel has the form:
+        Laplacian hostKernel has the form:
 
                   +--------------+
                  /     0 0 0    /|
