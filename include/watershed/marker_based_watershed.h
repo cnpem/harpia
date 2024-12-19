@@ -4,7 +4,7 @@
 #include <iostream>
 #include <climits>
 
-#define MAX_SIZE 100000  // Define a maximum size for the priority queue
+#define MAX_SIZE 9000000  // Define a maximum size for the priority queue
 
 // Union-Find operations
 int findd(int* set, int x);

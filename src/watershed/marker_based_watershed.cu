@@ -231,7 +231,7 @@ void union_find_watershed(int* sortedImage, int* labels, int xsize, int ysize) {
 
 */
 
-#define MAX_SIZE 100000 // Define a maximum size for the priority queue
+#define MAX_SIZE 9000000 // Define a maximum size for the priority queue
 
 // Function to initialize the priority queue
 void init_priority_queue_2d(PriorityQueue2d* pq) {
