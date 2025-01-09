@@ -3,6 +3,8 @@
 #include <cstdint>     // For uint16_t
 #include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <vector>
 
 /**
  * @brief Get the current CPU time in seconds.
@@ -31,9 +33,9 @@ double cpu_second() {
  * @param flag_verbose Flag to control verbosity of the function's output.
  */
 template <typename dtype>
-void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const size_t chunk_size = 1024 * 1024) {
+void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const size_t chunk_size = 1024 * 1024 * 1024) {
 
-  // Open the raw file
+    // Open the raw file
   std::ifstream file(filename, std::ios::in | std::ios::binary);
   if (!file) {
     std::cerr << "Error: Could not open file for reading." << std::endl;
@@ -41,17 +43,21 @@ void read_input(dtype* image, const std::string& filename, const size_t size, co
   }
 
   // Buffer for reading chunks
-  std::vector<uint16_t> buffer(chunk_size);
+  std::vector<uint16_t> buffer;
 
-  size_t total_chunks = size / chunk_size;
-  size_t remaining_elements = size % chunk_size;
+  // Adjust chunk size if the file is smaller
+  size_t actual_chunk_size = std::min(chunk_size, size);
+  buffer.resize(actual_chunk_size);
+
+  size_t total_chunks = size / actual_chunk_size;
+  size_t remaining_elements = size % actual_chunk_size;
 
   size_t index = 0;
 
   // Read and convert chunk by chunk
   for (size_t chunk = 0; chunk < total_chunks; ++chunk) {
-    file.read(reinterpret_cast<char*>(buffer.data()), chunk_size * sizeof(uint16_t));
-    for (size_t i = 0; i < chunk_size; ++i, ++index) {
+    file.read(reinterpret_cast<char*>(buffer.data()), actual_chunk_size * sizeof(uint16_t));
+    for (size_t i = 0; i < actual_chunk_size; ++i, ++index) {
       image[index] = static_cast<dtype>(buffer[i]);
     }
   }
@@ -71,7 +77,6 @@ void read_input(dtype* image, const std::string& filename, const size_t size, co
     std::cout << "Data has been successfully read in chunks." << std::endl;
   }
 }
-
 template void read_input<float>(float*, const std::string&, const size_t, const int, const size_t);
 template void read_input<int>(int*, const std::string&, const size_t, const int, const size_t);
 template void read_input<unsigned int>(unsigned int*, const std::string&, const size_t, const int, 
