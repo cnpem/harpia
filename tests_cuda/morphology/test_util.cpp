@@ -33,7 +33,7 @@ double cpu_second() {
  * @param flag_verbose Flag to control verbosity of the function's output.
  */
 template <typename dtype>
-void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const size_t chunk_size = 1024 * 1024 * 1024) {
+void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const size_t chunk_size) {
 
     // Open the raw file
   std::ifstream file(filename, std::ios::in | std::ios::binary);
