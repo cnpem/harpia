@@ -21,11 +21,8 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
   if (flag_verbose)
     printf("Matrix size:   %zu (%d.%d.%d) \n", size, xsize, ysize, zsize);
   
-  printf("\npitstop 0\n");
-
   int *host_A, *device_ref;  //pointers for host memmory
   host_A = (int*)malloc(nBytes);
-  printf("\npitstop 1\n");
   device_ref = (int*)malloc(nBytes);
 
   if (host_A == nullptr || device_ref == nullptr) {
@@ -33,15 +30,11 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
       return;
   }
 
-  printf("\npitstop 2\n");
-
   // set input data
   memset(host_A, 0, nBytes);
   memset(device_ref, 0, nBytes);
-  printf("\npitstop 3\n");
 
   read_input(host_A, filename, size, flag_verbose);
-  printf("\npitstop 4\n");
 
   // device erosion
   int ncopies = 2;

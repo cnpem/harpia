@@ -51,7 +51,7 @@ void read_input(dtype* image, const std::string& filename, const size_t size, co
 
   size_t total_chunks = size / actual_chunk_size;
   size_t remaining_elements = size % actual_chunk_size;
-
+  printf("chunksize: %zu  actual_chunksize: %zu\n", chunk_size, actual_chunk_size);
   size_t index = 0;
 
   // Read and convert chunk by chunk

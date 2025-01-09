@@ -224,12 +224,12 @@ int test_operations_on_device() {
 //checking with the cpu implementation
 // If the image is too big, the cpu may not be able to check the result, and kill the process
 int test_chunked_executer() {
-  std::string filenameBinary = "./example_images/binary/tomoFiltered_masked_2048x2048x1964_16bit.raw";
-  std::string filenameGrayscale = "./example_images/grayscale/tomoFiltered_masked_2048x2048x1964_16bit.raw";
+  std::string filenameBinary = "./example_images/binary/ILSIMG_600x1520x1520_16bits.raw";
+  std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
 
-  int xsize = 2048;
-  int ysize = 2048;
-  int zsize = 1964;
+  int xsize = 600;
+  int ysize = 1520;
+  int zsize = 1520;
 
   int kernel_xsize = 3;
   int kernel_ysize = 3;
