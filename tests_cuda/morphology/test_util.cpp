@@ -31,7 +31,7 @@ double cpu_second() {
  * @param flag_verbose Flag to control verbosity of the function's output.
  */
 template <typename dtype>
-void read_input(dtype* image, const std::string& filename, const int size, const int flag_verbose) {
+void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const size_t chunk_size = 1024 * 1024) {
 
   // Open the raw file
   std::ifstream file(filename, std::ios::in | std::ios::binary);
@@ -40,31 +40,50 @@ void read_input(dtype* image, const std::string& filename, const int size, const
     return;
   }
 
-  // Read the uint16_t raw data into dtype pointer. The test images are all unit16
-  uint16_t* data = new uint16_t[size];
-  file.read(reinterpret_cast<char*>(data), size * sizeof(uint16_t));
+  // Buffer for reading chunks
+  std::vector<uint16_t> buffer(chunk_size);
+
+  size_t total_chunks = size / chunk_size;
+  size_t remaining_elements = size % chunk_size;
+
+  size_t index = 0;
+
+  // Read and convert chunk by chunk
+  for (size_t chunk = 0; chunk < total_chunks; ++chunk) {
+    file.read(reinterpret_cast<char*>(buffer.data()), chunk_size * sizeof(uint16_t));
+    for (size_t i = 0; i < chunk_size; ++i, ++index) {
+      image[index] = static_cast<dtype>(buffer[i]);
+    }
+  }
+
+  // Handle remaining elements
+  if (remaining_elements > 0) {
+    buffer.resize(remaining_elements);
+    file.read(reinterpret_cast<char*>(buffer.data()), remaining_elements * sizeof(uint16_t));
+    for (size_t i = 0; i < remaining_elements; ++i, ++index) {
+      image[index] = static_cast<dtype>(buffer[i]);
+    }
+  }
+
   file.close();
 
-  // Convert uint16_t data into dtype data
-  for (int i = 0; i < size; ++i) {
-    image[i] = static_cast<dtype>(data[i]);
-  }
-
   if (flag_verbose) {
-    std::cout << "Data has been successfully read." << std::endl;
+    std::cout << "Data has been successfully read in chunks." << std::endl;
   }
-
-  // Clean up
-  delete[] data;
 }
-template void read_input<float>(float*, const std::string&, const int, const int);
-template void read_input<int>(int*, const std::string&, const int, const int);
-template void read_input<unsigned int>(unsigned int*, const std::string&, const int, const int);
-template void read_input<int16_t>(int16_t*, const std::string&, const int, const int);
-template void read_input<uint16_t>(uint16_t*, const std::string&, const int, const int);
-template void read_input<int8_t>(int8_t*, const std::string&, const int, const int);
-template void read_input<uint8_t>(uint8_t*, const std::string&, const int, const int);
 
+template void read_input<float>(float*, const std::string&, const size_t, const int, const size_t);
+template void read_input<int>(int*, const std::string&, const size_t, const int, const size_t);
+template void read_input<unsigned int>(unsigned int*, const std::string&, const size_t, const int, 
+                                       const size_t);
+template void read_input<int16_t>(int16_t*, const std::string&, const size_t, const int, 
+                                  const size_t);
+template void read_input<uint16_t>(uint16_t*, const std::string&, const size_t, const int, 
+                                   const size_t);
+template void read_input<int8_t>(int8_t*, const std::string&, const size_t, const int, 
+                                 const size_t);
+template void read_input<uint8_t>(uint8_t*, const std::string&, const size_t, const int, 
+                                  const size_t);
 /**
  * @brief Print a 3D matrix.
  * 
