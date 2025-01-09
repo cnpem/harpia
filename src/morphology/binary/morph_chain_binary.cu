@@ -130,7 +130,7 @@ void morph_chain_binary_on_host(dtype* hostImage, dtype* hostOutput, const int x
                                 int kernel_ysize, int kernel_zsize, MorphChain chain) {
 
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(dtype);
 
   // allocate temporary memory

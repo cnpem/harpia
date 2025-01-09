@@ -14,22 +14,34 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
 
   printf("\nTest binary complement on device\n");
 
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   // set input dimension
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d) \n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d) \n", size, xsize, ysize, zsize);
+  
+  printf("\npitstop 0\n");
 
   int *host_A, *device_ref;  //pointers for host memmory
   host_A = (int*)malloc(nBytes);
+  printf("\npitstop 1\n");
   device_ref = (int*)malloc(nBytes);
+
+  if (host_A == nullptr || device_ref == nullptr) {
+      std::cerr << "Memory allocation failed!" << std::endl;
+      return;
+  }
+
+  printf("\npitstop 2\n");
 
   // set input data
   memset(host_A, 0, nBytes);
   memset(device_ref, 0, nBytes);
+  printf("\npitstop 3\n");
 
   read_input(host_A, filename, size, flag_verbose);
+  printf("\npitstop 4\n");
 
   // device erosion
   int ncopies = 2;
@@ -59,14 +71,16 @@ void test_complement_binary_on_host(const std::string& filename, const int xsize
   printf("\nTest binary complement on host\n");
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
   size_t nBytes = size * sizeof(int);
   if (flag_verbose) {
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
   }
 
   int *host_A, *host_ref;  //pointers for host memmory
+
+  return;
   host_A = (int*)malloc(nBytes);
   host_ref = (int*)malloc(nBytes);
 

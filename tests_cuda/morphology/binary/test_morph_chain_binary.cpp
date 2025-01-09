@@ -37,11 +37,11 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
   printf("\nTest binary %s on device\n", (closing_flag ? "closing" : "opening"));
 
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *device_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
@@ -103,11 +103,11 @@ void test_morph_chain_binary_on_host(const std::string& filename, const int xsiz
   printf("\nTest binary %s on host\n", (closing_flag ? "closing" : "opening"));
 
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *host_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);

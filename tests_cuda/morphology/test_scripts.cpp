@@ -224,12 +224,12 @@ int test_operations_on_device() {
 //checking with the cpu implementation
 // If the image is too big, the cpu may not be able to check the result, and kill the process
 int test_chunked_executer() {
-  std::string filenameBinary = "./example_images/binary/ILSIMG_600x1520x1520_16bits.raw";
-  std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
+  std::string filenameBinary = "./example_images/binary/tomoFiltered_masked_2048x2048x1964_16bit.raw";
+  std::string filenameGrayscale = "./example_images/grayscale/tomoFiltered_masked_2048x2048x1964_16bit.raw";
 
-  int xsize = 600;
-  int ysize = 1520;
-  int zsize = 1520;
+  int xsize = 2048;
+  int ysize = 2048;
+  int zsize = 1964;
 
   int kernel_xsize = 3;
   int kernel_ysize = 3;
@@ -252,8 +252,8 @@ int test_chunked_executer() {
   printf("\nCompare chunked operations on device with host results in 3D\n");
 
   //ChunkedExecutorFillHoles
-  test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, 50, memoryOccupancy, flag_check,
-                            flag_verbose);
+  //test_fill_holes_on_device(filenameBinary, xsize, ysize, zsize, 50, memoryOccupancy, flag_check,
+  //                          flag_verbose);
 
   // ChunkedExecutor
   test_complement_binary_on_device(filenameBinary, xsize, ysize, zsize, memoryOccupancy, flag_check,

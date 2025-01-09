@@ -12,12 +12,12 @@ void test_morph_grayscale_pinned_on_device(const std::string& filename, const in
                                            const int kernel_zsize, MorphOp operation,
                                            const int flag_check, const int flag_verbose) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *device_ref;  //pointers for host memory
   host_A = (int*)malloc(nBytes);
@@ -58,11 +58,11 @@ void test_morph_grayscale_pinned_on_host(const std::string& filename, const int 
                                          const int flag_show, const int flag_check,
                                          const int flag_verbose) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
   size_t nBytes = size * sizeof(float);
   if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   float *host_A, *host_ref;  //pointers for host memory
   host_A = (float*)malloc(nBytes);

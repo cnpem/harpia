@@ -331,7 +331,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
                               Args... args) {
 
   // set output initial data
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(dtype);
 
   dtype* margins = (dtype*)malloc(nBytes);

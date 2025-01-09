@@ -61,9 +61,9 @@ CUDA_HOSTDEV void morph_binary_pixel(dtype* image, dtype* output, const int xsiz
 
         else {
           if (operation == EROSION) {
-            aux = (im[index] == (dtype)ik[ix]) && aux;  //erosion operation
+            aux = (im[index] == static_cast<dtype>(ik[ix])) && aux;  //erosion operation
           } else {
-            aux = (im[index] == (dtype)ik[ix]) || aux;  //dilation operation
+            aux = (im[index] == static_cast<dtype>(ik[ix])) || aux;  //dilation operation
           }
         }
       }

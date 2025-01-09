@@ -17,11 +17,11 @@ void test_bottom_hat_reconstruction_on_host(const std::string& filename, const i
   printf("\nTest Avizo's bottom hat on host\n");
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
   size_t nBytes = size * sizeof(float);
   if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   float *host_A, *host_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
@@ -53,12 +53,12 @@ void test_bottom_hat_reconstruction_on_device(const std::string& filename, const
   printf("\nTest Avizo's bottom hat on device\n");
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *device_ref;  //pointers for host memmory
   host_A = (int*)malloc(nBytes);
