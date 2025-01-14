@@ -13,7 +13,7 @@ void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
                              int kernel_zsize) {
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
 

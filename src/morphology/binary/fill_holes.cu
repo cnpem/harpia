@@ -22,7 +22,7 @@ __global__ void fill_holes_marker(dtype* deviceImage, dtype* deviceOutput, const
   bool ignore_zsize = (zsize == 1) ? true : false;
 
   if (idx < xsize && idy < ysize && idz < zsize) {
-    int index = idz * xsize * ysize + idy * xsize + idx;
+    size_t index = idz * xsize * ysize + idy * xsize + idx;
 
     // Check if the current voxel is on the border
     bool is_border_x = (idx == 0 || idx == xsize - 1) && (!ignore_xsize);
@@ -64,7 +64,7 @@ template <typename dtype>
 void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                           const int zsize, const int flag_verbose) {
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Malloc device global memory
@@ -137,7 +137,7 @@ template <typename dtype>
 void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                         const int zsize) {
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Malloc device global memory
@@ -155,7 +155,7 @@ void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
   for (int idz = 0; idz < zsize; idz++) {
     for (int idy = 0; idy < ysize; idy++) {
       for (int idx = 0; idx < xsize; idx++) {
-        int index = idz * xsize * ysize + idy * xsize + idx;
+        size_t index = idz * xsize * ysize + idy * xsize + idx;
         // Check if the current voxel is on the border
         bool is_border_x = (idx == 0 || idx == xsize - 1) && (!ignore_xsize);
         bool is_border_y = (idy == 0 || idy == ysize - 1) && (!ignore_ysize);

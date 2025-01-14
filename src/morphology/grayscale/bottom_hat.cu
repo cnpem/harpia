@@ -28,7 +28,7 @@ void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
                           const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
                           int kernel_zsize) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
 
@@ -120,7 +120,7 @@ void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
                         const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
                         int kernel_zsize) {
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
 
   // Opening operation
   MorphChain closing = {DILATION, EROSION};

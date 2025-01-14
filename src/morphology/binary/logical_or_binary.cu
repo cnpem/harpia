@@ -6,23 +6,23 @@
 #include "../../../include/morphology/cuda_helper.h"
 
 template <typename dtype>
-__global__ void logical_or_kernel(dtype* deviceImage, dtype* deviceOutput, const int size) {
-  int index = threadIdx.x + blockIdx.x * blockDim.x;
+__global__ void logical_or_kernel(dtype* deviceImage, dtype* deviceOutput, const size_t size) {
+  size_t index = threadIdx.x + blockIdx.x * blockDim.x;
   if (index < size) {
     deviceOutput[index] = deviceOutput[index] || deviceImage[index];
   }
 }
 // Template instantiations for specific types
-template __global__ void logical_or_kernel<int>(int*, int*, const int);
+template __global__ void logical_or_kernel<int>(int*, int*, const size_t);
 template __global__ void logical_or_kernel<unsigned int>(unsigned int*, unsigned int*,
-                                                                const int);
-template __global__ void logical_or_kernel<int16_t>(int16_t*, int16_t*, const int);
-template __global__ void logical_or_kernel<uint16_t>(uint16_t*, uint16_t*, const int);
-template __global__ void logical_or_kernel<int8_t>(int8_t*, int8_t*, const int);
-template __global__ void logical_or_kernel<uint8_t>(uint8_t*, uint8_t*, const int);
+                                                                const size_t);
+template __global__ void logical_or_kernel<int16_t>(int16_t*, int16_t*, const size_t);
+template __global__ void logical_or_kernel<uint16_t>(uint16_t*, uint16_t*, const size_t);
+template __global__ void logical_or_kernel<int8_t>(int8_t*, int8_t*, const size_t);
+template __global__ void logical_or_kernel<uint8_t>(uint8_t*, uint8_t*, const size_t);
 
 template <typename dtype>
-void logical_or(dtype* deviceImage, dtype* deviceOutput, const int size,
+void logical_or(dtype* deviceImage, dtype* deviceOutput, const size_t size,
                        const int flag_verbose) {
 
   // Set up execution configuration
@@ -40,19 +40,19 @@ void logical_or(dtype* deviceImage, dtype* deviceOutput, const int size,
   cudaDeviceSynchronize();  // Ensure all GPU threads are finished
 }
 // Template instantiations for specific types
-template void logical_or<int>(int*, int*, const int, const int);
-template void logical_or<unsigned int>(unsigned int*, unsigned int*, const int, const int);
-template void logical_or<int16_t>(int16_t*, int16_t*, const int, const int);
-template void logical_or<uint16_t>(uint16_t*, uint16_t*, const int, const int);
-template void logical_or<int8_t>(int8_t*, int8_t*, const int, const int);
-template void logical_or<uint8_t>(uint8_t*, uint8_t*, const int, const int);
+template void logical_or<int>(int*, int*, const size_t, const int);
+template void logical_or<unsigned int>(unsigned int*, unsigned int*, const size_t, const int);
+template void logical_or<int16_t>(int16_t*, int16_t*, const size_t, const int);
+template void logical_or<uint16_t>(uint16_t*, uint16_t*, const size_t, const int);
+template void logical_or<int8_t>(int8_t*, int8_t*, const size_t, const int);
+template void logical_or<uint8_t>(uint8_t*, uint8_t*, const size_t, const int);
 
 template <typename dtype>
 void logical_or_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
                                  const int ysize, const int zsize, const int flag_verbose) {
 
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Malloc device global memory
@@ -89,15 +89,15 @@ template void logical_or_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const
                                                    const int, const int);
 
 template <typename dtype>
-void logical_or_on_host(dtype* hostImage, dtype* hostOutput, const int size) {
-  for (int index = 0; index < size; index++) {
+void logical_or_on_host(dtype* hostImage, dtype* hostOutput, const size_t size) {
+  for (size_t index = 0; index < size; index++) {
     hostOutput[index] = hostOutput[index] || hostImage[index];
   }
 }
 // Template instantiations for specific types
-template void logical_or_on_host<int>(int*, int*, const int);
-template void logical_or_on_host<unsigned int>(unsigned int*, unsigned int*, const int);
-template void logical_or_on_host<int16_t>(int16_t*, int16_t*, const int);
-template void logical_or_on_host<uint16_t>(uint16_t*, uint16_t*, const int);
-template void logical_or_on_host<int8_t>(int8_t*, int8_t*, const int);
-template void logical_or_on_host<uint8_t>(uint8_t*, uint8_t*, const int);
+template void logical_or_on_host<int>(int*, int*, const size_t);
+template void logical_or_on_host<unsigned int>(unsigned int*, unsigned int*, const size_t);
+template void logical_or_on_host<int16_t>(int16_t*, int16_t*, const size_t);
+template void logical_or_on_host<uint16_t>(uint16_t*, uint16_t*, const size_t);
+template void logical_or_on_host<int8_t>(int8_t*, int8_t*, const size_t);
+template void logical_or_on_host<uint8_t>(uint8_t*, uint8_t*, const size_t);

@@ -34,9 +34,11 @@ CUDA_HOSTDEV void morph_grayscale_pixel(dtype* image, dtype* output, const int x
   int* ik = kernel;
 
   // Initialize auxiliary value with the central pixel
-  dtype aux = im[centerIdz * xsize * ysize + centerIdy * xsize + centerIdx];
+  size_t centerPixelIndex = centerIdz * xsize * ysize + centerIdy * xsize + centerIdx;
+  dtype aux = im[centerPixelIndex];
 
-  int imageIdx, imageIdy, imageIdz, index;
+  size_t index;
+  int imageIdx, imageIdy, imageIdz;
 
   int startIdx = centerIdx - kernel_xsize / 2;
   int startIdy = centerIdy - kernel_ysize / 2;
@@ -67,7 +69,7 @@ CUDA_HOSTDEV void morph_grayscale_pixel(dtype* image, dtype* output, const int x
       }
     }
   }
-  output[centerIdz * ysize * xsize + centerIdy * xsize + centerIdx] = aux;
+  output[centerPixelIndex] = aux;
 }
 template CUDA_HOSTDEV void morph_grayscale_pixel<unsigned int>(unsigned int*, unsigned int*,
                                                                const int, const int, const int,
@@ -167,7 +169,7 @@ void morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xs
                                int kernel_xsize, int kernel_ysize, int kernel_zsize,
                                MorphOp operation) {
   // set input dimension
-  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
   size_t nBytes_input = nBytes + nBytes_padding;

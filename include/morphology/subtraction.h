@@ -5,7 +5,7 @@
 
 //kernel for image subtraction
 template <typename dtype>
-void subtraction(dtype* deviceImage, dtype* deviceOutput, const int size, const int flag_verbose);
+void subtraction(dtype* deviceImage, dtype* deviceOutput, const size_t size, const int flag_verbose);
 
 // Slide kernel and erosion operation over all input image pixels
 template <typename dtype>
@@ -14,6 +14,6 @@ void subtraction_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
 
 // Slide kernel and erosion operation over all input image pixels
 template <typename dtype>
-void subtraction_on_host(dtype* hostImage, dtype* hostOutput, const int size);
+void subtraction_on_host(dtype* hostImage, dtype* hostOutput, const size_t size);
 
 #endif  // SUBTRACTION_H

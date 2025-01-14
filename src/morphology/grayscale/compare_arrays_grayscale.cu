@@ -23,9 +23,9 @@
  */
 template <typename dtype>
 __global__ void compare_arrays_grayscale_kernel(dtype* deviceImage1, dtype* deviceImage2,
-                                                int* deviceOutput, const int size,
+                                                int* deviceOutput, const size_t size,
                                                 dtype tolerance) {
-  int index = threadIdx.x + blockIdx.x * blockDim.x;
+  size_t index = threadIdx.x + blockIdx.x * blockDim.x;
   if (index < size) {
     if (custom_abs(deviceImage1[index] - deviceImage2[index]) > tolerance) {
       atomicAnd(deviceOutput, 0);
@@ -38,16 +38,16 @@ __global__ void compare_arrays_grayscale_kernel(dtype* deviceImage1, dtype* devi
   }
 }
 // Template instantiations for specific types
-template __global__ void compare_arrays_grayscale_kernel<int>(int*, int*, int*, const int, int);
+template __global__ void compare_arrays_grayscale_kernel<int>(int*, int*, int*, const size_t, int);
 template __global__ void compare_arrays_grayscale_kernel<unsigned int>(unsigned int*, unsigned int*,
-                                                                       int*, const int,
+                                                                       int*, const size_t,
                                                                        unsigned int);
-template __global__ void compare_arrays_grayscale_kernel<float>(float*, float*, int*, const int,
+template __global__ void compare_arrays_grayscale_kernel<float>(float*, float*, int*, const size_t,
                                                                 float);
 
 template <typename dtype>
 void compare_arrays_grayscale(dtype* deviceImage1, dtype* deviceImage2, int* deviceOutput,
-                              const int size, const int flag_verbose) {
+                              const size_t size, const int flag_verbose) {
 
   // Set up execution configuration
   dim3 block(BLOCK_1D);
@@ -68,14 +68,14 @@ void compare_arrays_grayscale(dtype* deviceImage1, dtype* deviceImage2, int* dev
   cudaDeviceSynchronize();  // Ensure all GPU threads are finished
 }
 // Template instantiations for specific types
-template void compare_arrays_grayscale<int>(int*, int*, int*, const int, const int);
-template void compare_arrays_grayscale<unsigned int>(unsigned int*, unsigned int*, int*, const int,
-                                                     const int);
-template void compare_arrays_grayscale<float>(float*, float*, int*, const int, const int);
+template void compare_arrays_grayscale<int>(int*, int*, int*, const size_t, const int);
+template void compare_arrays_grayscale<unsigned int>(unsigned int*, unsigned int*, int*, 
+                                                     const size_t, const int);
+template void compare_arrays_grayscale<float>(float*, float*, int*, const size_t, const int);
 
 template <typename dtype>
 void compare_arrays_grayscale_on_device(dtype* hostImage1, dtype* hostImage2, int* hostOutput,
-                                        const int size, const int flag_verbose) {
+                                        const size_t size, const int flag_verbose) {
 
   // Set input dimension
   size_t nBytes = size * sizeof(dtype);
@@ -103,10 +103,11 @@ void compare_arrays_grayscale_on_device(dtype* hostImage1, dtype* hostImage2, in
   cudaFree(deviceOutput);
 }
 // Template instantiations for specific types
-template void compare_arrays_grayscale_on_device<int>(int*, int*, int*, const int, const int);
+template void compare_arrays_grayscale_on_device<int>(int*, int*, int*, const size_t, const int);
 template void compare_arrays_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*, int*,
-                                                               const int, const int);
-template void compare_arrays_grayscale_on_device<float>(float*, float*, int*, const int, const int);
+                                                               const size_t, const int);
+template void compare_arrays_grayscale_on_device<float>(float*, float*, int*, const size_t, 
+                                                        const int);
 
 /**
  * @brief Function to perform pixel-wise comparison to check if two arrays are equal on the host 
@@ -124,11 +125,11 @@ template void compare_arrays_grayscale_on_device<float>(float*, float*, int*, co
  */
 template <typename dtype>
 void compare_arrays_grayscale_on_host(dtype* hostImage1, dtype* hostImage2, int* hostOutput,
-                                      const int size) {
+                                      const size_t size) {
   *hostOutput = 1;
   dtype epsilon = 1.0E-8;  // Tolerance for floating-point comparison
 
-  for (int index = 0; index < size; index++) {
+  for (size_t index = 0; index < size; index++) {
     if (custom_abs(hostImage1[index] - hostImage2[index]) > epsilon) {
       *hostOutput = 0;
       return;  // Exit on first mismatch
@@ -136,7 +137,7 @@ void compare_arrays_grayscale_on_host(dtype* hostImage1, dtype* hostImage2, int*
   }
 }
 // Template instantiations for specific types
-template void compare_arrays_grayscale_on_host<int>(int*, int*, int*, const int);
+template void compare_arrays_grayscale_on_host<int>(int*, int*, int*, const size_t);
 template void compare_arrays_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, int*,
-                                                             const int);
-template void compare_arrays_grayscale_on_host<float>(float*, float*, int*, const int);
+                                                             const size_t);
+template void compare_arrays_grayscale_on_host<float>(float*, float*, int*, const size_t);

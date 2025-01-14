@@ -38,7 +38,8 @@ CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtyp
   int startIdy = centerIdy - kernel_ysize / 2;
   int startIdz = centerIdz - kernel_zsize / 2;
 
-  int imageIdx, imageIdy, imageIdz, index;
+  size_t index;
+  int imageIdx, imageIdy, imageIdz;
 
   //erosion/dilation operation
   for (int iz = 0; iz < kernel_zsize; iz++) {
@@ -67,7 +68,7 @@ CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtyp
     }
   }
 
-  int centerIndex = centerIdz * ysize * xsize + centerIdy * xsize + centerIdx;
+  size_t centerIndex = centerIdz * ysize * xsize + centerIdy * xsize + centerIdx;
 
   // point-wise maximun/minimun operation
   if (operation == EROSION) {
@@ -200,7 +201,7 @@ void geodesic_morph_grayscale_on_device(dtype* hostImage, dtype* hostMask, dtype
                                         const int flag_verbose, const int padding_bottom,
                                         const int padding_top, MorphOp operation) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
   size_t nBytes_input = nBytes + nBytes_padding;

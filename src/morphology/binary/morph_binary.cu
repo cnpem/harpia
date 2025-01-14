@@ -37,7 +37,9 @@ CUDA_HOSTDEV void morph_binary_pixel(dtype* image, dtype* output, const int xsiz
     aux = 0;  //dilation operation
   }
 
-  int imageIdx, imageIdy, imageIdz, index;
+  size_t index;
+
+  int imageIdx, imageIdy, imageIdz;
 
   int startIdx = centerIdx - kernel_xsize / 2;
   int startIdy = centerIdy - kernel_ysize / 2;
@@ -70,7 +72,8 @@ CUDA_HOSTDEV void morph_binary_pixel(dtype* image, dtype* output, const int xsiz
       ik += kernel_xsize;
     }
   }
-  output[centerIdz * ysize * xsize + centerIdy * xsize + centerIdx] = aux;
+  size_t centerPixelIndex = centerIdz * ysize * xsize + centerIdy * xsize + centerIdx;
+  output[centerPixelIndex] = aux;
 }
 template CUDA_HOSTDEV void morph_binary_pixel<int>(int*, int*, const int, const int, const int,
                                                    const int, const int, int, int, int, int*, int,
@@ -202,7 +205,7 @@ void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize
                             const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
                             int kernel_zsize, MorphOp operation) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
   size_t nBytes_input = nBytes + nBytes_padding;

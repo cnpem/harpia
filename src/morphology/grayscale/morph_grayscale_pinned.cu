@@ -35,9 +35,11 @@ CUDA_HOSTDEV void morph_grayscale_pinned_pixel(dtype* image, dtype* output, cons
   int* ik = kernel;
 
   // Initialize auxiliary value with the central pixel
-  dtype aux = im[centerIdz * xsize * ysize + centerIdy * xsize + centerIdx];
+  size_t centerPixelIndex = centerIdz * xsize * ysize + centerIdy * xsize + centerIdx;
+  dtype aux = im[centerPixelIndex];
 
-  int imageIdx, imageIdy, imageIdz, index;
+  size_t index;
+  int imageIdx, imageIdy, imageIdz;
 
   int startIdx = centerIdx - kernel_xsize / 2;
   int startIdy = centerIdy - kernel_ysize / 2;
@@ -66,7 +68,7 @@ CUDA_HOSTDEV void morph_grayscale_pinned_pixel(dtype* image, dtype* output, cons
       }
     }
   }
-  output[centerIdz * ysize * xsize + centerIdy * xsize + centerIdx] = aux;
+  output[centerPixelIndex] = aux;
 }
 template CUDA_HOSTDEV void morph_grayscale_pinned_pixel<unsigned int>(unsigned int*, unsigned int*,
                                                                       const int, const int,
@@ -162,7 +164,7 @@ void morph_grayscale_pinned_on_device(dtype* hostImage, dtype* hostOutput, const
                                       int kernel_xsize, int kernel_ysize, int kernel_zsize,
                                       MorphOp operation, const int flag_verbose) {
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = xsize * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Set kernel dimension
