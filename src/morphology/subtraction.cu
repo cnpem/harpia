@@ -21,13 +21,13 @@ __global__ void subtraction_kernel(dtype* deviceImage, dtype* deviceOutput, cons
   }
 }
 // Template instantiations for specific types
-template __global__ void subtraction_kernel<int8_t>(int8_t*, int8_t*, const int);
-template __global__ void subtraction_kernel<uint8_t>(uint8_t*, uint8_t*, const int);
-template __global__ void subtraction_kernel<int16_t>(int16_t*, int16_t*, const int);
-template __global__ void subtraction_kernel<uint16_t>(uint16_t*, uint16_t*, const int);
-template __global__ void subtraction_kernel<unsigned int>(unsigned int*, unsigned int*, const int);
-template __global__ void subtraction_kernel<int>(int*, int*, const int);
-template __global__ void subtraction_kernel<float>(float*, float*, const int);
+template __global__ void subtraction_kernel<int8_t>(int8_t*, int8_t*, const size_t);
+template __global__ void subtraction_kernel<uint8_t>(uint8_t*, uint8_t*, const size_t);
+template __global__ void subtraction_kernel<int16_t>(int16_t*, int16_t*, const size_t);
+template __global__ void subtraction_kernel<uint16_t>(uint16_t*, uint16_t*, const size_t);
+template __global__ void subtraction_kernel<unsigned int>(unsigned int*, unsigned int*, const size_t);
+template __global__ void subtraction_kernel<int>(int*, int*, const size_t);
+template __global__ void subtraction_kernel<float>(float*, float*, const size_t);
 
 template <typename dtype>
 void subtraction(dtype* deviceImage, dtype* deviceOutput, const size_t size, const int flag_verbose) {
