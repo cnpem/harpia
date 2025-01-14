@@ -6,7 +6,7 @@
 
 int test_operations_on_host();
 int test_operations_on_device();
-int test_chunked_executer();
+int test_chunked_executer(float memoryOccupancy);
 int test_script1(MorphOp operation);
 int test_script2();
 int test_script3(MorphChain chain);
