@@ -61,11 +61,11 @@ __device__ void convolution3d(dtype* input, float* output, float* kernel, int id
   int inputX;
   int inputZ;
 
-  for (int l = 0; l < nz; l++) {
+  for (unsigned int l = 0; l < nz; l++) {
 
-    for (int m = 0; m < nx; m++) {
+    for (unsigned int m = 0; m < nx; m++) {
 
-      for (int n = 0; n < ny; n++) {
+      for (unsigned int n = 0; n < ny; n++) {
         //this is needed to compute everything with respect to the center of the kernel.
         inputX = idx - nx / 2 + m;
         inputY = idy - ny / 2 + n;
@@ -74,8 +74,10 @@ __device__ void convolution3d(dtype* input, float* output, float* kernel, int id
         //checks for boundaries.
         if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize && inputZ >= 0 &&
             inputZ < zsize) {
-          accumulation += kernel[(l * nx * ny) + (m * ny) + n] *
-                          input[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
+
+
+          unsigned int index = (inputZ * xsize * ysize) + (inputX * ysize) + inputY;  
+          accumulation += kernel[(l * nx * ny) + (m * ny) + n] * input[index];
         }
 
         //make a padding function to substitute this line of code.
@@ -105,8 +107,8 @@ __device__ void convolution3d(dtype* input, float* output, float* kernel, int id
             inputZ = 2 * zsize - inputZ - 1;
           }
 
-          accumulation += kernel[(l * nx * ny) + (m * ny) + n] *
-                          input[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
+          unsigned int index = (inputZ * xsize * ysize) + (inputX * ysize) + inputY; 
+          accumulation += kernel[(l * nx * ny) + (m * ny) + n] *input[index];
         }
       }
     }

@@ -10,18 +10,20 @@ __global__ void mean_filter_kernel_2d(dtype* image, float* output, int xsize, in
                                       int nx, int ny) {
 
   //threads
-  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
   if (idx < xsize && idy < ysize) {
     //mean value
     float mean = 0;
 
+    unsigned int index = idz * xsize * ysize + idx * ysize + idy;
+
     //get the neighbors
     get_mean_kernel_2d(image + idz * xsize * ysize, &mean, idx, idy, xsize, ysize, nx, ny);
 
     //assign the mean value
-    output[idz * xsize * ysize + idx * ysize + idy] = mean;
+    output[index] = mean;
   }
 }
 
@@ -39,11 +41,13 @@ __global__ void mean_filter_kernel_3d(dtype* image, float* output, int xsize, in
     //mean value
     float mean = 0;
 
+    unsigned int index = idz * xsize * ysize + idx * ysize + idy;
+
     //get the neighbors
     get_mean_kernel_3d(image, &mean, idx, idy, idz, xsize, ysize, zsize, nx, ny, nz);
 
     //assign the mean value
-    output[idz * ysize * xsize + idx * ysize + idy] = mean;
+    output[index] = mean;
   }
 }
 
@@ -63,16 +67,17 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
 
   dtype* deviceImage;
   float* deviceOutput;
+  unsigned int size = xsize * ysize * zsize;
 
-  cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
-  cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
+  cudaMalloc((void**)&deviceImage, size * sizeof(dtype));
+  cudaMalloc((void**)&deviceOutput, size * sizeof(float));
 
-  cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+  cudaMemcpy(deviceImage, image, size * sizeof(dtype), cudaMemcpyHostToDevice);
 
   if (nz == 1) {
 
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -93,7 +98,7 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
   else {
 
     dim3 blockSize(8, 8, 8);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x,
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
                   (zsize + blockSize.z - 1) / blockSize.z);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -109,7 +114,7 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
     std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
   }
 
-  cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+  cudaMemcpy(output, deviceOutput, size * sizeof(float), cudaMemcpyDeviceToHost);
 
   cudaFree(deviceImage);
   cudaFree(deviceOutput);
