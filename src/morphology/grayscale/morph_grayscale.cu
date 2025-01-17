@@ -34,7 +34,9 @@ CUDA_HOSTDEV void morph_grayscale_pixel(dtype* image, dtype* output, const int x
   int* ik = kernel;
 
   // Initialize auxiliary value with the central pixel
-  size_t centerPixelIndex = centerIdz * xsize * ysize + centerIdy * xsize + centerIdx;
+  size_t centerPixelIndex = static_cast<size_t>(centerIdz) * xsize * ysize + 
+                            static_cast<size_t>(centerIdy) * xsize + 
+                            static_cast<size_t>(centerIdx);
   dtype aux = im[centerPixelIndex];
 
   size_t index;
@@ -51,7 +53,6 @@ CUDA_HOSTDEV void morph_grayscale_pixel(dtype* image, dtype* output, const int x
         imageIdx = startIdx + ix;
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
-        index = imageIdz * xsize * ysize + imageIdy * xsize + imageIdx;
 
         // Ignore out of bounds pixels and don't care pixels
         if (imageIdx < 0 || imageIdx > xsize - 1 || imageIdy < 0 || imageIdy > ysize - 1 ||
@@ -60,6 +61,10 @@ CUDA_HOSTDEV void morph_grayscale_pixel(dtype* image, dtype* output, const int x
         }
 
         else {
+          index = static_cast<size_t>(imageIdz) * xsize * ysize + 
+                  static_cast<size_t>(imageIdy) * xsize + 
+                  static_cast<size_t>(imageIdx);
+          
           if (operation == EROSION) {
             aux = (im[index] < aux) ? im[index] : aux;  // Erosion: aux is the min value
           } else {
@@ -169,7 +174,7 @@ void morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xs
                                int kernel_xsize, int kernel_ysize, int kernel_zsize,
                                MorphOp operation) {
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
   size_t nBytes_input = nBytes + nBytes_padding;

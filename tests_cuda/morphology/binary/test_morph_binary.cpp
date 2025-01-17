@@ -101,6 +101,7 @@ void test_morph_binary_on_host(const std::string& filename, const int xsize, con
   if (flag_verbose)
     printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
+
   int *host_A, *host_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
   host_ref = (int*)malloc(nBytes);
@@ -111,10 +112,11 @@ void test_morph_binary_on_host(const std::string& filename, const int xsize, con
   read_input(host_A, filename, size, flag_verbose);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
-
+  
   // Perform binary morphology on host
   morph_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
                        kernel_zsize, operation);
+
   if (flag_show)
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
 

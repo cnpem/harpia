@@ -35,7 +35,9 @@ CUDA_HOSTDEV void morph_grayscale_pinned_pixel(dtype* image, dtype* output, cons
   int* ik = kernel;
 
   // Initialize auxiliary value with the central pixel
-  size_t centerPixelIndex = centerIdz * xsize * ysize + centerIdy * xsize + centerIdx;
+  size_t centerPixelIndex = static_cast<size_t>(centerIdz) * xsize * ysize + 
+                            static_cast<size_t>(centerIdy) * xsize + 
+                            static_cast<size_t>(centerIdx);
   dtype aux = im[centerPixelIndex];
 
   size_t index;
@@ -52,7 +54,9 @@ CUDA_HOSTDEV void morph_grayscale_pinned_pixel(dtype* image, dtype* output, cons
         imageIdx = startIdx + ix;
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
-        index = imageIdz * xsize * ysize + imageIdy * xsize + imageIdx;
+        index = static_cast<size_t>(imageIdz) * xsize * ysize + 
+                static_cast<size_t>(imageIdy) * xsize + 
+                static_cast<size_t>(imageIdx);
 
         // Ignore out of bounds pixels and don't care pixels
         if (imageIdx < 0 || imageIdx > xsize - 1 || imageIdy < 0 || imageIdy > ysize - 1 ||
@@ -164,7 +168,7 @@ void morph_grayscale_pinned_on_device(dtype* hostImage, dtype* hostOutput, const
                                       int kernel_xsize, int kernel_ysize, int kernel_zsize,
                                       MorphOp operation, const int flag_verbose) {
   // Set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Set kernel dimension

@@ -18,7 +18,7 @@ void top_hat_reconstruction_on_device(dtype* hostImage, dtype* hostOutput, const
                                       int* kernel, int kernel_xsize, int kernel_ysize,
                                       int kernel_zsize) {
   // Set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Set kernel dimension
@@ -74,7 +74,7 @@ void top_hat_reconstruction_on_host(dtype* hostImage, dtype* hostOutput, const i
                                     const int ysize, const int zsize, int* kernel, int kernel_xsize,
                                     int kernel_ysize, int kernel_zsize) {
   // Set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Allocate temporary memory

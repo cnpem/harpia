@@ -13,7 +13,7 @@ void reconstruction_grayscale(dtype* deviceMarker, dtype* deviceMask, dtype* dev
                               const int xsize, const int ysize, const int zsize, MorphOp operation,
                               const int flag_verbose) {
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Reconstruction: iterate geodesic erosion/dilation until convergency
@@ -65,7 +65,7 @@ void reconstruction_grayscale_on_device(dtype* hostImage, dtype* hostMask, dtype
                                         const int xsize, const int ysize, const int zsize,
                                         MorphOp operation, const int flag_verbose) {
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // malloc device global memory
@@ -117,7 +117,7 @@ void reconstruction_grayscale_on_host(dtype* hostImage, dtype* hostMask, dtype* 
   int flagConverged = 0;
 
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // allocate marker memory

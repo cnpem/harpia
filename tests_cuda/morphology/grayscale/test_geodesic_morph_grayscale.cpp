@@ -35,7 +35,7 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
   printf("\nTest grayscale geodesic %s on device\n", (operation ? "dilation" : "erosion"));
 
   // Set input dimension
-  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(float);
 
   if (flag_verbose)
@@ -113,7 +113,7 @@ void test_geodesic_morph_grayscale_on_host(const std::string& filename, const in
   printf("\nTest grayscale geodesic %s on host\n", (operation ? "dilation" : "erosion"));
 
   // Set input dimension
-  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(float);
 
   if (flag_verbose)

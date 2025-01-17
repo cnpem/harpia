@@ -52,7 +52,9 @@ CUDA_HOSTDEV void morph_binary_pinned_pixel(dtype* image, dtype* output, const i
         imageIdx = startIdx + ix;
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
-        index = imageIdz * xsize * ysize + imageIdy * xsize + imageIdx;
+        index = static_cast<size_t>(imageIdz) * xsize * ysize + 
+                static_cast<size_t>(imageIdy) * xsize + 
+                static_cast<size_t>(imageIdx);
 
         // ignore out of bounds pixels and don't care pixels
         // don't care pixels are signaled as -1 in the kernel
@@ -72,7 +74,9 @@ CUDA_HOSTDEV void morph_binary_pinned_pixel(dtype* image, dtype* output, const i
       ik += kernel_xsize;
     }
   }
-  size_t centerPixelIndex = centerIdz * ysize * xsize + centerIdy * xsize + centerIdx;
+  size_t centerPixelIndex = static_cast<size_t>(centerIdz) * ysize * xsize + 
+                            static_cast<size_t>(centerIdy) * xsize + 
+                            static_cast<size_t>(centerIdx);
   output[centerPixelIndex] = aux;
 }
 template CUDA_HOSTDEV void morph_binary_pinned_pixel<int>(int*, int*, const int, const int,
@@ -202,7 +206,7 @@ void morph_binary_pinned_on_device(dtype* hostImage, dtype* hostOutput, const in
                                    int kernel_ysize, int kernel_zsize, MorphOp operation,
                                    const int flag_verbose) {
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // set kenrel dimension

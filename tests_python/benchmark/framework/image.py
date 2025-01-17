@@ -11,7 +11,7 @@ def load(path, xsize, ysize, zsize, dtype, dtype_out):
     img = img.astype(dtype = dtype_out)
     contiguous(img)
     return img
-    
+
 def load_fast(path, xsize, ysize, zsize, dtype, dtype_out):
     # Memory-map the file for fast access
     img = np.memmap(path, dtype=dtype, mode='r', shape=(zsize, ysize, xsize))

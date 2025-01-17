@@ -52,8 +52,7 @@ CUDA_HOSTDEV void morph_binary_pixel(dtype* image, dtype* output, const int xsiz
         imageIdx = startIdx + ix;
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
-        index = imageIdz * xsize * ysize + imageIdy * xsize + imageIdx;
-
+       
         // ignore out of bounds pixels and don't care pixels
         // don't care pixels are signaled as -1 in the kernel
         if (imageIdx < 0 || imageIdx > xsize - 1 || imageIdy < 0 || imageIdy > ysize - 1 ||
@@ -62,6 +61,10 @@ CUDA_HOSTDEV void morph_binary_pixel(dtype* image, dtype* output, const int xsiz
         }
 
         else {
+          index = static_cast<size_t>(imageIdz) * xsize * ysize + 
+                  static_cast<size_t>(imageIdy) * xsize + 
+                  static_cast<size_t>(imageIdx);
+
           if (operation == EROSION) {
             aux = (im[index] == static_cast<dtype>(ik[ix])) && aux;  //erosion operation
           } else {
@@ -72,7 +75,10 @@ CUDA_HOSTDEV void morph_binary_pixel(dtype* image, dtype* output, const int xsiz
       ik += kernel_xsize;
     }
   }
-  size_t centerPixelIndex = centerIdz * ysize * xsize + centerIdy * xsize + centerIdx;
+  size_t centerPixelIndex = static_cast<size_t>(centerIdz) * ysize * xsize +
+                            static_cast<size_t>(centerIdy) * xsize +
+                            static_cast<size_t>(centerIdx);
+
   output[centerPixelIndex] = aux;
 }
 template CUDA_HOSTDEV void morph_binary_pixel<int>(int*, int*, const int, const int, const int,
@@ -205,7 +211,7 @@ void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize
                             const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
                             int kernel_zsize, MorphOp operation) {
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
   size_t nBytes_input = nBytes + nBytes_padding;

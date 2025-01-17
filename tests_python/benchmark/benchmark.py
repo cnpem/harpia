@@ -2,6 +2,7 @@
 import numpy as np                     # For array manipulation
 from framework import image, tests
 import csv
+import h5py
 
 # Grayscale morphology operations
 from skimage.morphology import (       
@@ -80,17 +81,17 @@ def custum_kernel3D():
 # img_num = 1
 # print("fineshed reading small image!")
 
-# # IMAGE 2
-print("reading big image...")
-xsize = 2048
-ysize = 2048
-zsize = 1964
-path = "../../../../../../../../beamlines/mogno/proposals/20180217/data/Soil_Experiment/testes_segmentacao/PBV29_Talita/tomoFiltered_masked_2048x2048x1964_16bit.raw"
-image_uint32_gray = image.load(path, xsize, ysize, zsize,'int16', 'uint32')
-image_int32_gray = image.load(path, xsize, ysize, zsize,'int16', 'int32')
-image_float32_gray = image.load(path, xsize, ysize, zsize,'int16', 'float32')
-img_num = 2
-print("fineshed reading big image!")
+# # IMAGE 2 (possibily with problem)
+# print("reading big image...")
+# xsize = 2048
+# ysize = 2048
+# zsize = 1964
+# path = "../../../../../../../../beamlines/mogno/proposals/20180217/data/Soil_Experiment/testes_segmentacao/PBV29_Talita/tomoFiltered_masked_2048x2048x1964_16bit.raw"
+# image_uint32_gray = image.load(path, xsize, ysize, zsize,'int16', 'uint32')
+# image_int32_gray = image.load(path, xsize, ysize, zsize,'int16', 'int32')
+# image_float32_gray = image.load(path, xsize, ysize, zsize,'int16', 'float32')
+# img_num = 2
+# print("fineshed reading big image!")
 
 # IMAGE 3
 # print("reading medium image...")
@@ -104,6 +105,18 @@ print("fineshed reading big image!")
 # img_num = 3
 # print("fineshed reading medium image!")
 
+# IMAGE 4 
+print("reading big image...")
+xsize = 2052
+ysize = 2052
+zsize = 2048
+
+path = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
+image_uint32_gray = image.load(path, xsize, ysize, zsize,'int32', 'uint32')
+image_int32_gray = image.load(path, xsize, ysize, zsize,'int32', 'int32')
+image_float32_gray = image.load(path, xsize, ysize, zsize,'int32', 'float32')
+img_num = 4
+print("fineshed reading big image!")
 
 #Kernel
 kernel = custum_kernel3D()
@@ -114,19 +127,19 @@ kernel = custum_kernel3D()
 
 machine = 'harriet'
 ngpus = 1
-gpuMemory = 0.41
+gpuMemory = 0.1
 repetitions = 11
 
-# BINARY 1 BIG IMAGE
+# BINARY 
 operations = [
     ("Smoothing 3D binary", None, smooth_binary, "smooth_binary"),
-    ("Closing 3D binary", None, closing_binary, "closing_binary"),
-    ("Opening 3D binary", None, opening_binary, "opening_binary"),
-    ("Erosion 3D binary", None, erosion_binary, "erosion_binary"),
-    ("Dilation 3D binary", None, dilation_binary, "dilation_binary"),
+    ("Closing 3D binary", closing, closing_binary, "closing_binary"),
+    ("Opening 3D binary", opening, opening_binary, "opening_binary"),
+#    ("Erosion 3D binary", erosion, erosion_binary, "erosion_binary"),
+#    ("Dilation 3D binary", dilation, dilation_binary, "dilation_binary"),
 ]
 
-# BINARY 1 BIG IMAGE
+# BINARY
 images = [
     ("int8", f"image{img_num}_int8_binary"),
     ("uint8", f"image{img_num}_uint8_binary"),
@@ -146,7 +159,7 @@ for img in images:
             csv_file, binerized_image, operation, machine, ngpus, True, repetitions, gpuMemory, kernel
         )
 
-# BINARY 1 SMALL IMAGE
+# BINARY 
 # images = [
 #     ("int32", "image1_int32_binary"),
 #     ("uint32", "image1_uint32_binary"),

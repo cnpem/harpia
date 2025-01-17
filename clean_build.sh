@@ -10,6 +10,6 @@ find harpia -iname *.c -exec rm {} \;
 find harpia -iname *.cpp -exec rm {} \;
 
 #clean Makefile build
-rm -rf obj Test
+#rm -rf obj Test
 
 

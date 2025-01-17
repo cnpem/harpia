@@ -56,10 +56,14 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   for (; iz <= zsize - chunkSize; iz += chunkSize) {
     selectedDevice = deviceCount % ngpus;
     CHECK(cudaSetDevice(selectedDevice));
+    cudaDeviceSynchronize();
     if (verbose) {
-      printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
+      //printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
+      printf("Processing chunk: iz=%d, chunkSize=%d, device=%d\n", iz, chunkSize, selectedDevice);
+      printf("i_ref: %p, o_ref: %p, sliceSize: %d\n", i_ref, o_ref, sliceSize);
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
+    cudaDeviceSynchronize();
     i_ref += chunkSize * sliceSize;
     o_ref += chunkSize * sliceSize;
     deviceCount += 1;
@@ -69,6 +73,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   int remaining = zsize - iz;
   selectedDevice = deviceCount % ngpus;
   CHECK(cudaSetDevice(selectedDevice));
+  cudaDeviceSynchronize();
   if (verbose) {
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
@@ -149,13 +154,13 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
   }
   padding_bottom = 0;
   padding_top = padding;
-  cudaDeviceSynchronize();
+
   func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, padding_bottom, padding_top, kernel,
        kernel_xsize, kernel_ysize, kernel_zsize, args...);
   i_ref += chunkSize * sliceSize;
   o_ref += chunkSize * sliceSize;
-  deviceCount += 1;
   cudaDeviceSynchronize();
+  deviceCount += 1;
 
   // Middle chunks: padding at the beginning and at the end
   padding_bottom = padding;
@@ -175,8 +180,9 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
          kernel_xsize, kernel_ysize, kernel_zsize, args...);
     i_ref += chunkSize * sliceSize;  // Move to the next chunk
     o_ref += chunkSize * sliceSize;
+    cudaDeviceSynchronize();
     deviceCount += 1;
-  }
+}
 
   // Last chunk: padding only at the begining
   int remaining = zsize - iz;
@@ -189,7 +195,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
     padding_top = 0;
     func(i_ref, o_ref, xsize, ysize, remaining, verbose, padding_bottom, padding_top, kernel,
          kernel_xsize, kernel_ysize, kernel_zsize, args...);
-  }
+}
 
   if (verbose) {
     printf("\nFinished processing all chunks!\n");
