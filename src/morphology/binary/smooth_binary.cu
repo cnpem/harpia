@@ -37,6 +37,10 @@ void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
   // transfer data from the host to the device
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
 
+  //Save original pointer for memmory deallocation
+  dtype *original_deviceImage = deviceImage;
+  dtype *original_deviceTmp = deviceTmp;
+
   // transfer input + padding
   i_hostImage = hostImage - padding_bottom * xsize * ysize;
 
@@ -85,8 +89,8 @@ void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
   CHECK(cudaMemcpy(hostOutput, deviceImage, nBytes, cudaMemcpyDeviceToHost));
 
   // free device memory
-  cudaFree(deviceImage);
-  cudaFree(deviceTmp);
+  cudaFree(original_deviceImage);
+  cudaFree(original_deviceTmp);
   cudaFree(deviceKernel);
 }
 
