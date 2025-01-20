@@ -40,16 +40,13 @@ void test_geodesic_morph_binary_on_device(const std::string& filename, const int
 
   if (flag_verbose)
     printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
-
+  
   int *hostMarker, *device_ref, *hostMask;  // Pointers for host memory
-  hostMarker = (int*)malloc(nBytes);
   hostMask = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
+  hostMarker = (int*)calloc(size, sizeof(int));
+  device_ref = (int*)calloc(size, sizeof(int));
 
   // Set input data
-  memset(hostMarker, 0, nBytes);
-  memset(hostMask, 0, nBytes);
-  memset(device_ref, 0, nBytes);
   read_input(hostMask, filename, size, flag_verbose);
 
   //create marker image
@@ -124,7 +121,7 @@ void test_geodesic_morph_binary_on_host(const std::string& filename, const int x
   hostMarker = (int*)malloc(nBytes);
   hostMask = (int*)malloc(nBytes);
   host_ref = (int*)malloc(nBytes);
-
+  
   // Set input data
   memset(hostMarker, 0, nBytes);
   memset(hostMask, 0, nBytes);
@@ -143,7 +140,6 @@ void test_geodesic_morph_binary_on_host(const std::string& filename, const int x
     morph_binary_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel, 3, 3, 3, EROSION);
   }
 
-  int ncopies = 3;
   geodesic_morph_binary_on_host(hostMarker, hostMask, host_ref, xsize, ysize, zsize, operation);
 
   show_image_3D(hostMarker, xsize, ysize, 1, "Marker");
