@@ -45,11 +45,7 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
 
   int *host_A, *device_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
-
-  // Initialize memory
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
+  device_ref = (int*)calloc(size, sizeof(int));
 
   // Read input data from file
   read_input(host_A, filename, size, flag_verbose);
@@ -62,8 +58,7 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
 
     morph_chain_binary_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
                                kernel_ysize, kernel_zsize, chain);
@@ -111,11 +106,9 @@ void test_morph_chain_binary_on_host(const std::string& filename, const int xsiz
 
   int *host_A, *host_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
-  host_ref = (int*)malloc(nBytes);
+  host_ref = (int*)calloc(size, sizeof(int));
 
   // Initialize memory
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
@@ -134,10 +127,8 @@ void test_morph_chain_binary_on_host(const std::string& filename, const int xsiz
           kernel_zsize);
     }
     int *opencv_ref, *opencv_tmp;
-    opencv_ref = (int*)malloc(nBytes);
+    opencv_ref = (int*)calloc(size, sizeof(int));
     opencv_tmp = (int*)malloc(nBytes);
-    memset(opencv_ref, 0, nBytes);
-    memset(opencv_tmp, 0, nBytes);
 
     // Apply OpenCV erosion in chain
     morphology_3D_openCV(host_A, opencv_tmp, xsize, ysize, zsize, kernel_xsize, kernel_ysize,

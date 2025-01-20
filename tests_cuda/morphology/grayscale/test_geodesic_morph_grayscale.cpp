@@ -44,12 +44,9 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
   float *hostMarker, *device_ref, *hostMask;  // Pointers for host memory
   hostMarker = (float*)malloc(nBytes);
   hostMask = (float*)malloc(nBytes);
-  device_ref = (float*)malloc(nBytes);
+  device_ref = (float*)calloc(size, sizeof(float));
 
   // Set input data
-  memset(hostMarker, 0, nBytes);
-  memset(hostMask, 0, nBytes);
-  memset(device_ref, 0, nBytes);
   read_input(hostMask, filename, size, flag_verbose);
 
   //create marker image
@@ -75,8 +72,7 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
                           operation);
   if (flag_check) {
     float* host_ref;
-    host_ref = (float*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (float*)calloc(size, sizeof(float));
     geodesic_morph_grayscale_on_host(hostMarker, hostMask, host_ref, xsize, ysize, zsize,
                                      operation);
     check_result(host_ref, device_ref, xsize, ysize, zsize);
@@ -122,12 +118,9 @@ void test_geodesic_morph_grayscale_on_host(const std::string& filename, const in
   float *hostMarker, *host_ref, *hostMask;  // Pointers for host memory
   hostMarker = (float*)malloc(nBytes);
   hostMask = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
 
   // Set input data
-  memset(hostMarker, 0, nBytes);
-  memset(hostMask, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(hostMask, filename, size, flag_verbose);
 
   //create marker image

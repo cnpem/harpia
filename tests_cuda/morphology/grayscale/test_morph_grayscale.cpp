@@ -16,7 +16,7 @@ void test_morph_grayscale_on_device(const std::string& filename, const int xsize
   printf("\nTest grayscale %s on device\n", (operation ? "dilation" : "erosion"));
 
   // set input dimension
-  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
 
   size_t nBytes = size * sizeof(int);
 
@@ -25,12 +25,9 @@ void test_morph_grayscale_on_device(const std::string& filename, const int xsize
 
   int *host_A, *device_ref;  //pointers for host memory
   host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
+  device_ref = (int*)calloc(size, sizeof(int));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-
   read_input(host_A, filename, size, flag_verbose);
 
   int ncopies = 2;
@@ -41,8 +38,7 @@ void test_morph_grayscale_on_device(const std::string& filename, const int xsize
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
 
     // erosion
     morph_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
@@ -65,23 +61,23 @@ void test_morph_grayscale_on_host(const std::string& filename, const int xsize, 
   printf("\nTest grayscale %s on host\n", (operation ? "dilation" : "erosion"));
 
   // set input dimension
-  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
-
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
+  printf("check 0\n");
   size_t nBytes = size * sizeof(float);
   if (flag_verbose)
     printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   float *host_A, *host_ref;  //pointers for host memory
   host_A = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
+  printf("check 1\n");
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
   if (flag_show) {
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
   }
+  printf("check 2\n");
 
   // operation on host
   morph_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
@@ -89,6 +85,7 @@ void test_morph_grayscale_on_host(const std::string& filename, const int xsize, 
   if (flag_show) {
     show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
   }
+  printf("check 3\n");
 
   if (flag_check) {
     if (kernel_zsize > 1) {
@@ -99,8 +96,8 @@ void test_morph_grayscale_on_host(const std::string& filename, const int xsize, 
     }
 
     float* opencv_ref;
-    opencv_ref = (float*)malloc(nBytes);
-    memset(opencv_ref, 0, nBytes);
+    opencv_ref = (float*)calloc(size, sizeof(float));
+    printf("check 4\n");
 
     // openCV operation
     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
@@ -108,8 +105,10 @@ void test_morph_grayscale_on_host(const std::string& filename, const int xsize, 
     if (flag_show) {
       show_image_3D(opencv_ref, xsize, ysize, zsize, "Result openCV");
     }
+    printf("check 5\n");
 
     check_result(host_ref, opencv_ref, xsize, ysize, zsize);
+    printf("check 6\n");
 
     free(opencv_ref);
   }

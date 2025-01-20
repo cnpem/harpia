@@ -154,9 +154,6 @@ void morph_chain_binary_on_host(dtype* hostImage, dtype* hostOutput, const int x
   dtype* hostTmp;
   hostTmp = (dtype*)malloc(nBytes);
 
-  // set input data
-  memset(hostTmp, 0, nBytes);
-
   // morphChain operation
   morph_binary_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
                        kernel_zsize, chain.operation1);

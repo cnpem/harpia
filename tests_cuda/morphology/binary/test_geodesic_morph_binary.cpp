@@ -66,7 +66,7 @@ void test_geodesic_morph_binary_on_device(const std::string& filename, const int
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           EROSION);
   }
-
+  printf("check 0");
   ncopies = 3;
   chunkedExecutorGeodesic(geodesic_morph_binary_on_device<int>, ncopies, memoryOccupancy,
                           hostMarker, hostMask, device_ref, xsize, ysize, zsize, flag_verbose,
@@ -74,8 +74,7 @@ void test_geodesic_morph_binary_on_device(const std::string& filename, const int
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
     // Perform binary morphology on host for comparison
     geodesic_morph_binary_on_host(hostMarker, hostMask, host_ref, xsize, ysize, zsize, operation);
     check_result(host_ref, device_ref, xsize, ysize, zsize);
@@ -120,12 +119,9 @@ void test_geodesic_morph_binary_on_host(const std::string& filename, const int x
   int *hostMarker, *host_ref, *hostMask;  // Pointers for host memory
   hostMarker = (int*)malloc(nBytes);
   hostMask = (int*)malloc(nBytes);
-  host_ref = (int*)malloc(nBytes);
+  host_ref = (int*)calloc(size, sizeof(int));
   
   // Set input data
-  memset(hostMarker, 0, nBytes);
-  memset(hostMask, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(hostMask, filename, size, flag_verbose);
 
   //create marker image

@@ -21,12 +21,9 @@ void test_morph_grayscale_pinned_on_device(const std::string& filename, const in
 
   int *host_A, *device_ref;  //pointers for host memory
   host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
+  device_ref = (int*)calloc(size, sizeof(int));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-
   read_input(host_A, filename, size, flag_verbose);
 
   // device erosion
@@ -35,8 +32,7 @@ void test_morph_grayscale_pinned_on_device(const std::string& filename, const in
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
 
     // erosion
     morph_grayscale_pinned_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
@@ -66,11 +62,9 @@ void test_morph_grayscale_pinned_on_host(const std::string& filename, const int 
 
   float *host_A, *host_ref;  //pointers for host memory
   host_A = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
@@ -90,8 +84,7 @@ void test_morph_grayscale_pinned_on_host(const std::string& filename, const int 
     }
 
     float* opencv_ref;
-    opencv_ref = (float*)malloc(nBytes);
-    memset(opencv_ref, 0, nBytes);
+    opencv_ref = (float*)calloc(size, sizeof(float));
 
     // openCV erosion
     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,

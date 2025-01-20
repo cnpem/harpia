@@ -140,9 +140,6 @@ void smooth_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
   dtype* hostTmp;
   hostTmp = (dtype*)malloc(nBytes);
 
-  // set input data
-  memset(hostTmp, 0, nBytes);
-
   //Opening
   morph_binary_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
                        kernel_zsize, EROSION);

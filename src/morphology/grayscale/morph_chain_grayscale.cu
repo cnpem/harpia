@@ -131,9 +131,6 @@ void morph_chain_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const in
   dtype* hostTmp;
   hostTmp = (dtype*)malloc(nBytes);
 
-  // initialize temporary memory
-  memset(hostTmp, 0, nBytes);
-
   // Perform the first operation in the chain
   morph_grayscale_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize,
                           kernel_ysize, kernel_zsize, chain.operation1);

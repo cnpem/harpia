@@ -25,11 +25,9 @@ void test_top_hat_reconstruction_on_host(const std::string& filename, const int 
 
   float *host_A, *host_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
 
   top_hat_reconstruction_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
@@ -53,7 +51,7 @@ void test_top_hat_reconstruction_on_device(const std::string& filename, const in
   printf("\nTest Avizo's top hat on device\n");
 
   // set input dimension
-  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
 
   size_t nBytes = size * sizeof(int);
 
@@ -62,12 +60,9 @@ void test_top_hat_reconstruction_on_device(const std::string& filename, const in
 
   int *host_A, *device_ref;  //pointers for host memmory
   host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
+  device_ref = (int*)calloc(size, sizeof(int));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-
   read_input(host_A, filename, size, flag_verbose);
 
   top_hat_reconstruction_on_device(host_A, device_ref, xsize, ysize, zsize, flag_verbose, kernel,
@@ -75,8 +70,7 @@ void test_top_hat_reconstruction_on_device(const std::string& filename, const in
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
 
     top_hat_reconstruction_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
                                    kernel_ysize, kernel_zsize);

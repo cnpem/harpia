@@ -25,11 +25,9 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
 
   float *host_A, *device_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
-  device_ref = (float*)malloc(nBytes);
+  device_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
 
   // device erosion
@@ -41,8 +39,7 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
 
   if (flag_check) {
     float* host_ref;
-    host_ref = (float*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (float*)calloc(size, sizeof(float));
 
     // erosion
     top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
@@ -73,11 +70,9 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
 
   float *host_A, *host_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
@@ -97,8 +92,7 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
     }
 
     float* opencv_ref;
-    opencv_ref = (float*)malloc(nBytes);
-    memset(opencv_ref, 0, nBytes);
+    opencv_ref = (float*)calloc(size, sizeof(float));
 
     // opencv erosion
     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,

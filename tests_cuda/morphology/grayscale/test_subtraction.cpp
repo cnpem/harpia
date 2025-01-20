@@ -27,9 +27,6 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
   device_ref = (float*)malloc(nBytes);
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-
   read_input(host_A, filename, size, flag_verbose);
   read_input(device_ref, filename2, size, flag_verbose);
 
@@ -41,8 +38,7 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
 
   if (flag_check) {
     float* host_ref;
-    host_ref = (float*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (float*)calloc(size, sizeof(float));
     read_input(host_ref, filename2, size, flag_verbose);
 
     // erosion
@@ -76,8 +72,6 @@ void test_subtraction_on_host(const std::string& filename, const std::string& fi
   host_ref = (float*)malloc(nBytes);
 
   // set input data
-  memset(host_A, 1, nBytes);
-  memset(host_ref, 1, nBytes);
   read_input(host_A, filename, size, flag_verbose);
   read_input(host_ref, filename, size, flag_verbose);
   if (flag_show) {
@@ -94,8 +88,7 @@ void test_subtraction_on_host(const std::string& filename, const std::string& fi
 
   if (flag_check) {
     float* host_result;  //pointers for host memmory
-    host_result = (float*)malloc(nBytes);
-    memset(host_result, 0, nBytes);  //subtracting two iqual images should result in zeros
+    host_result = (float*)calloc(size, sizeof(float));
     check_result(host_ref, host_result, xsize, ysize, zsize);
     free(host_result);
   }

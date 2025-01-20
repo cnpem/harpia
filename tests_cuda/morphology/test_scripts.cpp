@@ -37,9 +37,9 @@ int test_operations_on_host() {
   kernel = (int*)malloc(sizeof(int) * 25);  // Size to fit the horizontal line kernels 3x3x3
   get_structuring_element_3D(kernel, 5, 5, 1);
 
-  int flag_show = 0;     // Whether to plot the result
+  int flag_show = 1;     // Whether to plot the result
   int flag_check = 1;    // Whether to compare with OpenCV
-  int flag_verbose = 0;  // Whether to print status messages
+  int flag_verbose = 1;  // Whether to print status messages
 
   MorphChain closing = {DILATION, EROSION};
   MorphChain opening = {EROSION, DILATION};
@@ -87,25 +87,25 @@ int test_operations_on_host() {
   // Visual tests
   printf("\nVisualy evaluate operations on host in 2D\n");
 
-//  test_geodesic_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, EROSION, flag_verbose);
+  test_geodesic_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, EROSION, flag_verbose);
 
-//  test_geodesic_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, DILATION, flag_verbose);
+  test_geodesic_morph_grayscale_on_host(filenameGrayscale, 600, 1520, 1, DILATION, flag_verbose);
 
-//  test_top_hat_reconstruction_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1,
-//                                      flag_verbose);
+  test_top_hat_reconstruction_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1,
+                                     flag_verbose);
 
 
-//  test_bottom_hat_reconstruction_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1,
-//                                         flag_verbose);
+  test_bottom_hat_reconstruction_on_host(filenameGrayscale, 600, 1520, 1, kernel, 5, 5, 1,
+                                        flag_verbose);
 
-//  test_geodesic_morph_binary_on_host(filenameBinary, 355, 321, 1, EROSION, flag_verbose);
+  test_geodesic_morph_binary_on_host(filenameBinary, 355, 321, 1, EROSION, flag_verbose);
 
-//  test_geodesic_morph_binary_on_host(filenameBinary, 355, 321, 1, DILATION, flag_verbose);
+  test_geodesic_morph_binary_on_host(filenameBinary, 355, 321, 1, DILATION, flag_verbose);
 
-//  test_complement_binary_on_host(filenameBinary, 355, 321, 1, flag_verbose);
+  test_complement_binary_on_host(filenameBinary, 355, 321, 1, flag_verbose);
 
   filenameBinary = "./example_images/binary/eagle_275x183x1_16b.raw";
-//  test_fill_holes_on_host(filenameBinary, 275, 183, 1, flag_verbose);
+  test_fill_holes_on_host(filenameBinary, 275, 183, 1, flag_verbose);
 
   free(kernel);
 
@@ -224,12 +224,13 @@ int test_operations_on_device() {
 //checking with the cpu implementation
 // If the image is too big, the cpu may not be able to check the result, and kill the process
 int test_chunked_executer(float memoryOccupancy) {
-  std::string filenameBinary = "./example_images/binary/Recon_2052x2052x2048_16bits.raw";
-  std::string filenameGrayscale = "./example_images/grayscale/Recon_2052x2052x2048_32bits.raw";
 
-  int xsize = 2052;
-  int ysize = 2052;
-  int zsize = 2048;
+  std::string filenameBinary = "./example_images/binary/ILSIMG_600x1520x1520_16bits.raw";
+  std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
+
+  int xsize = 600;
+  int ysize = 1520;
+  int zsize = 1520;
 
   int kernel_xsize = 3;
   int kernel_ysize = 3;
@@ -241,7 +242,7 @@ int test_chunked_executer(float memoryOccupancy) {
                         kernel_zsize);  // Size to fit the horizontal line kernels 3x3x3
   get_structuring_element_3D(kernel, kernel_xsize, kernel_ysize, kernel_zsize);
 
-  int flag_check = 0;    // Whether to compare with host (Deactivate for Huge zsize values!!!)
+  int flag_check = 1;    // Whether to compare with host (Deactivate for Huge zsize values!!!)
   int flag_verbose = 1;  // Whether to print status messages
 
   MorphChain closing = {DILATION, EROSION};

@@ -80,9 +80,6 @@ void bottom_hat_reconstruction_on_host(dtype* hostImage, dtype* hostOutput, cons
   // Allocate temporary memory
   dtype* host_tmp = (dtype*)malloc(nBytes);
 
-  // Set input data
-  memset(host_tmp, 0, nBytes);
-
   // Opening operation
   MorphChain opening = {DILATION, EROSION};
   morph_chain_grayscale_on_host(hostImage, host_tmp, xsize, ysize, zsize, kernel, kernel_xsize,

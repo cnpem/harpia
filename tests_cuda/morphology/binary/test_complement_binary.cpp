@@ -23,7 +23,7 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
   
   int *host_A, *device_ref;  //pointers for host memmory
   host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
+  device_ref = (int*)calloc(size, sizeof(int));
 
   if (host_A == nullptr || device_ref == nullptr) {
       std::cerr << "Memory allocation failed!" << std::endl;
@@ -31,9 +31,6 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
   }
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-
   read_input(host_A, filename, size, flag_verbose);
 
   // device erosion
@@ -43,8 +40,7 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
 
     // erosion
     complement_binary_on_host(host_A, host_ref, size);
@@ -73,13 +69,10 @@ void test_complement_binary_on_host(const std::string& filename, const int xsize
 
   int *host_A, *host_ref;  //pointers for host memmory
 
-  return;
   host_A = (int*)malloc(nBytes);
-  host_ref = (int*)malloc(nBytes);
+  host_ref = (int*)calloc(size, sizeof(int));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
 
   complement_binary_on_host(host_A, host_ref, size);

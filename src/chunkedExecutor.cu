@@ -63,7 +63,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
       printf("i_ref: %p, o_ref: %p, sliceSize: %d\n", i_ref, o_ref, sliceSize);
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     i_ref += chunkSize * sliceSize;
     o_ref += chunkSize * sliceSize;
     deviceCount += 1;
@@ -149,6 +149,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
   int deviceCount = 0;
   int selectedDevice = deviceCount % ngpus;
   CHECK(cudaSetDevice(selectedDevice));
+  cudaDeviceSynchronize();
   if (verbose) {
     printf("\niz:0 gpu:%d deviceCount:%d\n", selectedDevice, deviceCount);
   }
@@ -159,7 +160,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
        kernel_xsize, kernel_ysize, kernel_zsize, args...);
   i_ref += chunkSize * sliceSize;
   o_ref += chunkSize * sliceSize;
-  cudaDeviceSynchronize();
+  //cudaDeviceSynchronize();
   deviceCount += 1;
 
   // Middle chunks: padding at the beginning and at the end
@@ -168,6 +169,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
   for (iz = chunkSize; iz <= zsize - chunkSize; iz += chunkSize) {
     selectedDevice = deviceCount % ngpus;
     CHECK(cudaSetDevice(selectedDevice));
+    cudaDeviceSynchronize();
     if (verbose) {
       printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
     }
@@ -180,7 +182,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
          kernel_xsize, kernel_ysize, kernel_zsize, args...);
     i_ref += chunkSize * sliceSize;  // Move to the next chunk
     o_ref += chunkSize * sliceSize;
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     deviceCount += 1;
 }
 
@@ -188,6 +190,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
   int remaining = zsize - iz;
   selectedDevice = deviceCount % ngpus;
   CHECK(cudaSetDevice(selectedDevice));
+  cudaDeviceSynchronize();
   if (verbose) {
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
@@ -235,7 +238,7 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   // How many slices fit in the GPU?
   if (safetyMargin > 1 || safetyMargin < 0) {
     fprintf(stderr,
-            "Error: GPU %.2f memory occupancy is invalid. Choose a value between 0 and 1 (100%).\n",
+            "Error: GPU %.2f memory occupancy is invalid. Choose a value between 0 and 1.\n",
             safetyMargin);
     return;
   }
@@ -276,6 +279,7 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   int deviceCount = 0;
   int selectedDevice = deviceCount % ngpus;
   CHECK(cudaSetDevice(selectedDevice));
+  cudaDeviceSynchronize();
   if (verbose) {
     printf("\niz:0 gpu:%d deviceCount:%d\n", selectedDevice, deviceCount);
   }
@@ -294,6 +298,7 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   for (iz = chunkSize; iz <= zsize - chunkSize; iz += chunkSize) {
     selectedDevice = deviceCount % ngpus;
     CHECK(cudaSetDevice(selectedDevice));
+    cudaDeviceSynchronize();
     if (verbose) {
       printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
     }
@@ -314,6 +319,7 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   int remaining = zsize - iz;
   selectedDevice = deviceCount % ngpus;
   CHECK(cudaSetDevice(selectedDevice));
+  cudaDeviceSynchronize();
   if (verbose) {
     printf("\nremaining:%d gpu:%d deviceCount:%d\n", remaining, selectedDevice, deviceCount);
   }
