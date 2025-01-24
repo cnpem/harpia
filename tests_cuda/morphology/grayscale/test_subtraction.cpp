@@ -11,7 +11,7 @@
 void test_subtraction_on_device(const std::string& filename, const std::string& filename2,
                                 const int xsize, const int ysize, const int zsize,
                                 float memoryOccupancy, const int flag_check,
-                                const int flag_verbose) {
+                                const int flag_verbose, const int flag_float) {
 
   printf("\nTest subtraction on device\n");
 
@@ -27,8 +27,8 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
   device_ref = (float*)malloc(nBytes);
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
-  read_input(device_ref, filename2, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
+  read_input(device_ref, filename2, size, flag_verbose, flag_float);
 
   // device erosion
   int ncopies = 2;
@@ -39,7 +39,7 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
   if (flag_check) {
     float* host_ref;
     host_ref = (float*)calloc(size, sizeof(float));
-    read_input(host_ref, filename2, size, flag_verbose);
+    read_input(host_ref, filename2, size, flag_verbose, flag_float);
 
     // erosion
     subtraction_on_host(host_A, host_ref, size);
@@ -55,7 +55,8 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
 }
 void test_subtraction_on_host(const std::string& filename, const std::string& filename2,
                               const int xsize, const int ysize, const int zsize,
-                              const int flag_show, const int flag_check, const int flag_verbose) {
+                              const int flag_show, const int flag_check, const int flag_verbose, 
+                              const int flag_float) {
 
   printf("\nTest subtraction on host\n");
 
@@ -72,8 +73,8 @@ void test_subtraction_on_host(const std::string& filename, const std::string& fi
   host_ref = (float*)malloc(nBytes);
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
-  read_input(host_ref, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
+  read_input(host_ref, filename, size, flag_verbose, flag_float);
   if (flag_show) {
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image A");
     show_image_3D(host_ref, xsize, ysize, zsize, "Input Image B");

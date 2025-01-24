@@ -111,10 +111,12 @@ xsize = 2052
 ysize = 2052
 zsize = 2048
 
-path = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
-image_uint32_gray = image.load(path, xsize, ysize, zsize,'int32', 'uint32')
-image_int32_gray = image.load(path, xsize, ysize, zsize,'int32', 'int32')
-image_float32_gray = image.load(path, xsize, ysize, zsize,'int32', 'float32')
+path_float = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
+path_binary = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/binary/Recon_2052x2052x2048_16bits.raw"
+image_uint16_binary = image.load(path_binary, xsize, ysize, zsize,'uint16', 'uint16')
+# image_uint32_binary = image.load(path_binary, xsize, ysize, zsize,'uint16', 'uint32')
+# image_int32_binary = image.load(path_binary, xsize, ysize, zsize,'uint16', 'int32')
+# image_float32_gray = image.load(path_float, xsize, ysize, zsize,'float32', 'float32')
 img_num = 4
 print("fineshed reading big image!")
 
@@ -128,35 +130,35 @@ kernel = custum_kernel3D()
 machine = 'harriet'
 ngpus = 1
 gpuMemory = 0.1
-repetitions = 11
+repetitions = 2
 
 # BINARY 
 operations = [
-    ("Smoothing 3D binary", None, smooth_binary, "smooth_binary"),
     ("Closing 3D binary", closing, closing_binary, "closing_binary"),
     ("Opening 3D binary", opening, opening_binary, "opening_binary"),
+    ("Smoothing 3D binary", None, smooth_binary, "smooth_binary"),
 #    ("Erosion 3D binary", erosion, erosion_binary, "erosion_binary"),
 #    ("Dilation 3D binary", dilation, dilation_binary, "dilation_binary"),
 ]
 
 # BINARY
 images = [
-    ("int8", f"image{img_num}_int8_binary"),
-    ("uint8", f"image{img_num}_uint8_binary"),
-    ("int16", f"image{img_num}_int16_binary"),
-    ("uint16", f"image{img_num}_uint16_binary"),    
-    ("int32", f"image{img_num}_int32_binary"),
-    ("uint32", f"image{img_num}_uint32_binary"),
+    # ("int8", f"image{img_num}_int8_binary"),
+    # ("uint8", f"image{img_num}_uint8_binary"),
+    # ("int16", f"image{img_num}_int16_binary"),
+     ("uint16", f"image{img_num}_uint16_binary"),    
+    # ("int32", f"image{img_num}_int32_binary"),
+    # ("uint32", f"image{img_num}_uint32_binary"),
    ]
 
 #Iterate over operations and images
 for img in images:
-    binerized_image = image.binarize(image_int32_gray, dtype_out = img[0])
+    #binerized_image = image.binarize(image_int32_gray, dtype_out = img[0])
     for operation in operations:
         csv_file = f"results{img_num}/{machine}_{ngpus}gpu_{operation[3]}_{img[1]}.csv"
         # Attempt to run the test
         results_df = tests.run(
-            csv_file, binerized_image, operation, machine, ngpus, True, repetitions, gpuMemory, kernel
+            csv_file, image_uint16_binary, operation, machine, ngpus, True, repetitions, gpuMemory, kernel
         )
 
 # BINARY 

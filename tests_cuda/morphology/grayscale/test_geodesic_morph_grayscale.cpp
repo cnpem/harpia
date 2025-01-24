@@ -30,7 +30,7 @@
 void test_geodesic_morph_grayscale_on_device(const std::string& filename, const int xsize,
                                              const int ysize, const int zsize, MorphOp operation,
                                              float memoryOccupancy, const int flag_check,
-                                             const int flag_verbose) {
+                                             const int flag_verbose, const int flag_float) {
 
   printf("\nTest grayscale geodesic %s on device\n", (operation ? "dilation" : "erosion"));
 
@@ -47,7 +47,7 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
   device_ref = (float*)calloc(size, sizeof(float));
 
   // Set input data
-  read_input(hostMask, filename, size, flag_verbose);
+  read_input(hostMask, filename, size, flag_verbose, flag_float);
 
   //create marker image
   int* kernel;
@@ -104,7 +104,7 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
  */
 void test_geodesic_morph_grayscale_on_host(const std::string& filename, const int xsize,
                                            const int ysize, const int zsize, MorphOp operation,
-                                           const int flag_verbose) {
+                                           const int flag_verbose, const int flag_float) {
 
   printf("\nTest grayscale geodesic %s on host\n", (operation ? "dilation" : "erosion"));
 
@@ -121,7 +121,7 @@ void test_geodesic_morph_grayscale_on_host(const std::string& filename, const in
   host_ref = (float*)calloc(size, sizeof(float));
 
   // Set input data
-  read_input(hostMask, filename, size, flag_verbose);
+  read_input(hostMask, filename, size, flag_verbose, flag_float);
 
   //create marker image
   int* kernel;
@@ -135,7 +135,6 @@ void test_geodesic_morph_grayscale_on_host(const std::string& filename, const in
     morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel, 3, 3, 3, EROSION);
   }
 
-  int ncopies = 3;
   geodesic_morph_grayscale_on_host(hostMarker, hostMask, host_ref, xsize, ysize, zsize, operation);
   show_image_3D(hostMarker, xsize, ysize, 1, "Marker");
   show_image_3D(hostMask, xsize, ysize, 1, "Mask");

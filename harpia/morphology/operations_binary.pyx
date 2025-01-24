@@ -41,7 +41,7 @@ cdef extern from "../../include/morphology/operations_binary.h":
 
 def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
+                   float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -56,7 +56,7 @@ def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
     
 def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                     numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                    float gpuMemory = 0.9, bool gpu = True):
+                    float gpuMemory = 0.4, bool gpu = True):
   
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -72,7 +72,7 @@ def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
+                   float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -87,7 +87,7 @@ def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
+                   float gpuMemory = 0.4, bool gpu = True):
   
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -102,7 +102,7 @@ def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def smooth_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
+                   float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -118,7 +118,7 @@ def smooth_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                             numpy.ndarray[numeric, ndim=3] hostMask, 
                             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                            float gpuMemory = 0.9, bool gpu = True):
+                            float gpuMemory = 0.4, bool gpu = True):
  
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -133,7 +133,7 @@ def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage,
 def geodesic_dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                              numpy.ndarray[numeric, ndim=3] hostMask, 
                              numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                             float gpuMemory = 0.9, bool gpu = True):
+                             float gpuMemory = 0.4, bool gpu = True):
    
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -170,7 +170,7 @@ def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage,
 
 def fill_holes(numpy.ndarray[numeric, ndim=3] hostImage, 
                numpy.ndarray[numeric, ndim=3] hostOutput = None,  int padding = 50, int verbose = 0, 
-               float gpuMemory = 0.9, bool gpu = True):
+               float gpuMemory = 0.4, bool gpu = True):
     
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)

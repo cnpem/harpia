@@ -12,7 +12,8 @@
 void test_top_hat_reconstruction_on_host(const std::string& filename, const int xsize,
                                          const int ysize, const int zsize, int* kernel,
                                          const int kernel_xsize, const int kernel_ysize,
-                                         const int kernel_zsize, const int flag_verbose) {
+                                         const int kernel_zsize, const int flag_verbose, 
+                                         const int flag_float) {
 
   printf("\nTest Avizo's top hat on host\n");
 
@@ -28,7 +29,7 @@ void test_top_hat_reconstruction_on_host(const std::string& filename, const int 
   host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
 
   top_hat_reconstruction_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
                                  kernel_ysize, kernel_zsize);
@@ -46,7 +47,7 @@ void test_top_hat_reconstruction_on_device(const std::string& filename, const in
                                            const int ysize, const int zsize, int* kernel,
                                            const int kernel_xsize, const int kernel_ysize,
                                            const int kernel_zsize, const int flag_check,
-                                           const int flag_verbose) {
+                                           const int flag_verbose, const int flag_float) {
 
   printf("\nTest Avizo's top hat on device\n");
 
@@ -63,7 +64,7 @@ void test_top_hat_reconstruction_on_device(const std::string& filename, const in
   device_ref = (int*)calloc(size, sizeof(int));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
 
   top_hat_reconstruction_on_device(host_A, device_ref, xsize, ysize, zsize, flag_verbose, kernel,
                                    kernel_xsize, kernel_ysize, kernel_zsize);

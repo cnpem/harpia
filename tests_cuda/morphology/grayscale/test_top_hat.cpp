@@ -11,7 +11,7 @@
 void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize,
                             const int zsize, int* kernel, const int kernel_xsize,
                             const int kernel_ysize, const int kernel_zsize, float memoryOccupancy,
-                            const int flag_check, const int flag_verbose) {
+                            const int flag_check, const int flag_verbose, const int flag_float) {
 
   printf("\nTest top hat on device\n");
 
@@ -28,7 +28,7 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
   device_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
 
   // device erosion
   int ncopies = 3;
@@ -57,7 +57,7 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
 void test_top_hat_on_host(const std::string& filename, const int xsize, const int ysize,
                           const int zsize, int* kernel, const int kernel_xsize,
                           const int kernel_ysize, const int kernel_zsize, const int flag_show,
-                          const int flag_check, const int flag_verbose) {
+                          const int flag_check, const int flag_verbose, const int flag_float) {
 
   printf("\nTest top hat on host\n");
 
@@ -73,7 +73,7 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
   host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 

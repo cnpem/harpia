@@ -11,7 +11,7 @@ with h5py.File(input_file, 'r') as hdf:
     dataset_name = 'data'  # Replace with the correct dataset name
     data = hdf[dataset_name]
     
-    # Extract slices 1500 to 1505
+    # Extract all slices 1500 to 1505
     slices = data[0:]
     
     # Save as .raw file

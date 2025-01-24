@@ -8,8 +8,8 @@
 double cpu_second();
 
 template <typename dtype>
-void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose);
-// void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const size_t chunk_size = 100*100*100);
+void read_input(dtype* image, const std::string& filename, const size_t size, 
+                const int flag_verbose, const int flag_float = 0);
 
 template <typename dtype>
 void show_matrix_3D(dtype* image, const int xsize, const int ysize, const int zsize);

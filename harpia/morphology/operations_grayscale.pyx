@@ -44,7 +44,7 @@ cdef extern from "../../include/morphology/operations_grayscale.h":
 
 def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                      float gpuMemory = 0.9, bool gpu = True):
+                      float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -58,7 +58,7 @@ def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kerne
 
 def dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                        numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                       float gpuMemory = 0.9, bool gpu = True):
+                       float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -72,7 +72,7 @@ def dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kern
 
 def closing_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                      float gpuMemory = 0.9, bool gpu = True):
+                      float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -87,7 +87,7 @@ def closing_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kerne
 
 def opening_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                      float gpuMemory = 0.9, bool gpu = True):
+                      float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -103,7 +103,7 @@ def opening_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kerne
 def geodesic_erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, 
                             numpy.ndarray[numeric, ndim=3] hostMask, 
                             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                            float gpuMemory = 0.9, bool gpu = True):
+                            float gpuMemory = 0.4, bool gpu = True):
     
 
     if hostOutput is None:
@@ -119,7 +119,7 @@ def geodesic_erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage,
 def geodesic_dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, 
                              numpy.ndarray[numeric, ndim=3] hostMask, 
                              numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                             float gpuMemory = 0.9, bool gpu = True):
+                             float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -159,7 +159,7 @@ def reconstruction_grayscale(numpy.ndarray[numeric, ndim=3] hostImage,
 
 def top_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-            float gpuMemory = 0.9, bool gpu = True):
+            float gpuMemory = 0.4, bool gpu = True):
  
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
@@ -175,7 +175,7 @@ def top_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def bottom_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
                numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-               float gpuMemory = 0.9, bool gpu = True):
+               float gpuMemory = 0.4, bool gpu = True):
  
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)

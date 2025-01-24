@@ -11,7 +11,7 @@ void test_morph_grayscale_on_device(const std::string& filename, const int xsize
                                     const int zsize, int* kernel, const int kernel_xsize,
                                     const int kernel_ysize, const int kernel_zsize,
                                     MorphOp operation, float memoryOccupancy, const int flag_check,
-                                    const int flag_verbose) {
+                                    const int flag_verbose, const int flag_float) {
 
   printf("\nTest grayscale %s on device\n", (operation ? "dilation" : "erosion"));
 
@@ -28,7 +28,7 @@ void test_morph_grayscale_on_device(const std::string& filename, const int xsize
   device_ref = (int*)calloc(size, sizeof(int));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
 
   int ncopies = 2;
   int operations = 1;
@@ -56,7 +56,7 @@ void test_morph_grayscale_on_host(const std::string& filename, const int xsize, 
                                   const int zsize, int* kernel, const int kernel_xsize,
                                   const int kernel_ysize, const int kernel_zsize, MorphOp operation,
                                   const int flag_show, const int flag_check,
-                                  const int flag_verbose) {
+                                  const int flag_verbose, const int flag_float) {
 
   printf("\nTest grayscale %s on host\n", (operation ? "dilation" : "erosion"));
 
@@ -73,7 +73,7 @@ void test_morph_grayscale_on_host(const std::string& filename, const int xsize, 
   printf("check 1\n");
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
   if (flag_show) {
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
   }

@@ -60,7 +60,6 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
     if (verbose) {
       //printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
       printf("Processing chunk: iz=%d, chunkSize=%d, device=%d\n", iz, chunkSize, selectedDevice);
-      printf("i_ref: %p, o_ref: %p, sliceSize: %d\n", i_ref, o_ref, sliceSize);
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
     //cudaDeviceSynchronize();

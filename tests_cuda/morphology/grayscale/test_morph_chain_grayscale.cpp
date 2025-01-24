@@ -16,7 +16,7 @@ void test_morph_chain_grayscale_on_device(const std::string& filename, const int
                                           const int kernel_xsize, const int kernel_ysize,
                                           const int kernel_zsize, MorphChain chain,
                                           float memoryOccupancy, const int flag_check,
-                                          const int flag_verbose) {
+                                          const int flag_verbose, const int flag_float) {
 
   const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
   printf("\nTest grayscale %s on device\n", (closing_flag ? "closing" : "opening"));
@@ -34,7 +34,7 @@ void test_morph_chain_grayscale_on_device(const std::string& filename, const int
   device_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
 
   // device erosion
   int ncopies = 3;
@@ -65,7 +65,7 @@ void test_morph_chain_grayscale_on_host(const std::string& filename, const int x
                                         const int kernel_xsize, const int kernel_ysize,
                                         const int kernel_zsize, MorphChain chain,
                                         const int flag_show, const int flag_check,
-                                        const int flag_verbose) {
+                                        const int flag_verbose, const int flag_float) {
 
   const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
   printf("\nTest grayscale %s on host\n", (closing_flag ? "closing" : "opening"));
@@ -82,7 +82,7 @@ void test_morph_chain_grayscale_on_host(const std::string& filename, const int x
   host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 

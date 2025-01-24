@@ -10,7 +10,8 @@ void test_morph_grayscale_pinned_on_device(const std::string& filename, const in
                                            const int ysize, const int zsize, int* kernel,
                                            const int kernel_xsize, const int kernel_ysize,
                                            const int kernel_zsize, MorphOp operation,
-                                           const int flag_check, const int flag_verbose) {
+                                           const int flag_check, const int flag_verbose, 
+                                           const int flag_float) {
   // set input dimension
   size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
@@ -24,7 +25,7 @@ void test_morph_grayscale_pinned_on_device(const std::string& filename, const in
   device_ref = (int*)calloc(size, sizeof(int));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
 
   // device erosion
   morph_grayscale_pinned_on_device(host_A, device_ref, xsize, ysize, zsize, kernel, kernel_xsize,
@@ -52,7 +53,7 @@ void test_morph_grayscale_pinned_on_host(const std::string& filename, const int 
                                          const int kernel_xsize, const int kernel_ysize,
                                          const int kernel_zsize, MorphOp operation,
                                          const int flag_show, const int flag_check,
-                                         const int flag_verbose) {
+                                         const int flag_verbose, const int flag_float) {
   // set input dimension
   size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
@@ -65,7 +66,7 @@ void test_morph_grayscale_pinned_on_host(const std::string& filename, const int 
   host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
@@ -108,7 +109,8 @@ void test_morph_grayscale_pinned_on_host(const std::string& filename, const int 
 void test_morph_grayscale_pinned_on_device_time(const std::string& filename, const int xsize,
                                                 const int ysize, const int zsize, int* kernel,
                                                 const int kernel_xsize, const int kernel_ysize,
-                                                const int kernel_zsize, MorphOp operation, int n) {
+                                                const int kernel_zsize, MorphOp operation, int n, 
+                                                const int flag_float) {
   int flag_check = 0;
   int flag_verbose = 0;
 
@@ -119,7 +121,7 @@ void test_morph_grayscale_pinned_on_device_time(const std::string& filename, con
     iStart = cpu_second();
     test_morph_grayscale_pinned_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize,
                                           kernel_ysize, kernel_zsize, operation, flag_check,
-                                          flag_verbose);
+                                          flag_verbose, flag_float);
     iElaps += cpu_second() - iStart;
   }
   iElaps = iElaps / n;
@@ -129,7 +131,8 @@ void test_morph_grayscale_pinned_on_device_time(const std::string& filename, con
 void test_morph_grayscale_pinned_time_compare(const std::string& filename, const int xsize,
                                               const int ysize, const int zsize, int* kernel,
                                               const int kernel_xsize, const int kernel_ysize,
-                                              const int kernel_zsize, MorphOp operation) {
+                                              const int kernel_zsize, MorphOp operation, 
+                                              const int flag_float) {
   int flag_show = 0;
   int flag_check = 0;
   int flag_verbose = 0;
@@ -141,14 +144,14 @@ void test_morph_grayscale_pinned_time_compare(const std::string& filename, const
   iStart = cpu_second();
   test_morph_grayscale_pinned_on_device(filename, xsize, ysize, zsize, kernel, kernel_xsize,
                                         kernel_ysize, kernel_zsize, operation, flag_check,
-                                        flag_verbose);
+                                        flag_verbose, flag_float);
   iElapsDeviceGrayscale = cpu_second() - iStart;
   printf("\nmorph_grayscale_pinned_on_device Time elapsed %f sec\n", iElapsDeviceGrayscale);
 
   iStart = cpu_second();
   test_morph_grayscale_pinned_on_host(filename, xsize, ysize, zsize, kernel, kernel_xsize,
                                       kernel_ysize, kernel_zsize, operation, flag_show, flag_check,
-                                      flag_verbose);
+                                      flag_verbose, flag_float);
   iElapsHostGrayscale = cpu_second() - iStart;
   printf("\nmorph_grayscale_pinned_on_host Time elapsed %f sec\n", iElapsHostGrayscale);
 }

@@ -34,7 +34,7 @@ double cpu_second() {
  */
 
 template <typename dtype>
-void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose) {
+void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const int flag_float) {
 
   // Open the raw file
   std::ifstream file(filename, std::ios::in | std::ios::binary);
@@ -43,14 +43,25 @@ void read_input(dtype* image, const std::string& filename, const size_t size, co
     return;
   }
 
-  // Read the uint16_t raw data into dtype pointer. The test images are all unit16
-  uint16_t* data = new uint16_t[size];
-  file.read(reinterpret_cast<char*>(data), size * sizeof(uint16_t));
+  void* data = nullptr;
+  if (flag_float) {
+    // Allocate and read float data
+    data = new float[size];
+    file.read(reinterpret_cast<char*>(data), size * sizeof(float));
+  } else {
+    // Allocate and read uint16_t data
+    data = new uint16_t[size];
+    file.read(reinterpret_cast<char*>(data), size * sizeof(uint16_t));
+  }
   file.close();
 
-  // Convert uint16_t data into dtype data
-  for (int i = 0; i < size; ++i) {
-    image[i] = static_cast<dtype>(data[i]);
+  // Convert the data into dtype format
+  for (size_t i = 0; i < size; ++i) {
+    if (flag_float) {
+      image[i] = static_cast<dtype>(reinterpret_cast<float*>(data)[i]);
+    } else {
+      image[i] = static_cast<dtype>(reinterpret_cast<uint16_t*>(data)[i]);
+    }
   }
 
   if (flag_verbose) {
@@ -58,17 +69,19 @@ void read_input(dtype* image, const std::string& filename, const size_t size, co
   }
 
   // Clean up
-  delete[] data;
+  if (flag_float) {
+    delete[] reinterpret_cast<float*>(data);
+  } else {
+    delete[] reinterpret_cast<uint16_t*>(data);
+  }
 }
-template void read_input<float>(float*, const std::string&, const size_t, const int);
-template void read_input<int>(int*, const std::string&, const size_t, const int);
-template void read_input<unsigned int>(unsigned int*, const std::string&, const size_t, const int);
-template void read_input<int16_t>(int16_t*, const std::string&, const size_t, const int);
-template void read_input<uint16_t>(uint16_t*, const std::string&, const size_t, const int);
-template void read_input<int8_t>(int8_t*, const std::string&, const size_t, const int);
-template void read_input<uint8_t>(uint8_t*, const std::string&, const size_t, const int);
-
-
+template void read_input<float>(float*, const std::string&, const size_t, const int, const int);
+template void read_input<int>(int*, const std::string&, const size_t, const int, const int);
+template void read_input<unsigned int>(unsigned int*, const std::string&, const size_t, const int, const int);
+template void read_input<int16_t>(int16_t*, const std::string&, const size_t, const int, const int);
+template void read_input<uint16_t>(uint16_t*, const std::string&, const size_t, const int, const int);
+template void read_input<int8_t>(int8_t*, const std::string&, const size_t, const int, const int);
+template void read_input<uint8_t>(uint8_t*, const std::string&, const size_t, const int, const int);
 
 // template <typename dtype>
 // void read_input(dtype* image, const std::string& filename, const size_t size, const int flag_verbose, const size_t chunk_size) {

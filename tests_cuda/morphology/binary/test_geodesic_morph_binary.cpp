@@ -66,7 +66,7 @@ void test_geodesic_morph_binary_on_device(const std::string& filename, const int
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           EROSION);
   }
-  printf("check 0");
+
   ncopies = 3;
   chunkedExecutorGeodesic(geodesic_morph_binary_on_device<int>, ncopies, memoryOccupancy,
                           hostMarker, hostMask, device_ref, xsize, ysize, zsize, flag_verbose,
