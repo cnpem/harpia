@@ -41,11 +41,10 @@ void test_morph_binary_on_device(const std::string& filename, const int xsize, c
     printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *device_ref;  // Pointers for host memory
-  host_A = (int*)malloc(nBytes);
+  host_A = (int*)malloc(nBytes); 
   device_ref = (int*)calloc(size, sizeof(int));
 
   // Set input data
-
   read_input(host_A, filename, size, flag_verbose);
 
   int ncopies = 2;
