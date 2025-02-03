@@ -7,8 +7,8 @@ OPENCV_CFLAGS = $(shell pkg-config --cflags opencv4)
 OPENCV_LIBS = $(shell pkg-config --libs opencv4)
 
 # Compiler flags
-NVCCFLAGS = -Iinclude -Xcompiler -Wall $(OPENCV_CFLAGS)
-CXXFLAGS = -Iinclude -Wall $(OPENCV_CFLAGS)
+NVCCFLAGS = -Iinclude -Xcompiler -Wall -m64 $(OPENCV_CFLAGS)
+CXXFLAGS = -Iinclude -Wall -m64 $(OPENCV_CFLAGS)
 
 # Target executable
 TARGET = Test

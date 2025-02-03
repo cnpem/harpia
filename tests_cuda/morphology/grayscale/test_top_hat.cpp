@@ -11,28 +11,24 @@
 void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize,
                             const int zsize, int* kernel, const int kernel_xsize,
                             const int kernel_ysize, const int kernel_zsize, float memoryOccupancy,
-                            const int flag_check, const int flag_verbose) {
+                            const int flag_check, const int flag_verbose, const int flag_float) {
 
   printf("\nTest top hat on device\n");
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
   size_t nBytes = size * sizeof(float);
 
   if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   float *host_A, *device_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
-  device_ref = (float*)malloc(nBytes);
+  device_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-  printf("here 1\n");
-  read_input(host_A, filename, size, flag_verbose);
-  printf("here 2\n");
+  read_input(host_A, filename, size, flag_verbose, flag_float);
 
   // device erosion
   int ncopies = 3;
@@ -43,8 +39,7 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
 
   if (flag_check) {
     float* host_ref;
-    host_ref = (float*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (float*)calloc(size, sizeof(float));
 
     // erosion
     top_hat_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
@@ -62,25 +57,23 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
 void test_top_hat_on_host(const std::string& filename, const int xsize, const int ysize,
                           const int zsize, int* kernel, const int kernel_xsize,
                           const int kernel_ysize, const int kernel_zsize, const int flag_show,
-                          const int flag_check, const int flag_verbose) {
+                          const int flag_check, const int flag_verbose, const int flag_float) {
 
   printf("\nTest top hat on host\n");
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
 
   size_t nBytes = size * sizeof(float);
   if (flag_verbose)
-    printf("Matrix size:   %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   float *host_A, *host_ref;  //pointers for host memmory
   host_A = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
 
   // set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
-  read_input(host_A, filename, size, flag_verbose);
+  read_input(host_A, filename, size, flag_verbose, flag_float);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
 
@@ -99,8 +92,7 @@ void test_top_hat_on_host(const std::string& filename, const int xsize, const in
     }
 
     float* opencv_ref;
-    opencv_ref = (float*)malloc(nBytes);
-    memset(opencv_ref, 0, nBytes);
+    opencv_ref = (float*)calloc(size, sizeof(float));
 
     // opencv erosion
     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,

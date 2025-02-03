@@ -3,7 +3,7 @@
 
 //kernel for image complement_binary
 template <typename dtype>
-void complement_binary(dtype* deviceImage, dtype* deviceOutput, const int size,
+void complement_binary(dtype* deviceImage, dtype* deviceOutput, const size_t size,
                        const int flag_verbose);
 
 // Slide kernel and erosion operation over all input image pixels
@@ -13,6 +13,6 @@ void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int 
 
 // Slide kernel and erosion operation over all input image pixels
 template <typename dtype>
-void complement_binary_on_host(dtype* hostImage, dtype* hostOutput, const int size);
+void complement_binary_on_host(dtype* hostImage, dtype* hostOutput, const size_t size);
 
 #endif  // COMPLEMENT_BINARY_H

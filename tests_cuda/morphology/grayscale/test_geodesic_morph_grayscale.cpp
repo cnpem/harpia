@@ -30,27 +30,24 @@
 void test_geodesic_morph_grayscale_on_device(const std::string& filename, const int xsize,
                                              const int ysize, const int zsize, MorphOp operation,
                                              float memoryOccupancy, const int flag_check,
-                                             const int flag_verbose) {
+                                             const int flag_verbose, const int flag_float) {
 
   printf("\nTest grayscale geodesic %s on device\n", (operation ? "dilation" : "erosion"));
 
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(float);
 
   if (flag_verbose)
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   float *hostMarker, *device_ref, *hostMask;  // Pointers for host memory
   hostMarker = (float*)malloc(nBytes);
   hostMask = (float*)malloc(nBytes);
-  device_ref = (float*)malloc(nBytes);
+  device_ref = (float*)calloc(size, sizeof(float));
 
   // Set input data
-  memset(hostMarker, 0, nBytes);
-  memset(hostMask, 0, nBytes);
-  memset(device_ref, 0, nBytes);
-  read_input(hostMask, filename, size, flag_verbose);
+  read_input(hostMask, filename, size, flag_verbose, flag_float);
 
   //create marker image
   int* kernel;
@@ -75,8 +72,7 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
                           operation);
   if (flag_check) {
     float* host_ref;
-    host_ref = (float*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (float*)calloc(size, sizeof(float));
     geodesic_morph_grayscale_on_host(hostMarker, hostMask, host_ref, xsize, ysize, zsize,
                                      operation);
     check_result(host_ref, device_ref, xsize, ysize, zsize);
@@ -108,27 +104,24 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
  */
 void test_geodesic_morph_grayscale_on_host(const std::string& filename, const int xsize,
                                            const int ysize, const int zsize, MorphOp operation,
-                                           const int flag_verbose) {
+                                           const int flag_verbose, const int flag_float) {
 
   printf("\nTest grayscale geodesic %s on host\n", (operation ? "dilation" : "erosion"));
 
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(float);
 
   if (flag_verbose)
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   float *hostMarker, *host_ref, *hostMask;  // Pointers for host memory
   hostMarker = (float*)malloc(nBytes);
   hostMask = (float*)malloc(nBytes);
-  host_ref = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
 
   // Set input data
-  memset(hostMarker, 0, nBytes);
-  memset(hostMask, 0, nBytes);
-  memset(host_ref, 0, nBytes);
-  read_input(hostMask, filename, size, flag_verbose);
+  read_input(hostMask, filename, size, flag_verbose, flag_float);
 
   //create marker image
   int* kernel;
@@ -142,7 +135,6 @@ void test_geodesic_morph_grayscale_on_host(const std::string& filename, const in
     morph_grayscale_on_host(hostMask, hostMarker, xsize, ysize, zsize, kernel, 3, 3, 3, EROSION);
   }
 
-  int ncopies = 3;
   geodesic_morph_grayscale_on_host(hostMarker, hostMask, host_ref, xsize, ysize, zsize, operation);
   show_image_3D(hostMarker, xsize, ysize, 1, "Marker");
   show_image_3D(hostMask, xsize, ysize, 1, "Mask");

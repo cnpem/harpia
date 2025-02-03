@@ -1,4 +1,5 @@
 {
+    "editor.rulers": [100],
     "files.associations": {
         "limits": "cpp",
         "cctype": "cpp",

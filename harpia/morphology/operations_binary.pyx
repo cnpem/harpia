@@ -37,17 +37,17 @@ cdef extern from "../../include/morphology/operations_binary.h":
                                                                      int, int, int, float, bool)
     void _reconstruction_binary "reconstruction_binary"[dtype](dtype*, dtype*, dtype*, int, int, 
                                                                int, int, MorphOp, bool)
-    void _fill_holes "fill_holes"[dtype](dtype*, dtype*, int, int, int, int, bool)
+    void _fill_holes "fill_holes"[dtype](dtype*, dtype*, int, int, int, int, int, float, bool)
 
 def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
-
-    isize = Size(hostImage)
-    ksize = Size(kernel)
+                   float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
+    ksize = Size(kernel)
 
     _erosion_binary(&hostImage[0,0,0], &hostOutput[0,0,0],  isize.x, isize.y, isize.z, 
                     verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -56,13 +56,13 @@ def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
     
 def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                     numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                    float gpuMemory = 0.9, bool gpu = True):
+                    float gpuMemory = 0.4, bool gpu = True):
+  
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
 
     isize = Size(hostImage)
     ksize = Size(kernel)
-    
-    if hostOutput is None:
-        hostOutput = numpy.empty_like(hostImage)
 
     _dilation_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
                      verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -72,13 +72,13 @@ def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
+                   float gpuMemory = 0.4, bool gpu = True):
+
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
 
     isize = Size(hostImage)
     ksize = Size(kernel)
-    
-    if hostOutput is None:
-        hostOutput = numpy.empty_like(hostImage)
 
     _closing_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
                     verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -87,13 +87,13 @@ def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
+                   float gpuMemory = 0.4, bool gpu = True):
+  
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
 
     isize = Size(hostImage)
     ksize = Size(kernel)
-    
-    if hostOutput is None:
-        hostOutput = numpy.empty_like(hostImage)
 
     _opening_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
                     verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -102,13 +102,13 @@ def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def smooth_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                   float gpuMemory = 0.9, bool gpu = True):
+                   float gpuMemory = 0.4, bool gpu = True):
+
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
 
     isize = Size(hostImage)
     ksize = Size(kernel)
-    
-    if hostOutput is None:
-        hostOutput = numpy.empty_like(hostImage)
 
     _smooth_binary(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
                    &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -118,12 +118,12 @@ def smooth_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                             numpy.ndarray[numeric, ndim=3] hostMask, 
                             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                            float gpuMemory = 0.9, bool gpu = True):
-
-    isize = Size(hostImage)
-
+                            float gpuMemory = 0.4, bool gpu = True):
+ 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
     
     _geodesic_erosion_binary(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
                              isize.y, isize.z, verbose, gpuMemory, gpu)
@@ -133,12 +133,12 @@ def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage,
 def geodesic_dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                              numpy.ndarray[numeric, ndim=3] hostMask, 
                              numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                             float gpuMemory = 0.9, bool gpu = True):
-
-    isize = Size(hostImage)
-    
+                             float gpuMemory = 0.4, bool gpu = True):
+   
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
 
     _geodesic_dilation_binary(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
                               isize.y, isize.z, verbose, gpuMemory, gpu)
@@ -149,7 +149,10 @@ def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage,
                           numpy.ndarray[numeric, ndim=3] hostMask, str operation, 
                           numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                           bool gpu = True):
-    
+      
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
+
     isize = Size(hostImage)
 
     cdef MorphOp morph_op
@@ -160,22 +163,21 @@ def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage,
     else:
         raise ValueError("Invalid operation. Must be 'erosion' or 'dilation'.")
     
-    if hostOutput is None:
-        hostOutput = numpy.empty_like(hostImage)
-
     _reconstruction_binary(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
                            isize.y, isize.z, verbose, morph_op, gpu)
 
     return hostOutput
 
 def fill_holes(numpy.ndarray[numeric, ndim=3] hostImage, 
-               numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, bool gpu = True):
-    
-    isize = Size(hostImage)
+               numpy.ndarray[numeric, ndim=3] hostOutput = None,  int padding = 50, int verbose = 0, 
+               float gpuMemory = 0.4, bool gpu = True):
     
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
     
-    _fill_holes(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, gpu)
+    _fill_holes(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, padding, verbose, 
+                gpuMemory, gpu)
 
     return hostOutput

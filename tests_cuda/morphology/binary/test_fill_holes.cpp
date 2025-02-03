@@ -11,38 +11,36 @@
 #include "../../../include/tests/morphology/test_util.h"
 
 void test_fill_holes_on_device(const std::string& filename, const int xsize, const int ysize,
-                               const int zsize, float memoryOccupancy, const int flag_check,
+                               const int zsize, int padding, float memoryOccupancy, const int flag_check,
                                const int flag_verbose) {
 
   printf("\nTest fill holes on device\n");
 
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *device_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
-
-  // Set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
+  device_ref = (int*)calloc(size, sizeof(int));
 
   read_input(host_A, filename, size, flag_verbose);
 
-  fill_holes_on_device(host_A, device_ref, xsize, ysize, zsize, flag_verbose);
+  int ncopies = 3;
+  chunkedExecutorFillHoles(fill_holes_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref,
+                           padding, xsize, ysize, zsize, flag_verbose);
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
     // Perform binary morphology on host for comparison
-    fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
+    // fill_holes_on_host(host_A, host_ref, xsize, ysize, zsize);
+    fill_holes_on_device(host_A, host_ref, xsize, ysize, zsize, flag_verbose);
 
-    check_result(host_ref, device_ref, xsize, ysize, zsize);
+    check_result(device_ref, host_ref, xsize, ysize, zsize);
     free(host_ref);
   }
 
@@ -73,20 +71,18 @@ void test_fill_holes_on_host(const std::string& filename, const int xsize, const
   printf("\nTest fill holes on host\n");
 
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose) {
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
   }
 
   int *host_A, *host_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
-  host_ref = (int*)malloc(nBytes);
+  host_ref = (int*)calloc(size, sizeof(int));
 
   // Set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
 
   // Perform binary morphology on host

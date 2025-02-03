@@ -37,7 +37,9 @@ CUDA_HOSTDEV void morph_binary_pinned_pixel(dtype* image, dtype* output, const i
     aux = 0;  //dilation operation
   }
 
-  int imageIdx, imageIdy, imageIdz, index;
+  size_t index;
+
+  int imageIdx, imageIdy, imageIdz;
 
   int startIdx = centerIdx - kernel_xsize / 2;
   int startIdy = centerIdy - kernel_ysize / 2;
@@ -50,7 +52,9 @@ CUDA_HOSTDEV void morph_binary_pinned_pixel(dtype* image, dtype* output, const i
         imageIdx = startIdx + ix;
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
-        index = imageIdz * xsize * ysize + imageIdy * xsize + imageIdx;
+        index = static_cast<size_t>(imageIdz) * xsize * ysize + 
+                static_cast<size_t>(imageIdy) * xsize + 
+                static_cast<size_t>(imageIdx);
 
         // ignore out of bounds pixels and don't care pixels
         // don't care pixels are signaled as -1 in the kernel
@@ -70,7 +74,10 @@ CUDA_HOSTDEV void morph_binary_pinned_pixel(dtype* image, dtype* output, const i
       ik += kernel_xsize;
     }
   }
-  output[centerIdz * ysize * xsize + centerIdy * xsize + centerIdx] = aux;
+  size_t centerPixelIndex = static_cast<size_t>(centerIdz) * ysize * xsize + 
+                            static_cast<size_t>(centerIdy) * xsize + 
+                            static_cast<size_t>(centerIdx);
+  output[centerPixelIndex] = aux;
 }
 template CUDA_HOSTDEV void morph_binary_pinned_pixel<int>(int*, int*, const int, const int,
                                                           const int, int, int, int, int*, int, int,
@@ -111,7 +118,6 @@ template <typename dtype>
 __global__ void morph_binary_pinned_kernel(dtype* deviceImage, dtype* deviceOutput, const int xsize,
                                            const int ysize, const int zsize, int* kernel,
                                            int kernel_xsize, int kernel_ysize, int kernel_zsize,
-
                                            MorphOp operation) {
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
   int idy = threadIdx.y + blockIdx.y * blockDim.y;
@@ -200,7 +206,7 @@ void morph_binary_pinned_on_device(dtype* hostImage, dtype* hostOutput, const in
                                    int kernel_ysize, int kernel_zsize, MorphOp operation,
                                    const int flag_verbose) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // set kenrel dimension

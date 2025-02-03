@@ -13,7 +13,7 @@ void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
                              int kernel_zsize) {
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
 
@@ -36,6 +36,10 @@ void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
 
   // transfer data from the host to the device
   CHECK(cudaMemcpy(deviceKernel, kernel, kernel_nBytes, cudaMemcpyHostToDevice));
+
+  //Save original pointer for memmory deallocation
+  dtype *original_deviceImage = deviceImage;
+  dtype *original_deviceTmp = deviceTmp;
 
   // transfer input + padding
   i_hostImage = hostImage - padding_bottom * xsize * ysize;
@@ -85,8 +89,8 @@ void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
   CHECK(cudaMemcpy(hostOutput, deviceImage, nBytes, cudaMemcpyDeviceToHost));
 
   // free device memory
-  cudaFree(deviceImage);
-  cudaFree(deviceTmp);
+  cudaFree(original_deviceImage);
+  cudaFree(original_deviceTmp);
   cudaFree(deviceKernel);
 }
 
@@ -129,15 +133,12 @@ void smooth_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
                            int kernel_zsize) {
 
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // allocate temporary memory
   dtype* hostTmp;
   hostTmp = (dtype*)malloc(nBytes);
-
-  // set input data
-  memset(hostTmp, 0, nBytes);
 
   //Opening
   morph_binary_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,

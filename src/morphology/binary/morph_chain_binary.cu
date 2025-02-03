@@ -30,7 +30,7 @@ void morph_chain_binary_on_device(dtype* hostImage, dtype* hostOutput, const int
                                   MorphChain chain) {
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
 
@@ -79,8 +79,25 @@ void morph_chain_binary_on_device(dtype* hostImage, dtype* hostOutput, const int
                chain.operation2);
 
   // transfer data from the device to the host
-  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
+  // DEBUGGING
+  cudaDeviceSynchronize();
+ 
+//  // Print the pointer addresses and size
+//   printf("DEBUG: cudaMemcpy called with:\n");
+//   printf("  Host pointer: %p type: %s\n", hostOutput, typeid(hostOutput).name());
+//   printf("  Device pointer: %p type: %s\n", deviceOutput, typeid(deviceOutput).name());
+//   printf("  Size in bytes: %zu type: %s\n", nBytes, typeid(nBytes).name());
 
+//   // Perform the actual cudaMemcpy and check for errors
+//   cudaError_t err = cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost);
+//   if (err != cudaSuccess) {
+//       printf("CUDA Memcpy Error: %s\n", cudaGetErrorString(err));
+//   } else {
+//       printf("DEBUG: cudaMemcpy completed successfully.\n");
+//   }
+
+  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
+ 
   // free device memory
   cudaFree(ii_deviceImage);
   cudaFree(i_deviceTmp);
@@ -130,15 +147,12 @@ void morph_chain_binary_on_host(dtype* hostImage, dtype* hostOutput, const int x
                                 int kernel_ysize, int kernel_zsize, MorphChain chain) {
 
   // set input dimension
-  size_t size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // allocate temporary memory
   dtype* hostTmp;
   hostTmp = (dtype*)malloc(nBytes);
-
-  // set input data
-  memset(hostTmp, 0, nBytes);
 
   // morphChain operation
   morph_binary_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,

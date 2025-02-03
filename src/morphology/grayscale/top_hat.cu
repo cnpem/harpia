@@ -28,7 +28,7 @@ void top_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, con
                        const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
                        int kernel_zsize) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
 
@@ -120,14 +120,11 @@ void top_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const
                      const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
                      int kernel_zsize) {
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // Allocate temporary memory
   dtype* host_tmp = (dtype*)malloc(nBytes);
-
-  // Set input data
-  memset(host_tmp, 0, nBytes);
 
   // Opening operation
   MorphChain opening = {EROSION, DILATION};

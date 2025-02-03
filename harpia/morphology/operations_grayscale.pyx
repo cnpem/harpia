@@ -44,14 +44,13 @@ cdef extern from "../../include/morphology/operations_grayscale.h":
 
 def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                      float gpuMemory = 0.9, bool gpu = True):
+                      float gpuMemory = 0.4, bool gpu = True):
 
-    isize = Size(hostImage)
-    ksize = Size(kernel)
-    
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
 
+    isize = Size(hostImage)
+    ksize = Size(kernel)
     _erosion_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
                        &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
 
@@ -59,14 +58,13 @@ def erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kerne
 
 def dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                        numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                       float gpuMemory = 0.9, bool gpu = True):
+                       float gpuMemory = 0.4, bool gpu = True):
 
-    isize = Size(hostImage)
-    ksize = Size(kernel)
-    
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
 
+    isize = Size(hostImage)
+    ksize = Size(kernel)
     _dilation_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
                         &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
 
@@ -74,13 +72,13 @@ def dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kern
 
 def closing_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                      float gpuMemory = 0.9, bool gpu = True):
+                      float gpuMemory = 0.4, bool gpu = True):
+
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
 
     isize = Size(hostImage)
     ksize = Size(kernel)
-    
-    if hostOutput is None:
-        hostOutput = numpy.empty_like(hostImage)
     
     _closing_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose,
                        &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -89,12 +87,13 @@ def closing_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kerne
 
 def opening_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                       numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                      float gpuMemory = 0.9, bool gpu = True):
-    isize = Size(hostImage)
-    ksize = Size(kernel)
+                      float gpuMemory = 0.4, bool gpu = True):
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
+    ksize = Size(kernel)
     
     _opening_grayscale(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose,
                        &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -104,11 +103,13 @@ def opening_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kerne
 def geodesic_erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, 
                             numpy.ndarray[numeric, ndim=3] hostMask, 
                             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                            float gpuMemory = 0.9, bool gpu = True):
-    isize = Size(hostImage)
+                            float gpuMemory = 0.4, bool gpu = True):
+    
 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
     
     _geodesic_erosion_grayscale(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
                              isize.y, isize.z, verbose, gpuMemory, gpu)
@@ -118,12 +119,12 @@ def geodesic_erosion_grayscale(numpy.ndarray[numeric, ndim=3] hostImage,
 def geodesic_dilation_grayscale(numpy.ndarray[numeric, ndim=3] hostImage, 
                              numpy.ndarray[numeric, ndim=3] hostMask, 
                              numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-                             float gpuMemory = 0.9, bool gpu = True):
+                             float gpuMemory = 0.4, bool gpu = True):
 
-    isize = Size(hostImage)
-    
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
 
     _geodesic_dilation_grayscale(&hostImage[0,0,0], &hostMask[0,0,0], &hostOutput[0,0,0], isize.x, 
                               isize.y, isize.z, verbose, gpuMemory, gpu)
@@ -135,6 +136,9 @@ def reconstruction_grayscale(numpy.ndarray[numeric, ndim=3] hostImage,
                           numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                           bool gpu = True):
     
+    if hostOutput is None:
+        hostOutput = numpy.empty_like(hostImage)
+
     isize = Size(hostImage)
 
     cdef MorphOp morph_op
@@ -155,12 +159,13 @@ def reconstruction_grayscale(numpy.ndarray[numeric, ndim=3] hostImage,
 
 def top_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-            float gpuMemory = 0.9, bool gpu = True):
-    isize = Size(hostImage)
-    ksize = Size(kernel)
-    
+            float gpuMemory = 0.4, bool gpu = True):
+ 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
+    ksize = Size(kernel)
 
     _top_hat(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
              &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)
@@ -170,12 +175,13 @@ def top_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def bottom_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
                numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
-               float gpuMemory = 0.9, bool gpu = True):
-    isize = Size(hostImage)
-    ksize = Size(kernel)
-    
+               float gpuMemory = 0.4, bool gpu = True):
+ 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
+    ksize = Size(kernel)
 
     _bottom_hat(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
                 &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, gpu)             
@@ -184,11 +190,12 @@ def bottom_hat(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
 def top_hat_reconstruction(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, bool gpu = True):
-    isize = Size(hostImage)
-    ksize = Size(kernel)
-    
+
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
+    ksize = Size(kernel)
 
     _top_hat_reconstruction(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, verbose, 
              &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)
@@ -198,11 +205,12 @@ def top_hat_reconstruction(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] 
 def bottom_hat_reconstruction(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
                               numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                               bool gpu = True):
-    isize = Size(hostImage)
-    ksize = Size(kernel)
-    
+ 
     if hostOutput is None:
         hostOutput = numpy.empty_like(hostImage)
+
+    isize = Size(hostImage)
+    ksize = Size(kernel)
 
     _bottom_hat_reconstruction(&hostImage[0,0,0], &hostOutput[0,0,0], isize.x, isize.y, isize.z, 
                                verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpu)

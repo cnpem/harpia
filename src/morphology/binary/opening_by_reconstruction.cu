@@ -32,7 +32,7 @@ void opening_by_reconstruction_on_device(dtype* hostImage, dtype* hostOutput, in
                                          const int xsize, const int ysize, const int zsize,
                                          MorphOp operation, const int flag_verbose) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // set kenrel dimension

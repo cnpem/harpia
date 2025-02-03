@@ -31,19 +31,15 @@ void test_morph_binary_pinned_on_device(const std::string& filename, const int x
                                         const int kernel_zsize, MorphOp operation,
                                         const int flag_check, const int flag_verbose) {
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *device_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
-  device_ref = (int*)malloc(nBytes);
-
-  // Set input data
-  memset(host_A, 0, nBytes);
-  memset(device_ref, 0, nBytes);
+  device_ref = (int*)calloc(size, sizeof(int));
 
   read_input(host_A, filename, size, flag_verbose);
 
@@ -52,8 +48,7 @@ void test_morph_binary_pinned_on_device(const std::string& filename, const int x
 
   if (flag_check) {
     int* host_ref;
-    host_ref = (int*)malloc(nBytes);
-    memset(host_ref, 0, nBytes);
+    host_ref = (int*)calloc(size, sizeof(int));
     // Perform binary morphology on host for comparison
     morph_binary_pinned_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
                                 kernel_ysize, kernel_zsize, operation);
@@ -89,19 +84,17 @@ void test_morph_binary_pinned_on_host(const std::string& filename, const int xsi
                                       MorphOp operation, const int flag_show, const int flag_check,
                                       const int flag_verbose) {
   // Set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
   size_t nBytes = size * sizeof(int);
 
   if (flag_verbose)
-    printf("Matrix size: %d (%d.%d.%d)\n", size, xsize, ysize, zsize);
+    printf("Matrix size: %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
 
   int *host_A, *host_ref;  // Pointers for host memory
   host_A = (int*)malloc(nBytes);
-  host_ref = (int*)malloc(nBytes);
+  host_ref = (int*)calloc(size, sizeof(int));
 
   // Set input data
-  memset(host_A, 0, nBytes);
-  memset(host_ref, 0, nBytes);
   read_input(host_A, filename, size, flag_verbose);
   if (flag_show)
     show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
@@ -121,8 +114,7 @@ void test_morph_binary_pinned_on_host(const std::string& filename, const int xsi
     }
 
     int* opencv_ref;
-    opencv_ref = (int*)malloc(nBytes);
-    memset(opencv_ref, 0, nBytes);
+    opencv_ref = (int*)calloc(size, sizeof(int));
 
     // Perform OpenCV erosion
     morphology_3D_openCV(host_A, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,

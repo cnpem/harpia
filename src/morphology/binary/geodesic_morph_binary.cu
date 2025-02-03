@@ -39,7 +39,9 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
     aux = 0;  //dilation operation
   }
 
-  int imageIdx, imageIdy, imageIdz, index;
+  size_t index;
+  
+  int imageIdx, imageIdy, imageIdz;
 
   int startIdx = centerIdx - kernel_xsize / 2;
   int startIdy = centerIdy - kernel_ysize / 2;
@@ -53,8 +55,7 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
         imageIdx = startIdx + ix;
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
-        index = imageIdz * xsize * ysize + imageIdy * xsize + imageIdx;
-
+        
         // ignore out of bounds pixels
         if (imageIdx < 0 || imageIdx > xsize - 1 || imageIdy < 0 || imageIdy > ysize - 1 ||
             imageIdz < -padding_bottom || imageIdz > zsize + padding_top - 1) {
@@ -62,6 +63,10 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
         }
 
         else {
+          index = static_cast<size_t>(imageIdz) * xsize * ysize + 
+                  static_cast<size_t>(imageIdy) * xsize + 
+                  static_cast<size_t>(imageIdx);
+
           if (operation == EROSION) {
             aux = (im[index] == kernel) && aux;  //erosion operation
           } else {
@@ -72,7 +77,9 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
     }
   }
 
-  int centerIndex = centerIdz * ysize * xsize + centerIdy * xsize + centerIdx;
+  size_t centerIndex = static_cast<size_t>(centerIdz) * ysize * xsize + 
+                       static_cast<size_t>(centerIdy) * xsize + 
+                       static_cast<size_t>(centerIdx);
 
   // intersection/union operation
   if (operation == EROSION) {
@@ -227,7 +234,7 @@ void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
                                      const int flag_verbose, const int padding_bottom,
                                      const int padding_top, MorphOp operation) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
   size_t nBytes_input = nBytes + nBytes_padding;

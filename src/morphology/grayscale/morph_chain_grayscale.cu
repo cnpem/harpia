@@ -31,7 +31,7 @@ void morph_chain_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const 
                                      int kernel_xsize, int kernel_ysize, int kernel_zsize,
                                      MorphChain chain) {
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
 
@@ -124,15 +124,12 @@ void morph_chain_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const in
                                    int kernel_ysize, int kernel_zsize, MorphChain chain) {
 
   // set input dimension
-  int size = xsize * ysize * zsize;
+  size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
   // allocate temporary memory
   dtype* hostTmp;
   hostTmp = (dtype*)malloc(nBytes);
-
-  // initialize temporary memory
-  memset(hostTmp, 0, nBytes);
 
   // Perform the first operation in the chain
   morph_grayscale_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize,
