@@ -14,14 +14,10 @@ dist/
 **.so
 **/__pycache__
 harpia/**/*.cpp
-#ignore CMakeLists
-**/CMakeLists.txt
 
-#ignore cyhton generated fiels (be cafeful with c++/cuda test files, they can be ignored also)
-#**.cpp
-ignore/
+#test files
 **.png
-**.csv
+#**.csv
 
 #ignore jupyter notebook files
 #.ipynb_checkpoints/
