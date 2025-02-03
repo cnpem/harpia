@@ -5,24 +5,10 @@ def contiguous(array: np.ndarray) -> np.ndarray:
     if not array.flags["C_CONTIGUOUS"]:
         array = np.ascontiguousarray(array.astype(array.type()))
     
-def load(path, xsize, ysize, zsize, dtype, dtype_out):
+def load(path, xsize, ysize, zsize, dtype):
     img = np.fromfile(path, dtype=dtype)
     img = img.reshape((zsize, ysize, xsize))
-    img = img.astype(dtype = dtype_out)
     contiguous(img)
-    return img
-
-def load_fast(path, xsize, ysize, zsize, dtype, dtype_out):
-    # Memory-map the file for fast access
-    img = np.memmap(path, dtype=dtype, mode='r', shape=(zsize, ysize, xsize))
-    
-    # Convert to desired output dtype, if necessary
-    if dtype != dtype_out:
-        img = np.array(img, dtype=dtype_out)
-    
-    # Ensure the array is contiguous
-    img = np.ascontiguousarray(img)
-    
     return img
 
 def binarize(data, plot=False, dtype_out='int32'):
