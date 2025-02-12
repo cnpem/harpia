@@ -260,7 +260,7 @@ class general_fgc:
         
         # Compute linear regression for anchors
         numCols = min(numNearestAnchor + 1, dis.shape[1])
-        for i in prange(num, nogil=True):
+        for i in range(num):
             idx_i = idx[i, :numCols]
             di = dis[i, idx_i]
             A[i, idx_i] = (di[numCols - 1] - di) / (numNearestAnchor * di[numNearestAnchor - 1] - np.sum(di[:numNearestAnchor]) + np.finfo(float).eps)
