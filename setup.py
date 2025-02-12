@@ -199,6 +199,7 @@ ext_modules = [
     *get_extension_modules("harpia.threshold"),
     *get_extension_modules("harpia.watershed"),
     *get_extension_modules("harpia.distanceTransform"),
+    *get_extension_modules("harpia.fastGraphClustering"),
 ]
 
 print(cuda_sources)
