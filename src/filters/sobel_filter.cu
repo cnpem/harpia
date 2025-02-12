@@ -272,22 +272,22 @@ template <typename dtype>
 __global__ void sobel_filter_kernel_2d(dtype* image, float* output, float* deviceKernelHorizontal,
                                        float* deviceKernelVertical, int idz, int xsize, int ysize,
                                        int zsize) {
-  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
   if (idx < xsize && idy < ysize) {
     float tempVertical;
     float tempHorizontal;
+
+    unsigned int index = idz * xsize * ysize + idx * ysize + idy;
 
     convolution2d(image + idz * xsize * ysize, &tempHorizontal, deviceKernelHorizontal, idx, idy,
                   xsize, ysize, 3, 3);
     convolution2d(image + idz * xsize * ysize, &tempVertical, deviceKernelVertical, idx, idy, xsize,
                   ysize, 3, 3);
 
-    output[idz * xsize * ysize + idx * ysize + idy] =
-        tempHorizontal * tempHorizontal + tempVertical * tempVertical;
-    output[idz * xsize * ysize + idx * ysize + idy] =
-        (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
+    output[index] = tempHorizontal * tempHorizontal + tempVertical * tempVertical;
+    output[index] = (float)sqrtf(output[index]);
   }
 }
 
@@ -295,14 +295,16 @@ template <typename dtype>
 __global__ void sobel_filter_kernel_3d(dtype* image, float* output, float* deviceKernelHorizontal,
                                        float* deviceKernelVertical, float* deviceKernelDepth,
                                        int xsize, int ysize, int zsize) {
-  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
-  const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+  const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const unsigned int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
   if (idx < xsize && idy < ysize && idz < zsize) {
     float tempVertical;
     float tempHorizontal;
     float tempDepth;
+
+    unsigned int index = idz * xsize * ysize + idx * ysize + idy;
 
     convolution3d(image, &tempHorizontal, deviceKernelHorizontal, idx, idy, idz, xsize, ysize,
                   zsize, 3, 3, 3);
@@ -311,10 +313,8 @@ __global__ void sobel_filter_kernel_3d(dtype* image, float* output, float* devic
     convolution3d(image, &tempDepth, deviceKernelDepth, idx, idy, idz, xsize, ysize, zsize, 3, 3,
                   3);
 
-    output[idz * xsize * ysize + idx * ysize + idy] =
-        tempHorizontal * tempHorizontal + tempVertical * tempVertical + tempDepth * tempDepth;
-    output[idz * xsize * ysize + idx * ysize + idy] =
-        (float)sqrtf(output[idz * xsize * ysize + idx * ysize + idy]);
+    output[index] = tempHorizontal * tempHorizontal + tempVertical * tempVertical + tempDepth * tempDepth;
+    output[index] = (float)sqrtf(output[index]);
   }
 }
 
@@ -343,10 +343,12 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
 
   dtype* deviceImage;
   float* deviceOutput;
-  cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
-  cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
+  unsigned int size = xsize * ysize * zsize;
 
-  cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+  cudaMalloc((void**)&deviceImage,size * sizeof(dtype));
+  cudaMalloc((void**)&deviceOutput,size * sizeof(float));
+
+  cudaMemcpy(deviceImage, image,size * sizeof(dtype), cudaMemcpyHostToDevice);
 
   if (type == false) {
     float* kernelHorizontal;
@@ -363,8 +365,8 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
     cudaMalloc((void**)&deviceKernelVertical, 9 * sizeof(float));
     cudaMemcpy(deviceKernelVertical, kernelVertical, 9 * sizeof(float), cudaMemcpyHostToDevice);
 
-    dim3 blockSize(16, 16);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
+    dim3 blockSize(32, 32);
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -408,7 +410,7 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
     cudaMemcpy(deviceKernelDepth, kernelDepth, 27 * sizeof(float), cudaMemcpyHostToDevice);
 
     dim3 blockSize(8, 8, 8);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x,
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
                   (zsize + blockSize.z - 1) / blockSize.z);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -429,7 +431,7 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
     cudaFree(deviceKernelDepth);
   }
 
-  cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+  cudaMemcpy(output, deviceOutput, size * sizeof(float), cudaMemcpyDeviceToHost);
 
   cudaFree(deviceImage);
   cudaFree(deviceOutput);

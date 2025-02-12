@@ -10,34 +10,37 @@ __global__ void gaussian_filter_kernel_2d(dtype* image, float* output, float* de
                                           int xsize, int ysize, int zsize, int nx, int ny) {
 
   //threads indices
-  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
   // general matrix convolution for each pixel of the image.
   if (idx < xsize && idy < ysize) {
     //temp variable
     float temp;
 
+    unsigned int index = idz * xsize * ysize + idx * ysize + idy;
+
     //convolution.
     convolution2d(image + idz * xsize * ysize, &temp, deviceKernel, idx, idy, xsize, ysize, nx, ny);
 
-    output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
+    output[index] = (float)temp;
   }
 }
 
 template <typename dtype>
 __global__ void gaussian_filter_kernel_3d(dtype* image, float* output, float* deviceKernel,
                                           int xsize, int ysize, int zsize, int nx, int ny, int nz) {
-  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
-  const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+  const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const unsigned int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
   if (idx < xsize && idy < ysize && idz < zsize) {
     float temp;
+    unsigned int index = idz * xsize * ysize + idx * ysize + idy;
 
     convolution3d(image, &temp, deviceKernel, idx, idy, idz, xsize, ysize, zsize, nx, ny, nz);
 
-    output[idz * xsize * ysize + idx * ysize + idy] = (float)temp;
+    output[index] = (float)temp;
   }
 }
 
@@ -61,10 +64,12 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
 
   dtype* deviceImage;
   float* deviceOutput;
-  cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
-  cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(float));
+  unsigned int size = xsize * ysize * zsize;
 
-  cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+  cudaMalloc((void**)&deviceImage, size * sizeof(dtype));
+  cudaMalloc((void**)&deviceOutput,size * sizeof(float));
+
+  cudaMemcpy(deviceImage, image, size * sizeof(dtype), cudaMemcpyHostToDevice);
 
   if (type == false) {
     //kernel size
@@ -130,7 +135,7 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
     cudaFree(deviceKernel);
   }
 
-  cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(float), cudaMemcpyDeviceToHost);
+  cudaMemcpy(output, deviceOutput, size * sizeof(float), cudaMemcpyDeviceToHost);
 
   cudaFree(deviceImage);
   cudaFree(deviceOutput);

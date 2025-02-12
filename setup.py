@@ -3,6 +3,8 @@ import os
 from os.path import join as pjoin
 from concurrent.futures import ThreadPoolExecutor
 import multiprocessing
+from concurrent.futures import ThreadPoolExecutor
+import multiprocessing
 
 import numpy
 from Cython.Build import cythonize
@@ -118,8 +120,11 @@ def customize_compiler_for_nvcc(self):
 # Run the customize_compiler function
 class custom_build_ext(build_ext):
     """Customize and build the extensions using the nvcc compiler for CUDA files."""
+    """Customize and build the extensions using the nvcc compiler for CUDA files."""
     def build_extensions(self):
         customize_compiler_for_nvcc(self.compiler)
+        with ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+            executor.map(self.build_extension, self.extensions)
         with ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
             executor.map(self.build_extension, self.extensions)
 
@@ -201,7 +206,7 @@ def get_all_extension_modules():
         "harpia.threshold",
         "harpia.watershed",
         "harpia.distanceTransform",
-    ]
+        "harpia.fastGraphClustering"    ]
     ext_modules = []
     with ThreadPoolExecutor() as executor:
         results = executor.map(get_extension_modules, submodules)

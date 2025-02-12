@@ -18,25 +18,23 @@ void unsharp_mask_filtering(dtype* image, float* output, int xsize, int ysize, i
   //gaussian filter application.
   gaussian_filtering(image, output, xsize, ysize, zsize, sigma, type);
 
-  for (int idx = 0; idx < xsize; ++idx) {
+  for (unsigned int idx = 0; idx < xsize; ++idx) {
 
-    for (int idy = 0; idy < ysize; ++idy) {
+    for (unsigned int idy = 0; idy < ysize; ++idy) {
 
-      for (int idz = 0; idz < zsize; ++idz) {
+      for (unsigned int idz = 0; idz < zsize; ++idz) {
 
         float temp;
+        unsigned int index = idz * xsize * ysize + idx * ysize + idy;
 
-        temp = image[idz * xsize * ysize + idx * ysize + idy] -
-               output[idz * xsize * ysize + idx * ysize + idy];
+        temp = image[index] - output[index];
 
         if (abs(temp) >= threshold) {
-          output[idz * xsize * ysize + idx * ysize + idy] =
-              (float)(image[idz * xsize * ysize + idx * ysize + idy] + ammount * temp);
+          output[index] = (float)(image[index] + ammount * temp);
         }
 
         else {
-          output[idz * xsize * ysize + idx * ysize + idy] =
-              (float)image[idz * xsize * ysize + idx * ysize + idy];
+          output[index] = (float)image[index];
         }
       }
     }

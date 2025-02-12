@@ -233,6 +233,14 @@ void union_find_watershed(int* sortedImage, int* labels, int xsize, int ysize) {
 
 #define MAX_SIZE 9000000 // Define a maximum size for the priority queue
 
+// Define a structure to hold the priority queue and its size
+struct  PriorityQueue2d {
+    static int PQ[MAX_SIZE][3]; // PQ[i][0]: intensity, PQ[i][1]: x, PQ[i][2]: y
+    int size; // Size of the priority queue
+};
+
+int PriorityQueue2d::PQ[MAX_SIZE][3];
+
 // Function to initialize the priority queue
 void init_priority_queue_2d(PriorityQueue2d* pq) {
     pq->size = 0;
@@ -343,6 +351,13 @@ void meyers_watershed_2d(int* R, int* M, int bg, int rows, int cols) {
     }
 }
 
+struct PriorityQueue3d {
+    static int PQ[MAX_SIZE][4]; // PQ[i][0]: intensity, PQ[i][1]: x, PQ[i][2]: y, PQ[i][3]: z
+    int size; // Size of the priority queue
+};
+
+
+int PriorityQueue3d::PQ[MAX_SIZE][4];
 
 // Function to initialize the priority queue
 void init_priority_queue_3d(PriorityQueue3d* pq) {

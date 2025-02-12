@@ -93,8 +93,9 @@ __device__ void get_median_kernel_3d(dtype* image, dtype* kernel, int i, int j, 
 
         if (inputX >= 0 && inputX < xsize && inputY >= 0 && inputY < ysize && inputZ >= 0 &&
             inputZ < zsize) {
-          kernel[(k * xsize * ysize + i * ysize + j) * (nx * ny * nz) + (l * nx * ny) + (m * ny) +
-                 n] = image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
+
+          unsigned int index = (inputZ * xsize * ysize) + (inputX * ysize) + inputY;
+          kernel[(k * xsize * ysize + i * ysize + j) * (nx * ny * nz) + (l * nx * ny) + (m * ny) +n] = image[index];
         }
 
         //make a padding function to substitute this line of code.
@@ -124,8 +125,8 @@ __device__ void get_median_kernel_3d(dtype* image, dtype* kernel, int i, int j, 
             inputZ = 2 * zsize - inputZ - 1;
           }
 
-          kernel[(k * xsize * ysize + i * ysize + j) * (nx * ny * nz) + (l * nx * ny) + (m * ny) +
-                 n] = image[(inputZ * xsize * ysize) + (inputX * ysize) + inputY];
+          unsigned int index = (inputZ * xsize * ysize) + (inputX * ysize) + inputY;
+          kernel[(k * xsize * ysize + i * ysize + j) * (nx * ny * nz) + (l * nx * ny) + (m * ny) +n] = image[index];
         }
       }
     }
@@ -135,8 +136,8 @@ __device__ void get_median_kernel_3d(dtype* image, dtype* kernel, int i, int j, 
 template <typename dtype>
 __global__ void median_filter_kernel_2d(dtype* image, dtype* output, dtype* kernel, int xsize,
                                         int ysize, int idz, int nx, int ny) {
-  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
   if (idx < xsize && idy < ysize) {
     get_median_kernel_2d(image + idz * xsize * ysize, kernel, idx, idy, xsize, ysize, nx, ny);
@@ -163,25 +164,33 @@ __global__ void median_filter_kernel_3d(dtype* image, dtype* output, dtype* kern
                                         int ysize, int zsize, int idz, int nx, int ny, int nz) {
 
   //threads
-  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
   if (idx < xsize && idy < ysize) {
+
+    unsigned int index = (idz * xsize * ysize + idx * ysize + idy) * (nx * ny * nz);
+    unsigned int out_index = idz * xsize * ysize + idx * ysize + idy;
+
     get_median_kernel_3d(image, kernel, idx, idy, idz, xsize, ysize, zsize, nx, ny, nz);
-    bubble_sort(kernel + (idz * xsize * ysize + idx * ysize + idy) * (nx * ny * nz), nx * ny * nz);
+
+    bubble_sort(kernel + index, nx * ny * nz);
 
     int medianIndex = (nx * ny * nz) / 2;
 
-    if ((nx * ny * nz) % 2 == 0) {
-      dtype medianValue =
-          (kernel[(idz * xsize * ysize + idx * ysize + idy) * (nx * ny * nz) + medianIndex] +
-           kernel[(idz * xsize * ysize + idx * ysize + idy) * (nx * ny * nz) + medianIndex - 1]) /
-          2;
-      output[idz * xsize * ysize + idx * ysize + idy] = medianValue;
-    } else {
-      output[idz * xsize * ysize + idx * ysize + idy] =
-          kernel[(idz * xsize * ysize + idx * ysize + idy) * (nx * ny * nz) + medianIndex];
+    if ((nx * ny * nz) % 2 == 0) 
+    {
+      dtype medianValue = (kernel[index + medianIndex] + kernel[index + medianIndex - 1]) / 2;
+
+      output[out_index] = medianValue;
+    } 
+    
+    else 
+    
+    {
+      output[out_index] = kernel[index + medianIndex];
     }
+
   }
 }
 
@@ -207,17 +216,18 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
   dtype* deviceImage;
   dtype* deviceOutput;
   dtype* deviceKernel;
+  unsigned int size = xsize * ysize * zsize;
 
-  cudaMalloc((void**)&deviceImage, xsize * ysize * zsize * sizeof(dtype));
-  cudaMalloc((void**)&deviceOutput, xsize * ysize * zsize * sizeof(dtype));
+  cudaMalloc((void**)&deviceImage, size * sizeof(dtype));
+  cudaMalloc((void**)&deviceOutput, size * sizeof(dtype));
   cudaMalloc((void**)&deviceKernel, xsize * ysize * nx * ny * nz * sizeof(dtype));
 
-  cudaMemcpy(deviceImage, image, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyHostToDevice);
+  cudaMemcpy(deviceImage, image, size * sizeof(dtype), cudaMemcpyHostToDevice);
 
   if (nz == 1) {
 
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -238,7 +248,7 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
   else {
 
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -255,7 +265,7 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
     std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
   }
 
-  cudaMemcpy(output, deviceOutput, xsize * ysize * zsize * sizeof(dtype), cudaMemcpyDeviceToHost);
+  cudaMemcpy(output, deviceOutput, size * sizeof(dtype), cudaMemcpyDeviceToHost);
 
   cudaFree(deviceImage);
   cudaFree(deviceOutput);
