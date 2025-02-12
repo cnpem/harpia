@@ -3,6 +3,7 @@ cimport numpy as np
 from scipy.spatial import distance
 from sklearn.cluster import KMeans
 from cython.parallel import prange
+from scipy.ndimage import uniform_filter
 from cython cimport boundscheck, wraparound, parallel
 from time import perf_counter
 
@@ -161,6 +162,8 @@ class general_fgc:
     def __init__(
         self,
         x: np.ndarray,
+        rows: int,
+        cols: int,
         basis: np.ndarray = None,
         lmbd: float = 1.0,
         k: int = 4,
@@ -204,6 +207,9 @@ class general_fgc:
         # Window size for spatial term
         self.size = size
 
+        self.cols = cols
+        self.rows= rows
+
         # Anchor matrix
         self.z = self.anchor(self.beta)
 
@@ -229,16 +235,14 @@ class general_fgc:
 
         # Distance matrix (spectral distance)
         dis_spectral = distance.cdist(self.x.T, self.u.T, self.metric)
+        x_reshaped = self.x.reshape((-1, self.rows, self.cols))
 
         if beta > 0:
             # Compute the spatial term
             window_size = self.size  # Example window size for neighboring pixels
-            pad_size = window_size // 2
-            x_padded = np.pad(self.x, ((0, 0), (pad_size, pad_size)), mode='reflect')
+            spatial_means_2d = uniform_filter(x_reshaped, size=(1, window_size, window_size), mode='reflect')
             
-            spatial_means = np.zeros_like(self.x)
-            for i in range(self.x.shape[1]):
-                spatial_means[:, i] = np.mean(x_padded[:, i:i+window_size], axis=1)
+            spatial_means = spatial_means_2d.reshape(self.x.shape)
             
             # Distance matrix (spatial distance)
             dis_spatial = distance.cdist(spatial_means.T, self.u.T, self.metric)
