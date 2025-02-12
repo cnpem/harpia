@@ -201,7 +201,7 @@ def get_all_extension_modules():
         "harpia.threshold",
         "harpia.watershed",
         "harpia.distanceTransform",
-    ]
+        "harpia.fastGraphClustering"    ]
     ext_modules = []
     with ThreadPoolExecutor() as executor:
         results = executor.map(get_extension_modules, submodules)
