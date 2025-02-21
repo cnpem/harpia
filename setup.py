@@ -200,6 +200,7 @@ ext_modules = [
     *get_extension_modules("harpia.watershed"),
     *get_extension_modules("harpia.distanceTransform"),
     *get_extension_modules("harpia.fastGraphClustering"),
+    *get_extension_modules("harpia.sparseUnmixing"),
 ]
 
 print(cuda_sources)
