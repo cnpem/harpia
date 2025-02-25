@@ -16,9 +16,10 @@ ctypedef fused numeric:
 @boundscheck(False)
 @wraparound(False)
 def solver_nmf(np.ndarray[np.float32_t, ndim=2] X,
+               np.ndarray[np.float32_t, ndim=2] Z,
                np.ndarray[np.float32_t, ndim=2] D,
                np.ndarray[np.float32_t, ndim=2] V,
-               float beta, int iterations):
+               float beta, float gamma, int iterations):
 
     cdef int P = X.shape[1]  # Number of pixels
     cdef int B = X.shape[0]  # Number of features/bands
@@ -32,6 +33,11 @@ def solver_nmf(np.ndarray[np.float32_t, ndim=2] X,
     cdef np.ndarray[np.float32_t, ndim=2] Vnumerator = np.empty((M, P), dtype=np.float32)
     cdef np.ndarray[np.float32_t, ndim=2] Vdenominator = np.empty((M, P), dtype=np.float32)
     cdef np.ndarray[np.float32_t, ndim=2] AbarTAbar = np.zeros((M, M), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim=2] VZtDiag = np.zeros((M, M), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim=2] VZtDiagZ = np.zeros((M, P), dtype=np.float32)
+
+    cdef np.ndarray[np.float32_t, ndim=1] Diag = np.sum(Z, axis=0).astype(np.float32)
+    cdef np.ndarray[np.float32_t, ndim=2] ZtDiag = np.zeros((P, M), dtype=np.float32) 
 
     cdef int i, j, k
     cdef float sqrtV
@@ -42,8 +48,27 @@ def solver_nmf(np.ndarray[np.float32_t, ndim=2] X,
             for k in range(B + 1):
                 AbarTAbar[i, j] += Abar[k, i] * Abar[k, j]
 
+    #ZtDiag->only once
+    for i in prange(P, nogil=True):
+        for j in range(M):
+            ZtDiag[i, j] = Z[j, i] * Diag[i]  # Z^T[i, j] = Z[j, i]
+
     # Iterative update loop
     for _ in range(iterations):
+
+        # Compute V * (Z^T * Diag)
+        for i in prange(M, nogil=True):
+            for j in range(M):
+                VZtDiag[i, j] = 0.0
+                for k in range(P):
+                    VZtDiag[i, j] += V[i, k] * ZtDiag[k, j]
+
+        # Compute VZTDiagZ = VZTDiag * Z (size MxP)
+        for i in prange(M, nogil=True):
+            for j in range(P):
+                VZtDiagZ[i, j] = 0.0
+                for k in range(P):
+                    VZtDiagZ[i, j] += VZtDiag[i, k] * Z[k, j]
 
         # Compute Vnumerator = Abar^T * Xbar
         for i in range(M):
@@ -51,6 +76,11 @@ def solver_nmf(np.ndarray[np.float32_t, ndim=2] X,
                 Vnumerator[i, j] = 0.0
                 for k in range(B + 1):
                     Vnumerator[i, j] += Abar[k, i] * Xbar[k, j]
+
+        # Add gamma * VZTDiagZ to Vnumerator
+        for i in prange(M, nogil=True):
+            for j in range(P):
+                Vnumerator[i, j] += gamma * VZtDiagZ[i, j]
 
         # Compute Vdenominator = (AbarTAbar @ V) + (beta / 2) / sqrt(V)
         for i in prange(M, nogil=True):
@@ -61,7 +91,7 @@ def solver_nmf(np.ndarray[np.float32_t, ndim=2] X,
 
                 # Regularization term
                 sqrtV = max(sqrt(V[i, j]), 1e-6)  # Prevent division by zero
-                Vdenominator[i, j] += (beta / 2) / sqrtV
+                Vdenominator[i, j] += gamma * V[i, j] + (beta / 2) / sqrtV 
 
         # Update V using multiplicative update rule
         for i in prange(M, nogil=True):
