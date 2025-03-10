@@ -51,21 +51,6 @@ template void reconstruction_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int
 template void reconstruction_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
                                              const int, MorphOp, const int);
 
-/**
- * @brief Perform recosntruction by erosion/dilation operation on the entire image using the GPU.
- * This function is meant to be called from host and slide the geodesic_morph_binary kernel function
- * through all pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
 template <typename dtype>
 void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                      const int xsize, const int ysize, const int zsize,
@@ -109,19 +94,6 @@ template void reconstruction_binary_on_device<int8_t>(int8_t*, int8_t*, int8_t*,
 template void reconstruction_binary_on_device<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int,
                                                        const int, const int, MorphOp, const int);
 
-/**
- * @brief Perform recosntruction by erosion/dilation operation on the entire image using the CPU.
- * This function is used to check GPU results correctness.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- */
 template <typename dtype>
 void reconstruction_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                    const int xsize, const int ysize, const int zsize,

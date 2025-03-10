@@ -5,6 +5,14 @@
 #include "../../../include/morphology/complement_binary.h"
 #include "../../../include/morphology/cuda_helper.h"
 
+/**
+ * @brief CUDA kernel to compute the binary complement of an image.
+ * 
+ * @tparam dtype Data type of the image (e.g., int, uint16_t, etc.).
+ * @param deviceImage Pointer to input image in device memory.
+ * @param deviceOutput Pointer to output image in device memory.
+ * @param size Number of elements in the image.
+ */
 template <typename dtype>
 __global__ void complement_binary_kernel(dtype* deviceImage, dtype* deviceOutput, const size_t size) {
   size_t index = threadIdx.x + blockIdx.x * blockDim.x;
@@ -12,7 +20,6 @@ __global__ void complement_binary_kernel(dtype* deviceImage, dtype* deviceOutput
     deviceOutput[index] = 1 - deviceImage[index];
   }
 }
-// Template instantiations for specific types
 template __global__ void complement_binary_kernel<int>(int*, int*, const size_t);
 template __global__ void complement_binary_kernel<unsigned int>(unsigned int*, unsigned int*,
                                                                 const size_t);
@@ -39,7 +46,6 @@ void complement_binary(dtype* deviceImage, dtype* deviceOutput, const size_t siz
   complement_binary_kernel<<<grid, block>>>(deviceImage, deviceOutput, size);
   cudaDeviceSynchronize();  // Ensure all GPU threads are finished
 }
-// Template instantiations for specific types
 template void complement_binary<int>(int*, int*, const size_t, const int);
 template void complement_binary<unsigned int>(unsigned int*, unsigned int*, const size_t, const int);
 template void complement_binary<int16_t>(int16_t*, int16_t*, const size_t, const int);
@@ -74,7 +80,6 @@ void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int 
   cudaFree(deviceImage);
   cudaFree(deviceOutput);
 }
-// Template instantiations for specific types
 template void complement_binary_on_device<int>(int*, int*, const int, const int, const int,
                                                const int);
 template void complement_binary_on_device<unsigned int>(unsigned int*, unsigned int*, const int,
@@ -94,7 +99,6 @@ void complement_binary_on_host(dtype* hostImage, dtype* hostOutput, const size_t
     hostOutput[index] = 1 - hostImage[index];
   }
 }
-// Template instantiations for specific types
 template void complement_binary_on_host<int>(int*, int*, const size_t);
 template void complement_binary_on_host<unsigned int>(unsigned int*, unsigned int*, const size_t);
 template void complement_binary_on_host<int16_t>(int16_t*, int16_t*, const size_t);

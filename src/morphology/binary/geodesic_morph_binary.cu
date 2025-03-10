@@ -7,19 +7,26 @@
 /**
  * @brief Perform geodesic erosion/dilation operation for one pixel.
  *
+ * This function applies geodesic morphological operations (erosion or dilation) 
+ * to a single pixel in a 3D image, considering a binary structuring element 
+ * (kernel of ones). The function determines the new pixel value based on the 
+ * neighborhood defined by the kernel and the given mask.
+ *
  * @tparam dtype The data type of the image.
- * @param image Input image (corresponds to the marker image).
- * @param output Output image.
+ * @param image Input image (marker image).
  * @param mask Mask image.
- * @param centerIdx Center index in the x-dimension.
- * @param centerIdy Center index in the y-dimension.
- * @param centerIdz Center index in the z-dimension.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
+ * @param output Output image.
+ * @param xsize Width of the image.
+ * @param ysize Height of the image.
+ * @param zsize Depth of the image.
+ * @param padding_bottom Padding added at the bottom in the z-dimension.
+ * @param padding_top Padding added at the top in the z-dimension.
+ * @param centerIdx X-coordinate of the pixel being processed.
+ * @param centerIdy Y-coordinate of the pixel being processed.
+ * @param centerIdz Z-coordinate of the pixel being processed.
+ * @param kernel_xsize Kernel size in the x-dimension.
+ * @param kernel_ysize Kernel size in the y-dimension.
+ * @param kernel_zsize Kernel size in the z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
  */
 template <typename dtype>
@@ -31,13 +38,8 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
                                               MorphOp operation) {
 
   dtype* im = image;
-  dtype kernel = 1;  //the kernel for geodesic operations is fixed in 1's.
-  dtype aux;
-  if (operation == EROSION) {
-    aux = 1;  //erosion operation
-  } else {
-    aux = 0;  //dilation operation
-  }
+  dtype kernel = 1; //The kernel for geodesic operations is fixed in 1's.
+  dtype aux = (operation == EROSION) ? 1 : 0;
 
   size_t index;
   
@@ -47,7 +49,7 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
   int startIdy = centerIdy - kernel_ysize / 2;
   int startIdz = centerIdz - kernel_zsize / 2;
 
-  //erosion/dilation operation
+  // Iterate over the kernel neighborhood
   for (int iz = 0; iz < kernel_zsize; iz++) {
     for (int iy = 0; iy < kernel_ysize; iy++) {
       for (int ix = 0; ix < kernel_xsize; ix++) {
@@ -56,10 +58,9 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
         
-        // ignore out of bounds pixels
+        // Ignore out-of-bounds pixels
         if (imageIdx < 0 || imageIdx > xsize - 1 || imageIdy < 0 || imageIdy > ysize - 1 ||
             imageIdz < -padding_bottom || imageIdz > zsize + padding_top - 1) {
-          // do nothing.
         }
 
         else {
@@ -68,9 +69,9 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
                   static_cast<size_t>(imageIdx);
 
           if (operation == EROSION) {
-            aux = (im[index] == kernel) && aux;  //erosion operation
+            aux = (im[index] == kernel) && aux;  
           } else {
-            aux = (im[index] == kernel) || aux;  //dilation operation
+            aux = (im[index] == kernel) || aux;
           }
         }
       }
@@ -81,7 +82,7 @@ CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* 
                        static_cast<size_t>(centerIdy) * xsize + 
                        static_cast<size_t>(centerIdx);
 
-  // intersection/union operation
+  // Apply geodesic intersection (for erosion) or union (for dilation)
   if (operation == EROSION) {
     output[centerIndex] = aux || mask[centerIndex];  //erosion operation
   } else {
@@ -114,18 +115,20 @@ template CUDA_HOSTDEV void geodesic_morph_binary_pixel<uint8_t>(uint8_t*, uint8_
                                                                 int, int, int, MorphOp);
 
 /**
- * @brief Kernel function to perform geodesic erosion/dilation operation on the entire image.
+ * @brief CUDA kernel for geodesic erosion/dilation on an entire image.
  *
  * @tparam dtype The data type of the image.
- * @param deviceImage Input image on the device (corrresponds to the marker image).
- * @param deviceOutput Output image on the device.
- * @param deviceMask Mask image on the device.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
+ * @param deviceImage Input image on the GPU.
+ * @param deviceMask Mask image on the GPU.
+ * @param deviceOutput Output image on the GPU.
+ * @param xsize Width of the image.
+ * @param ysize Height of the image.
+ * @param zsize Depth of the image.
+ * @param padding_bottom Padding at the bottom in the z-dimension.
+ * @param padding_top Padding at the top in the z-dimension.
+ * @param kernel_xsize Kernel size in x-dimension.
+ * @param kernel_ysize Kernel size in y-dimension.
+ * @param kernel_zsize Kernel size in z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
  */
 template <typename dtype>
@@ -169,17 +172,17 @@ template __global__ void geodesic_morph_binary_kernel<uint8_t>(uint8_t*, uint8_t
                                                                const int, const int, int, int, int,
                                                                MorphOp);
 
-template <typename dtype>
+ <typename dtype>
 void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceOutput,
                            const int xsize, const int ysize, const int zsize,
                            const int flag_verbose, const int padding_bottom, const int padding_top,
                            MorphOp operation) {
-  //define connectivity kernel size for images of any dimension
+  // Define connectivity kernel size
   int kernel_xsize = (xsize > 2) ? 3 : xsize;
   int kernel_ysize = (ysize > 2) ? 3 : ysize;
   int kernel_zsize = (zsize > 2) ? 3 : zsize;
 
-  //set up execution configuratio
+    // Set up execution configuration
   dim3 block(BLOCK_3D, BLOCK_3D, BLOCK_3D);
   if (zsize == 1)
     block = dim3(BLOCK_2D, BLOCK_2D, 1);
@@ -187,17 +190,16 @@ void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceO
   dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y,
             (zsize + block.z - 1) / block.z);
 
-  // check grid and block dimension from host side
   if (flag_verbose) {
     printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
     printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
   }
 
-  // device erosion/dialation
+  // Launch CUDA kernel
   geodesic_morph_binary_kernel<<<grid, block>>>(deviceImage, deviceMask, deviceOutput, xsize, ysize,
                                                 zsize, padding_bottom, padding_top, kernel_xsize,
                                                 kernel_ysize, kernel_zsize, operation);
-  CHECK(cudaDeviceSynchronize());  //assures all gpu threads are fineshed
+  CHECK(cudaDeviceSynchronize());  // Ensure all GPU threads finish
 }
 template void geodesic_morph_binary<int>(int*, int*, int*, const int, const int, const int,
                                          const int, const int, const int, MorphOp);
@@ -213,57 +215,43 @@ template void geodesic_morph_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int
 template void geodesic_morph_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
                                              const int, const int, const int, const int, MorphOp);
 
-/**
- * @brief Perform geodesic erosion/dilation operation on the entire image using the GPU. This
- * function is meant to be called from host and slide the morph_binary kerel function through all
- * pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
 template <typename dtype>
 void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                      const int xsize, const int ysize, const int zsize,
                                      const int flag_verbose, const int padding_bottom,
                                      const int padding_top, MorphOp operation) {
-  // set input dimension
+  // Set input dimension
   size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
   size_t nBytes_input = nBytes + nBytes_padding;
 
-  // malloc device global memory
+  // Allocate device memory
   dtype *deviceImage, *deviceOutput, *deviceMask, *i_deviceImage, *i_hostImage, *i_deviceMask,
       *i_hostMask;
   CHECK(cudaMalloc((dtype**)&i_deviceImage, nBytes_input));
   CHECK(cudaMalloc((dtype**)&i_deviceMask, nBytes_input));
   CHECK(cudaMalloc((dtype**)&deviceOutput, nBytes));
 
-  // transfer input and mask + padding
+  // Transfer data from the host to the device with padding
   i_hostImage = hostImage - padding_bottom * xsize * ysize;
   i_hostMask = hostMask - padding_bottom * xsize * ysize;
 
   CHECK(cudaMemcpy(i_deviceImage, i_hostImage, nBytes_input, cudaMemcpyHostToDevice));
   CHECK(cudaMemcpy(i_deviceMask, i_hostMask, nBytes_input, cudaMemcpyHostToDevice));
 
+  // Advance pointers from padding pixels to image pixels
   deviceImage = i_deviceImage + padding_bottom * xsize * ysize;
   deviceMask = i_deviceMask + padding_bottom * xsize * ysize;
 
-  // device erosion/dialation
+  // Perform morphological operation (EROSION OR DILATION)
   geodesic_morph_binary(deviceImage, deviceMask, deviceOutput, xsize, ysize, zsize, flag_verbose,
                         padding_bottom, padding_top, operation);
 
-  // transfer data from the device to the host
+  // Transfer data from the device to the host
   CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 
-  // free host memorys
+  // Free host memorys
   cudaFree(i_deviceImage);
   cudaFree(i_deviceMask);
   cudaFree(deviceOutput);
@@ -288,25 +276,12 @@ template void geodesic_morph_binary_on_device<uint8_t>(uint8_t*, uint8_t*, uint8
                                                        const int, const int, const int, const int,
                                                        const int, MorphOp);
 
-/**
- * @brief Perform geodesic erosion/dilation operation on the entire image using the CPU. This
- * function is used to check GPU results correctness.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- */
 template <typename dtype>
 void geodesic_morph_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                    const int xsize, const int ysize, const int zsize,
                                    MorphOp operation) {
 
-  //define connectivity kernel size for images of any dimension
+  // Define connectivity kernel size
   int kernel_xsize = (xsize > 2) ? 3 : xsize;
   int kernel_ysize = (ysize > 2) ? 3 : ysize;
   int kernel_zsize = (zsize > 2) ? 3 : zsize;

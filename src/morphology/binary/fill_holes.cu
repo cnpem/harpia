@@ -7,6 +7,20 @@
 #include "../../../include/morphology/morphology.h"
 #include "../../../include/morphology/reconstruction_binary.h"
 
+/**
+ * @brief Identifies and marks the holes in a 3D image using a connectivity-based approach.
+ *
+ * @tparam dtype Data type of the image.
+ * @param deviceImage Pointer to the input image on the GPU.
+ * @param deviceOutput Pointer to the output marker image on the GPU.
+ * @param xsize Size of the image in the x-dimension.
+ * @param ysize Size of the image in the y-dimension.
+ * @param zsize Size of the image in the z-dimension.
+ *
+ * This kernel processes each voxel in the input image and marks the border regions based on 
+ * connectivity. The output marker image is used as a seed for further processing, such as 
+ * morphological reconstruction.
+ */
 template <typename dtype>
 __global__ void fill_holes_marker(dtype* deviceImage, dtype* deviceOutput, const int xsize,
                                   const int ysize, const int zsize) {
@@ -14,9 +28,8 @@ __global__ void fill_holes_marker(dtype* deviceImage, dtype* deviceOutput, const
   int idy = threadIdx.y + blockIdx.y * blockDim.y;
   int idz = threadIdx.z + blockIdx.z * blockDim.z;
 
-  //define connectivity kernel size for images of any dimension
-  //when one of the dimensions is of size 1,the hole image is a border for that dimention
-  //this flags avoid this behavier
+  // Define connectivity kernel size for images of any dimension
+  // Avoid treating a flat image as a border by using these flags
   bool ignore_xsize = (xsize == 1) ? true : false;
   bool ignore_ysize = (ysize == 1) ? true : false;
   bool ignore_zsize = (zsize == 1) ? true : false;
@@ -49,17 +62,6 @@ template __global__ void fill_holes_marker<int8_t>(int8_t*, int8_t*, const int, 
 template __global__ void fill_holes_marker<uint8_t>(uint8_t*, uint8_t*, const int, const int,
                                                     const int);
 
-/**
- * @brief Performs the bottom-hat transformation on the input image on the device (GPU).
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                           const int zsize, const int flag_verbose) {
@@ -67,7 +69,7 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
   size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
-  // Malloc device global memory
+  // Allocate device memory
   dtype *deviceMarker, *deviceMask, *deviceAux;
   CHECK(cudaMalloc((dtype**)&deviceAux, nBytes));
   CHECK(cudaMalloc((dtype**)&deviceMarker, nBytes));
@@ -78,7 +80,7 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
   CHECK(cudaMemset(deviceMarker, 0, nBytes));  //Initialize with zeros
   CHECK(cudaMemset(deviceMask, 0, nBytes));
 
-  // Prepare marker
+  // Configure execution parameters
   dim3 block(BLOCK_3D, BLOCK_3D, BLOCK_3D);
   if (zsize == 1)
     block = dim3(BLOCK_2D, BLOCK_2D, 1);
@@ -90,13 +92,14 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
     printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
   }
 
+  // Create marker for morphological reconstruction
   fill_holes_marker<<<grid, block>>>(deviceAux, deviceMarker, xsize, ysize, zsize);
   cudaDeviceSynchronize();  // Assures all GPU threads are finished
 
-  // Prepare mask
+  // Prepare mask for morphological reconstruction
   complement_binary(deviceAux, deviceMask, size, flag_verbose);
 
-  // Reconstruction + Complement
+  // Perform morphological reconstruction (hole filling)
   reconstruction_binary(deviceMarker, deviceMask, deviceAux, xsize, ysize, zsize, DILATION,
                         flag_verbose);
   complement_binary(deviceAux, deviceAux, size, flag_verbose);
@@ -109,7 +112,6 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
   cudaFree(deviceMarker);
   cudaFree(deviceMask);
 }
-// Template instantiations for specific types
 template void fill_holes_on_device<int>(int*, int*, const int, const int, const int, const int);
 template void fill_holes_on_device<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                                  const int, const int);
@@ -122,17 +124,6 @@ template void fill_holes_on_device<int8_t>(int8_t*, int8_t*, const int, const in
 template void fill_holes_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
                                             const int);
 
-/**
- * @brief Performs the bottom-hat transformation on the input image on the host (CPU).
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                         const int zsize) {
@@ -144,9 +135,8 @@ void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
   dtype* hostMarker = (dtype*)malloc(nBytes);
   dtype* hostMask = (dtype*)malloc(nBytes);
 
-  //define connectivity kernel size for images of any dimension
-  //when one of the dimensions is of size 1,the hole image is a border for that dimention
-  //this flags avoid this behavier
+  // Define connectivity kernel size for images of any dimension
+  // Avoid treating a flat image as a border by using these flags
   bool ignore_xsize = (xsize == 1) ? true : false;
   bool ignore_ysize = (ysize == 1) ? true : false;
   bool ignore_zsize = (zsize == 1) ? true : false;
@@ -173,16 +163,15 @@ void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, co
     }
   }  // slide over image
 
-  // // Prepare mask
+  // Prepare mask
   complement_binary_on_host(hostImage, hostMask, size);
 
-  // // Reconstruction + Complement
+  // Reconstruction + Complement
   reconstruction_binary_on_host(hostMarker, hostMask, hostOutput, xsize, ysize, zsize, DILATION);
   complement_binary_on_host(hostOutput, hostOutput, size);
   free(hostMarker);
   free(hostMask);
 }
-// Template instantiations for specific types
 template void fill_holes_on_host<int>(int*, int*, const int, const int, const int);
 template void fill_holes_on_host<unsigned int>(unsigned int*, unsigned int*, const int, const int,
                                                const int);

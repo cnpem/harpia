@@ -112,21 +112,7 @@ template void smooth_binary_on_device<uint8_t>(uint8_t*, uint8_t*, const int, co
                                                const int, const int, const int, int*, int, int,
                                                int);
 
-/**
- * @brief Performs a morphological chain operation on a binary image using the CPU.
- * 
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param chain MorphChain structure containing the operations to be performed.
- */
+                                               
 template <typename dtype>
 void smooth_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                            const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,
