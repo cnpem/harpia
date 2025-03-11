@@ -1,0 +1,2 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Scikit-Image Time (s),Time Ratio,Repetitions,Mean Squared Error,Pixel Accuracy (%),Image Data Type,Image Size (MB),Image Dimensions
+Dilation 3D grayscale,harriet,2,0.2,7.967961954930797,293.0386027337983,36.8,10,0.0,100.0,uint32,32896.1,"(2048, 2052, 2052)"
