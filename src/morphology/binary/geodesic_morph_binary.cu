@@ -28,6 +28,12 @@
  * @param kernel_ysize Kernel size in the y-dimension.
  * @param kernel_zsize Kernel size in the z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 667-668.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 CUDA_HOSTDEV void geodesic_morph_binary_pixel(dtype* image, dtype* mask, dtype* output,
@@ -130,6 +136,12 @@ template CUDA_HOSTDEV void geodesic_morph_binary_pixel<uint8_t>(uint8_t*, uint8_
  * @param kernel_ysize Kernel size in y-dimension.
  * @param kernel_zsize Kernel size in z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 667-668.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 __global__ void geodesic_morph_binary_kernel(dtype* deviceImage, dtype* deviceMask,

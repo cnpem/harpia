@@ -19,6 +19,12 @@
  * @param padding_bottom Padding at the bottom in the z-dimension.
  * @param padding_top Padding at the top in the z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 667-668.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceOutput,
@@ -44,7 +50,11 @@ void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceO
  * @param padding_bottom Number of padding layers added at the bottom of the image.
  * @param padding_top Number of padding layers added at the top of the image.
  * 
- * @return None. The function modifies `hostOutput` in place.
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 667-668.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
@@ -67,7 +77,11 @@ void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
  * @param zsize Size of the image in the z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
  *
- * @return None. The function modifies `hostOutput` in place.
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 667-668.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 void geodesic_morph_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,

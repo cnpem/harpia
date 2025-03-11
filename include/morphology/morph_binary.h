@@ -24,6 +24,12 @@
  * @param kernel_ysize Height of the kernel (y-dimension).
  * @param kernel_zsize Depth of the kernel (z-dimension).
  * @param operation Type of morphological operation (EROSION or DILATION).
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
+ *       on pages 638-643.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, const int ysize,
@@ -52,6 +58,12 @@ void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, cons
  * @param kernel_ysize The size of the kernel in the y-dimension.
  * @param kernel_zsize The size of the kernel in the z-dimension.
  * @param operation The morphological operation to apply (EROSION or DILATION).
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
+ *       on pages 638-643.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
  template <typename dtype>
 void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -79,6 +91,12 @@ void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize
  * @param kernel_ysize The size of the kernel in the y-dimension.
  * @param kernel_zsize The size of the kernel in the z-dimension.
  * @param operation The morphological operation to apply (EROSION or DILATION).
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
+ *       on pages 638-643.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 void morph_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,

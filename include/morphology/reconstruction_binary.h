@@ -19,6 +19,12 @@
  * @param zsize Size of the image in the z-dimension.
  * @param operation Morphological operation to apply (EROSION or DILATION).
  * @param flag_verbose Flag to enable verbose output, printing grid and block dimensions.
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 668-669.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 void reconstruction_binary(dtype* deviceMarker, dtype* deviceMask, dtype* deviceOutput,
@@ -41,7 +47,13 @@ void reconstruction_binary(dtype* deviceMarker, dtype* deviceMask, dtype* device
  * @param zsize Size of the image in the z-dimension.
  * @param operation Morphological operation to apply (EROSION or DILATION).
  * @param flag_verbose Flag to enable verbose output, printing grid and block dimensions.
- */                           
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 668-669.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ */                         
 template <typename dtype>
 void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                      const int xsize, const int ysize, const int zsize,
@@ -61,7 +73,13 @@ void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
  * @param ysize Size of the image in the y-dimension.
  * @param zsize Size of the image in the z-dimension.
  * @param operation Morphological operation to apply (EROSION or DILATION).
- */                                    
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 668-669.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ */                                  
 template <typename dtype>
 void reconstruction_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                    const int xsize, const int ysize, const int zsize,

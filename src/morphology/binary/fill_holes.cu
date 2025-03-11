@@ -20,7 +20,13 @@
  * This kernel processes each voxel in the input image and marks the border regions based on 
  * connectivity. The output marker image is used as a seed for further processing, such as 
  * morphological reconstruction.
- */
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 671-672.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ */ 
 template <typename dtype>
 __global__ void fill_holes_marker(dtype* deviceImage, dtype* deviceOutput, const int xsize,
                                   const int ysize, const int zsize) {

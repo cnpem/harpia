@@ -17,7 +17,14 @@
  * @param ysize Size of the image in the y-dimension.
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag to enable verbose output for debugging.
- */
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 671-672.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ */ 
+ 
 template <typename dtype>
 void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                           const int zsize, const int flag_verbose);
@@ -33,7 +40,13 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
  * @param xsize Width of the image.
  * @param ysize Height of the image.
  * @param zsize Depth of the image (set to 1 for 2D images).
- */
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 671-672.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ */ 
 template <typename dtype>
 void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                         const int zsize);

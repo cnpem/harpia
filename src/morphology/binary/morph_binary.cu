@@ -26,6 +26,12 @@
  * @param kernel_ysize Height of the kernel (number of elements in the y-dimension).
  * @param kernel_zsize Depth of the kernel (number of elements in the z-dimension).
  * @param operation The morphological operation to apply (EROSION or DILATION).
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
+ *       on pages 638-643.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 CUDA_HOSTDEV void morph_binary_pixel(dtype* image, dtype* output, const int xsize, const int ysize,
@@ -121,6 +127,12 @@ template CUDA_HOSTDEV void morph_binary_pixel<uint8_t>(uint8_t*, uint8_t*, const
  * @param kernel_ysize Height of the kernel (number of elements in the y-dimension).
  * @param kernel_zsize Depth of the kernel (number of elements in the z-dimension).
  * @param operation The morphological operation to apply (EROSION or DILATION).
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
+ *       on pages 638-643.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 __global__ void morph_binary_kernel(dtype* deviceImage, dtype* deviceOutput, const int xsize,
