@@ -22,7 +22,7 @@
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 671-672.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see fill_holes_marker(), complement_binary(), reconstruction_binary()
  */ 
  
 template <typename dtype>
@@ -45,7 +45,7 @@ void fill_holes_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, 
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 671-672.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see reconstruction_binary_on_host(), complement_binary_on_host()
  */ 
 template <typename dtype>
 void fill_holes_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,

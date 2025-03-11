@@ -7,7 +7,7 @@
 /**
  * @brief Perform a binary morphological operation (erosion or dilation) on a single pixel.
  *
- * This function applies a morphological operation (either erosion or dilation) to a specific pixel
+ * This function applies binary a morphological operation (either erosion or dilation) to a specific pixel
  * in a 3D image, using a given kernel that defines the neighborhood for the operation.
  *
  * @tparam dtype The data type of the image (e.g., int, unsigned int, uint16_t, etc.).
@@ -110,7 +110,7 @@ template CUDA_HOSTDEV void morph_binary_pixel<uint8_t>(uint8_t*, uint8_t*, const
 /**
  * @brief CUDA kernel to perform a binary morphological operation on a 3D image.
  *
- * This kernel function is executed on the GPU, applying a morphological operation (erosion or dilation)
+ * This kernel function is executed on the GPU, applying a morphological binary operation (erosion or dilation)
  * to every pixel in the image. Each thread processes a single pixel by invoking `morph_binary_pixel`
  * for the corresponding pixel.
  *
@@ -132,7 +132,7 @@ template CUDA_HOSTDEV void morph_binary_pixel<uint8_t>(uint8_t*, uint8_t*, const
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
  *       on pages 638-643.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see morph_binary_pixel()
  */
 template <typename dtype>
 __global__ void morph_binary_kernel(dtype* deviceImage, dtype* deviceOutput, const int xsize,

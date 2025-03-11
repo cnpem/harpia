@@ -24,14 +24,13 @@
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 667-668.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see geodesic_morph_binary_kernel()
  */
 template <typename dtype>
 void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceOutput,
                            const int xsize, const int ysize, const int zsize,
                            const int flag_verbose, const int padding_bottom, const int padding_top,
                            MorphOp operation);
-
 
 /**
  * @brief Perform geodesic erosion/dilation operation on the entire image using the GPU.
@@ -54,7 +53,7 @@ void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceO
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 667-668.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see geodesic_morph_binary()
  */
 template <typename dtype>
 void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
@@ -81,7 +80,8 @@ void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 667-668.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see geodesic_morph_binary_pixel()
+ 
  */
 template <typename dtype>
 void geodesic_morph_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,

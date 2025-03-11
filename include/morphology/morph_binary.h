@@ -4,7 +4,7 @@
 #include "morphology.h"
 
 /**
- * @brief Apply a morphological operation (erosion or dilation) to an entire image using the GPU.
+ * @brief Apply a binary morphological operation (erosion or dilation) to an entire image using the GPU.
  * 
  * This function configures and launches a CUDA kernel (`morph_binary_kernel`) to process an entire 
  * 3D image using a morphological operation. The function avoids unnecessary memory transfers 
@@ -29,7 +29,7 @@
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
  *       on pages 638-643.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see morph_binary_kernel()
  */
 template <typename dtype>
 void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, const int ysize,
@@ -38,7 +38,7 @@ void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, cons
                   int kernel_zsize, MorphOp operation);
 
 /**
- * @brief Perform erosion or dilation on an entire image using the GPU.
+ * @brief Perform binary erosion or dilation on an entire image using the GPU.
  *
  * This function is called from the host. It allocates memory on the device, transfers the input image
  * and kernel data to the GPU, performs the specified morphological operation (erosion or dilation),
@@ -63,7 +63,7 @@ void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, cons
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
  *       on pages 638-643.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see morph_binary()
  */
  template <typename dtype>
 void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -96,7 +96,7 @@ void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.2, 
  *       on pages 638-643.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see morph_binary_pixel()
  */
 template <typename dtype>
 void morph_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,

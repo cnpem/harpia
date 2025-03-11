@@ -29,7 +29,7 @@
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.3, 
  *       on pages 644-648.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see morph_binary()
  */
 template <typename dtype>
 void morph_chain_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
@@ -61,7 +61,7 @@ void morph_chain_binary_on_device(dtype* hostImage, dtype* hostOutput, const int
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.3, 
  *       on pages 644-648.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see morph_binary_on_host()
  */
 template <typename dtype>
 void morph_chain_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,

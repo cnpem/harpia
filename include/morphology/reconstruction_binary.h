@@ -24,7 +24,7 @@
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 668-669.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see geodesic_morph_binary(), compare_arrays_binary()
  */
 template <typename dtype>
 void reconstruction_binary(dtype* deviceMarker, dtype* deviceMask, dtype* deviceOutput,
@@ -52,7 +52,7 @@ void reconstruction_binary(dtype* deviceMarker, dtype* deviceMask, dtype* device
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 668-669.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see reconstruction_binary()
  */                         
 template <typename dtype>
 void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
@@ -78,7 +78,7 @@ void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 668-669.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see geodesic_morph_binary_on_host(), compare_arrays_binary_on_host()
  */                                  
 template <typename dtype>
 void reconstruction_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,

@@ -141,7 +141,7 @@ template CUDA_HOSTDEV void geodesic_morph_binary_pixel<uint8_t>(uint8_t*, uint8_
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 667-668.
- * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ * @see geodesic_morph_binary_pixel()
  */
 template <typename dtype>
 __global__ void geodesic_morph_binary_kernel(dtype* deviceImage, dtype* deviceMask,

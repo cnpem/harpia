@@ -9,6 +9,8 @@
  * @param deviceOutput Pointer to output image in device memory (GPU).
  * @param size Number of elements in the image.
  * @param flag_verbose Flag to enable verbose output for debugging.
+ *
+ * @see complement_binary_kernel()
  */
 template <typename dtype>
 void complement_binary(dtype* deviceImage, dtype* deviceOutput, const size_t size,
@@ -27,6 +29,8 @@ void complement_binary(dtype* deviceImage, dtype* deviceOutput, const size_t siz
  * @param ysize Image height.
  * @param zsize Image depth.
  * @param flag_verbose Flag to enable verbose output for debugging.
+ *
+ * @see complement_binary()
  */
 template <typename dtype>
 void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,

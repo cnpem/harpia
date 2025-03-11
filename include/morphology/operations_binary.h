@@ -19,6 +19,8 @@
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorKernel(), morph_binary_on_device(), morph_binary_on_host()
  */
 template <typename dtype>
 void erosion_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -41,6 +43,8 @@ void erosion_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorKernel(), morph_binary_on_device(), morph_binary_on_host()
  */
 template <typename dtype>
 void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -63,6 +67,8 @@ void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorKernel(), morph_chain_binary_on_device(), morph_chain_binary_on_host()
  */
 template <typename dtype>
 void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -85,6 +91,8 @@ void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorKernel(), morph_chain_binary_on_device(), morph_chain_binary_on_host()
  */
 template <typename dtype>
 void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -107,6 +115,8 @@ void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorKernel(), smooth_binary_on_device(), smooth_binary_on_host()
  */
 template <typename dtype>
 void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -126,6 +136,8 @@ void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const i
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorGeodesic(), geodesic_morph_binary_on_device(), geodesic_morph_binary_on_host()
  */
 template <typename dtype>
 void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
@@ -145,6 +157,8 @@ void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutpu
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorGeodesic(), geodesic_morph_binary_on_device(), geodesic_morph_binary_on_host()
  */
 template <typename dtype>
 void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
@@ -164,6 +178,8 @@ void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutp
  * @param flag_verbose Flag for verbose output.
  * @param operation Morphological operation to be performed (erosion or dilation).
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see reconstruction_binary_on_device(), reconstruction_binary_on_host()
  */
 template <typename dtype>
 void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
@@ -183,6 +199,8 @@ void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
  * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ *
+ * @see chunkedExecutorFillHoles(), fill_holes_on_device(), fill_holes_on_host()
  */
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,

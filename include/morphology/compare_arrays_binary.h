@@ -16,6 +16,8 @@
  * @param deviceOutput Pointer to the output flag on the device (GPU).
  * @param size The total number of elements (pixels) in the arrays.
  * @param flag_verbose Flag to enable verbose output for debugging.
+ *
+ * @see compare_arrays_binary_kernel()
  */
 template <typename dtype>
 void compare_arrays_binary(dtype* deviceImage1, dtype* deviceImage2, int* deviceOutput,
@@ -33,6 +35,8 @@ void compare_arrays_binary(dtype* deviceImage1, dtype* deviceImage2, int* device
  * @param hostOutput Pointer to the output flag on the host (CPU).
  * @param size The total number of elements (pixels) in the arrays.
  * @param flag_verbose If nonzero, prints debugging information about memory allocation and copying.
+ *
+ * @see compare_arrays_binary()
  */
 template <typename dtype>
 void compare_arrays_binary_on_device(dtype* hostImage1, dtype* hostImage2, int* hostOutput,

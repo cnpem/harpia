@@ -9,6 +9,8 @@
  * @param deviceOutput Output image on the device.
  * @param size Total number of elements in the image.
  * @param flag_verbose Verbose flag to print grid and block dimensions.
+ * 
+ * @see logical_or_kernel()
  */
 template <typename dtype>
 void logical_or(dtype* deviceImage, dtype* deviceOutput, const size_t size,
@@ -24,6 +26,8 @@ void logical_or(dtype* deviceImage, dtype* deviceOutput, const size_t size,
  * @param ysize Size of the image in the y-dimension.
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Verbose flag to print execution details.
+ * 
+ * @see logical_or()
  */
 template <typename dtype>
 void logical_or_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,

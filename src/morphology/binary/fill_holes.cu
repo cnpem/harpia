@@ -10,16 +10,16 @@
 /**
  * @brief Identifies and marks the holes in a 3D image using a connectivity-based approach.
  *
+ * This kernel processes each voxel in the input image and marks the border regions based on 
+ * connectivity. The output marker image is used as a seed for further processing, such as 
+ * morphological reconstruction.
+ *
  * @tparam dtype Data type of the image.
  * @param deviceImage Pointer to the input image on the GPU.
  * @param deviceOutput Pointer to the output marker image on the GPU.
  * @param xsize Size of the image in the x-dimension.
  * @param ysize Size of the image in the y-dimension.
  * @param zsize Size of the image in the z-dimension.
- *
- * This kernel processes each voxel in the input image and marks the border regions based on 
- * connectivity. The output marker image is used as a seed for further processing, such as 
- * morphological reconstruction.
  * 
  * @note This implementation is based on the morphological operations 
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <cstdint>  // For uint16_t, unsigned int
-#include "../../../include/common/chunkedExecutor.h"
 #include "../../../include/common/grid_block_sizes.h"
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/morphology/morph_binary.h"
@@ -105,10 +104,13 @@ void morph_chain_binary_on_host(dtype* hostImage, dtype* hostOutput, const int x
   dtype* hostTmp;
   hostTmp = (dtype*)malloc(nBytes);
 
+  // Perform the first operation in the chain
   morph_binary_on_host(hostImage, hostTmp, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
                        kernel_zsize, chain.operation1);
+  
+  // Perform the second operation in the chain
   morph_binary_on_host(hostTmp, hostOutput, xsize, ysize, zsize, kernel, kernel_xsize, kernel_ysize,
-                       kernel_zsize, chain.operation2);
+  kernel_zsize, chain.operation2);
 
   // Free temporary memory
   free(hostTmp);

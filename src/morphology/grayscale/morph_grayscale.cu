@@ -3,26 +3,33 @@
 #include "../../../include/morphology/cuda_helper.h"
 #include "../../../include/morphology/morph_grayscale.h"
 /**
- * @brief Performs grayscale morphological operation on a single pixel.
- * 
- * This function processes a single pixel in the grayscale image based on a given kernel and 
- * morphological operation (erosion or dilation). It considers the pixel's neighborhood defined by 
- * the kernel.
- * 
- * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
- * @param image Pointer to the input grayscale image.
- * @param output Pointer to the output image where the result will be stored.
- * @param centerIdx X-coordinate of the central pixel in the image.
- * @param centerIdy Y-coordinate of the central pixel in the image.
- * @param centerIdz Z-coordinate of the central pixel in the image.
+ * @brief Perform a grayscale morphological operation (erosion or dilation) on a single pixel.
+ *
+ * This function applies a grayscale morphological operation (either erosion or dilation) to a specific pixel
+ * in a 3D image, using a given kernel that defines the neighborhood for the operation.
+ *
+ * @tparam dtype The data type of the image (e.g., int, unsigned int, uint16_t, etc.).
+ * @param image Pointer to the input image.
+ * @param output Pointer to the output image.
+ * @param xsize Width of the image (number of pixels in the x-dimension).
+ * @param ysize Height of the image (number of pixels in the y-dimension).
+ * @param zsize Depth of the image (number of pixels in the z-dimension).
+ * @param padding_bottom Padding size added to the bottom of the image.
+ * @param padding_top Padding size added to the top of the image.
+ * @param centerIdx x-coordinate of the center pixel where the operation is applied.
+ * @param centerIdy y-coordinate of the center pixel where the operation is applied.
+ * @param centerIdz z-coordinate of the center pixel where the operation is applied.
  * @param kernel Pointer to the kernel used for the morphological operation.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation The morphological operation to perform (erosion or dilation).
+ * @param kernel_xsize Width of the kernel (number of elements in the x-dimension).
+ * @param kernel_ysize Height of the kernel (number of elements in the y-dimension).
+ * @param kernel_zsize Depth of the kernel (number of elements in the z-dimension).
+ * @param operation The morphological operation to apply (EROSION or DILATION).
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.8, 
+ *       on pages 674-679.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 CUDA_HOSTDEV void morph_grayscale_pixel(dtype* image, dtype* output, const int xsize,
@@ -88,7 +95,33 @@ template CUDA_HOSTDEV void morph_grayscale_pixel<int>(int*, int*, const int, con
 template CUDA_HOSTDEV void morph_grayscale_pixel<float>(float*, float*, const int, const int,
                                                         const int, const int, const int, int, int,
                                                         int, int*, int, int, int, MorphOp);
-
+/**
+ * @brief CUDA kernel to perform a grayscale morphological operation on a 3D image.
+ *
+ * This kernel function is executed on the GPU, applying a morphological grayscale operation (erosion or dilation)
+ * to every pixel in the image. Each thread processes a single pixel by invoking `morph_grayscale_pixel`
+ * for the corresponding pixel.
+ *
+ * @tparam dtype The data type of the image (e.g., int, unsigned int, uint16_t, etc.).
+ * @param deviceImage Pointer to the input image stored in GPU memory.
+ * @param deviceOutput Pointer to the output image stored in GPU memory.
+ * @param xsize Width of the image (number of pixels in the x-dimension).
+ * @param ysize Height of the image (number of pixels in the y-dimension).
+ * @param zsize Depth of the image (number of pixels in the z-dimension).
+ * @param padding_bottom Padding size added to the bottom of the image.
+ * @param padding_top Padding size added to the top of the image.
+ * @param kernel Pointer to the kernel used for the morphological operation.
+ * @param kernel_xsize Width of the kernel (number of elements in the x-dimension).
+ * @param kernel_ysize Height of the kernel (number of elements in the y-dimension).
+ * @param kernel_zsize Depth of the kernel (number of elements in the z-dimension).
+ * @param operation The morphological operation to apply (EROSION or DILATION).
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.8, 
+ *       on pages 674-679.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
+ */
 template <typename dtype>
 __global__ void morph_grayscale_kernel(dtype* deviceImage, dtype* deviceOutput, const int xsize,
                                        const int ysize, const int zsize, const int padding_bottom,
@@ -147,26 +180,6 @@ template void morph_grayscale<int>(int*, int*, const int, const int, const int, 
 template void morph_grayscale<float>(float*, float*, const int, const int, const int, const int,
                                      const int, const int, int*, int, int, int, MorphOp);
 
-/**
- * @brief Applies grayscale morphological operations on the device.
- * 
- * This function sets up the execution configuration and memory on the device, launches the CUDA 
- * kernel to apply the morphological operation across the image, and then transfers the result back 
- * to the host.
- * 
- * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
- * @param hostImage Pointer to the input grayscale image on the host.
- * @param hostOutput Pointer to the output image where the result will be stored on the host.
- * @param kernel Pointer to the kernel used for the morphological operation.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation The morphological operation to perform (erosion or dilation).
- * @param flag_verbose If non-zero, print verbose output about the grid and block dimensions.
- */
 template <typename dtype>
 void morph_grayscale_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, const int flag_verbose,
@@ -222,24 +235,6 @@ template void morph_grayscale_on_device<float>(float*, float*, const int, const 
                                                const int, const int, const int, int*, int, int, int,
                                                MorphOp);
 
-/**
- * @brief Applies grayscale morphological operations on the host.
- * 
- * This function iterates over all pixels in the image and applies the morphological operation 
- * using the `morph_grayscale_pixel` function on the CPU.
- * 
- * @tparam dtype The data type of the image pixels (e.g., unsigned int, int, float).
- * @param hostImage Pointer to the input grayscale image on the host.
- * @param hostOutput Pointer to the output image where the result will be stored on the host.
- * @param kernel Pointer to the kernel used for the morphological operation.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation The morphological operation to perform (erosion or dilation).
- */
 template <typename dtype>
 void morph_grayscale_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                              const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,

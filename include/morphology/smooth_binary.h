@@ -23,6 +23,12 @@
  * @param kernel_xsize The size of the kernel in the x-dimension.
  * @param kernel_ysize The size of the kernel in the y-dimension.
  * @param kernel_zsize The size of the kernel in the z-dimension.
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.8, 
+ *       on page 682. The grayscale smoothing algorithm described was adapted for binary images.
+ * @see morph_binary()
  */
 template <typename dtype>
 void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -47,6 +53,12 @@ void smooth_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsiz
  * @param kernel_xsize The size of the kernel in the x-dimension.
  * @param kernel_ysize The size of the kernel in the y-dimension.
  * @param kernel_zsize The size of the kernel in the z-dimension.
+ *
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.8, 
+ *       on page 682. The grayscale smoothing algorithm described was adapted for binary images.
+ * @see morph_binary_on_host()
  */
 template <typename dtype>
 void smooth_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
