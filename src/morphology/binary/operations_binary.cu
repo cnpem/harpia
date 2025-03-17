@@ -31,10 +31,6 @@ template void erosion_binary<int16_t>(int16_t*, int16_t*, const int, const int, 
                                       const int, int*, int, int, int, float, bool);
 template void erosion_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, float, bool);
-template void erosion_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
-template void erosion_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                      const int, int*, int, int, int, float, bool);
 
 template <typename dtype>
 void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -59,10 +55,6 @@ template void dilation_binary<int16_t>(int16_t*, int16_t*, const int, const int,
                                        const int, int*, int, int, int, float, bool);
 template void dilation_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                         const int, int*, int, int, int, float, bool);
-template void dilation_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                      int*, int, int, int, float, bool);
-template void dilation_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                       const int, int*, int, int, int, float, bool);
 
 template <typename dtype>
 void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -89,10 +81,6 @@ template void closing_binary<int16_t>(int16_t*, int16_t*, const int, const int, 
                                       const int, int*, int, int, int, float, bool);
 template void closing_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, float, bool);
-template void closing_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
-template void closing_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                      const int, int*, int, int, int, float, bool);
 
 template <typename dtype>
 void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -119,10 +107,6 @@ template void opening_binary<int16_t>(int16_t*, int16_t*, const int, const int, 
                                       const int, int*, int, int, int, float, bool);
 template void opening_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, float, bool);
-template void opening_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
-template void opening_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                      const int, int*, int, int, int, float, bool);
 
 template <typename dtype>
 void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -148,10 +132,6 @@ template void smooth_binary<int16_t>(int16_t*, int16_t*, const int, const int, c
                                      int*, int, int, int, float, bool);
 template void smooth_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                       const int, int*, int, int, int, float, bool);
-template void smooth_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                    int*, int, int, int, float, bool);
-template void smooth_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
 
 template <typename dtype>
 void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
@@ -175,10 +155,6 @@ template void geodesic_erosion_binary<int16_t>(int16_t*, int16_t*, int16_t*, con
                                                const int, const int, float, bool);
 template void geodesic_erosion_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                 const int, const int, const int, float, bool);
-template void geodesic_erosion_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                              const int, const int, float, bool);
-template void geodesic_erosion_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
-                                               const int, const int, float, bool);
 
 template <typename dtype>
 void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
@@ -202,12 +178,8 @@ template void geodesic_dilation_binary<int16_t>(int16_t*, int16_t*, int16_t*, co
                                                 const int, const int, float, bool);
 template void geodesic_dilation_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                  const int, const int, const int, float, bool);
-template void geodesic_dilation_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                               const int, const int, float, bool);
-template void geodesic_dilation_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
-                                                const int, const int, float, bool);
 
- // TODO: add a check if there is sfficiet memory on the gpu to perform the operation. Since it is 
+ // TODO: add a check if there is sufficiet memory on the gpu to perform the operation. Since it is 
  // a convergence operation it cannot be broken in chunks.
 template <typename dtype>
 void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
@@ -230,10 +202,6 @@ template void reconstruction_binary<int16_t>(int16_t*, int16_t*, int16_t*, const
                                              const int, const int, MorphOp, bool);
 template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int, const int,
                                               const int, const int, MorphOp, bool);
-template void reconstruction_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                            const int, const int, MorphOp, bool);
-template void reconstruction_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
-                                             const int, const int, MorphOp, bool);
 
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -255,7 +223,3 @@ template void fill_holes<int16_t>(int16_t*, int16_t*, const int, const int, cons
                                   const int, float, bool);
 template void fill_holes<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int, int, 
                                    const int, float, bool);
-template void fill_holes<int8_t>(int8_t*, int8_t*, const int, const int, const int, int, const int, 
-                                 float, bool);
-template void fill_holes<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, int, 
-                                  const int, float, bool);

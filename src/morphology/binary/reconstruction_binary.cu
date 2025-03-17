@@ -46,10 +46,6 @@ template void reconstruction_binary<int16_t>(int16_t*, int16_t*, int16_t*, const
                                              const int, MorphOp, const int);
 template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int, const int,
                                               const int, MorphOp, const int);
-template void reconstruction_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                            const int, MorphOp, const int);
-template void reconstruction_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
-                                             const int, MorphOp, const int);
 
 template <typename dtype>
 void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
@@ -89,10 +85,6 @@ template void reconstruction_binary_on_device<int16_t>(int16_t*, int16_t*, int16
                                                        const int, const int, MorphOp, const int);
 template void reconstruction_binary_on_device<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                         const int, const int, MorphOp, const int);
-template void reconstruction_binary_on_device<int8_t>(int8_t*, int8_t*, int8_t*, const int,
-                                                      const int, const int, MorphOp, const int);
-template void reconstruction_binary_on_device<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int,
-                                                       const int, const int, MorphOp, const int);
 
 template <typename dtype>
 void reconstruction_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
@@ -130,7 +122,3 @@ template void reconstruction_binary_on_host<int16_t>(int16_t*, int16_t*, int16_t
                                                      const int, const int, MorphOp);
 template void reconstruction_binary_on_host<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                       const int, const int, MorphOp);
-template void reconstruction_binary_on_host<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                                    const int, MorphOp);
-template void reconstruction_binary_on_host<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int,
-                                                     const int, const int, MorphOp);

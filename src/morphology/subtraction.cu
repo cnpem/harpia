@@ -20,9 +20,6 @@ __global__ void subtraction_kernel(dtype* deviceImage, dtype* deviceOutput, cons
     deviceOutput[index] = deviceOutput[index] - deviceImage[index];
   }
 }
-// Template instantiations for specific types
-template __global__ void subtraction_kernel<int8_t>(int8_t*, int8_t*, const size_t);
-template __global__ void subtraction_kernel<uint8_t>(uint8_t*, uint8_t*, const size_t);
 template __global__ void subtraction_kernel<int16_t>(int16_t*, int16_t*, const size_t);
 template __global__ void subtraction_kernel<uint16_t>(uint16_t*, uint16_t*, const size_t);
 template __global__ void subtraction_kernel<unsigned int>(unsigned int*, unsigned int*, const size_t);
@@ -46,8 +43,6 @@ void subtraction(dtype* deviceImage, dtype* deviceOutput, const size_t size, con
   subtraction_kernel<<<grid, block>>>(deviceImage, deviceOutput, size);
   cudaDeviceSynchronize();  // Ensure all GPU threads are finished
 }
-template void subtraction<int8_t>(int8_t*, int8_t*, const size_t, const int);
-template void subtraction<uint8_t>(uint8_t*, uint8_t*, const size_t, const int);
 template void subtraction<int16_t>(int16_t*, int16_t*, const size_t, const int);
 template void subtraction<uint16_t>(uint16_t*, uint16_t*, const size_t, const int);
 template void subtraction<unsigned int>(unsigned int*, unsigned int*, const size_t, const int);
@@ -80,10 +75,6 @@ void subtraction_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
   cudaFree(deviceImage);
   cudaFree(deviceOutput);
 }
-template void subtraction_on_device<int8_t>(int8_t*, int8_t*, const int, const int, const int,
-                                              const int);
-template void subtraction_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                              const int);
 template void subtraction_on_device<int16_t>(int16_t*, int16_t*, const int, const int, const int,
                                               const int);
 template void subtraction_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
@@ -100,9 +91,6 @@ void subtraction_on_host(dtype* hostImage, dtype* hostOutput, const size_t size)
     hostOutput[idx] = hostOutput[idx] - hostImage[idx];
   }
 }
-// Template instantiations for specific types
-template void subtraction_on_host<int8_t>(int8_t*, int8_t*, const size_t);
-template void subtraction_on_host<uint8_t>(uint8_t*, uint8_t*, const size_t);
 template void subtraction_on_host<int16_t>(int16_t*, int16_t*, const size_t);
 template void subtraction_on_host<uint16_t>(uint16_t*, uint16_t*, const size_t);
 template void subtraction_on_host<unsigned int>(unsigned int*, unsigned int*, const size_t);

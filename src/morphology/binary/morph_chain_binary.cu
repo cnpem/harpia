@@ -84,12 +84,6 @@ template void morph_chain_binary_on_device<int16_t>(int16_t*, int16_t*, const in
 template void morph_chain_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                      const int, const int, const int, const int,
                                                      int*, int, int, int, MorphChain);
-template void morph_chain_binary_on_device<int8_t>(int8_t*, int8_t*, const int, const int,
-                                                   const int, const int, const int, const int, int*,
-                                                   int, int, int, MorphChain);
-template void morph_chain_binary_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int,
-                                                    const int, const int, const int, const int,
-                                                    int*, int, int, int, MorphChain);
 
 template <typename dtype>
 void morph_chain_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,
@@ -124,7 +118,3 @@ template void morph_chain_binary_on_host<int16_t>(int16_t*, int16_t*, const int,
                                                   const int, int*, int, int, int, MorphChain);
 template void morph_chain_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                    const int, int*, int, int, int, MorphChain);
-template void morph_chain_binary_on_host<int8_t>(int8_t*, int8_t*, const int, const int, const int,
-                                                 int*, int, int, int, MorphChain);
-template void morph_chain_binary_on_host<uint8_t>(uint8_t*, uint8_t*, const int, const int,
-                                                  const int, int*, int, int, int, MorphChain);

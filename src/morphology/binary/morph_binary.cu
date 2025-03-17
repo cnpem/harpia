@@ -100,12 +100,6 @@ template CUDA_HOSTDEV void morph_binary_pixel<int16_t>(int16_t*, int16_t*, const
 template CUDA_HOSTDEV void morph_binary_pixel<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                         const int, const int, const int, int, int,
                                                         int, int*, int, int, int, MorphOp);
-template CUDA_HOSTDEV void morph_binary_pixel<int8_t>(int8_t*, int8_t*, const int, const int,
-                                                      const int, const int, const int, int, int,
-                                                      int, int*, int, int, int, MorphOp);
-template CUDA_HOSTDEV void morph_binary_pixel<uint8_t>(uint8_t*, uint8_t*, const int, const int,
-                                                       const int, const int, const int, int, int,
-                                                       int, int*, int, int, int, MorphOp);
 
 /**
  * @brief CUDA kernel to perform a binary morphological operation on a 3D image.
@@ -160,12 +154,6 @@ template __global__ void morph_binary_kernel<int16_t>(int16_t*, int16_t*, const 
 template __global__ void morph_binary_kernel<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                        const int, const int, const int, int*, int,
                                                        int, int, MorphOp);
-template __global__ void morph_binary_kernel<int8_t>(int8_t*, int8_t*, const int, const int,
-                                                     const int, const int, const int, int*, int,
-                                                     int, int, MorphOp);
-template __global__ void morph_binary_kernel<uint8_t>(uint8_t*, uint8_t*, const int, const int,
-                                                      const int, const int, const int, int*, int,
-                                                      int, int, MorphOp);
 
 template <typename dtype>
 void morph_binary(dtype* deviceImage, dtype* deviceOutput, const int xsize, const int ysize,
@@ -201,10 +189,6 @@ template void morph_binary<int16_t>(int16_t*, int16_t*, const int, const int, co
                                     const int, const int, int*, int, int, int, MorphOp);
 template void morph_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                      const int, const int, const int, int*, int, int, int, MorphOp);
-template void morph_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                   const int, const int, int*, int, int, int, MorphOp);
-template void morph_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int,
-                                    const int, const int, int*, int, int, int, MorphOp);
 
 template <typename dtype>
 void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -260,12 +244,6 @@ template void morph_binary_on_device<int16_t>(int16_t*, int16_t*, const int, con
 template void morph_binary_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                const int, const int, const int, const int, int*,
                                                int, int, int, MorphOp);
-template void morph_binary_on_device<int8_t>(int8_t*, int8_t*, const int, const int, const int,
-                                             const int, const int, const int, int*, int, int, int,
-                                             MorphOp);
-template void morph_binary_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                              const int, const int, const int, int*, int, int, int,
-                                              MorphOp);
 
 template <typename dtype>
 void morph_binary_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -290,7 +268,3 @@ template void morph_binary_on_host<int16_t>(int16_t*, int16_t*, const int, const
                                             int*, int, int, int, MorphOp);
 template void morph_binary_on_host<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                              int*, int, int, int, MorphOp);
-template void morph_binary_on_host<int8_t>(int8_t*, int8_t*, const int, const int, const int, int*,
-                                           int, int, int, MorphOp);
-template void morph_binary_on_host<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                            int*, int, int, int, MorphOp);

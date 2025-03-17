@@ -25,8 +25,6 @@ template __global__ void logical_or_kernel<unsigned int>(unsigned int*, unsigned
                                                                 const size_t);
 template __global__ void logical_or_kernel<int16_t>(int16_t*, int16_t*, const size_t);
 template __global__ void logical_or_kernel<uint16_t>(uint16_t*, uint16_t*, const size_t);
-template __global__ void logical_or_kernel<int8_t>(int8_t*, int8_t*, const size_t);
-template __global__ void logical_or_kernel<uint8_t>(uint8_t*, uint8_t*, const size_t);
 
 template <typename dtype>
 void logical_or(dtype* deviceImage, dtype* deviceOutput, const size_t size,
@@ -50,8 +48,6 @@ template void logical_or<int>(int*, int*, const size_t, const int);
 template void logical_or<unsigned int>(unsigned int*, unsigned int*, const size_t, const int);
 template void logical_or<int16_t>(int16_t*, int16_t*, const size_t, const int);
 template void logical_or<uint16_t>(uint16_t*, uint16_t*, const size_t, const int);
-template void logical_or<int8_t>(int8_t*, int8_t*, const size_t, const int);
-template void logical_or<uint8_t>(uint8_t*, uint8_t*, const size_t, const int);
 
 template <typename dtype>
 void logical_or_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
@@ -88,10 +84,6 @@ template void logical_or_on_device<int16_t>(int16_t*, int16_t*, const int, const
                                                    const int, const int);
 template void logical_or_on_device<uint16_t>(uint16_t*, uint16_t*, const int, const int,
                                                     const int, const int);
-template void logical_or_on_device<int8_t>(int8_t*, int8_t*, const int, const int, const int,
-                                                  const int);
-template void logical_or_on_device<uint8_t>(uint8_t*, uint8_t*, const int, const int,
-                                                   const int, const int);
 
 template <typename dtype>
 void logical_or_on_host(dtype* hostImage, dtype* hostOutput, const size_t size) {
@@ -103,5 +95,3 @@ template void logical_or_on_host<int>(int*, int*, const size_t);
 template void logical_or_on_host<unsigned int>(unsigned int*, unsigned int*, const size_t);
 template void logical_or_on_host<int16_t>(int16_t*, int16_t*, const size_t);
 template void logical_or_on_host<uint16_t>(uint16_t*, uint16_t*, const size_t);
-template void logical_or_on_host<int8_t>(int8_t*, int8_t*, const size_t);
-template void logical_or_on_host<uint8_t>(uint8_t*, uint8_t*, const size_t);
