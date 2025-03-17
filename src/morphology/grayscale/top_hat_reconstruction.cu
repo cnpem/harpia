@@ -8,10 +8,6 @@
 #include "../../../include/morphology/subtraction.h"
 #include "../../../include/morphology/top_hat_reconstruction.h"
 
-//##################################################################################################
-// inspired in the avizo VERSION -------------------------------------------------------------------
-//##################################################################################################
-// Reference: https://www.thermofisher.com/software-em-3d-vis/xtra-library/xtras/interactive-top-hat-by-reconstruction
 template <typename dtype>
 void top_hat_reconstruction_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
                                       const int ysize, const int zsize, const int flag_verbose,

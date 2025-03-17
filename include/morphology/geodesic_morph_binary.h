@@ -4,7 +4,7 @@
 #include "morphology.h"
 
 /**
- * @brief Launches the CUDA kernel for geodesic morphological operations.
+ * @brief Launches the CUDA kernel for binary geodesic morphological operations.
  *
  * This function sets up the kernel execution configuration and launches the CUDA kernel.
  *
@@ -33,7 +33,7 @@ void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceO
                            MorphOp operation);
 
 /**
- * @brief Perform geodesic erosion/dilation operation on the entire image using the GPU.
+ * @brief Perform geodesic binary erosion/dilation operation on the entire image using the GPU.
  * This function is called from the host and slides the `morph_binary` kernel function
  * through all pixels of the input image.
  *
@@ -44,10 +44,10 @@ void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceO
  * @param xsize Size of the image in the x-dimension.
  * @param ysize Size of the image in the y-dimension.
  * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
  * @param flag_verbose Verbose flag to print grid and block dimensions.
  * @param padding_bottom Number of padding layers added at the bottom of the image.
  * @param padding_top Number of padding layers added at the top of the image.
+ * @param operation Morphological operation (EROSION or DILATION).
  * 
  * @note This implementation is based on the morphological operations 
  *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
@@ -63,7 +63,7 @@ void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
 
 
 /**
- * @brief Perform geodesic erosion/dilation operation on the entire image using the CPU.
+ * @brief Perform geodesic binary erosion/dilation operation on the entire image using the CPU.
  * This function is used to verify the correctness of the GPU results by computing
  * the same operation on the host.
  *
@@ -81,7 +81,6 @@ void geodesic_morph_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
  *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
  *       on pages 667-668.
  * @see geodesic_morph_binary_pixel()
- 
  */
 template <typename dtype>
 void geodesic_morph_binary_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,

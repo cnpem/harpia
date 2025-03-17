@@ -4,11 +4,12 @@
 #include "morphology.h"
 
 /**
- * @brief Performs morphological reconstruction (erosion or dilation) on an image using the GPU.
+ * @brief Performs morphological reconstruction (erosion or dilation) on a binary image using the 
+ *        GPU.
  *
  * This function operates entirely on the device, avoiding unnecessary memory transfers between
- * the host and the device. It iteratively applies geodesic erosion or dilation until convergence.
- * The results remain in device memory for further processing if needed.
+ * the host and the device. It iteratively applies geodesic binary erosion or dilation until
+ * convergence. The results remain in device memory for further processing if needed.
  *
  * @tparam dtype The data type of the image.
  * @param deviceMarker Pointer to the marker image stored on the device (corresponds to the input image).
@@ -32,8 +33,8 @@ void reconstruction_binary(dtype* deviceMarker, dtype* deviceMask, dtype* device
                            const int flag_verbose);
 
 /**
- * @brief Performs morphological reconstruction (erosion or dilation) on an image using the GPU,
- *        with memory management handled automatically.
+ * @brief Performs morphological reconstruction (erosion or dilation) on a binary image using the 
+ *        GPU, with memory management handled automatically.
  *
  * This function is called from the host. It allocates memory on the device, transfers the input data,
  * performs the reconstruction, and then transfers the result back to the host.
@@ -60,10 +61,10 @@ void reconstruction_binary_on_device(dtype* hostImage, dtype* hostMask, dtype* h
                                      MorphOp operation, const int flag_verbose);
 
 /**
- * @brief Performs morphological reconstruction (erosion or dilation) on an image using the CPU.
+ * @brief Performs morphological reconstruction on a binary image using the CPU.
  *
- * This function runs entirely on the host and is primarily used for correctness verification of GPU results.
- * It iteratively applies geodesic erosion or dilation until convergence.
+ * This function runs entirely on the host and is primarily used for correctness verification of GPU 
+ * results. It iteratively applies geodesic erosion or dilation until convergence.
  *
  * @tparam dtype The data type of the image.
  * @param hostImage Pointer to the input image stored on the host (marker image).

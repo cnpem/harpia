@@ -5,22 +5,34 @@
 #include "../../../include/morphology/geodesic_morph_grayscale.h"
 
 /**
- * @brief Perform geodesic erosion/dilation operation for one pixel.
+ * @brief Perform geodesic grayscale erosion/dilation operation for one pixel.
+ *
+ * This function applies geodesic morphological operations (erosion or dilation) 
+ * to a single pixel in a 3D image. The function determines the new pixel value based on the 
+ * neighborhood defined by the kernel and the given mask.
  *
  * @tparam dtype The data type of the image.
- * @param image Input image (corresponds to the marker image).
- * @param output Output image.
+ * @param image Input image (marker image).
  * @param mask Mask image.
- * @param centerIdx Center index in the x-dimension.
- * @param centerIdy Center index in the y-dimension.
- * @param centerIdz Center index in the z-dimension.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
+ * @param output Output image.
+ * @param xsize Width of the image.
+ * @param ysize Height of the image.
+ * @param zsize Depth of the image.
+ * @param padding_bottom Padding added at the bottom in the z-dimension.
+ * @param padding_top Padding added at the top in the z-dimension.
+ * @param centerIdx X-coordinate of the pixel being processed.
+ * @param centerIdy Y-coordinate of the pixel being processed.
+ * @param centerIdz Z-coordinate of the pixel being processed.
+ * @param kernel_xsize Kernel size in the x-dimension.
+ * @param kernel_ysize Kernel size in the y-dimension.
+ * @param kernel_zsize Kernel size in the z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 667-668, adapted for grayscale images.
+ * @see R.C. Gonzalez, R.E. Woods, "Digital Image Processing," 4th Edition, Pearson, 2018.
  */
 template <typename dtype>
 CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtype* output,
@@ -45,7 +57,7 @@ CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtyp
   size_t index;
   int imageIdx, imageIdy, imageIdz;
 
-  //erosion/dilation operation
+  // Erosion/dilation operation
   for (int iz = 0; iz < kernel_zsize; iz++) {
     for (int iy = 0; iy < kernel_ysize; iy++) {
       for (int ix = 0; ix < kernel_xsize; ix++) {
@@ -54,10 +66,9 @@ CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtyp
         imageIdy = startIdy + iy;
         imageIdz = startIdz + iz;
 
-        // ignore out of bounds pixels
+        // Ignore out of bounds pixels
         if (imageIdx < 0 || imageIdx > xsize - 1 || imageIdy < 0 || imageIdy > ysize - 1 ||
             imageIdz < -padding_bottom || imageIdz > zsize + padding_top - 1) {
-          // do nothing.
         }
 
         else {
@@ -75,7 +86,7 @@ CUDA_HOSTDEV void geodesic_morph_grayscale_pixel(dtype* image, dtype* mask, dtyp
     }
   }
 
-  // point-wise maximun/minimun operation
+  // Point-wise maximun/minimun operation
   if (operation == EROSION) {
     output[centerIndex] =
         (aux > mask[centerIndex]) ? aux : mask[centerIndex];  // Erosion: output is the max value
@@ -91,27 +102,32 @@ template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<int>(int*, int*, int*,
 template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<unsigned int>(
     unsigned int*, unsigned int*, unsigned int*, const int, const int, const int, const int,
     const int, int, int, int, int, int, int, MorphOp);
-//template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<uint16_t>(uint16_t *, uint16_t *,
-//uint16_t *, int, int, int, int, int, int, const int, const int, const int, MorphOp);
 template CUDA_HOSTDEV void geodesic_morph_grayscale_pixel<float>(float*, float*, float*, const int,
                                                                  const int, const int, const int,
                                                                  const int, int, int, int, int, int,
                                                                  int, MorphOp);
-
 /**
- * @brief Kernel function to perform geodesic erosion/dilation operation on the entire image.
+ * @brief CUDA kernel for geodesic grayscale erosion/dilation on an entire image.
  *
  * @tparam dtype The data type of the image.
- * @param deviceImage Input image on the device (corrresponds to the marker image).
- * @param deviceOutput Output image on the device.
- * @param deviceMask Mask image on the device.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
+ * @param deviceImage Input image on the GPU.
+ * @param deviceMask Mask image on the GPU.
+ * @param deviceOutput Output image on the GPU.
+ * @param xsize Width of the image.
+ * @param ysize Height of the image.
+ * @param zsize Depth of the image.
+ * @param padding_bottom Padding at the bottom in the z-dimension.
+ * @param padding_top Padding at the top in the z-dimension.
+ * @param kernel_xsize Kernel size in x-dimension.
+ * @param kernel_ysize Kernel size in y-dimension.
+ * @param kernel_zsize Kernel size in z-dimension.
  * @param operation Morphological operation (EROSION or DILATION).
+ * 
+ * @note This implementation is based on the morphological operations 
+ *       described in "Digital Image Processing, 4th Edition" by R.C. Gonzalez and R.E. Woods, 
+ *       particularly in Chapter 9 (Morphological Image Processing), Section 9.6, 
+ *       on pages 667-668, adapted for grayscale images.
+ * @see geodesic_morph_grayscale_pixel()
  */
 template <typename dtype>
 __global__ void geodesic_morph_grayscale_kernel(dtype* deviceImage, dtype* deviceMask,
@@ -138,8 +154,6 @@ template __global__ void geodesic_morph_grayscale_kernel<unsigned int>(unsigned 
                                                                        const int, const int,
                                                                        const int, const int, int,
                                                                        int, int, MorphOp);
-// template __global__ void geodesic_morph_grayscale_kernel<uint16_t>(uint16_t *, /uint16_t *,uint16_t *,
-// int, int, int, const int, const int, const int, const int, const int, MorphOp);
 template __global__ void geodesic_morph_grayscale_kernel<float>(float*, float*, float*, const int,
                                                                 const int, const int, const int,
                                                                 const int, int, int, int, MorphOp);
@@ -180,26 +194,9 @@ template void geodesic_morph_grayscale<int>(int*, int*, int*, const int, const i
 template void geodesic_morph_grayscale<unsigned int>(unsigned int*, unsigned int*, unsigned int*,
                                                      const int, const int, const int, const int,
                                                      const int, const int, MorphOp);
-//template void geodesic_morph_grayscale<uint16_t>(uint16_t *,uint16_t *, uint16_t *,  const int,
-//const int, const int, MorphOp, const int);
 template void geodesic_morph_grayscale<float>(float*, float*, float*, const int, const int,
                                               const int, const int, const int, const int, MorphOp);
 
-/**
- * @brief Perform geodesic erosion/dilation operation on the entire image using the GPU. This
- * function is meant to be called from host and slide the morph_grayscale kerel function through all
- * pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
 template <typename dtype>
 void geodesic_morph_grayscale_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                         const int xsize, const int ysize, const int zsize,
@@ -247,25 +244,10 @@ template void geodesic_morph_grayscale_on_device<unsigned int>(unsigned int*, un
                                                                unsigned int*, const int, const int,
                                                                const int, const int, const int,
                                                                const int, MorphOp);
-//template void geodesic_morph_grayscale_on_device<uint16_t>(uint16_t *,uint16_t *, uint16_t *,
-// const int, const int, const int, const int, const int, const int, MorphOp);
 template void geodesic_morph_grayscale_on_device<float>(float*, float*, float*, const int,
                                                         const int, const int, const int, const int,
                                                         const int, MorphOp);
 
-/**
- * @brief Perform geodesic erosion/dilation operation on the entire image using the CPU. This
- * function is used to check GPU results correctness.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- */
 template <typename dtype>
 void geodesic_morph_grayscale_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                       const int xsize, const int ysize, const int zsize,
@@ -292,7 +274,5 @@ template void geodesic_morph_grayscale_on_host<int>(int*, int*, int*, const int,
 template void geodesic_morph_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*,
                                                              unsigned int*, const int, const int,
                                                              const int, MorphOp);
-//template void geodesic_morph_grayscale_on_host<uint16_t>(uint16_t *, uint16_t *,uint16_t *,const int, const int, const int,
-// MorphOp);
 template void geodesic_morph_grayscale_on_host<float>(float*, float*, float*, const int, const int,
                                                       const int, MorphOp);

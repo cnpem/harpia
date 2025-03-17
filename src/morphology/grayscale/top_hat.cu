@@ -7,27 +7,12 @@
 #include "../../../include/morphology/subtraction.h"
 #include "../../../include/morphology/top_hat.h"
 
-/**
- * @brief Perform top-hat operation on the device.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the structuring element.
- * @param kernel_xsize Size of the structuring element in the x-dimension.
- * @param kernel_ysize Size of the structuring element in the y-dimension.
- * @param kernel_zsize Size of the structuring element in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void top_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                        const int zsize, const int flag_verbose, const int padding_bottom,
                        const int padding_top, int* kernel, int kernel_xsize, int kernel_ysize,
                        int kernel_zsize) {
-  // set input dimension
+  // Set input dimension
   size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
   size_t nBytes_padding = xsize * ysize * (padding_bottom + padding_top) * sizeof(dtype);
@@ -100,21 +85,6 @@ template void top_hat_on_device<unsigned int>(unsigned int*, unsigned int*, cons
 template void top_hat_on_device<float>(float*, float*, const int, const int, const int, const int,
                                        const int, const int, int*, int, int, int);
 
-/**
- * @brief Perform top-hat operation on the host.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the structuring element.
- * @param kernel_xsize Size of the structuring element in the x-dimension.
- * @param kernel_ysize Size of the structuring element in the y-dimension.
- * @param kernel_zsize Size of the structuring element in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void top_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                      const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,

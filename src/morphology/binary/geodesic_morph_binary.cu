@@ -5,7 +5,7 @@
 #include "../../../include/morphology/geodesic_morph_binary.h"
 
 /**
- * @brief Perform geodesic erosion/dilation operation for one pixel.
+ * @brief Perform geodesic binary erosion/dilation operation for one pixel.
  *
  * This function applies geodesic morphological operations (erosion or dilation) 
  * to a single pixel in a 3D image, considering a binary structuring element 
@@ -121,7 +121,7 @@ template CUDA_HOSTDEV void geodesic_morph_binary_pixel<uint8_t>(uint8_t*, uint8_
                                                                 int, int, int, MorphOp);
 
 /**
- * @brief CUDA kernel for geodesic erosion/dilation on an entire image.
+ * @brief CUDA kernel for geodesic binary erosion/dilation on an entire image.
  *
  * @tparam dtype The data type of the image.
  * @param deviceImage Input image on the GPU.

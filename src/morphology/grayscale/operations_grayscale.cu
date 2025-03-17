@@ -9,22 +9,6 @@
 #include "../../../include/morphology/top_hat.h"
 #include "../../../include/morphology/top_hat_reconstruction.h"
 
-/**
- * @brief Perform erosion operation on a grayscale image.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
-
 template <typename dtype>
 void erosion_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                        const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -42,7 +26,6 @@ void erosion_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
                             kernel_ysize, kernel_zsize, EROSION);
   }
 }
-// Template instantiations for specific types
 template void erosion_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
                                      int, int, int, float, bool);
 template void erosion_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
@@ -51,21 +34,6 @@ template void erosion_grayscale<unsigned int>(unsigned int*, unsigned int*, cons
 template void erosion_grayscale<float>(float*, float*, const int, const int, const int, const int,
                                        int*, int, int, int, float, bool);
 
-/**
- * @brief Perform dilation operation on a grayscale image.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void dilation_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                         const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -84,7 +52,6 @@ void dilation_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, co
                             kernel_ysize, kernel_zsize, DILATION);
   }
 }
-// Template instantiations for specific types
 template void dilation_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
                                       int, int, int, float, bool);
 template void dilation_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
@@ -93,23 +60,6 @@ template void dilation_grayscale<unsigned int>(unsigned int*, unsigned int*, con
 template void dilation_grayscale<float>(float*, float*, const int, const int, const int, const int,
                                         int*, int, int, int, float, bool);
 
-/**
- * @brief Perform closing operation on a grayscale image.
- *
- * Closing is defined as a dilation followed by an erosion.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void closing_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                        const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -128,7 +78,6 @@ void closing_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
                                   kernel_ysize, kernel_zsize, closing);
   }
 }
-// Template instantiations for specific types
 template void closing_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
                                      int, int, int, float, bool);
 template void closing_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
@@ -137,23 +86,6 @@ template void closing_grayscale<unsigned int>(unsigned int*, unsigned int*, cons
 template void closing_grayscale<float>(float*, float*, const int, const int, const int, const int,
                                        int*, int, int, int, float, bool);
 
-/**
- * @brief Perform opening operation on a grayscale image.
- *
- * Opening is defined as an erosion followed by a dilation.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void opening_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                        const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -172,7 +104,6 @@ void opening_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
                                   kernel_ysize, kernel_zsize, opening);
   }
 }
-// Template instantiations for specific types
 template void opening_grayscale<int>(int*, int*, const int, const int, const int, const int, int*,
                                      int, int, int, float, bool);
 template void opening_grayscale<unsigned int>(unsigned int*, unsigned int*, const int, const int,
@@ -181,19 +112,6 @@ template void opening_grayscale<unsigned int>(unsigned int*, unsigned int*, cons
 template void opening_grayscale<float>(float*, float*, const int, const int, const int, const int,
                                        int*, int, int, int, float, bool);
 
-/**
- * @brief Perform geodesic erosion operation on the entire image using the GPU. This function is
- * meant to be called from host and slide the morph_grayscale kerel function through all pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
 template <typename dtype>
 void geodesic_erosion_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                 const int xsize, const int ysize, const int zsize,
@@ -216,19 +134,6 @@ template void geodesic_erosion_grayscale<unsigned int>(unsigned int*, unsigned i
 template void geodesic_erosion_grayscale<float>(float*, float*, float*, const int, const int,
                                                 const int, const int, float, bool);
 
-/**
- * @brief Perform geodesic dilation operation on the entire image using the GPU. This function is
- * meant to be called from host and slide the morph_grayscale kerel function through all pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
 template <typename dtype>
 void geodesic_dilation_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                  const int xsize, const int ysize, const int zsize,

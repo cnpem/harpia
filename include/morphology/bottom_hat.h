@@ -32,7 +32,6 @@
  *
  * @see morph_grayscale(), subtraction()
  */
- 
 template <typename dtype>
 void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                           const int zsize, const int flag_verbose, const int padding_bottom,

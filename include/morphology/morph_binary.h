@@ -84,8 +84,6 @@ void morph_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize
  * @param xsize The size of the image in the x-dimension.
  * @param ysize The size of the image in the y-dimension.
  * @param zsize The size of the image in the z-dimension.
- * @param padding_bottom The padding size added at the bottom of the image.
- * @param padding_top The padding size added at the top of the image.
  * @param hostKernel Pointer to the morphological kernel on the host.
  * @param kernel_xsize The size of the kernel in the x-dimension.
  * @param kernel_ysize The size of the kernel in the y-dimension.

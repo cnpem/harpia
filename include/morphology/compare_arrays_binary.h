@@ -4,7 +4,7 @@
 #include "morphology.h"
 
 /**
- * @brief Launches a CUDA kernel to compare two device arrays element-wise.
+ * @brief Launches a CUDA kernel to compare two binary device arrays element-wise.
  * 
  * This function configures the CUDA grid and block dimensions, then calls the 
  * `compare_arrays_binary_kernel` function to compare `deviceImage1` and `deviceImage2`. 
@@ -24,7 +24,7 @@ void compare_arrays_binary(dtype* deviceImage1, dtype* deviceImage2, int* device
                            const size_t size, const int flag_verbose);
 
 /**
- * @brief Performs element-wise comparison of two arrays on the GPU using CUDA.
+ * @brief Performs element-wise comparison of two binary arrays on the GPU using CUDA.
  * 
  * This function allocates memory on the GPU, copies input data from host to device, calls 
  * `compare_arrays_binary` to perform the comparison, and then copies the result back to the host.
@@ -42,7 +42,7 @@ template <typename dtype>
 void compare_arrays_binary_on_device(dtype* hostImage1, dtype* hostImage2, int* hostOutput,
                                      const size_t size, const int flag_verbose);
 /**
- * @brief Function to perform pixel-wise comparison to check if two arrays are equal on the host 
+ * @brief Function to perform pixel-wise comparison to check if two binary arrays are equal on the host 
  * (CPU). 
  * 
  * This function compares two input arrays (`hostImage1` and `hostImage2`) element by element. If 

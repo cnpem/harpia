@@ -12,7 +12,7 @@ template <typename dtype>
 void reconstruction_grayscale(dtype* deviceMarker, dtype* deviceMask, dtype* deviceOutput,
                               const int xsize, const int ysize, const int zsize, MorphOp operation,
                               const int flag_verbose) {
-  // set input dimension
+  // Set input dimension
   size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
 
@@ -23,16 +23,16 @@ void reconstruction_grayscale(dtype* deviceMarker, dtype* deviceMask, dtype* dev
   CHECK(cudaMemcpy(deviceFlagConverged, &hostFlagConverged, sizeof(int), cudaMemcpyHostToDevice));
 
   do {
-    //Reconstruction step
+    // Reconstruction step
     geodesic_morph_grayscale(deviceMarker, deviceMask, deviceOutput, xsize, ysize, zsize,
                              flag_verbose, 0, 0, operation);
 
-    //Check convergency
+    // Check convergency
     cudaMemset(deviceFlagConverged, 1,
                sizeof(int));  //compare_arrays_grayscale() initial output value MUST be 1 (true)
     compare_arrays_grayscale(deviceMarker, deviceOutput, deviceFlagConverged, size, flag_verbose);
 
-    //Copy data to the next iteration
+    // Copy data to the next iteration
     CHECK(cudaMemcpy(deviceMarker, deviceOutput, nBytes, cudaMemcpyDeviceToDevice));
     CHECK(cudaMemcpy(&hostFlagConverged, deviceFlagConverged, sizeof(int), cudaMemcpyDeviceToHost));
   } while (!hostFlagConverged);
@@ -45,21 +45,7 @@ template void reconstruction_grayscale<unsigned int>(unsigned int*, unsigned int
 template void reconstruction_grayscale<float>(float*, float*, float*, const int, const int,
                                               const int, MorphOp, const int);
 
-/**
- * @brief Perform recosntruction by erosion/dilation operation on the entire image using the GPU.
- * This function is meant to be called from host and slide the geodesic_morph_grayscale kernel function
- * through all pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
+
 template <typename dtype>
 void reconstruction_grayscale_on_device(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                         const int xsize, const int ysize, const int zsize,
@@ -85,7 +71,6 @@ void reconstruction_grayscale_on_device(dtype* hostImage, dtype* hostMask, dtype
   // transfer data from the device to the host
   CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
 
-  // free device memorys
   cudaFree(deviceMarker);
   cudaFree(deviceOutput);
 }
@@ -97,19 +82,7 @@ template void reconstruction_grayscale_on_device<unsigned int>(unsigned int*, un
 template void reconstruction_grayscale_on_device<float>(float*, float*, float*, const int,
                                                         const int, const int, MorphOp, const int);
 
-/**
- * @brief Perform recosntruction by erosion/dilation operation on the entire image using the CPU.
- * This function is used to check GPU results correctness.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param operation Morphological operation (EROSION or DILATION).
- */
+
 template <typename dtype>
 void reconstruction_grayscale_on_host(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                       const int xsize, const int ysize, const int zsize,
