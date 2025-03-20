@@ -94,8 +94,8 @@ void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const
                          const int zsize, const int verbose, int* kernel, int kernel_xsize,
                          int kernel_ysize, int kernel_zsize, Args... args);
 
-// Include the implementation to avoid compilation linkage errors
-// (this is the same as defining the funcition in the header file)
+// Includes the implementation to prevent linkage errors during compilation,  
+// similar to defining the function in the header.
 #include "../../src/chunkedExecutor.cu"
 
 #endif  // CHUNKED_EXECUTOR_H
