@@ -5,8 +5,8 @@ import csv
 import h5py
 
 # Grayscale morphology operations
-from skimage.morphology import (       
-    erosion, dilation, closing, opening, 
+from skimage.morphology import (
+    erosion, dilation, closing, opening,
     white_tophat, black_tophat, reconstruction
 )
 
@@ -16,7 +16,7 @@ from skimage.morphology import binary_erosion, binary_dilation, binary_closing, 
 # Workaround to allow importing harpia python module locally
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir))) 
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)))
 
 # Custom morphology operations from harpia for binary images
 from harpia.morphology.operations_binary import (
@@ -102,7 +102,7 @@ def smooth_sk(image, selem):
 # img_num = 3
 # print("fineshed reading medium image!")
 
-# IMAGE 4 
+# IMAGE 4
 print("reading big image...")
 xsize = 2052
 ysize = 2052
@@ -123,11 +123,11 @@ kernel = custum_kernel3D()
 #############
 
 machine = 'harriet'
-ngpus = 1
+ngpus = 4
 gpuMemory = 0.2
 repetitions = 11
 
-# GRAYSCALE 
+# GRAYSCALE
 operations = [
     ("Erosion 3D grayscale", erosion, erosion_grayscale, "erosion_grayscale"),
     ("Dilation 3D grayscale", dilation, dilation_grayscale, "dilation_grayscale"),
@@ -135,7 +135,7 @@ operations = [
     ("Opening 3D grayscale", opening, opening_grayscale, "opening_grayscale"),
 ]
 
-images = [    
+images = [
     ("int32", f"image{img_num}_int32_grayscale"),
     ("uint32", f"image{img_num}_uint32_grayscale"),
     ("float32", f"image{img_num}_float32_grayscale"),
@@ -151,20 +151,20 @@ for img in images:
             csv_file, image_input, operation, machine, ngpus, True, repetitions, gpuMemory, kernel
         )
 
-# BINARY 
+# BINARY
 operations = [
     ("Erosion 3D binary", erosion, erosion_binary, "erosion_binary"),
-    ("Dilation 3D binary", dilation, dilation_binary, "dilation_binary"),    
+    ("Dilation 3D binary", dilation, dilation_binary, "dilation_binary"),
     ("Closing 3D binary", closing, closing_binary, "closing_binary"),
     ("Opening 3D binary", opening, opening_binary, "opening_binary"),
     ("Smoothing 3D binary", smooth_sk, smooth_binary, "smooth_binary"),
 ]
 
 images_binary = [
-    ("int8", f"image{img_num}_int8_binary"),
-    ("uint8", f"image{img_num}_uint8_binary"),
+    # ("int8", f"image{img_num}_int8_binary"), cause segmentation fault for Big Images (image 4)
+    # ("uint8", f"image{img_num}_uint8_binary"), cause segmentation fault for Big Images (image 4)
     ("int16", f"image{img_num}_int16_binary"),
-    ("uint16", f"image{img_num}_uint16_binary"),    
+    ("uint16", f"image{img_num}_uint16_binary"),
     ("int32", f"image{img_num}_int32_binary"),
     ("uint32", f"image{img_num}_uint32_binary"),
    ]

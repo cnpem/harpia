@@ -1,0 +1,2 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Scikit-Image Time (s),Time Ratio,Repetitions,Mean Squared Error,Pixel Accuracy (%),Image Data Type,Image Size (MB),Image Dimensions
+Dilation 3D binary,harriet,2,0.2,9.917727238079532,168.04382309983484,16.9,10,0.0,100.0,uint32,32896.1,"(2048, 2052, 2052)"

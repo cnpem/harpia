@@ -10,8 +10,8 @@
  * GPU. 
  * 
  * This function compares two input arrays (`deviceImage1` and `deviceImage2`) element by element. 
- * If any corresponding elements are not equal, the output flag (`deviceOutput`) is set to false.The
- *  comparison is performed in parallel using CUDA threads.
+ * If any corresponding elements are not equal, the output flag (`deviceOutput`) is set to 0 
+ * (false). The comparison is performed in parallel using CUDA threads.
  *
  * @tparam dtype The data type of the elements in the arrays.
  * @param deviceImage1 Pointer to the first input array on the device (GPU).
@@ -28,22 +28,20 @@ __global__ void compare_arrays_binary_kernel(dtype* deviceImage1, dtype* deviceI
     if (deviceImage1[index] != deviceImage2[index]) {
       atomicAnd(deviceOutput, 0);
       /**
-             * @note The atomic operation is used to set `deviceOutput` to `false` in a thread-safe 
-             * manner. This ensures that only one thread modifies `deviceOutput` at a time, 
-             * preventing race conditions.
-             */
+      * @note The atomic operation is used to set `deviceOutput` to `false` in a thread-safe 
+      * manner. This ensures that only one thread modifies `deviceOutput` at a time, 
+      * preventing race conditions.
+      */
     }
   }
 }
-// Template instantiations for specific types
 template __global__ void compare_arrays_binary_kernel<int>(int*, int*, int*, const size_t);
 template __global__ void compare_arrays_binary_kernel<unsigned int>(unsigned int*, unsigned int*,
                                                                     int*, const size_t);
-template __global__ void compare_arrays_binary_kernel<int16_t>(int16_t*, int16_t*, int*, const size_t);
+template __global__ void compare_arrays_binary_kernel<int16_t>(int16_t*, int16_t*, int*, const 
+                                                               size_t);
 template __global__ void compare_arrays_binary_kernel<uint16_t>(uint16_t*, uint16_t*, int*,
                                                                 const size_t);
-template __global__ void compare_arrays_binary_kernel<int8_t>(int8_t*, int8_t*, int*, const size_t);
-template __global__ void compare_arrays_binary_kernel<uint8_t>(uint8_t*, uint8_t*, int*, const size_t);
 
 template <typename dtype>
 void compare_arrays_binary(dtype* deviceImage1, dtype* deviceImage2, int* deviceOutput,
@@ -59,7 +57,7 @@ void compare_arrays_binary(dtype* deviceImage1, dtype* deviceImage2, int* device
     printf("block.x %d \n", block.x);
   }
 
-  // Perform subtraction on the device
+  // Perform operation on the device
   compare_arrays_binary_kernel<<<grid, block>>>(deviceImage1, deviceImage2, deviceOutput, size);
   cudaDeviceSynchronize();  // Ensure all GPU threads are finished
 }
@@ -69,8 +67,6 @@ template void compare_arrays_binary<unsigned int>(unsigned int*, unsigned int*, 
                                                   const int);
 template void compare_arrays_binary<int16_t>(int16_t*, int16_t*, int*, const size_t, const int);
 template void compare_arrays_binary<uint16_t>(uint16_t*, uint16_t*, int*, const size_t, const int);
-template void compare_arrays_binary<int8_t>(int8_t*, int8_t*, int*, const size_t, const int);
-template void compare_arrays_binary<uint8_t>(uint8_t*, uint8_t*, int*, const size_t, const int);
 
 template <typename dtype>
 void compare_arrays_binary_on_device(dtype* hostImage1, dtype* hostImage2, int* hostOutput,
@@ -90,7 +86,7 @@ void compare_arrays_binary_on_device(dtype* hostImage1, dtype* hostImage2, int* 
   CHECK(cudaMemcpy(deviceImage1, hostImage1, nBytes, cudaMemcpyHostToDevice));
   CHECK(cudaMemcpy(deviceImage2, hostImage2, nBytes, cudaMemcpyHostToDevice));
 
-  // Perform subtraction on the device
+  // Perform operation on the device
   compare_arrays_binary(deviceImage1, deviceImage2, deviceOutput, size, flag_verbose);
 
   // Transfer data from the device to the host
@@ -101,7 +97,6 @@ void compare_arrays_binary_on_device(dtype* hostImage1, dtype* hostImage2, int* 
   cudaFree(deviceImage2);
   cudaFree(deviceOutput);
 }
-// Template instantiations for specific types
 template void compare_arrays_binary_on_device<int>(int*, int*, int*, const size_t, const int);
 template void compare_arrays_binary_on_device<unsigned int>(unsigned int*, unsigned int*, int*,
                                                             const size_t, const int);
@@ -109,24 +104,7 @@ template void compare_arrays_binary_on_device<int16_t>(int16_t*, int16_t*, int*,
                                                        const int);
 template void compare_arrays_binary_on_device<uint16_t>(uint16_t*, uint16_t*, int*, const size_t,
                                                         const int);
-template void compare_arrays_binary_on_device<int8_t>(int8_t*, int8_t*, int*, const size_t, const int);
-template void compare_arrays_binary_on_device<uint8_t>(uint8_t*, uint8_t*, int*, const size_t,
-                                                       const int);
 
-/**
- * @brief Function to perform pixel-wise comparison to check if two arrays are equal on the host 
- * (CPU). 
- * 
- * This function compares two input arrays (`hostImage1` and `hostImage2`) element by element. If 
- * any corresponding elements are not equal, the output flag (`hostOutput`) is set to false, and the 
- * function exits early.
- * 
- * @tparam dtype The data type of the elements in the arrays.
- * @param hostImage1 Pointer to the first input array on the host (CPU).
- * @param hostImage2 Pointer to the second input array on the host (CPU).
- * @param hostOutput Pointer to the output flag on the host (CPU).
- * @param size The total number of elements (pixels) in the arrays.
- */
 template <typename dtype>
 void compare_arrays_binary_on_host(dtype* hostImage1, dtype* hostImage2, int* hostOutput,
                                    const size_t size) {
@@ -138,11 +116,8 @@ void compare_arrays_binary_on_host(dtype* hostImage1, dtype* hostImage2, int* ho
     }
   }
 }
-// Template instantiations for specific types
 template void compare_arrays_binary_on_host<int>(int*, int*, int*, const size_t);
 template void compare_arrays_binary_on_host<unsigned int>(unsigned int*, unsigned int*, int*,
                                                           const size_t);
 template void compare_arrays_binary_on_host<int16_t>(int16_t*, int16_t*, int*, const size_t);
 template void compare_arrays_binary_on_host<uint16_t>(uint16_t*, uint16_t*, int*, const size_t);
-template void compare_arrays_binary_on_host<int8_t>(int8_t*, int8_t*, int*, const size_t);
-template void compare_arrays_binary_on_host<uint8_t>(uint8_t*, uint8_t*, int*, const size_t);

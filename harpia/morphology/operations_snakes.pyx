@@ -12,7 +12,7 @@ cdef extern from "../../include/morphology/morph_snakes_2d.h":
     void morph_chan_vese(float* hostImage, bool* initLs, const int iterations, const float lambda1, const float lambda2, const int smoothing, bool* hostOutput,
                          const int xsize, const int ysize,
                          const int flag_verbose)
-
+    
 def morph_2D_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bool, ndim=2] initLs, int iterations, float threshold, float balloonForce, int smoothing, int flag_verbose=0):
     """Morphological Geodesic Active Contours (MorphGAC).
 

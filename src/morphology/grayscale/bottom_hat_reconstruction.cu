@@ -8,10 +8,7 @@
 #include "../../../include/morphology/reconstruction_grayscale.h"
 #include "../../../include/morphology/subtraction.h"
 
-//##################################################################################################
-// inspired in the avizo VERSION -------------------------------------------------------------------
-//##################################################################################################
-// Reference: https://www.thermofisher.com/software-em-3d-vis/xtra-library/xtras/interactive-bottom-hat-by-reconstruction
+
 template <typename dtype>
 void bottom_hat_reconstruction_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
                                          const int ysize, const int zsize, const int flag_verbose,
@@ -68,6 +65,7 @@ template void bottom_hat_reconstruction_on_device<unsigned int>(unsigned int*, u
                                                                 const int, int*, int, int, int);
 template void bottom_hat_reconstruction_on_device<float>(float*, float*, const int, const int,
                                                          const int, const int, int*, int, int, int);
+
 
 template <typename dtype>
 void bottom_hat_reconstruction_on_host(dtype* hostImage, dtype* hostOutput, const int xsize,

@@ -7,21 +7,6 @@
 #include "../../../include/morphology/morphology.h"
 #include "../../../include/morphology/subtraction.h"
 
-/**
- * @brief Performs the bottom-hat transformation on the input image on the device (GPU).
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void bottom_hat_on_device(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                           const int zsize, const int flag_verbose, const int padding_bottom,
@@ -100,21 +85,6 @@ template void bottom_hat_on_device<unsigned int>(unsigned int*, unsigned int*, c
 template void bottom_hat_on_device<float>(float*, float*, const int, const int, const int,
                                           const int, const int, const int, int*, int, int, int);
 
-/**
- * @brief Performs the bottom-hat transformation on the input image on the host (CPU).
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void bottom_hat_on_host(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                         const int zsize, int* kernel, int kernel_xsize, int kernel_ysize,

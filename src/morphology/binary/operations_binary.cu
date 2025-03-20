@@ -8,21 +8,6 @@
 #include "../../../include/morphology/reconstruction_binary.h"
 #include "../../../include/morphology/smooth_binary.h"
 
-/**
- * @brief Performs binary erosion on the input image.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void erosion_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -46,26 +31,7 @@ template void erosion_binary<int16_t>(int16_t*, int16_t*, const int, const int, 
                                       const int, int*, int, int, int, float, bool);
 template void erosion_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, float, bool);
-template void erosion_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
-template void erosion_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                      const int, int*, int, int, int, float, bool);
 
-/**
- * @brief Performs binary dilation on the input image.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                      const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -89,26 +55,7 @@ template void dilation_binary<int16_t>(int16_t*, int16_t*, const int, const int,
                                        const int, int*, int, int, int, float, bool);
 template void dilation_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                         const int, int*, int, int, int, float, bool);
-template void dilation_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                      int*, int, int, int, float, bool);
-template void dilation_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                       const int, int*, int, int, int, float, bool);
 
-/**
- * @brief Performs binary closing on the input image.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -134,26 +81,7 @@ template void closing_binary<int16_t>(int16_t*, int16_t*, const int, const int, 
                                       const int, int*, int, int, int, float, bool);
 template void closing_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, float, bool);
-template void closing_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
-template void closing_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                      const int, int*, int, int, int, float, bool);
 
-/**
- * @brief Performs binary openig on the input image.
- *
- * @tparam dtype Data type of the image.
- * @param hostImage Pointer to the input image on the host.
- * @param hostOutput Pointer to the output image on the host.
- * @param kernel Pointer to the morphological kernel.
- * @param kernel_xsize Size of the kernel in the x-dimension.
- * @param kernel_ysize Size of the kernel in the y-dimension.
- * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Flag for verbose output.
- */
 template <typename dtype>
 void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
@@ -179,10 +107,6 @@ template void opening_binary<int16_t>(int16_t*, int16_t*, const int, const int, 
                                       const int, int*, int, int, int, float, bool);
 template void opening_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                        const int, int*, int, int, int, float, bool);
-template void opening_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
-template void opening_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int,
-                                      const int, int*, int, int, int, float, bool);
 
 template <typename dtype>
 void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -208,24 +132,7 @@ template void smooth_binary<int16_t>(int16_t*, int16_t*, const int, const int, c
                                      int*, int, int, int, float, bool);
 template void smooth_binary<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int,
                                       const int, int*, int, int, int, float, bool);
-template void smooth_binary<int8_t>(int8_t*, int8_t*, const int, const int, const int, const int,
-                                    int*, int, int, int, float, bool);
-template void smooth_binary<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, const int,
-                                     int*, int, int, int, float, bool);
 
-/**
- * @brief Perform geodesic erosion operation on the entire image using the GPU. This function is
- * meant to be called from host and slide the morph_binary kerel function through all pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
 template <typename dtype>
 void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                              const int ysize, const int zsize, const int flag_verbose,
@@ -248,24 +155,7 @@ template void geodesic_erosion_binary<int16_t>(int16_t*, int16_t*, int16_t*, con
                                                const int, const int, float, bool);
 template void geodesic_erosion_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                 const int, const int, const int, float, bool);
-template void geodesic_erosion_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                              const int, const int, float, bool);
-template void geodesic_erosion_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
-                                               const int, const int, float, bool);
 
-/**
- * @brief Perform geodesic dilation operation on the entire image using the GPU. This function is
- * meant to be called from host and slide the morph_binary kerel function through all pixels.
- *
- * @tparam dtype The data type of the image.
- * @param hostImage Input image on the host (corresponds to the marker image).
- * @param hostOutput Output image on the host.
- * @param hostMask Mask image on the host.
- * @param xsize Size of the image in the x-dimension.
- * @param ysize Size of the image in the y-dimension.
- * @param zsize Size of the image in the z-dimension.
- * @param flag_verbose Verbose flag to print grid and block dimensions.
- */
 template <typename dtype>
 void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                               const int ysize, const int zsize, const int flag_verbose,
@@ -288,11 +178,9 @@ template void geodesic_dilation_binary<int16_t>(int16_t*, int16_t*, int16_t*, co
                                                 const int, const int, float, bool);
 template void geodesic_dilation_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                  const int, const int, const int, float, bool);
-template void geodesic_dilation_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                               const int, const int, float, bool);
-template void geodesic_dilation_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
-                                                const int, const int, float, bool);
 
+ // TODO: add a check if there is sufficiet memory on the gpu to perform the operation. Since it is 
+ // a convergence operation it cannot be broken in chunks.
 template <typename dtype>
 void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                            const int ysize, const int zsize, const int flag_verbose,
@@ -314,10 +202,6 @@ template void reconstruction_binary<int16_t>(int16_t*, int16_t*, int16_t*, const
                                              const int, const int, MorphOp, bool);
 template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int, const int,
                                               const int, const int, MorphOp, bool);
-template void reconstruction_binary<int8_t>(int8_t*, int8_t*, int8_t*, const int, const int,
-                                            const int, const int, MorphOp, bool);
-template void reconstruction_binary<uint8_t>(uint8_t*, uint8_t*, uint8_t*, const int, const int,
-                                             const int, const int, MorphOp, bool);
 
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
@@ -331,7 +215,6 @@ void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int 
     fill_holes_on_host(hostImage, hostOutput, xsize, ysize, zsize);
   }
 }
-// Template instantiations for specific types
 template void fill_holes<int>(int*, int*, const int, const int, const int, int, const int, float, 
                               bool);
 template void fill_holes<unsigned int>(unsigned int*, unsigned int*, const int, const int,
@@ -340,7 +223,3 @@ template void fill_holes<int16_t>(int16_t*, int16_t*, const int, const int, cons
                                   const int, float, bool);
 template void fill_holes<uint16_t>(uint16_t*, uint16_t*, const int, const int, const int, int, 
                                    const int, float, bool);
-template void fill_holes<int8_t>(int8_t*, int8_t*, const int, const int, const int, int, const int, 
-                                 float, bool);
-template void fill_holes<uint8_t>(uint8_t*, uint8_t*, const int, const int, const int, int, 
-                                  const int, float, bool);

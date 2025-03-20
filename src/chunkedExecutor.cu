@@ -4,7 +4,6 @@
 #include "../include/morphology/cuda_helper.h"
 #include "../include/morphology/logical_or_binary.h"
 
-// Wrapper function
 template <typename Func, typename dtype, typename... Args>
 void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* image, dtype* output,
                      const int xsize, const int ysize, const int zsize, const int verbose,
@@ -13,15 +12,15 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   dtype* i_ref = image;
   dtype* o_ref = output;
 
-  // Get memory allocated by the func
+  // Calculate slice size and memory usage
   int sliceSize = xsize * ysize;
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
-  // Get available devices
+  // Get number of available devices
   int ngpus;
   CHECK(cudaGetDeviceCount(&ngpus));
 
-  // Get free memory on the GPU with less memory in bytes
+  // Determine the GPU with the least available memory
   size_t freeBytes, totalBytes, freeGpuBytes;
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
@@ -32,7 +31,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
     }
   }
 
-  // How many slices fit in the GPU?
+  // Determine chunk size based on available memory
   int chunkSize = static_cast<int>(freeBytes * safetyMargin / sliceBytes);
   if (verbose) {
     printf("MaxChunkSize:%d zsize:%d ngpus:%d\n", chunkSize, zsize, ngpus);
@@ -50,6 +49,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
     }
   }
 
+  // Process image in chunks
   int iz = 0;
   int deviceCount = 0;
   int selectedDevice;
@@ -58,17 +58,15 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
     CHECK(cudaSetDevice(selectedDevice));
     cudaDeviceSynchronize();
     if (verbose) {
-      //printf("\niz:%d gpu:%d deviceCount:%d\n", iz, selectedDevice, deviceCount);
       printf("Processing chunk: iz=%d, chunkSize=%d, device=%d\n", iz, chunkSize, selectedDevice);
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
-    //cudaDeviceSynchronize();
     i_ref += chunkSize * sliceSize;
     o_ref += chunkSize * sliceSize;
     deviceCount += 1;
   }
 
-  // Process the remaining slices, if any
+  // Process remaining slices
   int remaining = zsize - iz;
   selectedDevice = deviceCount % ngpus;
   CHECK(cudaSetDevice(selectedDevice));
@@ -84,8 +82,6 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   }
 }
 
-// Wrapper function
-//Designed for functions that execute ONE or TWO kernel morphological operations
 template <typename Func, typename dtype, typename... Args>
 void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
                            const int kernelOperations, dtype* image, dtype* output, const int xsize,
@@ -127,7 +123,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
         "Error: Not enough memory to fit even one slice. Adjust slice size or free up memory.\n");
     return;
 
-    // CASE: intire input fits GPU memory (no padding)
+  // CASE: Intire input fits in the GPU memory (no padding)
   } else if (chunkSize >= zsize) {
     func(i_ref, o_ref, xsize, ysize, zsize, verbose, padding_bottom, padding_top, kernel,
          kernel_xsize, kernel_ysize, kernel_zsize, args...);
@@ -142,7 +138,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
     printf("MaxChunkSize:%d zsize:%d ngpus:%d\n", chunkSize, zsize, ngpus);
   }
 
-  // CASE: break input into chunks (padding)
+  // CASE: Break input into chunks (needs padding)
 
   // First chunk: padding only at the end
   int deviceCount = 0;
@@ -159,7 +155,6 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
        kernel_xsize, kernel_ysize, kernel_zsize, args...);
   i_ref += chunkSize * sliceSize;
   o_ref += chunkSize * sliceSize;
-  //cudaDeviceSynchronize();
   deviceCount += 1;
 
   // Middle chunks: padding at the beginning and at the end
@@ -181,7 +176,6 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
          kernel_xsize, kernel_ysize, kernel_zsize, args...);
     i_ref += chunkSize * sliceSize;  // Move to the next chunk
     o_ref += chunkSize * sliceSize;
-    //cudaDeviceSynchronize();
     deviceCount += 1;
 }
 
@@ -204,8 +198,6 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
   }
 }
 
-// Designed for geodesic operations which have an 8-connectivity fixed kerenl of ones and
-// two inputs, image and mask
 template <typename Func, typename dtype, typename... Args>
 void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, dtype* image,
                              dtype* mask, dtype* output, const int xsize, const int ysize,
@@ -392,8 +384,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
     return;
   }
 
-  //Execute output
-
+  // Execute output
   int iz = 0;
   int deviceCount = 0;
   int selectedDevice;
@@ -424,7 +415,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
     printf("\nFinished processing all chunks!\n");
   }
 
-  //Execute margins
+  // Execute margins
 
   padding = (padding < chunkSize/2) ? padding : chunkSize/2;
   iz = chunkSize-padding;

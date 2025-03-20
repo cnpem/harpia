@@ -7,7 +7,7 @@
 #include "../../../include/morphology/custom_abs.h"
 
 /**
- * @brief Kernel function to perform pixel-wise comparison to check if two arrays are equal on the 
+ * @brief Kernel function to perform pixel-wise comparison to check if two grayscale arrays are equal on the 
  * GPU. 
  * 
  * This function compares two input arrays (`deviceImage1` and `deviceImage2`) element by element. 
@@ -37,7 +37,6 @@ __global__ void compare_arrays_grayscale_kernel(dtype* deviceImage1, dtype* devi
     }
   }
 }
-// Template instantiations for specific types
 template __global__ void compare_arrays_grayscale_kernel<int>(int*, int*, int*, const size_t, int);
 template __global__ void compare_arrays_grayscale_kernel<unsigned int>(unsigned int*, unsigned int*,
                                                                        int*, const size_t,
@@ -67,7 +66,6 @@ void compare_arrays_grayscale(dtype* deviceImage1, dtype* deviceImage2, int* dev
                                                    tolerance);
   cudaDeviceSynchronize();  // Ensure all GPU threads are finished
 }
-// Template instantiations for specific types
 template void compare_arrays_grayscale<int>(int*, int*, int*, const size_t, const int);
 template void compare_arrays_grayscale<unsigned int>(unsigned int*, unsigned int*, int*, 
                                                      const size_t, const int);
@@ -102,27 +100,12 @@ void compare_arrays_grayscale_on_device(dtype* hostImage1, dtype* hostImage2, in
   cudaFree(deviceImage2);
   cudaFree(deviceOutput);
 }
-// Template instantiations for specific types
 template void compare_arrays_grayscale_on_device<int>(int*, int*, int*, const size_t, const int);
 template void compare_arrays_grayscale_on_device<unsigned int>(unsigned int*, unsigned int*, int*,
                                                                const size_t, const int);
 template void compare_arrays_grayscale_on_device<float>(float*, float*, int*, const size_t, 
                                                         const int);
 
-/**
- * @brief Function to perform pixel-wise comparison to check if two arrays are equal on the host 
- * (CPU). 
- * 
- * This function compares two input arrays (`hostImage1` and `hostImage2`) element by element. If 
- * any corresponding elements are not equal, the output flag (`hostOutput`) is set to false, and the 
- * function exits early.
- * 
- * @tparam dtype The data type of the elements in the arrays.
- * @param hostImage1 Pointer to the first input array on the host (CPU).
- * @param hostImage2 Pointer to the second input array on the host (CPU).
- * @param hostOutput Pointer to the output flag on the host (CPU).
- * @param size The total number of elements (pixels) in the arrays.
- */
 template <typename dtype>
 void compare_arrays_grayscale_on_host(dtype* hostImage1, dtype* hostImage2, int* hostOutput,
                                       const size_t size) {
@@ -136,7 +119,6 @@ void compare_arrays_grayscale_on_host(dtype* hostImage1, dtype* hostImage2, int*
     }
   }
 }
-// Template instantiations for specific types
 template void compare_arrays_grayscale_on_host<int>(int*, int*, int*, const size_t);
 template void compare_arrays_grayscale_on_host<unsigned int>(unsigned int*, unsigned int*, int*,
                                                              const size_t);
