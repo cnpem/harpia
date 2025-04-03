@@ -18,6 +18,9 @@
  * @param func The CUDA function to execute.
  * @param ncopies Number of copies of the image data needed to execute the algorithm.
  * @param safetyMargin Fraction of available GPU memory to use (0-1).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.  
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  * @param image Pointer to the input image data.
  * @param output Pointer to the output image data.
  * @param xsize Width of the image.
@@ -27,9 +30,9 @@
  * @param args Additional arguments passed to the CUDA function.
  */
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* image, dtype* output,
-                     const int xsize, const int ysize, const int zsize, const int verbose,
-                     Args... args);
+void chunkedExecutor(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                     dtype* image, dtype* output, const int xsize, const int ysize, const int zsize, 
+                     const int verbose, Args... args);
 
 /**
  * @brief Specialized chunked execution for morphological operations using a kernel.
@@ -48,6 +51,9 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
  * @param func The CUDA function to execute.
  * @param ncopies Number of copies of the image data needed to execute the algorithm.
  * @param safetyMargin Fraction of available GPU memory to use.
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.  
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  * @param kernelOperations Number of kernel operations to be performed.
  * @param image Pointer to the input image data.
  * @param output Pointer to the output image data.
@@ -62,7 +68,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
  * @param args Additional arguments passed to the CUDA function.
  */
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
+void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, int ngpus, 
                            const int kernelOperations, dtype* image, dtype* output, const int xsize,
                            const int ysize, const int zsize, const int verbose, int* kernel,
                            int kernel_xsize, int kernel_ysize, int kernel_zsize, Args... args);
@@ -79,6 +85,9 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
  * @param func The CUDA function to execute.
  * @param ncopies Number of copies of the image data.
  * @param safetyMargin Fraction of available GPU memory to use.
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.  
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  * @param image Pointer to the input image data.
  * @param mask Pointer to the mask data.
  * @param output Pointer to the output image data.
@@ -89,13 +98,23 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
  * @param args Additional arguments passed to the CUDA function.
  */
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorMask(Func func, int ncopies, const float safetyMargin, const int flag_chain,
-                         dtype* image, dtype* mask, dtype* output, const int xsize, const int ysize,
-                         const int zsize, const int verbose, int* kernel, int kernel_xsize,
-                         int kernel_ysize, int kernel_zsize, Args... args);
+void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                             dtype* image, dtype* mask, dtype* output, const int xsize, 
+                             const int ysize, const int zsize, const int verbose, Args... args);
+
+template <typename Func, typename dtype, typename... Args>
+void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                              dtype* image, dtype* output, int padding, const int xsize, 
+                              const int ysize, const int zsize, const int verbose, Args... args);
 
 // Includes the implementation to prevent linkage errors during compilation,  
 // similar to defining the function in the header.
 #include "../../src/chunkedExecutor.cu"
+// #include "../../src/chunkedExecutor/chunkedExecutor.cu"
+// #include "../../src/chunkedExecutor/chunkedExecutorKernel.cu"
+// #include "../../src/chunkedExecutor/chunkedExecutorGeodesic.cu"
+// #include "../../src/chunkedExecutor/chunkedExecutor.cu"
 
 #endif  // CHUNKED_EXECUTOR_H
+
+

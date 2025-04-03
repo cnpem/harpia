@@ -18,14 +18,17 @@
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_binary_on_device(), morph_binary_on_host()
  */
 template <typename dtype>
 void erosion_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                    int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                    int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs binary dilation on the entire image using the GPU or CPU.
@@ -42,14 +45,17 @@ void erosion_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_binary_on_device(), morph_binary_on_host()
  */
 template <typename dtype>
 void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                      const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                     int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                     int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs binary closing on the entire image using the GPU or CPU.
@@ -66,14 +72,17 @@ void dilation_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_chain_binary_on_device(), morph_chain_binary_on_host()
  */
 template <typename dtype>
 void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                    int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                    int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs binary openig on the entire image using the GPU or CPU.
@@ -90,14 +99,17 @@ void closing_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_chain_binary_on_device(), morph_chain_binary_on_host()
  */
 template <typename dtype>
 void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                     const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                    int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                    int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs binary smooth on the entire image using the GPU or CPU.
@@ -114,14 +126,17 @@ void opening_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const 
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), smooth_binary_on_device(), smooth_binary_on_host()
  */
 template <typename dtype>
 void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                    const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                   int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                   int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Perform geodesic erosion operation on the entire image using the GPU or CPU.
@@ -135,14 +150,17 @@ void smooth_binary(dtype* hostImage, dtype* hostOutput, const int xsize, const i
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorGeodesic(), geodesic_morph_binary_on_device(), geodesic_morph_binary_on_host()
  */
 template <typename dtype>
 void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                              const int ysize, const int zsize, const int flag_verbose,
-                             float gpuMemory, bool gpu);
+                             float gpuMemory, int ngpus);
 
 /**
  * @brief Perform geodesic dilation operation on the entire image using the GPU or CPU. 
@@ -156,14 +174,17 @@ void geodesic_erosion_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutpu
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorGeodesic(), geodesic_morph_binary_on_device(), geodesic_morph_binary_on_host()
  */
 template <typename dtype>
 void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                               const int ysize, const int zsize, const int flag_verbose,
-                              float gpuMemory, bool gpu);
+                              float gpuMemory, int ngpus);
 
 /**
  * @brief Perform morphological reconstruction operation using the GPU or CPU.
@@ -177,14 +198,17 @@ void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutp
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param operation Morphological operation to be performed (erosion or dilation).
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see reconstruction_binary_on_device(), reconstruction_binary_on_host()
  */
 template <typename dtype>
 void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                            const int ysize, const int zsize, const int flag_verbose,
-                           MorphOp operation, bool gpu);
+                           MorphOp operation, int ngpus);
 
 /**
  * @brief Fill holes in the binary image using the GPU or CPU.
@@ -198,12 +222,15 @@ void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
  * @param padding Padding size for hole filling.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorFillHoles(), fill_holes_on_device(), fill_holes_on_host()
  */
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
-                const int zsize, int padding, const int flag_verbose, float gpuMemory, bool gpu);
+                const int zsize, int padding, const int flag_verbose, float gpuMemory, int ngpus);
 
 #endif  // MORPH_binary_on_device_OPS_H

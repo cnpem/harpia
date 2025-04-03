@@ -10,7 +10,7 @@
 
 void test_top_hat_on_device(const std::string& filename, const int xsize, const int ysize,
                             const int zsize, int* kernel, const int kernel_xsize,
-                            const int kernel_ysize, const int kernel_zsize, float memoryOccupancy,
+                            const int kernel_ysize, const int kernel_zsize, float memoryOccupancy, int ngpus, 
                             const int flag_check, const int flag_verbose, const int flag_float) {
 
   printf("\nTest top hat on device\n");
@@ -33,7 +33,7 @@ void test_top_hat_on_device(const std::string& filename, const int xsize, const 
   // device erosion
   int ncopies = 3;
   int operations = 2;
-  chunkedExecutorKernel(top_hat_on_device<float>, ncopies, memoryOccupancy, operations, host_A,
+  chunkedExecutorKernel(top_hat_on_device<float>, ncopies, memoryOccupancy, ngpus, operations, host_A,
                         device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                         kernel_ysize, kernel_zsize);
 

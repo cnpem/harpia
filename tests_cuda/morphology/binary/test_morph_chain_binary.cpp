@@ -30,7 +30,7 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
                                        const int ysize, const int zsize, int* kernel,
                                        const int kernel_xsize, const int kernel_ysize,
                                        const int kernel_zsize, MorphChain chain,
-                                       float memoryOccupancy, const int flag_check,
+                                       float memoryOccupancy, int ngpus, const int flag_check,
                                        const int flag_verbose) {
 
   const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
@@ -52,7 +52,7 @@ void test_morph_chain_binary_on_device(const std::string& filename, const int xs
 
   int ncopies = 3;
   int operations = 2;
-  chunkedExecutorKernel(morph_chain_binary_on_device<int>, ncopies, memoryOccupancy, operations,
+  chunkedExecutorKernel(morph_chain_binary_on_device<int>, ncopies, memoryOccupancy, ngpus, operations,
                         host_A, device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                         kernel_ysize, kernel_zsize, chain);
 

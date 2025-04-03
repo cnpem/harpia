@@ -18,14 +18,17 @@
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_grayscale_on_device(), morph_grayscale_on_host()
  */
 template <typename dtype>
 void erosion_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                        const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                       int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                       int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs grayscale dilation on the entire image using the GPU or CPU.
@@ -42,14 +45,17 @@ void erosion_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_grayscale_on_device(), morph_grayscale_on_host()
  */
 template <typename dtype>
 void dilation_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                         const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                        int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                        int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs grayscale closing on the entire image using the GPU or CPU.
@@ -66,14 +72,17 @@ void dilation_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, co
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_chain_grayscale_on_device(), morph_chain_grayscale_on_host()
  */
 template <typename dtype>
 void closing_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                        const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                       int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                       int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 /**
  * @brief Performs grayscale openig on the entire image using the GPU or CPU.
  *
@@ -89,14 +98,17 @@ void closing_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), morph_chain_grayscale_on_device(), morph_chain_grayscale_on_host()
  */
 template <typename dtype>
 void opening_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                        const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                       int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                       int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Perform geodesic erosion operation on the entire image using the GPU or CPU.
@@ -110,14 +122,17 @@ void opening_grayscale(dtype* hostImage, dtype* hostOutput, const int xsize, con
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorGeodesic(), geodesic_morph_grayscale_on_device(), geodesic_morph_grayscale_on_host()
  */
 template <typename dtype>
 void geodesic_erosion_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                 const int xsize, const int ysize, const int zsize,
-                                const int flag_verbose, float gpuMemory, bool gpu);
+                                const int flag_verbose, float gpuMemory, int ngpus);
 /**
  * @brief Perform geodesic dilation operation on the entire image using the GPU or CPU. 
  *
@@ -130,14 +145,17 @@ void geodesic_erosion_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOu
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorGeodesic(), geodesic_morph_grayscale_on_device(), geodesic_morph_grayscale_on_host()
  */
 template <typename dtype>
 void geodesic_dilation_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
                                  const int xsize, const int ysize, const int zsize,
-                                 const int flag_verbose, float gpuMemory, bool gpu);
+                                 const int flag_verbose, float gpuMemory, int ngpus);
 
 /**
  * @brief Perform morphological reconstruction operation using the GPU or CPU.
@@ -151,14 +169,17 @@ void geodesic_dilation_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostO
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param operation Morphological operation to be performed (erosion or dilation).
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see reconstruction_grayscale_on_device(), reconstruction_grayscale_on_host()
  */
 template <typename dtype>
 void reconstruction_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                               const int ysize, const int zsize, const int flag_verbose,
-                              MorphOp operation, bool gpu);
+                              MorphOp operation, int ngpus);
 
 /**
  * @brief Performs bottom-hat transformation on the entire image using the GPU or CPU.
@@ -179,14 +200,17 @@ void reconstruction_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostOutp
  * @param kernel_ysize Size of the kernel in the y-dimension.
  * @param kernel_zsize Size of the kernel in the z-dimension.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), bottom_hat_on_device(), bottom_hat_on_host()
  */
 template <typename dtype>
 void bottom_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                 const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                int kernel_ysize, int kernel_zsize, float gpuMemory, bool gpu);
+                int kernel_ysize, int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs top-hat transformation on the entire image using the GPU or CPU.
@@ -206,14 +230,17 @@ void bottom_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int 
  * @param kernel_ysize Size of the kernel in the y-dimension.
  * @param kernel_zsize Size of the kernel in the z-dimension.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see chunkedExecutorKernel(), top_hat_on_device(), top_hat_on_host()
  */
 template <typename dtype>
 void top_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize, const int zsize,
              const int flag_verbose, int* kernel, int kernel_xsize, int kernel_ysize,
-             int kernel_zsize, float gpuMemory, bool gpu);
+             int kernel_zsize, float gpuMemory, int ngpus);
 
 /**
  * @brief Performs top-hat transformation using morphological reconstruction.
@@ -233,14 +260,17 @@ void top_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysi
  * @param kernel_xsize Size of the kernel in the x-dimension.
  * @param kernel_ysize Size of the kernel in the y-dimension.
  * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see top_hat_reconstruction_on_device(), top_hat_reconstruction_on_host
  */
 template <typename dtype>
 void top_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                             const int zsize, const int flag_verbose, int* kernel, int kernel_xsize,
-                            int kernel_ysize, int kernel_zsize, bool gpu);
+                            int kernel_ysize, int kernel_zsize, int ngpus);
 
 /**
  * @brief Performs bottom-hat transformation using morphological reconstruction.
@@ -259,7 +289,10 @@ void top_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize
  * @param kernel_xsize Size of the kernel in the x-dimension.
  * @param kernel_ysize Size of the kernel in the y-dimension.
  * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param gpu Flag to indicate whether to use GPU (true) or CPU (false).
+ * @param ngpus The number of GPUs to use. 
+ *              If ngpus < 1, all available GPUs are used.
+ *              If ngpus = 0, CPU execution is selected. 
+ *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
  *
  * @see bottom_hat_reconstruction_on_device(), bottom_hat_reconstruction_on_host
  */
@@ -267,6 +300,6 @@ template <typename dtype>
 void bottom_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize,
                                const int ysize, const int zsize, const int flag_verbose,
                                int* kernel, int kernel_xsize, int kernel_ysize, int kernel_zsize,
-                               bool gpu);
+                               int ngpus);
 
 #endif  // MORPH_grayscale_on_device_OPS_H

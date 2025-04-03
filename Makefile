@@ -19,8 +19,11 @@ TESTS_DIR = tests_cuda
 OBJ_DIR = obj
 
 # Source files
-CPP_SRCS = $(shell find $(SRC_DIR) $(TESTS_DIR) -type f -name '*.cpp')
-CU_SRCS = $(shell find $(SRC_DIR) $(TESTS_DIR) -type f -name '*.cu')
+# CPP_SRCS = $(shell find $(SRC_DIR) $(TESTS_DIR) -type f -name '*.cpp')
+# CU_SRCS = $(shell find $(SRC_DIR) $(TESTS_DIR) -type f -name '*.cu')
+# ignore snakes folder -> it was causing compilation errors
+CPP_SRCS = $(shell find $(SRC_DIR) $(TESTS_DIR) -type f -name '*.cpp' ! -path "$(SRC_DIR)/snakes/*")
+CU_SRCS = $(shell find $(SRC_DIR) $(TESTS_DIR) -type f -name '*.cu' ! -path "$(SRC_DIR)/snakes/*")
 SRCS = $(CPP_SRCS) $(CU_SRCS)
 
 # Object files
@@ -32,8 +35,8 @@ OBJS = $(CPP_OBJS) $(CU_OBJS)
 all: $(TARGET)
 
 # Link object files to create the executable
-$(TARGET): $(OBJS)
-	$(NVCC) $(OBJS) -o $(TARGET) $(OPENCV_LIBS)
+$(TARGET): $(CU_OBJS) $(CPP_OBJS)
+	$(NVCC) $(CU_OBJS) $(CPP_OBJS) -o $(TARGET) $(OPENCV_LIBS)
 
 # Compile C++ source files to object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp

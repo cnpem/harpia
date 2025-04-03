@@ -5,9 +5,9 @@
 #include "../include/morphology/logical_or_binary.h"
 
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* image, dtype* output,
-                     const int xsize, const int ysize, const int zsize, const int verbose,
-                     Args... args) {
+void chunkedExecutor(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                     dtype* image, dtype* output, const int xsize, const int ysize, const int zsize, 
+                     const int verbose, Args... args) {
 
   dtype* i_ref = image;
   dtype* o_ref = output;
@@ -17,8 +17,22 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
   // Get number of available devices
-  int ngpus;
-  CHECK(cudaGetDeviceCount(&ngpus));
+  int ngpus_available;
+  CHECK(cudaGetDeviceCount(&ngpus_available));
+  
+  // Ajust number of gpus to available gpus
+  if (ngpus_available < 1){
+    if(verbose){
+      printf("No gpus available. Cannot execute operations on the gpu.");
+    }
+    return;
+  }
+  else  if ((ngpus_available < ngpus) || (ngpus < 1)){
+    if(verbose){
+      printf("Number of gpus ajusted to maximun available gpus: %d.", ngpus_available);
+    }
+    ngpus = ngpus_available;
+  }
 
   // Determine the GPU with the least available memory
   size_t freeBytes, totalBytes, freeGpuBytes;
@@ -83,7 +97,7 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, dtype* im
 }
 
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
+void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, int ngpus, 
                            const int kernelOperations, dtype* image, dtype* output, const int xsize,
                            const int ysize, const int zsize, const int verbose, int* kernel,
                            int kernel_xsize, int kernel_ysize, int kernel_zsize, Args... args) {
@@ -94,10 +108,24 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
   // Get memory allocated by the func
   int sliceSize = xsize * ysize;
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
-
-  // Get available devices
-  int ngpus;
-  CHECK(cudaGetDeviceCount(&ngpus));
+  
+  // Get number of available devices
+  int ngpus_available;
+  CHECK(cudaGetDeviceCount(&ngpus_available));
+  
+  // Ajust number of gpus to available gpus
+  if (ngpus_available < 1){
+    if(verbose){
+      printf("No gpus available. Cannot execute operations on the gpu.");
+    }
+    return;
+  }
+  else  if ((ngpus_available < ngpus) || (ngpus < 1)){
+    if(verbose){
+      printf("Number of gpus ajusted to maximun available gpus: %d.", ngpus_available);
+    }
+    ngpus = ngpus_available;
+  }
 
   // Get free memory on the GPU with less memory in bytes
   size_t freeBytes, totalBytes, freeGpuBytes;
@@ -199,9 +227,9 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin,
 }
 
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, dtype* image,
-                             dtype* mask, dtype* output, const int xsize, const int ysize,
-                             const int zsize, const int verbose, Args... args) {
+void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                             dtype* image, dtype* mask, dtype* output, const int xsize, 
+                             const int ysize, const int zsize, const int verbose, Args... args) {
 
   dtype* i_ref = image;
   dtype* m_ref = mask;
@@ -211,9 +239,23 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
   int sliceSize = xsize * ysize;
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
-  // Get available devices
-  int ngpus;
-  CHECK(cudaGetDeviceCount(&ngpus));
+  // Get number of available devices
+  int ngpus_available;
+  CHECK(cudaGetDeviceCount(&ngpus_available));
+  
+  // Ajust number of gpus to available gpus
+  if (ngpus_available < 1){
+    if(verbose){
+      printf("No gpus available. Cannot execute operations on the gpu.");
+    }
+    return;
+  }
+  else  if ((ngpus_available < ngpus) || (ngpus < 1)){
+    if(verbose){
+      printf("Number of gpus ajusted to maximun available gpus: %d.", ngpus_available);
+    }
+    ngpus = ngpus_available;
+  }
 
   // Get free memory on the GPU with less memory in bytes
   size_t freeBytes, totalBytes, freeGpuBytes;
@@ -326,12 +368,19 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, d
 }
 
 // Wrapper function
-// ToDo: vou resolver só no annotat3ed? e a memória? a operação 'or' faço aqui ou no arquivo operations?
-// tem que chamar mais um chunked executor lá
+// ToDo: The fill holes operation has no fixed number of iterations, since it uses a convergency 
+// operation of reconstruction. Because of that, it is not possible to determine a padding value to
+// break the operation in chunks, the needed padding would have t be infine.
+// But the operation can be executed wihtout padding and overlapping chunks. This way there will be 
+// border issues with possibly non-filled holes, but the overlapped chunk will have the border as
+// interior area, and this hole will be filled. A silmpe or operation can unite this results.
+// This solution is implemented on annotat3d backend in pyhton, but it could be done in cuda, it
+// isn't working yet here.
+
 template <typename Func, typename dtype, typename... Args>
-void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, dtype* image, dtype* output,
-                              int padding, const int xsize, const int ysize, const int zsize, const int verbose,
-                              Args... args) {
+void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                              dtype* image, dtype* output, int padding, const int xsize, 
+                              const int ysize, const int zsize, const int verbose, Args... args) {
 
   // set output initial data
   size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
@@ -350,9 +399,23 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
   int sliceSize = xsize * ysize;
   size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
 
-  // Get available devices
-  int ngpus;
-  CHECK(cudaGetDeviceCount(&ngpus));
+  // Get number of available devices
+  int ngpus_available;
+  CHECK(cudaGetDeviceCount(&ngpus_available));
+  
+  // Ajust number of gpus to available gpus
+  if (ngpus_available < 1){
+    if(verbose){
+      printf("No gpus available. Cannot execute operations on the gpu.");
+    }
+    return;
+  }
+  else  if ((ngpus_available < ngpus) || (ngpus < 1)){
+    if(verbose){
+      printf("Number of gpus ajusted to maximun available gpus: %d.", ngpus_available);
+    }
+    ngpus = ngpus_available;
+  }
 
   // Get free memory on the GPU with less memory in bytes
   size_t freeBytes, totalBytes, freeGpuBytes;
@@ -460,7 +523,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
   }
 
   // Unite output and margins
-  chunkedExecutor(logical_or_on_device<dtype>, 2, safetyMargin, margins, output,
+  chunkedExecutor(logical_or_on_device<dtype>, 2, safetyMargin, ngpus, margins, output,
                   xsize, ysize, zsize, 0);
 
 }

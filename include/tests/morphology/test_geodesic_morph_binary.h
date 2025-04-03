@@ -6,7 +6,7 @@
 
 void test_geodesic_morph_binary_on_device(const std::string& filename, const int xsize,
                                           const int ysize, const int zsize, MorphOp operation,
-                                          float memoryOccupancy, const int flag_check,
+                                          float memoryOccupancy, int ngpus, const int flag_check,
                                           const int flag_verbose);
 
 void test_geodesic_morph_binary_on_host(const std::string& filename, const int xsize,

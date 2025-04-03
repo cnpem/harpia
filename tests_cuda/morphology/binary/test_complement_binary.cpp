@@ -9,8 +9,8 @@
 #include "../../../include/tests/morphology/test_util.h"
 
 void test_complement_binary_on_device(const std::string& filename, const int xsize, const int ysize,
-                                      const int zsize, float memoryOccupancy, const int flag_check,
-                                      const int flag_verbose) {
+                                      const int zsize, float memoryOccupancy, int ngpus, 
+                                      const int flag_check, const int flag_verbose) {
 
   printf("\nTest binary complement on device\n");
 
@@ -35,7 +35,7 @@ void test_complement_binary_on_device(const std::string& filename, const int xsi
 
   // device erosion
   int ncopies = 2;
-  chunkedExecutor(complement_binary_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref,
+  chunkedExecutor(complement_binary_on_device<int>, ncopies, memoryOccupancy, ngpus, host_A, device_ref,
                   xsize, ysize, zsize, flag_verbose);
 
   if (flag_check) {

@@ -29,7 +29,7 @@
  */
 void test_geodesic_morph_grayscale_on_device(const std::string& filename, const int xsize,
                                              const int ysize, const int zsize, MorphOp operation,
-                                             float memoryOccupancy, const int flag_check,
+                                             float memoryOccupancy, int ngpus, const int flag_check,
                                              const int flag_verbose, const int flag_float) {
 
   printf("\nTest grayscale geodesic %s on device\n", (operation ? "dilation" : "erosion"));
@@ -57,17 +57,17 @@ void test_geodesic_morph_grayscale_on_device(const std::string& filename, const 
   int operations = 1;
   if (operation == EROSION) {
     get_structuring_element_3D(kernel, 3, 3, 3);
-    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, operations,
+    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, ngpus, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           DILATION);
   } else {
     horizontal_line_kernel(kernel);
-    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, operations,
+    chunkedExecutorKernel(morph_grayscale_on_device<float>, ncopies, memoryOccupancy, ngpus, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           EROSION);
   }
   ncopies = 3;
-  chunkedExecutorGeodesic(geodesic_morph_grayscale_on_device<float>, ncopies, memoryOccupancy,
+  chunkedExecutorGeodesic(geodesic_morph_grayscale_on_device<float>, ncopies, memoryOccupancy, ngpus,
                           hostMarker, hostMask, device_ref, xsize, ysize, zsize, flag_verbose,
                           operation);
   if (flag_check) {

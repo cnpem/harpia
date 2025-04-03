@@ -29,7 +29,7 @@
 void test_smooth_binary_on_device(const std::string& filename, const int xsize, const int ysize,
                                   const int zsize, int* kernel, const int kernel_xsize,
                                   const int kernel_ysize, const int kernel_zsize,
-                                  float memoryOccupancy, const int flag_check,
+                                  float memoryOccupancy, int ngpus, const int flag_check,
                                   const int flag_verbose) {
 
   printf("\nTest smooth binary on device\n");
@@ -50,7 +50,7 @@ void test_smooth_binary_on_device(const std::string& filename, const int xsize, 
 
   int ncopies = 2;
   int operations = 4;
-  chunkedExecutorKernel(smooth_binary_on_device<int>, ncopies, memoryOccupancy, operations, host_A,
+  chunkedExecutorKernel(smooth_binary_on_device<int>, ncopies, memoryOccupancy, ngpus, operations, host_A,
                         device_ref, xsize, ysize, zsize, flag_verbose, kernel, kernel_xsize,
                         kernel_ysize, kernel_zsize);
 
