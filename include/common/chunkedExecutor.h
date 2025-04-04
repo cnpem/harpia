@@ -109,11 +109,10 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
 
 // Includes the implementation to prevent linkage errors during compilation,  
 // similar to defining the function in the header.
-#include "../../src/chunkedExecutor.cu"
-// #include "../../src/chunkedExecutor/chunkedExecutor.cu"
-// #include "../../src/chunkedExecutor/chunkedExecutorKernel.cu"
-// #include "../../src/chunkedExecutor/chunkedExecutorGeodesic.cu"
-// #include "../../src/chunkedExecutor/chunkedExecutor.cu"
+#include "../../src/chunkedExecutor/chunkedExecutor.cu"
+#include "../../src/chunkedExecutor/chunkedExecutorKernel.cu"
+#include "../../src/chunkedExecutor/chunkedExecutorGeodesic.cu"
+#include "../../src/chunkedExecutor/chunkedExecutorFillHoles.cu"
 
 #endif  // CHUNKED_EXECUTOR_H
 
