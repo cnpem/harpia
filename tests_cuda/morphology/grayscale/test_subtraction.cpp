@@ -26,6 +26,11 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
   host_A = (float*)malloc(nBytes);
   device_ref = (float*)malloc(nBytes);
 
+  if (host_A == nullptr || device_ref == nullptr) {
+    std::cerr << "Memory allocation failed!" << std::endl;
+    return;
+  }
+
   // set input data
   read_input(host_A, filename, size, flag_verbose, flag_float);
   read_input(device_ref, filename2, size, flag_verbose, flag_float);

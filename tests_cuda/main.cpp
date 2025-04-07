@@ -29,8 +29,11 @@ int main(int argc, char** argv) {
 
     test_check_device_info();
     // test_operations_on_host();
-    test_operations_on_device();
+    // test_operations_on_device();
     // test_chunked_executer(gpuMemory);
 
+    std::string fileName = "notebook_1gpu_test_results.csv", machineName = "notebook";
+    int ngpus = 1, repetitions = 1;
+    test_chunked_time(fileName, machineName, ngpus, gpuMemory, repetitions);
     return 0;
 }
