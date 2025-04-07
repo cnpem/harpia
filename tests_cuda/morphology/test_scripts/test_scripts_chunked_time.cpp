@@ -67,25 +67,26 @@ file.close();
 // };
 
 int test_chunked_time(const std::string&csv_filename , const std::string& machineName, int ngpus, 
-                      float memoryOccupancy, int repetitions) {
+                      float memoryOccupancy, int repetitions, int flag_verbose) {
 
-  // std::string filenameBinary = "./example_images/binary/Recon_2052x2052x2048_16bits.raw";
-  // std::string filenameGrayscale = "./example_images/grayscale/Recon_2052x2052x2048_32bits.raw";
+  std::string filenameBinary = "./example_images/binary/Recon_2052x2052x2048_16bits.raw";
+  std::string filenameGrayscale = "./example_images/grayscale/Recon_2052x2052x2048_32bits.raw";
+  int xsize = 2052, ysize = 2052, zsize = 2048;
 
-  std::string filenameBinary = "./example_images/binary/ILSIMG_600x1520x1520_16bits.raw";
-  std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
-
-  int xsize = 600, ysize = 1520, zsize = 1000;
+//   std::string filenameBinary = "./example_images/binary/ILSIMG_600x1520x1520_16bits.raw";
+//   std::string filenameGrayscale = "./example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw";
+//   int xsize = 600, ysize = 1520, zsize = 1000;
+  
   int kernel_xsize = 3, kernel_ysize = 3, kernel_zsize = 3;
 
   int* kernel = (int*)malloc(sizeof(int) * kernel_xsize * kernel_ysize * kernel_zsize);
   get_structuring_element_3D(kernel, kernel_xsize, kernel_ysize, kernel_zsize);
 
-  int flag_check = 0, flag_verbose = 1, flag_float = 1;
+  int flag_check = 0, flag_float = 1;
   MorphChain closing = {DILATION, EROSION};
   MorphChain opening = {EROSION, DILATION};
 
-  printf("\nCompare chunked operations on device with host results in 3D\n");
+  printf("\nMeasure chunked operations time execution on device\n");
 
   // Define an inline lambda function to measure and log time
   auto measure_and_log = [&](const std::string& functionName, std::string dataType, auto test_func){

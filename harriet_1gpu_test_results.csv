@@ -1,0 +1,41 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Repetitions,Image Data Type,xsize,ysize,zsize
+complement_binary_on_device,harriet,1,0.2,53878513,1,int16,2052,2052,2048
+subtraction_on_device,harriet,1,0.2,104030982,1,int16,2052,2052,2048
+morph_binary_on_device (erosion),harriet,1,0.2,45087845,1,int16,2052,2052,2048
+morph_binary_on_device (dilation),harriet,1,0.2,44351822,1,int16,2052,2052,2048
+morph_chain_binary_on_device (closing),harriet,1,0.2,47300942,1,int16,2052,2052,2048
+morph_chain_binary_on_device (opening),harriet,1,0.2,45997792,1,int16,2052,2052,2048
+morph_grayscale_on_device (erosion),harriet,1,0.2,51658187,1,int16,2052,2052,2048
+morph_grayscale_on_device (dilation),harriet,1,0.2,52485467,1,int16,2052,2052,2048
+top_hat_on_device,harriet,1,0.2,68948440,1,int16,2052,2052,2048
+bottom_hat_on_device,harriet,1,0.2,53019411,1,int16,2052,2052,2048
+geodesic_morph_binary_on_device (erosion),harriet,1,0.2,66991778,1,int16,2052,2052,2048
+geodesic_morph_binary_on_device (dilation),harriet,1,0.2,65181447,1,int16,2052,2052,2048
+geodesic_morph_grayscale_on_device (erosion),harriet,1,0.2,83889096,1,int16,2052,2052,2048
+geodesic_morph_grayscale_on_device (dilation),harriet,1,0.2,91945545,1,int16,2052,2052,2048
+complement_binary_on_device,harriet,1,0.2,46022381,1,int16,2052,2052,2048
+subtraction_on_device,harriet,1,0.2,87357412,1,int16,2052,2052,2048
+morph_binary_on_device (erosion),harriet,1,0.2,43917059,1,int16,2052,2052,2048
+morph_binary_on_device (dilation),harriet,1,0.2,45199558,1,int16,2052,2052,2048
+morph_chain_binary_on_device (closing),harriet,1,0.2,45023245,1,int16,2052,2052,2048
+morph_chain_binary_on_device (opening),harriet,1,0.2,44472226,1,int16,2052,2052,2048
+morph_grayscale_on_device (erosion),harriet,1,0.2,57119146,1,int16,2052,2052,2048
+morph_grayscale_on_device (dilation),harriet,1,0.2,53463864,1,int16,2052,2052,2048
+top_hat_on_device,harriet,1,0.2,54797048,1,int16,2052,2052,2048
+bottom_hat_on_device,harriet,1,0.2,54147276,1,int16,2052,2052,2048
+geodesic_morph_binary_on_device (erosion),harriet,1,0.2,64011657,1,int16,2052,2052,2048
+geodesic_morph_binary_on_device (dilation),harriet,1,0.2,63898791,1,int16,2052,2052,2048
+geodesic_morph_grayscale_on_device (erosion),harriet,1,0.2,92332649,1,int16,2052,2052,2048
+geodesic_morph_grayscale_on_device (dilation),harriet,1,0.2,71718624,1,int16,2052,2052,2048
+complement_binary_on_device,harriet,1,0.4,44277187,1,int16,2052,2052,2048
+subtraction_on_device,harriet,1,0.4,85406864,1,int16,2052,2052,2048
+morph_binary_on_device (erosion),harriet,1,0.4,46063496,1,int16,2052,2052,2048
+morph_binary_on_device (dilation),harriet,1,0.4,45196166,1,int16,2052,2052,2048
+morph_chain_binary_on_device (closing),harriet,1,0.4,45777189,1,int16,2052,2052,2048
+morph_chain_binary_on_device (opening),harriet,1,0.4,45812486,1,int16,2052,2052,2048
+morph_grayscale_on_device (erosion),harriet,1,0.4,52983613,1,int16,2052,2052,2048
+morph_grayscale_on_device (dilation),harriet,1,0.4,52438882,1,int16,2052,2052,2048
+top_hat_on_device,harriet,1,0.4,52691883,1,int16,2052,2052,2048
+bottom_hat_on_device,harriet,1,0.4,53199819,1,int16,2052,2052,2048
+geodesic_morph_binary_on_device (erosion),harriet,1,0.4,64645086,1,int16,2052,2052,2048
+geodesic_morph_binary_on_device (dilation),harriet,1,0.4,63716955,1,int16,2052,2052,2048
