@@ -179,14 +179,15 @@ template void geodesic_dilation_binary<int16_t>(int16_t*, int16_t*, int16_t*, co
 template void geodesic_dilation_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, const int,
                                                  const int, const int, const int, float, int);
 
- // TODO: add a check if there is sufficiet memory on the gpu to perform the operation. Since it is 
- // a convergence operation it cannot be broken in chunks.
 template <typename dtype>
 void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput, const int xsize,
                            const int ysize, const int zsize, const int flag_verbose,
                            MorphOp operation, int ngpus) {
 
-  if (ngpus == 0) {
+ // TODO: add a check if there is sufficiet memory on the gpu to perform the operation. Since it is 
+ // a convergence operation it cannot be broken in chunks.
+
+ if (ngpus == 0) {
     reconstruction_binary_on_host(hostImage, hostMask, hostOutput, xsize, ysize, zsize, operation);
   } else {
     reconstruction_binary_on_device(hostImage, hostMask, hostOutput, xsize, ysize, zsize, operation,
@@ -206,6 +207,9 @@ template void reconstruction_binary<uint16_t>(uint16_t*, uint16_t*, uint16_t*, c
 template <typename dtype>
 void fill_holes(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysize,
                 const int zsize, int padding, const int flag_verbose, float gpuMemory, int ngpus) {
+
+ // TODO: add a check if there is sufficiet memory on the gpu to perform the operation. Since it is 
+ // a convergence operation it cannot be broken in chunks.
 
   if (ngpus == 0) {
     fill_holes_on_host(hostImage, hostOutput, xsize, ysize, zsize);

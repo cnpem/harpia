@@ -12,7 +12,7 @@
 
 int main(int argc, char** argv) {
     if (argc < 5) {
-        std::cerr << "Usage: " << argv[0] << " <gpuMemory (0 to 1)> <ngpus> <repetitions>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <gpuMemory (0 to 1)> <ngpus> <repetitions> <verbose (0 or 1)>" << std::endl;
         return 1;
     }
 
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
               << ", repetitions: " << repetitions
               << ", verbose: " << flag_verbose << std::endl;
 
-    test_check_device_info();
+    // test_check_device_info();
     // test_operations_on_host();
     // test_operations_on_device();
     // test_chunked_executer(gpuMemory);
