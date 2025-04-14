@@ -35,9 +35,11 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, int ngpus
 
   // Determine the GPU with the least available memory
   size_t freeBytes, totalBytes, freeGpuBytes;
+  cudaSetDevice(0);
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
   for (int i = 1; i < ngpus; i++) {
+    cudaSetDevice(i);
     CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
     if (freeGpuBytes < freeBytes) {
       freeBytes = freeGpuBytes;
@@ -72,6 +74,10 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, int ngpus
     cudaDeviceSynchronize();
     if (verbose) {
       printf("Processing chunk: iz=%d, chunkSize=%d, device=%d\n", iz, chunkSize, selectedDevice);
+    }
+    if (verbose) {
+      printf("i_ref ptr: %p | max ptr: %p\n", (void*)i_ref, (void*)(image + zsize * sliceSize));
+      printf("o_ref ptr: %p | max ptr: %p\n", (void*)o_ref, (void*)(output + zsize * sliceSize));
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, verbose, args...);
     i_ref += chunkSize * sliceSize;

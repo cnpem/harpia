@@ -39,6 +39,7 @@ void chunkedExecutorGeodesic(Func func, int ncopies, const float safetyMargin, i
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
   for (int i = 1; i < ngpus; i++) {
+    cudaSetDevice(i);
     CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
     if (freeGpuBytes < freeBytes) {
       freeBytes = freeGpuBytes;

@@ -59,6 +59,7 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
   CHECK(cudaMemGetInfo(&freeBytes, &totalBytes));
 
   for (int i = 1; i < ngpus; i++) {
+    cudaSetDevice(i);
     CHECK(cudaMemGetInfo(&freeGpuBytes, &totalBytes));
     if (freeGpuBytes < freeBytes) {
       freeBytes = freeGpuBytes;
