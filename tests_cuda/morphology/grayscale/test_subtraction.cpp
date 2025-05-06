@@ -10,7 +10,7 @@
 
 void test_subtraction_on_device(const std::string& filename, const std::string& filename2,
                                 const int xsize, const int ysize, const int zsize,
-                                float memoryOccupancy, const int flag_check,
+                                float memoryOccupancy, int ngpus, const int flag_check,
                                 const int flag_verbose, const int flag_float) {
 
   printf("\nTest subtraction on device\n");
@@ -26,13 +26,18 @@ void test_subtraction_on_device(const std::string& filename, const std::string& 
   host_A = (float*)malloc(nBytes);
   device_ref = (float*)malloc(nBytes);
 
+  if (host_A == nullptr || device_ref == nullptr) {
+    std::cerr << "Memory allocation failed!" << std::endl;
+    return;
+  }
+
   // set input data
   read_input(host_A, filename, size, flag_verbose, flag_float);
   read_input(device_ref, filename2, size, flag_verbose, flag_float);
 
   // device erosion
   int ncopies = 2;
-  chunkedExecutor(subtraction_on_device<float>, ncopies, memoryOccupancy, host_A, device_ref, xsize,
+  chunkedExecutor(subtraction_on_device<float>, ncopies, memoryOccupancy, ngpus, host_A, device_ref, xsize,
                   ysize, zsize, flag_verbose);
   //show_image_3D(device_ref + 54 * xsize * ysize, xsize, ysize, 2, "device_ref");
 

@@ -11,7 +11,7 @@
 #include "../../../include/tests/morphology/test_util.h"
 
 void test_fill_holes_on_device(const std::string& filename, const int xsize, const int ysize,
-                               const int zsize, int padding, float memoryOccupancy, const int flag_check,
+                               const int zsize, int padding, float memoryOccupancy, int ngpus, const int flag_check,
                                const int flag_verbose) {
 
   printf("\nTest fill holes on device\n");
@@ -30,7 +30,7 @@ void test_fill_holes_on_device(const std::string& filename, const int xsize, con
   read_input(host_A, filename, size, flag_verbose);
 
   int ncopies = 3;
-  chunkedExecutorFillHoles(fill_holes_on_device<int>, ncopies, memoryOccupancy, host_A, device_ref,
+  chunkedExecutorFillHoles(fill_holes_on_device<int>, ncopies, memoryOccupancy, ngpus, host_A, device_ref,
                            padding, xsize, ysize, zsize, flag_verbose);
 
   if (flag_check) {

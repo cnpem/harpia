@@ -7,7 +7,7 @@
 void test_bottom_hat_on_device(const std::string& filename, const int xsize, const int ysize,
                                const int zsize, int* kernel, const int kernel_xsize,
                                const int kernel_ysize, const int kernel_zsize,
-                               float memoryOccupancy, const int flag_check, const int flag_verbose, 
+                               float memoryOccupancy, int ngpus, const int flag_check, const int flag_verbose, 
                                const int flag_float);
 
 void test_bottom_hat_on_host(const std::string& filename, const int xsize, const int ysize,

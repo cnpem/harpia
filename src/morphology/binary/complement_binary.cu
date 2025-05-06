@@ -1,5 +1,6 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
+#include <iostream> // for debug cout code
 #include <cstdint>  // For uint16_t, unsigned int
 #include "../../../include/common/grid_block_sizes.h"
 #include "../../../include/morphology/complement_binary.h"
@@ -53,6 +54,11 @@ template <typename dtype>
 void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int xsize,
                                  const int ysize, const int zsize, const int flag_verbose) {
 
+  // DEBUG
+  size_t free_mem, total_mem;
+  cudaMemGetInfo(&free_mem, &total_mem);
+  if (flag_verbose) std::cout << "Free GPU memory: " << free_mem / (1024 * 1024) << " MB" << std::endl;
+
   // Set input dimension
   size_t size = static_cast<size_t>(xsize) * ysize * zsize;
   size_t nBytes = size * sizeof(dtype);
@@ -70,7 +76,17 @@ void complement_binary_on_device(dtype* hostImage, dtype* hostOutput, const int 
   complement_binary(deviceImage, deviceOutput, size, flag_verbose);
 
   // Transfer data from the device to the host
-  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost));
+  //DEBUG
+  if (flag_verbose) {
+    printf("before cudaMemcpy()\n");
+    std::cout << "cudaMemcpy parameters:" << std::endl;
+    std::cout << "  hostOutput (dst): " << static_cast<void*>(hostOutput) << std::endl;
+    std::cout << "  deviceOutput (src): " << static_cast<void*>(deviceOutput) << std::endl;
+    std::cout << "  nBytes: " << nBytes << " (" << (nBytes / (1024.0 * 1024.0)) << " MB)" << std::endl;
+    std::cout << "  direction: cudaMemcpyDeviceToHost" << std::endl;
+  }
+  CHECK(cudaMemcpy(hostOutput, deviceOutput, nBytes, cudaMemcpyDeviceToHost)); //original code
+  if (flag_verbose) printf("after cudaMemcpy()\n\n");
 
   // Free device memory
   cudaFree(deviceImage);

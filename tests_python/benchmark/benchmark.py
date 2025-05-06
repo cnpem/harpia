@@ -161,8 +161,6 @@ operations = [
 ]
 
 images_binary = [
-    # ("int8", f"image{img_num}_int8_binary"), cause segmentation fault for Big Images (image 4)
-    # ("uint8", f"image{img_num}_uint8_binary"), cause segmentation fault for Big Images (image 4)
     ("int16", f"image{img_num}_int16_binary"),
     ("uint16", f"image{img_num}_uint16_binary"),
     ("int32", f"image{img_num}_int32_binary"),

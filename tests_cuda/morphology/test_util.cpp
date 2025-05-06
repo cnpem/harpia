@@ -24,7 +24,7 @@ double cpu_second() {
  * @brief Read raw image data from file into memory.
  * 
  * This function reads raw image data from a file into a memory pointer. The data is read as
- * `uint16_t` and then converted to the specified data type.
+ * `uint16_t` or `float32` and then converted to the specified data type of image.
  * 
  * @tparam dtype The data type to which the image data will be converted.
  * @param image Pointer to the memory where the image data will be stored.

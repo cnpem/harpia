@@ -7,12 +7,6 @@
 int test_operations_on_host();
 int test_operations_on_device();
 int test_chunked_executer(float memoryOccupancy);
-int test_script1(MorphOp operation);
-int test_script2();
-int test_script3(MorphChain chain);
-int test_script4();
-int test_script5();
-int test_script6();
-int test_script7();
-
+int test_chunked_time(const std::string&csv_filename , const std::string& machineName, int ngpus, 
+                      float memoryOccupancy, int repetitions, int flag_verbose);
 #endif  // TEST_SCRIPTS_H

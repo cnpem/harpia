@@ -123,7 +123,7 @@ kernel = custum_kernel3D()
 #############
 
 machine = 'harriet'
-ngpus = 1
+ngpus = 3
 gpuMemory = 0.2
 repetitions = 11
 

@@ -29,7 +29,7 @@
  */
 void test_geodesic_morph_binary_on_device(const std::string& filename, const int xsize,
                                           const int ysize, const int zsize, MorphOp operation,
-                                          float memoryOccupancy, const int flag_check,
+                                          float memoryOccupancy, int ngpus, const int flag_check,
                                           const int flag_verbose) {
 
   printf("\nTest binary geodesic %s on device\n", (operation ? "dilation" : "erosion"));
@@ -57,18 +57,18 @@ void test_geodesic_morph_binary_on_device(const std::string& filename, const int
   int operations = 1;
   if (operation == EROSION) {
     get_structuring_element_3D(kernel, 3, 3, 3);
-    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, operations,
+    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, ngpus, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           DILATION);
   } else {
     horizontal_line_kernel(kernel);
-    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, operations,
+    chunkedExecutorKernel(morph_binary_on_device<int>, ncopies, memoryOccupancy, ngpus, operations,
                           hostMask, hostMarker, xsize, ysize, zsize, flag_verbose, kernel, 3, 3, 3,
                           EROSION);
   }
 
   ncopies = 3;
-  chunkedExecutorGeodesic(geodesic_morph_binary_on_device<int>, ncopies, memoryOccupancy,
+  chunkedExecutorGeodesic(geodesic_morph_binary_on_device<int>, ncopies, memoryOccupancy, ngpus,
                           hostMarker, hostMask, device_ref, xsize, ysize, zsize, flag_verbose,
                           operation);
 

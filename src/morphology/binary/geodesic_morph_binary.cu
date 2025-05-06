@@ -169,7 +169,7 @@ template __global__ void geodesic_morph_binary_kernel<uint16_t>(uint16_t*, uint1
                                                                 const int, const int, int, int, int,
                                                                 MorphOp);
 
- <typename dtype>
+template <typename dtype>
 void geodesic_morph_binary(dtype* deviceImage, dtype* deviceMask, dtype* deviceOutput,
                            const int xsize, const int ysize, const int zsize,
                            const int flag_verbose, const int padding_bottom, const int padding_top,
