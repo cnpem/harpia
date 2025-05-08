@@ -62,7 +62,7 @@ void anisotropicDiffusion2DGPU(dtype* hostImage, dtype* hostOutput, int totalIte
  */
 template <typename dtype>
 void anisotropicDiffusion3D(dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
-                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, bool gpu);
+                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, int ngpus);
 
 
 #endif

@@ -169,10 +169,9 @@ void geodesic_dilation_grayscale(dtype* hostImage, dtype* hostMask, dtype* hostO
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param operation Morphological operation to be performed (erosion or dilation).
- * @param ngpus The number of GPUs to use. 
- *              If ngpus < 1, all available GPUs are used.
+ * @param ngpus Whether to execute on GPU or CPU. 
  *              If ngpus = 0, CPU execution is selected. 
- *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
+ *              Otherwise, the function executes on GPU.
  *
  * @see reconstruction_grayscale_on_device(), reconstruction_grayscale_on_host()
  */
@@ -260,10 +259,9 @@ void top_hat(dtype* hostImage, dtype* hostOutput, const int xsize, const int ysi
  * @param kernel_xsize Size of the kernel in the x-dimension.
  * @param kernel_ysize Size of the kernel in the y-dimension.
  * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param ngpus The number of GPUs to use. 
- *              If ngpus < 1, all available GPUs are used.
+ * @param ngpus Whether to execute on GPU or CPU. 
  *              If ngpus = 0, CPU execution is selected. 
- *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
+ *              Otherwise, the function executes on GPU.
  *
  * @see top_hat_reconstruction_on_device(), top_hat_reconstruction_on_host
  */
@@ -289,10 +287,9 @@ void top_hat_reconstruction(dtype* hostImage, dtype* hostOutput, const int xsize
  * @param kernel_xsize Size of the kernel in the x-dimension.
  * @param kernel_ysize Size of the kernel in the y-dimension.
  * @param kernel_zsize Size of the kernel in the z-dimension.
- * @param ngpus The number of GPUs to use. 
- *              If ngpus < 1, all available GPUs are used.
+ * @param ngpus Whether to execute on GPU or CPU. 
  *              If ngpus = 0, CPU execution is selected. 
- *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
+ *              Otherwise, the function executes on GPU.
  *
  * @see bottom_hat_reconstruction_on_device(), bottom_hat_reconstruction_on_host
  */

@@ -198,10 +198,9 @@ void geodesic_dilation_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutp
  * @param zsize Size of the image in the z-dimension.
  * @param flag_verbose Flag for verbose output.
  * @param operation Morphological operation to be performed (erosion or dilation).
- * @param ngpus The number of GPUs to use. 
- *              If ngpus < 1, all available GPUs are used.
+ * @param ngpus Whether to execute on GPU or CPU. 
  *              If ngpus = 0, CPU execution is selected. 
- *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
+ *              Otherwise, the function executes on GPU.
  *
  * @see reconstruction_binary_on_device(), reconstruction_binary_on_host()
  */
@@ -222,10 +221,9 @@ void reconstruction_binary(dtype* hostImage, dtype* hostMask, dtype* hostOutput,
  * @param padding Padding size for hole filling.
  * @param flag_verbose Flag for verbose output.
  * @param gpuMemory Percentage of free GPU memory to be used, with values ranging from 0 to 1.
- * @param ngpus The number of GPUs to use. 
- *              If ngpus < 1, all available GPUs are used.
+ * @param ngpus Whether to execute on GPU or CPU. 
  *              If ngpus = 0, CPU execution is selected. 
- *              If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
+ *              Otherwise, the function executes on GPU.
  *
  * @see chunkedExecutorFillHoles(), fill_holes_on_device(), fill_holes_on_host()
  */

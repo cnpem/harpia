@@ -178,17 +178,18 @@ template void anisotropicDiffusion3DGPU<double>(double* , double* , int, int, in
 
 template <typename dtype>
 void anisotropicDiffusion3D(dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
-                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, bool gpu) {
-    if (gpu) {
-    int ncopies = 2;
-    chunkedExecutor(anisotropicDiffusion3DGPU<dtype>, ncopies, gpuMemory, hostImage,
-                          hostOutput, xsize, ysize, zsize, flag_verbose, totalIterations, deltaT, kappa, diffusionOption);
-  } else {
-    throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D. "
-                                 "Please ensure a GPU is available to execute this function.");
+                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, int ngpus) {
+    if (ngpus == 0) {
+      throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D. "
+        "Please ensure a GPU is available to execute this function.");
+
+    } else {
+      int ncopies = 2;
+      chunkedExecutor(anisotropicDiffusion3DGPU<dtype>, ncopies, gpuMemory, ngpus, hostImage,
+        hostOutput, xsize, ysize, zsize, flag_verbose, totalIterations, deltaT, kappa, diffusionOption);
   }
 }
 
-template void anisotropicDiffusion3D<float>(float*, float*,    int, float, float, int, int, int, int, int, float, bool);
-template void anisotropicDiffusion3D<double>(double*, double*, int, float, float, int, int, int, int, int, float, bool);
+template void anisotropicDiffusion3D<float>(float*, float*,    int, float, float, int, int, int, int, int, float, int);
+template void anisotropicDiffusion3D<double>(double*, double*, int, float, float, int, int, int, int, int, float, int);
 

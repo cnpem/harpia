@@ -231,7 +231,7 @@ cdef extern from '../../include/filters/anisotropic_diffusion.h':
                                int diffusionOption, int xsize, int ysize)                        
 
     void anisotropicDiffusion3D[dtype](dtype* hostImage, dtype* hostOutput, int totalIterations, float deltaT, float kappa,
-                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, bool gpu)
+                               int diffusionOption, int xsize, int ysize, int zsize, const int flag_verbose, float gpuMemory, int ngpus)
 
 
 def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterations,
@@ -278,7 +278,7 @@ def anisotropic_diffusion2D(np.ndarray[real, ndim=2] hostImage, int total_iterat
     return hostOutput
 
 def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterations,
-                          float delta_t, float kappa, int diffusion_option, int flag_verbose, float gpuMemory, bool gpu = True):
+                          float delta_t, float kappa, int diffusion_option, int flag_verbose, float gpuMemory, int ngpus = -1):
     """
     Performs anisotropic diffusion on a 3D image.
 
@@ -307,8 +307,11 @@ def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterat
         Verbose for number of chuncks in execution
     gpuMemmory: bool
         Percentage of memmory occupied in the GPU (if using the gpu function). With cython value, working value is of 0.4 (40%).
-    gpu: bool
-        True for using the gpu function, false for using the cpu function (not implemented).
+    ngpus: int 
+        The number of GPUs to use. 
+        If ngpus < 1, all available GPUs are used.
+        If ngpus = 0, CPU execution is selected. 
+        If ngpus >= 1, the function uses up to min(ngpus, available GPUs).
 
     Returns:
     --------
@@ -322,7 +325,7 @@ def anisotropic_diffusion3D(np.ndarray[real, ndim=3] hostImage, int total_iterat
     cdef np.ndarray[real, ndim=3] hostOutput = np.empty_like(hostImage)
 
     anisotropicDiffusion3D(&hostImage[0,0,0], &hostOutput[0,0,0], total_iterations, delta_t, kappa, 
-    diffusion_option, isize.x, isize.y, isize.z, flag_verbose, gpuMemory, gpu)
+    diffusion_option, isize.x, isize.y, isize.z, flag_verbose, gpuMemory, ngpus)
 
     return hostOutput
 
