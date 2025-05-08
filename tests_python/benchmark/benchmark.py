@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np                     # For array manipulation
 from framework import image, tests
-import csv
-import h5py
 
 # Grayscale morphology operations
 from skimage.morphology import (
@@ -122,59 +120,66 @@ kernel = custum_kernel3D()
 # Tests
 #############
 
-machine = 'harriet'
-ngpus = 4
-gpuMemory = 0.2
-repetitions = 11
-
 # GRAYSCALE
-operations = [
-    ("Erosion 3D grayscale", erosion, erosion_grayscale, "erosion_grayscale"),
-    ("Dilation 3D grayscale", dilation, dilation_grayscale, "dilation_grayscale"),
-    ("Closing 3D grayscale", closing, closing_grayscale, "closing_grayscale"),
-    ("Opening 3D grayscale", opening, opening_grayscale, "opening_grayscale"),
+operations_grayscale = [
+    ("Erosion 3D grayscale", None, erosion_grayscale, "erosion_grayscale"),
+    ("Dilation 3D grayscale", None, dilation_grayscale, "dilation_grayscale"),
+    ("Closing 3D grayscale", None, closing_grayscale, "closing_grayscale"),
+    ("Opening 3D grayscale", None, opening_grayscale, "opening_grayscale"),
+#    ("Geodesisc Erosion 3D grayscale", None, geodesic_erosion_grayscale, "geodesic_erosion_grayscale"),
+#    ("Geodesisc Dilation 3D grayscale", None, geodesic_dilation_grayscale, "geodesic_dilation_grayscale"),
+    ("Top Hat 3D grayscale", None, top_hat, "top_hat"),
+    ("Bottom Hat 3D grayscale", None, bottom_hat, "bottom_hat"),
 ]
 
-images = [
+images_grayscale = [
     ("int32", f"image{img_num}_int32_grayscale"),
-    ("uint32", f"image{img_num}_uint32_grayscale"),
-    ("float32", f"image{img_num}_float32_grayscale"),
+    #("uint32", f"image{img_num}_uint32_grayscale"),
+    #("float32", f"image{img_num}_float32_grayscale"),
    ]
 
-#Iterate over operations and images
-for img in images:
-    image_input = image_grayscale.astype(dtype=img[0])
-    for operation in operations:
-        csv_file = f"results{img_num}/{machine}_{ngpus}gpu_{operation[3]}_{img[1]}.csv"
-        # Attempt to run the test
-        results_df = tests.run(
-            csv_file, image_input, operation, machine, ngpus, True, repetitions, gpuMemory, kernel
-        )
 
 # BINARY
-operations = [
-    ("Erosion 3D binary", erosion, erosion_binary, "erosion_binary"),
-    ("Dilation 3D binary", dilation, dilation_binary, "dilation_binary"),
-    ("Closing 3D binary", closing, closing_binary, "closing_binary"),
-    ("Opening 3D binary", opening, opening_binary, "opening_binary"),
-    ("Smoothing 3D binary", smooth_sk, smooth_binary, "smooth_binary"),
+operations_binary = [
+    ("Erosion 3D binary", None, erosion_binary, "erosion_binary"),
+    ("Dilation 3D binary", None, dilation_binary, "dilation_binary"),
+    ("Closing 3D binary", None, closing_binary, "closing_binary"),
+    ("Opening 3D binary", None, opening_binary, "opening_binary"),
+    ("Smoothing 3D binary", None, smooth_binary, "smooth_binary"),
+#    ("Geodesisc Erosion 3D binary", None, geodesic_erosion_binary, "geodesic_erosion_binary"),
+#    ("Geodesisc Dilation 3D binary", None, geodesic_dilation_binary, "geodesic_dilation_binary"),
 ]
 
 images_binary = [
-    ("int16", f"image{img_num}_int16_binary"),
-    ("uint16", f"image{img_num}_uint16_binary"),
+    #("int16", f"image{img_num}_int16_binary"),
+    #("uint16", f"image{img_num}_uint16_binary"),
     ("int32", f"image{img_num}_int32_binary"),
-    ("uint32", f"image{img_num}_uint32_binary"),
+    #("uint32", f"image{img_num}_uint32_binary"),
    ]
 
-#Iterate over operations and images
-for img in images_binary:
-    image_input = image_binary.astype(dtype=img[0])
-    for operation in operations:
-        csv_file = f"results{img_num}/{machine}_{ngpus}gpu_{operation[3]}_{img[1]}.csv"
-        # Attempt to run the test
-        results_df = tests.run(
-            csv_file, image_input, operation, machine, ngpus, True, repetitions, gpuMemory, kernel
-        )
+machine = 'harriet'
+ngpus_values = [1, 2, 3, 4]
+gpuMemory_values = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4]
+repetitions = 20
+
+for ngpus in ngpus_values:
+    for gpuMemory in gpuMemory_values:
+        csv_file = f"results_cython/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
+
+        for img in images_grayscale:
+            image_input = image_grayscale.astype(dtype=img[0])
+            for operation in operations_grayscale:
+                # Attempt to run the test
+                results_df = tests.run(
+                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel
+                )
+
+        for img in images_binary:
+            image_input = image_binary.astype(dtype=img[0])
+            for operation in operations_binary:
+                # Attempt to run the test
+                results_df = tests.run(
+                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel
+                )
 
 print(f"The End!")

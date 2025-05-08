@@ -123,16 +123,16 @@ kernel = custum_kernel3D()
 #############
 
 machine = 'harriet'
-ngpus = 3
+ngpus = 4
 gpuMemory = 0.2
-repetitions = 11
+repetitions = 10
 
 # GRAYSCALE
 operations = [
-    ("Erosion 3D grayscale", None, erosion_grayscale, "erosion_grayscale"),
-    ("Dilation 3D grayscale", None, dilation_grayscale, "dilation_grayscale"),
-    ("Closing 3D grayscale", None, closing_grayscale, "closing_grayscale"),
-    ("Opening 3D grayscale", None, opening_grayscale, "opening_grayscale"),
+    ("Erosion 3D grayscale", erosion, erosion_grayscale, "erosion_grayscale"),
+    ("Dilation 3D grayscale", dilation, dilation_grayscale, "dilation_grayscale"),
+    ("Closing 3D grayscale", closing, closing_grayscale, "closing_grayscale"),
+    ("Opening 3D grayscale", opening, opening_grayscale, "opening_grayscale"),
 ]
 
 images = [
@@ -153,11 +153,11 @@ for img in images:
 
 # BINARY
 operations = [
-    ("Erosion 3D binary", None, erosion_binary, "erosion_binary"),
-    ("Dilation 3D binary", None, dilation_binary, "dilation_binary"),
-    ("Closing 3D binary", None, closing_binary, "closing_binary"),
-    ("Opening 3D binary", None, opening_binary, "opening_binary"),
-    ("Smoothing 3D binary", None, smooth_binary, "smooth_binary"),
+    ("Erosion 3D binary", erosion, erosion_binary, "erosion_binary"),
+    ("Dilation 3D binary", dilation, dilation_binary, "dilation_binary"),
+    ("Closing 3D binary", closing, closing_binary, "closing_binary"),
+    ("Opening 3D binary", opening, opening_binary, "opening_binary"),
+    ("Smoothing 3D binary", smooth_sk, smooth_binary, "smooth_binary"),
 ]
 
 images_binary = [

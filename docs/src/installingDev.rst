@@ -83,7 +83,7 @@ Installing locally
 .. code-block:: bash
 
   cd tests_python
-  pyrhon3 test_script.py
+  python3 test_script.py
 
 
 Testing on C++ level

@@ -1,8 +1,9 @@
+import os
 import pandas as pd
 from .time import time_module_only
 from .time_check import time_compare_and_plot
 
-def run(csv_file, image, operation, machine, ngpus, gpu_flag, repetitions, gpuMemory, kernel):
+def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kernel):
     # Loop over hardware and GPU parameters, images, and operations
     csv_data = []
     print("")
@@ -16,9 +17,9 @@ def run(csv_file, image, operation, machine, ngpus, gpu_flag, repetitions, gpuMe
     if(skimage_func):
         time_compare_and_plot(
             csv_data=csv_data,
-            hardware=ngpus,
             machine=machine,
             gpuMemory=gpuMemory,
+            ngpus=ngpus,
             module_func=harpia_func,
             skimage_func=skimage_func,
             image=image,
@@ -30,15 +31,14 @@ def run(csv_file, image, operation, machine, ngpus, gpu_flag, repetitions, gpuMe
             slice_num=0,
             figsize=(18, 6),
             save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
-            repetitions=repetitions,
-            gpu=gpu_flag
+            repetitions=repetitions
         )
     else:
         time_module_only(
             csv_data=csv_data,
-            hardware=ngpus,
             machine=machine,
             gpuMemory=gpuMemory,
+            ngpus=ngpus,
             module_func=harpia_func,
             image=image,
             kernel=kernel,
@@ -48,15 +48,16 @@ def run(csv_file, image, operation, machine, ngpus, gpu_flag, repetitions, gpuMe
             slice_num=0,
             figsize=(18, 6),
             save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
-            repetitions=repetitions,
-            gpu=gpu_flag
+            repetitions=repetitions
         )
     print('\nFinish Test!')
     results_df = pd.DataFrame(csv_data)
-    results_df.to_csv(csv_file, index=False)
+    # Append to the file, only writing the header if the file does not exist
+    results_df.to_csv(csv_file, mode='a', header=not os.path.exists(csv_file), index=False)
+
     return results_df
 
-def run_no_kernel(csv_file, image, operation, machine, ngpus, gpu_flag, repetitions, gpuMemory):
+def run_no_kernel(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory):
     # Loop over hardware and GPU parameters, images, and operations
     csv_data = []
     print("")
@@ -70,9 +71,9 @@ def run_no_kernel(csv_file, image, operation, machine, ngpus, gpu_flag, repetiti
     if(skimage_func):
         time_compare_and_plot(
             csv_data=csv_data,
-            hardware=ngpus,
             machine=machine,
             gpuMemory=gpuMemory,
+            ngpus=ngpus,
             module_func=harpia_func,
             skimage_func=skimage_func,
             image=image,
@@ -83,15 +84,14 @@ def run_no_kernel(csv_file, image, operation, machine, ngpus, gpu_flag, repetiti
             slice_num=0,
             figsize=(18, 6),
             save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
-            repetitions=repetitions,
-            gpu=gpu_flag
+            repetitions=repetitions
         )
     else:
         time_module_only(
             csv_data=csv_data,
-            hardware=ngpus,
             machine=machine,
             gpuMemory=gpuMemory,
+            ngpus=ngpus,
             module_func=harpia_func,
             image=image,
             plot=False,
@@ -100,10 +100,12 @@ def run_no_kernel(csv_file, image, operation, machine, ngpus, gpu_flag, repetiti
             slice_num=0,
             figsize=(18, 6),
             save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
-            repetitions=repetitions,
-            gpu=gpu_flag
+            repetitions=repetitions
         )
     print('\nFinish Tests!')
     results_df = pd.DataFrame(csv_data)
-    results_df.to_csv(csv_file, index=False)
+    # Append to the file, only writing the header if the file does not exist
+    results_df.to_csv(csv_file, mode='a', header=not os.path.exists(csv_file), index=False)
+    print('\nSaved Tests!')
+
     return results_df

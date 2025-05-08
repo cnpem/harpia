@@ -35,19 +35,19 @@ size_t time_function(Func func, int repetitions) {
 void log_to_csv(const std::string& filename, const std::string& machineName, int ngpus, 
   float memoryOccupancy, int repetitions, int xsize, int ysize, int zsize, 
   const std::string& dataType, const std::string& functionName, size_t execTime) {
-std::ofstream file;
-bool file_exists = std::ifstream(filename).good();  // Check if file already exists
+  std::ofstream file;
+  bool file_exists = std::ifstream(filename).good();  // Check if file already exists
 
-file.open(filename, std::ios::app); // Append mode
-if (!file_exists) {
-file << "Operation,Machine,Gpus,gpuMemory,Module Time (s),Repetitions,Image Data Type,xsize,ysize,zsize\n"; 
-}
+  file.open(filename, std::ios::app); // Append mode
+  if (!file_exists) {
+  file << "Operation,Machine,Gpus,gpuMemory,Module Time (s),Repetitions,Image Data Type,xsize,ysize,zsize\n"; 
+  }
 
-file << functionName << "," << machineName << "," << ngpus << "," << memoryOccupancy << "," 
-<< execTime << "," << repetitions << "," << dataType << "," << xsize << "," << ysize << "," 
-<< zsize << "\n";
+  file << functionName << "," << machineName << "," << ngpus << "," << memoryOccupancy << "," 
+  << execTime << "," << repetitions << "," << dataType << "," << xsize << "," << ysize << "," 
+  << zsize << "\n";
 
-file.close();
+  file.close();
 }
 
 

@@ -3,33 +3,31 @@ import numpy as np                     # For array manipulation
 import matplotlib.pyplot as plt         # For plotting images
 
 # Merged function to time, compare, and plot results with MSE instead of accuracy
-def time_compare_and_plot(csv_data, hardware, machine, module_func, skimage_func, image, kernel, plot=False, show=False,
-                          operation="", framework="", slice_num=0, figsize=(18, 6), save_path=None, repetitions=1, gpuMemory =0.4,
-                          *args, **kwargs):
+def time_compare_and_plot(csv_data, machine, module_func, skimage_func, image, kernel, 
+                          plot=False, show=False, operation="", framework="", slice_num=0, 
+                          figsize=(18, 6), save_path=None, repetitions=1, gpuMemory =0.4,
+                          ngpus = -1, *args, **kwargs):
     fontsize = 18
     module_times = []
     skimage_times = []
 
     # Time the module function multiple times
+    module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
     for _ in range(repetitions):
         start = timeit.default_timer()
-        module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, **kwargs)
+        module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, ngpus = ngpus, **kwargs)
         module_times.append(timeit.default_timer() - start)
 
     # Time the scikit-image function multiple times
+    skimage_output = skimage_func(image, kernel) #warm up run
     for _ in range(repetitions):
         start = timeit.default_timer()
         skimage_output = skimage_func(image, kernel)
         skimage_times.append(timeit.default_timer() - start)
 
-    # Calculate mean times, ignoring the first run if repetitions > 1
-    if repetitions > 1:
-        module_time = np.mean(module_times[1:])
-        skimage_time = np.mean(skimage_times[1:])
-        repetitions = repetitions-1
-    else:
-        module_time = module_times[0]
-        skimage_time = skimage_times[0]
+    # Calculate mean times
+    module_time = np.mean(module_times)
+    skimage_time = np.mean(skimage_times)
 
     # Calculate Mean Squared Error
     mse = np.mean((skimage_output.astype(np.float32) - module_output.astype(np.float32)) ** 2)
@@ -42,13 +40,13 @@ def time_compare_and_plot(csv_data, hardware, machine, module_func, skimage_func
     # Get the image data type, size, and dimensions
     image_dtype = str(image.dtype)
     image_size_mb = round(image.nbytes/(1024 ** 2),1)
-    image_shape = image.shape
+    image_shape = (image.shape[2], image.shape[1], image.shape[0]) #compatible with c++ shape
 
     # Add timing, MSE, and image details to CSV data
     csv_data.append({
         'Operation':  module_func.__name__ if not operation else operation,
         'Machine': machine,
-        'Gpus': hardware,
+        'Gpus': ngpus,
         'gpuMemory': gpuMemory, 
         'Module Time (s)': module_time,
         'Scikit-Image Time (s)': skimage_time,
