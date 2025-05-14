@@ -16,8 +16,14 @@ template <typename dtype>
 void unsharp_mask_filtering(dtype* image, float* output, int xsize, int ysize, int zsize,
                             float sigma, float ammount, float threshold, bool type) {
   //gaussian filter application.
-  gaussian_filtering(image, output, xsize, ysize, zsize, sigma, type);
-
+  if (type == false){
+    gaussian_filtering(image, output, xsize, ysize, zsize, sigma, type);
+  }
+  //use chunked version
+  else{
+    std::cout<<"chunked";
+    gaussianFilterChunked(image,output,xsize,ysize,zsize,sigma,1,1);
+  }
   for (unsigned int idx = 0; idx < xsize; ++idx) {
 
     for (unsigned int idy = 0; idy < ysize; ++idy) {

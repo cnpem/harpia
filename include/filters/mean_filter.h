@@ -31,4 +31,15 @@ template <typename dtype>
 void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, int nx, int ny,
                     int nz);
 
+
+//used only for the chunked executor variant
+template <typename in_dtype, typename out_dtype>
+void meanFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize, int flag_verbose,
+                     int nx, int ny, int nz);
+
+
+template<typename in_dtype, typename out_dtype>
+void meanFilterChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize, int flag_verbose,
+                       float gpuMemory, int ngpus, int nx, int ny, int nz);
+
 #endif  // MEAN_FILTER_H
