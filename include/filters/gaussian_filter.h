@@ -22,4 +22,19 @@ template <typename dtype>
 void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, float sigma,
                         bool type);
 
+
+
+//chunked executor version
+template <typename in_dtype, typename out_dtype, typename kernel_dtype>
+void gaussianFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
+                    const int ysize, const int zsize, const int verbose,
+                    int padding_bottom, int padding_top,
+                    kernel_dtype* kernel,
+                    int kernel_xsize, int kernel_ysize, int kernel_zsize);
+                    
+template<typename in_dtype, typename out_dtype>
+void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
+                      const int xsize, const int ysize, const int zsize, float sigma,
+                      const int verbose, int ngpus);
+
 #endif  // GAUSSIAN_FILTER_H

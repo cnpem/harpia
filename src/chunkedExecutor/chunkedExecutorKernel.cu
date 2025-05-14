@@ -3,18 +3,18 @@
 #include <iostream>
 #include "../../include/morphology/cuda_helper.h"
 
-template <typename Func, typename dtype, typename... Args>
+template <typename Func, typename in_dtype, typename out_dtype, typename kernel_dtype,  typename... Args>
 void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, int ngpus, 
-                           const int kernelOperations, dtype* image, dtype* output, const int xsize,
-                           const int ysize, const int zsize, const int verbose, int* kernel,
+                           const int kernelOperations, in_dtype* image, out_dtype* output, const int xsize,
+                           const int ysize, const int zsize, const int verbose, kernel_dtype* kernel,
                            int kernel_xsize, int kernel_ysize, int kernel_zsize, Args... args) {
 
-  dtype* i_ref = image;
-  dtype* o_ref = output;
+  in_dtype* i_ref = image;
+  out_dtype* o_ref = output;
 
   // Get memory allocated by the func
   int sliceSize = xsize * ysize;
-  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
+  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(in_dtype) * ncopies;
   
   // Get number of available devices
   int ngpus_available;
@@ -59,7 +59,7 @@ void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, int
         "Error: Not enough memory to fit even one slice. Adjust slice size or free up memory.\n");
     return;
 
-  // CASE: Intire input fits in the GPU memory (no padding)
+  // CASE: Entire input fits in the GPU memory (no padding)
   } else if (chunkSize >= zsize) {
     func(i_ref, o_ref, xsize, ysize, zsize, verbose, padding_bottom, padding_top, kernel,
          kernel_xsize, kernel_ysize, kernel_zsize, args...);

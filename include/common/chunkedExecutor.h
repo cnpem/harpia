@@ -29,9 +29,9 @@
  * @param verbose Verbosity flag (1 for debug output, 0 for silent execution).
  * @param args Additional arguments passed to the CUDA function.
  */
-template <typename Func, typename dtype, typename... Args>
+template <typename Func, typename in_dtype, typename out_dtype, typename... Args>
 void chunkedExecutor(Func func, int ncopies, const float safetyMargin, int ngpus, 
-                     dtype* image, dtype* output, const int xsize, const int ysize, const int zsize, 
+                     in_dtype* image, out_dtype* output, const int xsize, const int ysize, const int zsize, 
                      const int verbose, Args... args);
 
 /**
@@ -67,10 +67,10 @@ void chunkedExecutor(Func func, int ncopies, const float safetyMargin, int ngpus
  * @param kernel_zsize Depth of the kernel.
  * @param args Additional arguments passed to the CUDA function.
  */
-template <typename Func, typename dtype, typename... Args>
+template <typename Func, typename in_dtype, typename out_dtype, typename kernel_dtype,  typename... Args>
 void chunkedExecutorKernel(Func func, int ncopies, const float safetyMargin, int ngpus, 
-                           const int kernelOperations, dtype* image, dtype* output, const int xsize,
-                           const int ysize, const int zsize, const int verbose, int* kernel,
+                           const int kernelOperations, in_dtype* image, out_dtype* output, const int xsize,
+                           const int ysize, const int zsize, const int verbose, kernel_dtype* kernel,
                            int kernel_xsize, int kernel_ysize, int kernel_zsize, Args... args);
 
 /**

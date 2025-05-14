@@ -3,17 +3,17 @@
 #include <iostream>
 #include "../../include/morphology/cuda_helper.h"
 
-template <typename Func, typename dtype, typename... Args>
+template <typename Func, typename in_dtype, typename out_dtype, typename... Args>
 void chunkedExecutor(Func func, int ncopies, const float safetyMargin, int ngpus, 
-                     dtype* image, dtype* output, const int xsize, const int ysize, const int zsize, 
+                     in_dtype* image, out_dtype* output, const int xsize, const int ysize, const int zsize, 
                      const int verbose, Args... args) {
 
-  dtype* i_ref = image;
-  dtype* o_ref = output;
+  in_dtype* i_ref = image;
+  out_dtype* o_ref = output;
 
   // Calculate slice size and memory usage
   int sliceSize = xsize * ysize;
-  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(dtype) * ncopies;
+  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(in_dtype) * ncopies;
 
   // Get number of available devices
   int ngpus_available;
