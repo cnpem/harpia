@@ -109,6 +109,103 @@ def solver_fgc(np.ndarray[np.float32_t, ndim=2] Z,
     return Y
 
 
+@boundscheck(False)
+@wraparound(False)
+def solver_fgc_with_labels(np.ndarray[np.float32_t, ndim=2] Z,
+               np.ndarray[np.float32_t, ndim=2] Y,
+               np.ndarray[np.float32_t, ndim=2] F,
+               float lambda_,
+               float gamma,
+               int iterations,
+               float tolerance):
+    """
+    Solves the minimization problem:
+        min_{Y} Tr(Y^{T}LY)
+        s.t. Y^{T}Y = I, Y >= 0
+    using a multiplicative update rule and a anchor graph approach (L=ZRZ^T).
+
+    Parameters:
+    ----------
+    Z: np.ndarray, shape (P, M)
+    Y: np.ndarray, shape (P, M) (Modified in place)
+    lambda_: float
+    iterations: int
+    tolerance: float
+    """
+    cdef int P = Y.shape[0]  # Number of pixels
+    cdef int M = Y.shape[1]  # Number of representative points
+
+    # Pre-compute auxiliary variables
+    cdef np.ndarray[np.float32_t, ndim=1] D = np.sum(Z, axis=0).astype(np.float32)  # Z.colwise().sum()
+    cdef np.ndarray[np.float32_t, ndim=2] ZD = np.zeros_like(Z, dtype=np.float32)
+
+    # Compute ZD = Z @ diag(D)
+    cdef int i, j, k
+    for i in prange(P, nogil=True):
+        for j in range(M):
+            ZD[i, j] = Z[i, j] * D[j]
+
+    # Initialize matrices
+    cdef np.ndarray[np.float32_t, ndim=2] ZtY = np.empty((M, M), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim=2] YtY = np.empty((M, M), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim=2] Numerator = np.empty((P, M), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim=2] Denominator = np.empty((P, M), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim=2] Yold = np.copy(Y)
+
+    cdef float currentObjective
+
+    # Iterative update
+    for _ in range(iterations):
+
+        # Compute Z^T * Y
+        for i in prange(M, nogil=True):
+            for j in range(M):
+                ZtY[i, j] = 0
+                for k in range(P):
+                    ZtY[i, j] += Z[k, i] * Y[k, j]
+
+        # Compute Y^T * Y
+        for i in prange(M, nogil=True):
+            for j in range(M):
+                YtY[i, j] = 0
+                for k in range(P):
+                    YtY[i, j] += Y[k, i] * Y[k, j]
+
+        # Compute Numerator and denominator
+        for i in prange(P, nogil=True):
+            for j in range(M):
+                Numerator[i, j] = 2 * lambda_ * Y[i, j] +  + gamma * F[i, j]
+                Denominator[i, j] = (1 + gamma) * Y[i, j]
+                for k in range(M):
+                    Numerator[i, j] += ZD[i, k] * ZtY[k, j]
+                    Denominator[i, j] += 2 * lambda_ * Y[i, k] * YtY[k, j]
+
+        # Update Y
+        for i in prange(P, nogil=True):
+            for j in range(M):
+                if Denominator[i, j] != 0:
+                    Y[i, j] *= Numerator[i, j] / Denominator[i, j]
+
+        # Compute Frobenius norm
+        currentObjective = 0.0
+        for i in prange(P, nogil=True):
+            for j in range(M):
+                currentObjective += (Y[i, j] - Yold[i, j]) ** 2
+        currentObjective = currentObjective ** 0.5
+
+        # Check for convergence
+        if currentObjective < tolerance:
+            print(f"Converged in iteration {_}")
+            break
+
+        # Update Yold
+        for i in prange(P, nogil=True):
+            for j in range(M):
+                Yold[i, j] = Y[i, j]
+
+
+    return Y
+
 class general_fgc:
     """
     FGC (Fast Graph Clustering) Class
@@ -271,7 +368,7 @@ class general_fgc:
         
         return A
 
-    def classification(self) -> None:
+    def classification(self, labels: np.ndarray=None, gamma: float=0) -> None:
         """
         Calls the C++ implementation of the FGC algorithm for image segmentation.
 
@@ -285,4 +382,7 @@ class general_fgc:
         self.y = np.asfortranarray(self.z.copy(), dtype=np.float32)
 
         # Calls C++ implementation
-        solver_fgc(self.z, self.y, self.lmbd, self.iterations, self.tol)
+        if labels is None:
+            solver_fgc(self.z, self.y, self.lmbd, self.iterations, self.tol)
+        else:
+            solver_fgc_with_labels(self.z, self.y, labels, self.lmbd, gamma, self.iterations, self.tol)
