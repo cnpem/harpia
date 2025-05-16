@@ -174,7 +174,7 @@ def solver_fgc_with_labels(np.ndarray[np.float32_t, ndim=2] Z,
         # Compute Numerator and denominator
         for i in prange(P, nogil=True):
             for j in range(M):
-                Numerator[i, j] = 2 * lambda_ * Y[i, j] +  + gamma * F[i, j]
+                Numerator[i, j] = 2 * lambda_ * Y[i, j] + gamma * F[i, j]
                 Denominator[i, j] = (1 + gamma) * Y[i, j]
                 for k in range(M):
                     Numerator[i, j] += ZD[i, k] * ZtY[k, j]
