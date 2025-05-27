@@ -211,14 +211,13 @@ template void gaussianFilter3DGPU<unsigned int, float, float>(unsigned int*, flo
 template<typename in_dtype, typename out_dtype>
 void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
                       const int xsize, const int ysize, const int zsize, float sigma,
-                      const int verbose, int ngpus)
+                      const int verbose, int ngpus,const float safetyMargin )
 {
   if (ngpus == 0) {
     throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D.");
   } else {
     int ncopies = 1;
     const int kernelOperations = 1;
-    const float safetyMargin = 1.0f;
     float* kernel;
     int gaussian_size = (int)ceil(2 * sigma + 1); 
     get_gaussian_kernel_3d(&kernel,gaussian_size,gaussian_size,gaussian_size,sigma);  // kernel should be 3x3x3
@@ -230,9 +229,9 @@ void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
   }
 }
 
-template void gaussianFilterChunked<float, float>(float*, float*, const int, const int, const int, float, const int, int);
-template void gaussianFilterChunked<int, float>(int*, float*, const int, const int, const int, float, const int, int);
-template void gaussianFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, float, const int, int);
+template void gaussianFilterChunked<float, float>(float*, float*, const int, const int, const int, float, const int, int, const float);
+template void gaussianFilterChunked<int, float>(int*, float*, const int, const int, const int, float, const int, int, const float);
+template void gaussianFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, float, const int, int, const float);
 
 
 /*

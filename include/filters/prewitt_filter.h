@@ -59,4 +59,17 @@ __global__ void prewitt_filter_kernel_3d(dtype* image, float* output, float* dev
 template <typename dtype>
 void prewitt_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type);
 
+//chunked version
+template <typename in_dtype, typename out_dtype, typename kernel_dtype>
+void prewittFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
+                        const int ysize, const int zsize, const int verbose,
+                        int padding_bottom, int padding_top,
+                        kernel_dtype* kernel,
+                        int kernel_xsize, int kernel_ysize, int kernel_zsize);
+
+template<typename in_dtype, typename out_dtype>
+void prewittFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
+                          const int xsize, const int ysize, const int zsize,
+                          const int verbose, int ngpus, const float safetyMargin);
+
 #endif  // PREWITT_FILTER_H

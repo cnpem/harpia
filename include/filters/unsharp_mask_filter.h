@@ -9,4 +9,10 @@ template <typename dtype>
 void unsharp_mask_filtering(dtype* image, float* output, int xsize, int ysize, int zsize,
                             float sigma, float ammount, float threshold, bool type);
 
+
+// chunked version
+template <typename dtype>
+void unsharpMaskChunked(dtype* image, float* output, int xsize, int ysize, int zsize,
+                        float sigma, float ammount, float threshold, const int verbose, int ngpus,
+                        const float safetyMargin);
 #endif  // UNSHARP_MASK_FILTER_H

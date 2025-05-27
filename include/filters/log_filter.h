@@ -30,7 +30,7 @@ void logFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
 template<typename in_dtype, typename out_dtype>
 void logFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
                       const int xsize, const int ysize, const int zsize,
-                      const int verbose, int ngpus);
+                      const int verbose, int ngpus, const float safetyMargin);
 
 
 #endif  // LOG_FILTER_H

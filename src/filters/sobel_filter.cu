@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include "../../include/filters/sobel_filter.h"
+#include "../../include/common/chunkedExecutor.h"
 
 void get_sobel_horizontal_kernel_2d(float** kernel) {
   /*
@@ -444,6 +445,107 @@ template void sobel_filtering<int>(int* image, float* output, int xsize, int ysi
                                    bool type);
 template void sobel_filtering<unsigned int>(unsigned int* image, float* output, int xsize,
                                             int ysize, int zsize, bool type);
+
+
+// chunked version
+template <typename in_dtype, typename out_dtype, typename kernel_dtype>
+void sobelFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
+                        const int ysize, const int zsize, const int verbose,
+                        int padding_bottom, int padding_top,
+                        kernel_dtype* kernel,
+                        int kernel_xsize, int kernel_ysize, int kernel_zsize)
+{
+  const int paddedZsize = padding_bottom + zsize + padding_top;
+  const unsigned int totalSize = xsize * ysize * paddedZsize;
+  const int offset = padding_bottom * xsize * ysize;
+
+  in_dtype* deviceImage;
+  out_dtype* deviceOutput;
+  cudaMalloc((void**)&deviceImage, totalSize * sizeof(in_dtype));
+  cudaMalloc((void**)&deviceOutput, totalSize * sizeof(out_dtype));
+
+  cudaMemcpy(deviceImage, hostImage, totalSize * sizeof(in_dtype), cudaMemcpyHostToDevice);
+
+  float* kernelHorizontal;
+  get_sobel_horizontal_kernel_3d(&kernelHorizontal);
+
+  float* kernelVertical;
+  get_sobel_vertical_kernel_3d(&kernelVertical);
+
+  float* kernelDepth;
+  get_sobel_depth_kernel_3d(&kernelDepth);
+
+  float* deviceKernelHorizontal;
+  cudaMalloc((void**)&deviceKernelHorizontal, 27 * sizeof(float));
+  cudaMemcpy(deviceKernelHorizontal, kernelHorizontal, 27 * sizeof(float), cudaMemcpyHostToDevice);
+
+  float* deviceKernelVertical;
+  cudaMalloc((void**)&deviceKernelVertical, 27 * sizeof(float));
+  cudaMemcpy(deviceKernelVertical, kernelVertical, 27 * sizeof(float), cudaMemcpyHostToDevice);
+
+  float* deviceKernelDepth;
+  cudaMalloc((void**)&deviceKernelDepth, 27 * sizeof(float));
+  cudaMemcpy(deviceKernelDepth, kernelDepth, 27 * sizeof(float), cudaMemcpyHostToDevice);
+
+  dim3 block(8, 8, 8);
+  if (zsize == 1) block = dim3(32, 32, 1);
+
+  dim3 grid((xsize + block.x - 1) / block.x,
+            (ysize + block.y - 1) / block.y,
+            (zsize + block.z - 1) / block.z);
+
+  if (verbose == 1) {
+    printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
+    printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+  }
+
+  sobel_filter_kernel_3d<<<grid, block>>>(
+      deviceImage + offset,
+      deviceOutput + offset,
+      deviceKernelHorizontal,
+      deviceKernelVertical,
+      deviceKernelDepth,
+      xsize, ysize, zsize);
+
+  cudaDeviceSynchronize();
+  cudaMemcpy(hostOutput, deviceOutput + offset, xsize * ysize * zsize * sizeof(out_dtype), cudaMemcpyDeviceToHost);
+
+  cudaFree(deviceKernelHorizontal);
+  cudaFree(deviceKernelVertical);
+  cudaFree(deviceKernelDepth);
+  cudaFree(deviceImage);
+  cudaFree(deviceOutput);
+}
+
+// Explicit template instantiations
+template void sobelFilter3DGPU<float, float, float>(float*, float*, const int, const int, const int, const int, int, int, float*, int, int, int);
+template void sobelFilter3DGPU<int, float, float>(int*, float*, const int, const int, const int, const int, int, int, float*, int, int, int);
+template void sobelFilter3DGPU<unsigned int, float, float>(unsigned int*, float*, const int, const int, const int, const int, int, int, float*, int, int, int);
+
+
+template<typename in_dtype, typename out_dtype>
+void sobelFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
+                          const int xsize, const int ysize, const int zsize,
+                          const int verbose, int ngpus, const float safetyMargin)
+{
+  if (ngpus == 0) {
+    throw std::runtime_error("CPU implementation is not available for sobelFilter3D.");
+  } else {
+    int ncopies = 1;
+    const int kernelOperations = 1;
+    float* dummyKernel = nullptr;  // not used, but placeholder for compatibility
+
+    chunkedExecutorKernel(sobelFilter3DGPU<in_dtype, out_dtype, float>,
+                          ncopies, safetyMargin, ngpus, kernelOperations,
+                          hostImage, hostOutput, xsize, ysize, zsize, verbose,
+                          dummyKernel, 3, 3, 3);
+  }
+}
+
+// Explicit instantiations
+template void sobelFilterChunked<float, float>(float*, float*, const int, const int, const int, const int, int, const float);
+template void sobelFilterChunked<int, float>(int*, float*, const int, const int, const int, const int, int, const float);
+template void sobelFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, const int, int, const float);
 
 /*
 

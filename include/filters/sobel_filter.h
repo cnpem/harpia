@@ -68,4 +68,18 @@ __global__ void sobel_filter_kernel_3d(dtype* image, float* output, float* devic
 template <typename dtype>
 void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, bool type);
 
+
+//chunked version
+template <typename in_dtype, typename out_dtype, typename kernel_dtype>
+void sobelFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
+                        const int ysize, const int zsize, const int verbose,
+                        int padding_bottom, int padding_top,
+                        kernel_dtype* kernel,
+                        int kernel_xsize, int kernel_ysize, int kernel_zsize);
+
+
+template<typename in_dtype, typename out_dtype>
+void sobelFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
+                          const int xsize, const int ysize, const int zsize,
+                          const int verbose, int ngpus, const float safetyMargin);
 #endif  // SOBEL_FILTER_H

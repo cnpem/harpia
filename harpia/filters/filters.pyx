@@ -40,7 +40,8 @@ cdef extern from "../../include/filters/gaussian_filter.h":
     void gaussianFilterChunked[numeric](numeric* hostImage,
                                                     float* hostOutput,
                                                     int xsize, int ysize, int zsize,
-                                                    float sigma, int verbose, int ngpus)
+                                                    float sigma, int verbose, int ngpus, float gpuMemory)
+
 
 def gaussianChunked(np.ndarray[numeric, ndim=3] hostImage,
                     np.ndarray[float, ndim=3] hostOutput,
@@ -53,7 +54,21 @@ def gaussianChunked(np.ndarray[numeric, ndim=3] hostImage,
     gaussianFilterChunked(&hostImage[0, 0, 0],
                           &hostOutput[0, 0, 0],
                           xsize, ysize, zsize,
-                          sigma, verbose, ngpus)
+                          sigma, verbose, ngpus,0.2)
+
+def gaussianFilter(np.ndarray[numeric, ndim=3] hostImage,
+                   np.ndarray[float, ndim=3] hostOutput,
+                   float sigma = 1,
+                   int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
+                   ):
+
+
+    isize = Size(hostImage)
+    gaussianFilterChunked(&hostImage[0, 0, 0],
+                          &hostOutput[0, 0, 0],
+                          isize.x, isize.y, isize.z,
+                          sigma, verbose, ngpus, gpuMemory)
+
 
 #Extern declaration for the Mean filtering function from C / C++ library
 cdef extern from "../../include/filters/mean_filter.h":
@@ -101,6 +116,26 @@ def meanChunked(np.ndarray[numeric, ndim=3] hostImage,
                    xsize, ysize, zsize,flag_verbose,gpuMemory,
                    ngpus,nx,ny,nz)
 
+
+def meanFilter(np.ndarray[numeric, ndim=3] hostImage,
+               np.ndarray[np.float32_t, ndim=3] hostOutput,
+               int windowSize = 1,
+               int verbose = 0,
+               float gpuMemory = 0.4,
+               int ngpus = -1,
+               ):
+    
+    isize = Size(hostImage)
+    nx = windowSize
+    ny = windowSize
+    nz = windowSize
+
+    meanFilterChunked(&hostImage[0, 0, 0],
+                      &hostOutput[0, 0, 0],
+                      isize.x, isize.y, isize.z,
+                      verbose, gpuMemory, ngpus,
+                      nx, ny, nz)
+
 #Extern declaration for the LoG filtering function from C / C++ library
 cdef extern from "../../include/filters/log_filter.h":
     void log_filtering[numeric] (numeric* hostImage, float* hostOutput,
@@ -132,7 +167,7 @@ def LoG(np.ndarray[numeric, ndim=3] hostImage,
 cdef extern from "../../include/filters/log_filter.h":
     void logFilterChunked[numeric](numeric* hostImage, float* hostOutput,
                                     int xsize, int ysize, int zsize,
-                                    int flag_verbose, int ngpus)
+                                    int flag_verbose, int ngpus, float gpuMemory)
 
 def logChunked(np.ndarray[numeric, ndim=3] hostImage,
                np.ndarray[np.float32_t, ndim=3] hostOutput,
@@ -144,7 +179,21 @@ def logChunked(np.ndarray[numeric, ndim=3] hostImage,
     logFilterChunked(&hostImage[0,0,0],
                      &hostOutput[0,0,0],
                      xsize, ysize, zsize,
-                     flag_verbose, ngpus)
+                     flag_verbose, ngpus, 0.2)
+
+
+def logFilter(np.ndarray[numeric, ndim=3] hostImage,
+              np.ndarray[np.float32_t, ndim=3] hostOutput,
+              int verbose = 0,
+              float gpuMemory = 0.4,
+              int ngpus = -1):
+
+    isize = Size(hostImage)
+
+    logFilterChunked(&hostImage[0, 0, 0],
+                     &hostOutput[0, 0, 0],
+                     isize.x, isize.y, isize.z,
+                     verbose, ngpus, gpuMemory)
 
 #Extern declaration for the Unsharp Mask filtering function from C / C++ library
 cdef extern from "../../include/filters/unsharp_mask_filter.h":
@@ -175,6 +224,28 @@ def unsharp_mask(np.ndarray[numeric, ndim=3] hostImage,
                            xsize, ysize, zsize,
                            sigma, amount, threshold, type)
 
+#Chunked version
+cdef extern from "../../include/filters/unsharp_mask_filter.h":
+    void unsharpMaskChunked[numeric](numeric* image, float* output, int xsize, int ysize, int zsize,
+                            float sigma, float ammount, float threshold, const int verbose, int ngpus,
+                            const float safetyMargin)
+
+def unsharpMaskFilter(np.ndarray[numeric, ndim=3] hostImage,
+                      np.ndarray[np.float32_t, ndim=3] hostOutput,
+                      float sigma = 1,
+                      float ammount = 1,
+                      float threshold = 0,
+                      int verbose = 0,
+                      float gpuMemory = 0.4,
+                      int ngpus = -1):
+    
+    isize = Size(hostImage)
+    unsharpMaskChunked(&hostImage[0, 0, 0],
+                     &hostOutput[0, 0, 0],
+                     isize.x, isize.y, isize.z,
+                     sigma, ammount, threshold,
+                     verbose, ngpus, gpuMemory)
+
 #Extern declaration for the Sobel filtering function from C / C++ library
 cdef extern from "../../include/filters/sobel_filter.h":
     void sobel_filtering[numeric] (numeric* hostImage, float* hostOutput,
@@ -198,6 +269,27 @@ def sobel(np.ndarray[numeric, ndim=3] hostImage,
                     &hostOutput[0,0,0],
                     xsize, ysize, zsize, type)
 
+
+#Chunked version
+
+cdef extern from "../../include/filters/sobel_filter.h":
+    void sobelFilterChunked[numeric](numeric* hostImage, float* hostOutput,
+                                    int xsize, int ysize, int zsize,
+                                    int flag_verbose, int ngpus, float gpuMemory)
+                                    
+def sobelFilter(np.ndarray[numeric, ndim=3] hostImage,
+              np.ndarray[np.float32_t, ndim=3] hostOutput,
+              int verbose = 0,
+              float gpuMemory = 0.4,
+              int ngpus = -1):
+
+    isize = Size(hostImage)
+
+    sobelFilterChunked(&hostImage[0, 0, 0],
+                     &hostOutput[0, 0, 0],
+                     isize.x, isize.y, isize.z,
+                     verbose, ngpus, gpuMemory)
+
 #Extern declaration for the Prewitt filtering function from C / C++ library
 cdef extern from "../../include/filters/prewitt_filter.h":
     void prewitt_filtering[numeric] (numeric* hostImage, float* hostOutput,
@@ -220,6 +312,27 @@ def prewitt(np.ndarray[numeric, ndim=3] hostImage,
     prewitt_filtering(&hostImage[0,0,0],
                       &hostOutput[0,0,0],
                       xsize, ysize, zsize, type)
+
+
+#Chunked version
+
+cdef extern from "../../include/filters/prewitt_filter.h":
+    void prewittFilterChunked[numeric](numeric* hostImage, float* hostOutput,
+                                    int xsize, int ysize, int zsize,
+                                    int flag_verbose, int ngpus, float gpuMemory)
+
+def prewittFilter(np.ndarray[numeric, ndim=3] hostImage,
+              np.ndarray[np.float32_t, ndim=3] hostOutput,
+              int verbose = 0,
+              float gpuMemory = 0.4,
+              int ngpus = -1):
+
+    isize = Size(hostImage)
+
+    prewittFilterChunked(&hostImage[0, 0, 0],
+                     &hostOutput[0, 0, 0],
+                     isize.x, isize.y, isize.z,
+                     verbose, ngpus, gpuMemory)
 
 #Extern declaration for the Canny filtering function from C / C++ library
 cdef extern from "../../include/filters/canny_filter.h":
@@ -277,6 +390,24 @@ def median(np.ndarray[numeric, ndim=3] hostImage,
                           xsize, ysize, zsize,
                           nx, ny, nz)
 
+
+#Median filter chunked format (not actually chunked, just in the format of)
+def medianFilter(np.ndarray[numeric, ndim=3] hostImage,
+               np.ndarray[numeric, ndim=3] hostOutput,
+               int nx = 1,
+               int ny = 1,
+               int nz = 1,
+               int verbose = 0,
+               float gpuMemory = 0.4,
+               int ngpus = -1,
+               ):
+    
+    isize = Size(hostImage)
+
+    median_filtering(&hostImage[0, 0, 0],
+                      &hostOutput[0, 0, 0],
+                      isize.x, isize.y, isize.z,
+                      nx, ny, nz)
 #Define the fused type for numeric types : float, double
 ctypedef fused real:
     float
@@ -412,3 +543,35 @@ def non_local_means(np.ndarray[numeric, ndim=2] hostImage,
                       &hostOutput[0,0],
                       xsize, ysize,
                       small_window, big_window, h, sigma)
+
+
+def nonLocalMeansFilter(np.ndarray[numeric, ndim=3] hostImage,
+                        np.ndarray[np.float64_t, ndim=3] hostOutput,
+                        int small_window, int big_window, double h, double sigma=0, int axis=0,
+                        int verbose=1, float gpuMemory=1, int ngpus=-1):
+    cdef int i
+    cdef int xsize, ysize
+    cdef int zsize = hostImage.shape[0]
+    cdef int ydim = hostImage.shape[1]
+    cdef int xdim = hostImage.shape[2]
+
+    if axis == 0:  # slices along z axis, shape (z, y, x) → filter on (y, x)
+        xsize, ysize = xdim, ydim
+        for i in range(zsize):
+            non_local_means(hostImage[i], hostOutput[i], xsize, ysize,
+                            small_window, big_window, h, sigma)
+
+    elif axis == 1:  # slices along y axis, shape (z, y, x) → filter on (z, x)
+        xsize, ysize = xdim, zsize
+        for i in range(ydim):
+            non_local_means(hostImage[:, i, :], hostOutput[:, i, :], xsize, ysize,
+                            small_window, big_window, h, sigma)
+
+    elif axis == 2:  # slices along x axis, shape (z, y, x) → filter on (z, y)
+        xsize, ysize = ydim, zsize
+        for i in range(xdim):
+            non_local_means(hostImage[:, :, i], hostOutput[:, :, i], xsize, ysize,
+                            small_window, big_window, h, sigma)
+
+    else:
+        raise ValueError("Axis must be 0, 1, or 2.")
