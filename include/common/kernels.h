@@ -4,6 +4,7 @@
 #include <cuda_runtime.h>
 #include <cmath>
 #include <iostream>
+#define PI 3.141592653589793
 
 template <typename dtype>
 __device__ void get_mean_kernel_2d(dtype* image, float* mean, int idx, int idy, int xsize,
@@ -216,7 +217,7 @@ __device__ void get_std_kernel_3d(dtype* image, float mean, float* standard_devi
   *standard_deviation = sqrt(accumulation / (nx * ny * nz));
 }
 
-static void get_gaussian_kernel_2d(float** kernel, int nx, int ny, float sigma) {
+static void get_gaussian_kernel_2d(double** kernel, int nx, int ny, float sigma) {
   /*
 
         kernel is given by the gaussian distribution:
@@ -226,7 +227,7 @@ static void get_gaussian_kernel_2d(float** kernel, int nx, int ny, float sigma) 
     */
 
   //kernel allocation
-  *kernel = (float*)malloc(sizeof(float) * nx * ny);
+  *kernel = (double*)malloc(sizeof(double) * nx * ny);
 
   if (!*kernel) {
     return;
@@ -238,8 +239,8 @@ static void get_gaussian_kernel_2d(float** kernel, int nx, int ny, float sigma) 
   int x0 = nx / 2;
   int y0 = ny / 2;
 
-  float distance = 0;
-  float normalization = 0;
+  double distance = 0;
+  double normalization = 0;
 
   // Generate the kernel values.
   for (int i = 0; i < nx; i++) {
@@ -251,7 +252,7 @@ static void get_gaussian_kernel_2d(float** kernel, int nx, int ny, float sigma) 
 
       distance = x * x + y * y;
 
-      (*kernel)[i * ny + j] = exp(-distance / (2 * sigma * sigma + 1E-16)) * 1E2;
+      (*kernel)[i * ny + j] = exp(-distance / (2 * sigma * sigma + 1E-16));
       normalization += (*kernel)[i * ny + j];
 
       //std::cout<<(*kernel)[i*ysize+j]<<" ";
@@ -261,11 +262,19 @@ static void get_gaussian_kernel_2d(float** kernel, int nx, int ny, float sigma) 
   }
 
   for (int i = 0; i < nx * ny; i++) {
-    (*kernel)[i] = (*kernel)[i] / normalization;
+    (*kernel)[i] = (*kernel)[i] / (2*sigma*sigma*PI);
+  }
+
+  printf("2D Gaussian Kernel (%dx%d):\n", nx, ny);
+  for (int i = 0; i < nx; i++) {
+    for (int j = 0; j < ny; j++) {
+      printf("%0.6f ", (*kernel)[i * ny + j]);
+    }
+    printf("\n");
   }
 }
 
-static void get_gaussian_kernel_3d(float** kernel, int nx, int ny, int nz, float sigma) {
+static void get_gaussian_kernel_3d(double** kernel, int nx, int ny, int nz, float sigma) {
   /*
 
         kernel is given by the gaussian distribution:
@@ -275,7 +284,7 @@ static void get_gaussian_kernel_3d(float** kernel, int nx, int ny, int nz, float
     */
 
   //kernel allocation
-  *kernel = (float*)malloc(sizeof(float) * nx * ny * nz);
+  *kernel = (double*)malloc(sizeof(double) * nx * ny * nz);
 
   if (!*kernel) {
     return;
@@ -289,8 +298,8 @@ static void get_gaussian_kernel_3d(float** kernel, int nx, int ny, int nz, float
   int y0 = ny / 2;
   int z0 = nz / 2;
 
-  float distance = 0;
-  float normalization = 0;
+  double distance = 0;
+  double normalization = 0;
 
   // Generate the kernel values.
   for (int k = 0; k < nz; k++) {
@@ -305,10 +314,10 @@ static void get_gaussian_kernel_3d(float** kernel, int nx, int ny, int nz, float
 
         distance = x * x + y * y + z * z;
 
-        (*kernel)[k * nx * ny + i * ny + j] = exp(-distance / (2 * sigma * sigma + 1E-16)) * 1E2;
+        (*kernel)[k * nx * ny + i * ny + j] = exp(-distance / (2 * sigma * sigma + 1E-16));
         normalization += (*kernel)[k * nx * ny + i * ny + j];
 
-        //std::cout<<(*kernel)[i*ysize+j]<<" ";
+        //std::cout<<(*kernel)[i*ny+j]<<" ";
       }
 
       //std::cout<<"\n";
@@ -316,7 +325,19 @@ static void get_gaussian_kernel_3d(float** kernel, int nx, int ny, int nz, float
   }
 
   for (int i = 0; i < nx * ny * nz; i++) {
-    (*kernel)[i] = (*kernel)[i] / normalization;
+    (*kernel)[i] = (*kernel)[i] / (2*sigma*sigma*PI);
+  }
+
+  printf("3D Gaussian Kernel (%dx%dx%d):\n", nx, ny, nz);
+  for (int k = 0; k < nz; k++) {
+    printf("Slice z = %d:\n", k);
+    for (int i = 0; i < nx; i++) {
+      for (int j = 0; j < ny; j++) {
+        printf("%0.6f ", (*kernel)[k * nx * ny + i * ny + j]);
+      }
+      printf("\n");
+    }
+    printf("\n");
   }
 }
 #endif  // KERNELS_H
