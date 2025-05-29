@@ -301,13 +301,13 @@ void canny_filtering(dtype* hostImage, float* hostOutput,
     int ny = nx;
 
     //get gaussian kernel.
-    float* gaussian_kernel;
+    double* gaussian_kernel;
     get_gaussian_kernel_2d(&gaussian_kernel, nx, ny, sigma);
 
     //device allocation for the gaussian kernel
-    float* deviceKernel;
-    cudaMalloc((void**)&deviceKernel, nx * ny * sizeof(float));
-    cudaMemcpy(deviceKernel, gaussian_kernel, nx * ny * sizeof(float), cudaMemcpyHostToDevice);
+    double* deviceKernel;
+    cudaMalloc((void**)&deviceKernel, nx * ny * sizeof(double));
+    cudaMemcpy(deviceKernel, gaussian_kernel, nx * ny * sizeof(double), cudaMemcpyHostToDevice);
 
     //Free host gaussian kernel
     free(gaussian_kernel);
