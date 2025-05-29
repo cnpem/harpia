@@ -44,6 +44,17 @@ from harpia.morphology.operations_grayscale import (
      bottom_hat_reconstruction,
 )
 
+# Custom filters chunked operations from harpia
+from harpia.filters.filtersChunked import (
+     gaussianFilter,
+     meanFilter,
+     logFilter,
+     unsharpMaskFilter,
+     sobelFilter,
+     prewittFilter,
+     anisotropic_diffusion3D,
+)
+
 import harpia
 print(harpia.__file__)
 
@@ -64,18 +75,18 @@ def smooth_sk(image, selem):
 
 # Instruction: Uncomment the image for which tests will be executed.
 
-# # IMAGE 1
-# print("reading small image...")
-# xsize = 190
-# ysize = 207
-# zsize_original = 100
-# zsize = 100
-# path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
-# path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-# img_num = 1
-# print("fineshed reading small image!")
+# IMAGE 1
+print("reading small image...")
+xsize = 190
+ysize = 207
+zsize_original = 100
+zsize = 100
+path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
+path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
+image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
+image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+img_num = 1
+print("fineshed reading small image!")
 
 # # IMAGE 2 (possibily with problem)
 # print("reading big image...")
@@ -100,18 +111,18 @@ def smooth_sk(image, selem):
 # img_num = 3
 # print("fineshed reading medium image!")
 
-# IMAGE 4
-print("reading big image...")
-xsize = 2052
-ysize = 2052
-zsize = 2048
+# # IMAGE 4
+# print("reading big image...")
+# xsize = 2052
+# ysize = 2052
+# zsize = 2048
 
-path_grayscale = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
-path_binary = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/binary/Recon_2052x2052x2048_16bits.raw"
-image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'float32')
-image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-img_num = 4
-print("fineshed reading big image!")
+# path_grayscale = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
+# path_binary = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/binary/Recon_2052x2052x2048_16bits.raw"
+# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'float32')
+# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+# img_num = 4
+# print("fineshed reading big image!")
 
 #Kernel
 kernel = custum_kernel3D()
@@ -131,11 +142,21 @@ operations_grayscale = [
     ("Top Hat 3D grayscale", None, top_hat, "top_hat"),
     ("Bottom Hat 3D grayscale", None, bottom_hat, "bottom_hat"),
 ]
+operations_filters = [
+    ("Gaussian Filter 3D grayscale", None, gaussianFilter, "gaussianFilter"),
+    ("Mean Filter 3D grayscale", None, meanFilter, "meanFilter"),
+    ("Log Filter 3D grayscale", None, logFilter, "logFilter"),
+    ("Unsharp Mask Filter 3D grayscale", None, unsharpMaskFilter, "unsharpMaskFilter"),
+    ("Sobel Filter 3D grayscale", None, sobelFilter, "sobelFilter"),
+    ("Prewitt Filter 3D grayscale", None, prewittFilter, "prewittFilter"),
+    ("Anisotropic Diffusion Filter 3D grayscale", None, anisotropic_diffusion3D, "anisotropic_diffusion3D"), #only runs in float images
+]
+
 
 images_grayscale = [
-    ("int32", f"image{img_num}_int32_grayscale"),
+    #("int32", f"image{img_num}_int32_grayscale"),
     #("uint32", f"image{img_num}_uint32_grayscale"),
-    #("float32", f"image{img_num}_float32_grayscale"),
+    ("float32", f"image{img_num}_float32_grayscale"),
    ]
 
 
@@ -158,9 +179,9 @@ images_binary = [
    ]
 
 machine = 'harriet'
-ngpus_values = [1, 2, 3, 4]
-gpuMemory_values = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4]
-repetitions = 20
+ngpus_values = [1]
+gpuMemory_values = [0.4]
+repetitions = 1
 
 for ngpus in ngpus_values:
     for gpuMemory in gpuMemory_values:
@@ -168,6 +189,10 @@ for ngpus in ngpus_values:
 
         for img in images_grayscale:
             image_input = image_grayscale.astype(dtype=img[0])
+            for operation in operations_filters:
+                # Attempt to run the test
+                results_df = tests.run_no_kernel(
+                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory)
             for operation in operations_grayscale:
                 # Attempt to run the test
                 results_df = tests.run(

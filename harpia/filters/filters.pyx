@@ -34,27 +34,6 @@ def gaussian(np.ndarray[numeric, ndim=3] hostImage, np.ndarray[np.float32_t, ndi
                         xsize, ysize, zsize,
                         sigma, type)
 
-
-#chunked version
-cdef extern from "../../include/filters/gaussian_filter.h":
-    void gaussianFilterChunked[numeric](numeric* hostImage,
-                                                    float* hostOutput,
-                                                    int xsize, int ysize, int zsize,
-                                                    float sigma, int verbose, int ngpus)
-
-def gaussianChunked(np.ndarray[numeric, ndim=3] hostImage,
-                    np.ndarray[float, ndim=3] hostOutput,
-                    int xsize, int ysize, int zsize,
-                    float sigma):
-    
-    cdef int verbose = 1
-    cdef int ngpus = 1
-
-    gaussianFilterChunked(&hostImage[0, 0, 0],
-                          &hostOutput[0, 0, 0],
-                          xsize, ysize, zsize,
-                          sigma, verbose, ngpus)
-
 #Extern declaration for the Mean filtering function from C / C++ library
 cdef extern from "../../include/filters/mean_filter.h":
     void mean_filtering[numeric] (numeric* hostImage, float* hostOutput,
@@ -83,23 +62,6 @@ def mean(np.ndarray[numeric, ndim=3] hostImage,
                    xsize, ysize, zsize,
                    nx, ny, nz)
 
-#Extern declaration for the Mean filtering with the chunked executor function
-cdef extern from "../../include/filters/mean_filter.h":
-    void meanFilterChunked[numeric](numeric* hostImage, float* hostOutput, int xsize, int ysize, int zsize, int flag_verbose,
-                       float gpuMemory, int ngpus, int nx, int ny, int nz)
-
-def meanChunked(np.ndarray[numeric, ndim=3] hostImage,
-         np.ndarray[np.float32_t, ndim=3] hostOutput,
-         int xsize, int ysize, int zsize,
-         int nx, int ny, int nz):
-
-        flag_verbose = 1
-        gpuMemory = 0.2
-        ngpus = 1
-        meanFilterChunked(&hostImage[0,0,0],
-                   &hostOutput[0,0,0],
-                   xsize, ysize, zsize,flag_verbose,gpuMemory,
-                   ngpus,nx,ny,nz)
 
 #Extern declaration for the LoG filtering function from C / C++ library
 cdef extern from "../../include/filters/log_filter.h":
@@ -128,23 +90,6 @@ def LoG(np.ndarray[numeric, ndim=3] hostImage,
                   xsize, ysize, zsize,
                   type)
 
-#chunked version
-cdef extern from "../../include/filters/log_filter.h":
-    void logFilterChunked[numeric](numeric* hostImage, float* hostOutput,
-                                    int xsize, int ysize, int zsize,
-                                    int flag_verbose, int ngpus)
-
-def logChunked(np.ndarray[numeric, ndim=3] hostImage,
-               np.ndarray[np.float32_t, ndim=3] hostOutput,
-               int xsize, int ysize, int zsize):
-    
-    cdef int flag_verbose = 1
-    cdef int ngpus = 1
-
-    logFilterChunked(&hostImage[0,0,0],
-                     &hostOutput[0,0,0],
-                     xsize, ysize, zsize,
-                     flag_verbose, ngpus)
 
 #Extern declaration for the Unsharp Mask filtering function from C / C++ library
 cdef extern from "../../include/filters/unsharp_mask_filter.h":
@@ -175,6 +120,7 @@ def unsharp_mask(np.ndarray[numeric, ndim=3] hostImage,
                            xsize, ysize, zsize,
                            sigma, amount, threshold, type)
 
+
 #Extern declaration for the Sobel filtering function from C / C++ library
 cdef extern from "../../include/filters/sobel_filter.h":
     void sobel_filtering[numeric] (numeric* hostImage, float* hostOutput,
@@ -198,6 +144,7 @@ def sobel(np.ndarray[numeric, ndim=3] hostImage,
                     &hostOutput[0,0,0],
                     xsize, ysize, zsize, type)
 
+
 #Extern declaration for the Prewitt filtering function from C / C++ library
 cdef extern from "../../include/filters/prewitt_filter.h":
     void prewitt_filtering[numeric] (numeric* hostImage, float* hostOutput,
@@ -220,6 +167,8 @@ def prewitt(np.ndarray[numeric, ndim=3] hostImage,
     prewitt_filtering(&hostImage[0,0,0],
                       &hostOutput[0,0,0],
                       xsize, ysize, zsize, type)
+
+
 
 #Extern declaration for the Canny filtering function from C / C++ library
 cdef extern from "../../include/filters/canny_filter.h":
@@ -276,6 +225,7 @@ def median(np.ndarray[numeric, ndim=3] hostImage,
                           &hostOutput[0,0,0],
                           xsize, ysize, zsize,
                           nx, ny, nz)
+
 
 #Define the fused type for numeric types : float, double
 ctypedef fused real:
@@ -412,3 +362,4 @@ def non_local_means(np.ndarray[numeric, ndim=2] hostImage,
                       &hostOutput[0,0],
                       xsize, ysize,
                       small_window, big_window, h, sigma)
+
