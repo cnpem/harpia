@@ -12,7 +12,21 @@ def time_compare_and_plot(csv_data, machine, module_func, skimage_func, image, k
     skimage_times = []
 
     # Time the module function multiple times
-    if(kernel):
+    if(kernel is None):
+        module_output = module_func(image, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
+        for _ in range(repetitions):
+            start = timeit.default_timer()
+            module_output = module_func(image, *args, gpuMemory= gpuMemory, ngpus = ngpus, **kwargs)
+            module_times.append(timeit.default_timer() - start)
+
+        # Time the scikit-image function multiple times
+        skimage_output = skimage_func(image) #warm up run
+        for _ in range(repetitions):
+            start = timeit.default_timer()
+            skimage_output = skimage_func(image)
+            skimage_times.append(timeit.default_timer() - start)
+    
+    else:
         module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
         for _ in range(repetitions):
             start = timeit.default_timer()
@@ -24,20 +38,6 @@ def time_compare_and_plot(csv_data, machine, module_func, skimage_func, image, k
         for _ in range(repetitions):
             start = timeit.default_timer()
             skimage_output = skimage_func(image, kernel)
-            skimage_times.append(timeit.default_timer() - start)
-    
-    else:
-        module_output = module_func(image, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            module_output = module_func(image, *args, gpuMemory= gpuMemory, ngpus = ngpus, **kwargs)
-            module_times.append(timeit.default_timer() - start)
-
-        # Time the scikit-image function multiple times
-        skimage_output = skimage_func(image) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            skimage_output = skimage_func(imagey)
             skimage_times.append(timeit.default_timer() - start)
 
     # Calculate mean times
