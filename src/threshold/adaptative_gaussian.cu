@@ -6,7 +6,7 @@
 #include "../../include/threshold/adaptative_gaussian.h"
 
 template <typename dtype>
-__global__ void local_gaussian_kernel_2d(dtype* image, float* output, float* dev_kernel,
+__global__ void local_gaussian_kernel_2d(dtype* image, float* output, double* dev_kernel,
                                          float weight, int idz, int rows, int cols, int slices,
                                          int rows_kernel, int cols_kernel) {
 
@@ -17,13 +17,13 @@ __global__ void local_gaussian_kernel_2d(dtype* image, float* output, float* dev
   // general matrix convolution for each pixel of the image.
   if (idx < rows && idy < cols) {
     //temp variable
-    float temp;
+    double temp;
 
     //convolution.
     convolution2d(image + idz * rows * cols, &temp, dev_kernel, idx, idy, rows, cols, rows_kernel,
                   cols_kernel);
 
-    float T_local_gaussian = temp - weight;
+    double T_local_gaussian = temp - weight;
 
     if (image[idz * rows * cols + idx * cols + idy] > T_local_gaussian) {
       output[idz * rows * cols + idx * cols + idy] = 255;
@@ -35,7 +35,7 @@ __global__ void local_gaussian_kernel_2d(dtype* image, float* output, float* dev
 }
 
 template <typename dtype>
-__global__ void local_gaussian_kernel_3d(dtype* image, float* output, float* dev_kernel,
+__global__ void local_gaussian_kernel_3d(dtype* image, float* output, double* dev_kernel,
                                          float weight, int rows, int cols, int depth,
                                          int rows_kernel, int cols_kernel, int depth_kernel) {
   const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -43,12 +43,12 @@ __global__ void local_gaussian_kernel_3d(dtype* image, float* output, float* dev
   const int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
   if (idx < rows && idy < cols && idz < depth) {
-    float temp;
+    double temp;
 
     convolution3d(image, &temp, dev_kernel, idx, idy, idz, rows, cols, depth, rows_kernel,
                   cols_kernel, depth_kernel);
 
-    float T_local_gaussian = temp - weight;
+    double T_local_gaussian = temp - weight;
 
     if (image[idz * rows * cols + idx * cols + idy] > T_local_gaussian) {
       output[idz * rows * cols + idx * cols + idy] = 255;
@@ -59,21 +59,21 @@ __global__ void local_gaussian_kernel_3d(dtype* image, float* output, float* dev
   }
 }
 
-template __global__ void local_gaussian_kernel_2d<int>(int* image, float* output, float* dev_kernel,
+template __global__ void local_gaussian_kernel_2d<int>(int* image, float* output, double* dev_kernel,
                                                        float weight, int idz, int rows, int cols,
                                                        int slices, int rows_kernel,
                                                        int cols_kernel);
 template __global__ void local_gaussian_kernel_2d<float>(float* image, float* output,
-                                                         float* dev_kernel, float weight, int idz,
+                                                         double* dev_kernel, float weight, int idz,
                                                          int rows, int cols, int slices,
                                                          int rows_kernel, int cols_kernel);
 
-template __global__ void local_gaussian_kernel_3d<int>(int* image, float* output, float* dev_kernel,
+template __global__ void local_gaussian_kernel_3d<int>(int* image, float* output, double* dev_kernel,
                                                        float weight, int rows, int cols, int depth,
                                                        int rows_kernel, int cols_kernel,
                                                        int depth_kernel);
 template __global__ void local_gaussian_kernel_3d<float>(float* image, float* output,
-                                                         float* dev_kernel, float weight, int rows,
+                                                         double* dev_kernel, float weight, int rows,
                                                          int cols, int depth, int rows_kernel,
                                                          int cols_kernel, int depth_kernel);
 
@@ -93,12 +93,12 @@ void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, i
     int rows_kernel = (int)ceil(2 * sigma + 1);
     int cols_kernel = rows_kernel;
 
-    float* kernel;
+    double* kernel;
     get_gaussian_kernel_2d(&kernel, rows_kernel, cols_kernel, sigma);
 
-    float* dev_kernel;
-    cudaMalloc((void**)&dev_kernel, rows_kernel * cols_kernel * sizeof(float));
-    cudaMemcpy(dev_kernel, kernel, rows_kernel * cols_kernel * sizeof(float),
+    double* dev_kernel;
+    cudaMalloc((void**)&dev_kernel, rows_kernel * cols_kernel * sizeof(double));
+    cudaMemcpy(dev_kernel, kernel, rows_kernel * cols_kernel * sizeof(double),
                cudaMemcpyHostToDevice);
 
     dim3 blockSize(32, 32);
@@ -127,12 +127,12 @@ void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, i
     int cols_kernel = rows_kernel;
     int depth_kernel = rows_kernel;
 
-    float* kernel;
+    double* kernel;
     get_gaussian_kernel_3d(&kernel, rows_kernel, cols_kernel, depth_kernel, sigma);
 
-    float* dev_kernel;
-    cudaMalloc((void**)&dev_kernel, rows_kernel * cols_kernel * depth_kernel * sizeof(float));
-    cudaMemcpy(dev_kernel, kernel, rows_kernel * cols_kernel * depth_kernel * sizeof(float),
+    double* dev_kernel;
+    cudaMalloc((void**)&dev_kernel, rows_kernel * cols_kernel * depth_kernel * sizeof(double));
+    cudaMemcpy(dev_kernel, kernel, rows_kernel * cols_kernel * depth_kernel * sizeof(double),
                cudaMemcpyHostToDevice);
 
     dim3 blockSize(16, 16, 4);

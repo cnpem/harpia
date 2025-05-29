@@ -7,7 +7,7 @@
 #include "../../include/common/chunkedExecutor.h"
 
 template <typename dtype>
-__global__ void gaussian_filter_kernel_2d(dtype* image, float* output, float* deviceKernel, int idz,
+__global__ void gaussian_filter_kernel_2d(dtype* image, float* output, double* deviceKernel, int idz,
                                           int xsize, int ysize, int zsize, int nx, int ny) {
 
   //threads indices
@@ -17,46 +17,46 @@ __global__ void gaussian_filter_kernel_2d(dtype* image, float* output, float* de
   // general matrix convolution for each pixel of the image.
   if (idx < xsize && idy < ysize) {
     //temp variable
-    float temp;
+    double temp;
 
     unsigned int index = idz * xsize * ysize + idx * ysize + idy;
 
     //convolution.
     convolution2d(image + idz * xsize * ysize, &temp, deviceKernel, idx, idy, xsize, ysize, nx, ny);
 
-    output[index] = (float)temp;
+    output[index] = (double)temp;
   }
 }
 
 template <typename dtype>
-__global__ void gaussian_filter_kernel_3d(dtype* image, float* output, float* deviceKernel,
+__global__ void gaussian_filter_kernel_3d(dtype* image, float* output, double* deviceKernel,
                                           int xsize, int ysize, int zsize, int nx, int ny, int nz) {
   const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
   const unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
   const unsigned int idz = blockIdx.z * blockDim.z + threadIdx.z;
 
   if (idx < xsize && idy < ysize && idz < zsize) {
-    float temp;
+    double temp;
     unsigned int index = idz * xsize * ysize + idx * ysize + idy;
 
     convolution3d(image, &temp, deviceKernel, idx, idy, idz, xsize, ysize, zsize, nx, ny, nz);
 
-    output[index] = (float)temp;
+    output[index] = (double)temp;
   }
 }
 
 template __global__ void gaussian_filter_kernel_2d<int>(int* image, float* output,
-                                                        float* deviceKernel, int idz, int xsize,
+                                                        double* deviceKernel, int idz, int xsize,
                                                         int ysize, int zsize, int nx, int ny);
 template __global__ void gaussian_filter_kernel_2d<float>(float* image, float* output,
-                                                          float* deviceKernel, int idz, int xsize,
+                                                          double* deviceKernel, int idz, int xsize,
                                                           int ysize, int zsize, int nx, int ny);
 
 template __global__ void gaussian_filter_kernel_3d<int>(int* image, float* output,
-                                                        float* deviceKernel, int xsize, int ysize,
+                                                        double* deviceKernel, int xsize, int ysize,
                                                         int zsize, int nx, int ny, int nz);
 template __global__ void gaussian_filter_kernel_3d<float>(float* image, float* output,
-                                                          float* deviceKernel, int xsize, int ysize,
+                                                          double* deviceKernel, int xsize, int ysize,
                                                           int zsize, int nx, int ny, int nz);
 
 template <typename dtype>
@@ -74,15 +74,15 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
 
   if (type == false) {
     //kernel size
-    int nx = (int)ceil(2 * sigma + 1);
+    int nx = (int)ceil(6 * sigma + 1);
     int ny = nx;
 
-    float* kernel;
+    double* kernel;
     get_gaussian_kernel_2d(&kernel, nx, ny, sigma);
 
-    float* deviceKernel;
-    cudaMalloc((void**)&deviceKernel, nx * ny * sizeof(float));
-    cudaMemcpy(deviceKernel, kernel, nx * ny * sizeof(float), cudaMemcpyHostToDevice);
+    double* deviceKernel;
+    cudaMalloc((void**)&deviceKernel, nx * ny * sizeof(double));
+    cudaMemcpy(deviceKernel, kernel, nx * ny * sizeof(double), cudaMemcpyHostToDevice);
 
     dim3 blockSize(32, 32);
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
@@ -106,16 +106,16 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
 
   else {
     //kernel size
-    int nx = (int)ceil(2 * sigma + 1);
+    int nx = (int)ceil(6 * sigma + 1);
     int ny = nx;
     int nz = nx;
 
-    float* kernel;
+    double* kernel;
     get_gaussian_kernel_3d(&kernel, nx, ny, nz, sigma);
 
-    float* deviceKernel;
-    cudaMalloc((void**)&deviceKernel, nx * ny * nz * sizeof(float));
-    cudaMemcpy(deviceKernel, kernel, nx * ny * nz * sizeof(float), cudaMemcpyHostToDevice);
+    double* deviceKernel;
+    cudaMalloc((void**)&deviceKernel, nx * ny * nz * sizeof(double));
+    cudaMemcpy(deviceKernel, kernel, nx * ny * nz * sizeof(double), cudaMemcpyHostToDevice);
 
     dim3 blockSize(8, 8, 8);
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
@@ -203,9 +203,9 @@ void gaussianFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int x
 
 }
 
-template void gaussianFilter3DGPU<float, float, float>(float*, float*, const int, const int, const int, const int, int, int, float*, int, int, int);
-template void gaussianFilter3DGPU<int, float, float>(int*, float*, const int, const int, const int, const int, int, int, float*, int, int, int);
-template void gaussianFilter3DGPU<unsigned int, float, float>(unsigned int*, float*, const int, const int, const int, const int, int, int, float*, int, int, int);
+template void gaussianFilter3DGPU<float, float, double>(float*, float*, const int, const int, const int, const int, int, int, double*, int, int, int);
+template void gaussianFilter3DGPU<int, float, double>(int*, float*, const int, const int, const int, const int, int, int, double*, int, int, int);
+template void gaussianFilter3DGPU<unsigned int, float, double>(unsigned int*, float*, const int, const int, const int, const int, int, int, double*, int, int, int);
 
 
 template<typename in_dtype, typename out_dtype>
@@ -218,11 +218,11 @@ void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
   } else {
     int ncopies = 1;
     const int kernelOperations = 1;
-    float* kernel;
+    double* kernel;
     int gaussian_size = (int)ceil(2 * sigma + 1); 
     get_gaussian_kernel_3d(&kernel,gaussian_size,gaussian_size,gaussian_size,sigma);  // kernel should be 3x3x3
 
-    chunkedExecutorKernel(gaussianFilter3DGPU<in_dtype, out_dtype, float>,
+    chunkedExecutorKernel(gaussianFilter3DGPU<in_dtype, out_dtype, double>,
                           ncopies, safetyMargin, ngpus, kernelOperations,
                           hostImage, hostOutput, xsize, ysize, zsize, verbose,
                           kernel, gaussian_size, gaussian_size, gaussian_size);
