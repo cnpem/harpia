@@ -69,7 +69,8 @@ def gaussianFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                           &hostOutput[0, 0, 0],
                           isize.x, isize.y, isize.z,
                           sigma, verbose, ngpus, gpuMemory)
-
+    
+    return hostOutput
 
 def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
@@ -94,6 +95,8 @@ def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                       verbose, gpuMemory, ngpus,
                       nx, ny, nz)
 
+    return hostOutput
+
 def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
               int verbose = 0,
@@ -111,6 +114,7 @@ def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                      isize.x, isize.y, isize.z,
                      verbose, ngpus, gpuMemory)
 
+    return hostOutput
 
 def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                       numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
@@ -131,7 +135,9 @@ def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                      isize.x, isize.y, isize.z,
                      sigma, ammount, threshold,
                      verbose, ngpus, gpuMemory)
-                                    
+
+    return hostOutput
+
 def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
               int verbose = 0,
@@ -148,6 +154,7 @@ def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                      isize.x, isize.y, isize.z,
                      verbose, ngpus, gpuMemory)
 
+    return hostOutput
 
 def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
@@ -166,6 +173,7 @@ def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                      isize.x, isize.y, isize.z,
                      verbose, ngpus, gpuMemory)
 
+    return hostOutput
 
 def anisotropic_diffusion3D(numpy.ndarray[real, ndim=3] hostImage, 
                             numpy.ndarray[real, ndim=3] hostOutput = None, int total_iterations=50, 
