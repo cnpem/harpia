@@ -291,12 +291,22 @@ template void logFilter3DGPU<unsigned int, float, float>(unsigned int*, float*, 
 
 template<typename in_dtype, typename out_dtype>
 void logFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
-                      const int xsize, const int ysize, const int zsize,
+                      const int xsize, const int ysize, const int zsize, const int type3d,
                       const int verbose, int ngpus, const float safetyMargin)
 {
   if (ngpus == 0) {
     throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D.");
-  } else {
+  }
+  
+  else if (zsize==1 || type3d == 0)
+  {
+    //calls 2d variant
+    log_filtering(hostImage, hostOutput,xsize,ysize,zsize,0);
+    std::cout<<"2d variant\n";
+
+  }
+  
+  else {
     int ncopies = 1;
     const int kernelOperations = 1;
     float* kernel;
@@ -309,6 +319,6 @@ void logFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
   }
 }
 
-template void logFilterChunked<float, float>(float*, float*, const int, const int, const int, const int, int, const float);
-template void logFilterChunked<int, float>(int*, float*, const int, const int, const int, const int, int, const float);
-template void logFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, const int, int, const float);
+template void logFilterChunked<float, float>(float*, float*, const int, const int, const int, const int, const int, int, const float);
+template void logFilterChunked<int, float>(int*, float*, const int, const int, const int,const int, const int, int, const float);
+template void logFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int,const int, const int, int, const float);

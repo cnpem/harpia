@@ -39,7 +39,7 @@ void meanFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int 
 
 
 template<typename in_dtype, typename out_dtype>
-void meanFilterChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize, int flag_verbose,
+void meanFilterChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize, int type3d,int flag_verbose,
                        float gpuMemory, int ngpus, int nx, int ny, int nz);
 
 #endif  // MEAN_FILTER_H

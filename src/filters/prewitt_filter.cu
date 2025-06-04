@@ -533,12 +533,23 @@ template void prewittFilter3DGPU<unsigned int, float, float>(unsigned int*, floa
 
 template<typename in_dtype, typename out_dtype>
 void prewittFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
-                          const int xsize, const int ysize, const int zsize,
+                          const int xsize, const int ysize, const int zsize, const int type3d,
                           const int verbose, int ngpus, const float safetyMargin)
 {
   if (ngpus == 0) {
     throw std::runtime_error("CPU implementation is not available for prewittFilter3D.");
-  } else {
+  }
+
+  else if (zsize==1 || type3d == 0)
+  {
+    //calls 2d variant
+    prewitt_filtering(hostImage, hostOutput,xsize,ysize,zsize,0);
+    std::cout<<"2d variant\n";
+
+  }
+  
+
+  else {
     int ncopies = 1;
     const int kernelOperations = 1;
     float* dummyKernel = nullptr;  // not used, but placeholder for compatibility
@@ -551,9 +562,9 @@ void prewittFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
 }
 
 // Explicit instantiations
-template void prewittFilterChunked<float, float>(float*, float*, const int, const int, const int, const int, int, const float);
-template void prewittFilterChunked<int, float>(int*, float*, const int, const int, const int, const int, int, const float);
-template void prewittFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, const int, int, const float);
+template void prewittFilterChunked<float, float>(float*, float*, const int, const int, const int, const int, const int, int, const float);
+template void prewittFilterChunked<int, float>(int*, float*, const int, const int, const int, const int, const int, int, const float);
+template void prewittFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, const int ,const int, int, const float);
 
 
 /*

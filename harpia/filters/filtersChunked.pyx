@@ -18,32 +18,32 @@ ctypedef fused real:
 #---------------------------------------------------------------------------------------------------
 cdef extern from "../../include/filters/gaussian_filter.h":
     void gaussianFilterChunked[numeric](numeric* hostImage, float* hostOutput, int xsize, int ysize, 
-                                        int zsize, float sigma, int verbose, int ngpus, 
+                                        int zsize, float sigma, int type3d, int verbose, int ngpus, 
                                         float gpuMemory)
 
 cdef extern from "../../include/filters/mean_filter.h":
     void meanFilterChunked[numeric](numeric* hostImage, float* hostOutput, int xsize, int ysize, 
-                                    int zsize, int flag_verbose, float gpuMemory, int ngpus, int nx, 
+                                    int zsize, int type3d, int flag_verbose, float gpuMemory, int ngpus, int nx, 
                                     int ny, int nz)
 
 cdef extern from "../../include/filters/log_filter.h":
     void logFilterChunked[numeric](numeric* hostImage, float* hostOutput,
-                                    int xsize, int ysize, int zsize,
+                                    int xsize, int ysize, int zsize, int type3d,
                                     int flag_verbose, int ngpus, float gpuMemory)
 
 cdef extern from "../../include/filters/unsharp_mask_filter.h":
     void unsharpMaskChunked[numeric](numeric* image, float* output, int xsize, int ysize, int zsize,
-                                     float sigma, float ammount, float threshold, const int verbose, 
+                                     float sigma, float ammount, float threshold,  int type3d, const int verbose, 
                                      int ngpus, const float safetyMargin)
 
 cdef extern from "../../include/filters/sobel_filter.h":
     void sobelFilterChunked[numeric](numeric* hostImage, float* hostOutput,
-                                    int xsize, int ysize, int zsize,
+                                    int xsize, int ysize, int zsize, int type3d,
                                     int flag_verbose, int ngpus, float gpuMemory)
 
 cdef extern from "../../include/filters/prewitt_filter.h":
     void prewittFilterChunked[numeric](numeric* hostImage, float* hostOutput,
-                                       int xsize, int ysize, int zsize,
+                                       int xsize, int ysize, int zsize, int type3d,
                                        int flag_verbose, int ngpus, float gpuMemory)
 
 cdef extern from '../../include/filters/anisotropic_diffusion.h':
@@ -56,7 +56,7 @@ cdef extern from '../../include/filters/anisotropic_diffusion.h':
 
 def gaussianFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
-                   float sigma = 1,
+                   float sigma = 1, int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
 
@@ -67,14 +67,15 @@ def gaussianFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     gaussianFilterChunked(&hostImage[0, 0, 0],
                           &hostOutput[0, 0, 0],
-                          isize.x, isize.y, isize.z,
-                          sigma, verbose, ngpus, gpuMemory)
+                          isize.y, isize.x, isize.z,
+                          sigma, type3d, verbose, ngpus, gpuMemory)
     
     return hostOutput
 
 def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
                int windowSize = 1,
+               int type3d = 1,
                int verbose = 0,
                float gpuMemory = 0.4,
                int ngpus = -1,
@@ -91,7 +92,7 @@ def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     meanFilterChunked(&hostImage[0, 0, 0],
                       &hostOutput[0, 0, 0],
-                      isize.x, isize.y, isize.z,
+                      isize.y, isize.x, isize.z, type3d,
                       verbose, gpuMemory, ngpus,
                       nx, ny, nz)
 
@@ -99,6 +100,7 @@ def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
 def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
+              int type3d = 1,
               int verbose = 0,
               float gpuMemory = 0.4,
               int ngpus = -1):
@@ -111,7 +113,7 @@ def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     logFilterChunked(&hostImage[0, 0, 0],
                      &hostOutput[0, 0, 0],
-                     isize.x, isize.y, isize.z,
+                     isize.y, isize.x, isize.z,type3d,
                      verbose, ngpus, gpuMemory)
 
     return hostOutput
@@ -121,6 +123,7 @@ def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                       float sigma = 1,
                       float ammount = 1,
                       float threshold = 0,
+                      int type3d = 1,
                       int verbose = 0,
                       float gpuMemory = 0.4,
                       int ngpus = -1):
@@ -132,14 +135,15 @@ def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     unsharpMaskChunked(&hostImage[0, 0, 0],
                      &hostOutput[0, 0, 0],
-                     isize.x, isize.y, isize.z,
-                     sigma, ammount, threshold,
+                     isize.y, isize.x, isize.z,
+                     sigma, ammount, threshold, type3d,
                      verbose, ngpus, gpuMemory)
 
     return hostOutput
 
 def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
+              int type3d = 1,
               int verbose = 0,
               float gpuMemory = 0.4,
               int ngpus = -1):
@@ -151,13 +155,14 @@ def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     sobelFilterChunked(&hostImage[0, 0, 0],
                      &hostOutput[0, 0, 0],
-                     isize.x, isize.y, isize.z,
+                     isize.y, isize.x, isize.z, type3d,
                      verbose, ngpus, gpuMemory)
 
     return hostOutput
 
 def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
+              int type3d  = 1,
               int verbose = 0,
               float gpuMemory = 0.4,
               int ngpus = -1):
@@ -170,7 +175,7 @@ def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     prewittFilterChunked(&hostImage[0, 0, 0],
                      &hostOutput[0, 0, 0],
-                     isize.x, isize.y, isize.z,
+                     isize.y, isize.x, isize.z, type3d,
                      verbose, ngpus, gpuMemory)
 
     return hostOutput

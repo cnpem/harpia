@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include "../../include/threshold/sauvola.h"
+#include "../../include/common/chunkedExecutor.h"
 
 /*
 
@@ -169,3 +170,101 @@ template void sauvola_threshold<int>(int* image, float* output, float weight, in
 template void sauvola_threshold<unsigned int>(unsigned int* image, float* output, float weight,
                                               unsigned int range, int rows, int cols, int depth,
                                               int rows_kernel, int cols_kernel, int depth_kernel);
+
+
+
+//chunked version
+template <typename in_dtype, typename out_dtype>
+void sauvolaThreshold3DGPU(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize, int flag_verbose,
+                     int nx, int ny, int nz, float weight, in_dtype range)
+{
+  in_dtype* deviceImage;
+  out_dtype* deviceOutput;
+  unsigned int size = xsize * ysize * zsize;
+
+  cudaMalloc((void**)&deviceImage, size * sizeof(in_dtype));
+  cudaMalloc((void**)&deviceOutput, size * sizeof(out_dtype));
+
+  cudaMemcpy(deviceImage, hostImage, size * sizeof(in_dtype), cudaMemcpyHostToDevice);
+
+  dim3 block(8, 8, 8);
+
+  if (zsize == 1)
+  {
+    block = dim3(32, 32, 1);
+  }
+
+  dim3 grid((xsize + block.x - 1) / block.x, (ysize + block.y - 1) / block.y,
+            (zsize + block.z - 1) / block.z);
+
+  if (flag_verbose==1) {
+    printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
+    printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+  }
+  sauvola_kernel_3d<<<grid, block>>>(deviceImage, deviceOutput, weight, range, xsize, ysize, zsize,
+                                                   nx, ny, nz);
+
+  cudaDeviceSynchronize();
+
+  cudaMemcpy(hostOutput, deviceOutput, size * sizeof(out_dtype), cudaMemcpyDeviceToHost);
+
+  cudaFree(deviceImage);
+  cudaFree(deviceOutput);
+
+}
+
+// Explicit instantiation for float
+template void sauvolaThreshold3DGPU<float, float>(float* hostImage, float* hostOutput,
+                                            int xsize, int ysize, int zsize, int flag_verbose,
+                                            int nx, int ny, int nz, float weight, float range);
+
+template void sauvolaThreshold3DGPU<int, float>(int* hostImage, float* hostOutput,
+                                            int xsize, int ysize, int zsize, int flag_verbose,
+                                            int nx, int ny, int nz, float weight, int range);
+
+template void sauvolaThreshold3DGPU<unsigned int, float>(unsigned int* hostImage, float* hostOutput,
+                                            int xsize, int ysize, int zsize, int flag_verbose,
+                                            int nx, int ny, int nz, float weight, unsigned int range);
+
+
+template<typename in_dtype, typename out_dtype>
+void sauvolaThresholdChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize,float weight, in_dtype range,int type3d, int flag_verbose,
+                       float gpuMemory, int ngpus, int nx, int ny, int nz)
+{
+  if (ngpus == 0)
+  {
+      throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D. "
+        "Please ensure a GPU is available to execute this function.");
+
+  }
+
+  else if (zsize==1 || type3d == 0 || nz == 1)
+  {
+    //calls 2d variant
+    sauvola_threshold(hostImage, hostOutput,weight,range,xsize,ysize,zsize,nx,ny,1);
+    std::cout<<"2d variant\n";
+
+  }
+
+  else
+  {
+
+    int ncopies = 1;
+    chunkedExecutor(sauvolaThreshold3DGPU<in_dtype,out_dtype>, ncopies, gpuMemory, ngpus,
+                    hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, nx, ny, nz,weight,range);
+
+  }
+
+}
+
+template void sauvolaThresholdChunked<float, float>(float* hostImage, float* hostOutput,
+                                              int xsize, int ysize, int zsize, float weight, float range, int type3d, int flag_verbose,
+                                              float gpuMemory, int ngpus, int nx, int ny, int nz);
+
+template void sauvolaThresholdChunked<int, float>(int* hostImage, float* hostOutput,
+                                            int xsize, int ysize, int zsize, float weight,int range,int type3d,int flag_verbose,
+                                            float gpuMemory, int ngpus, int nx, int ny, int nz);
+
+template void sauvolaThresholdChunked<unsigned int, float>(unsigned int* hostImage, float* hostOutput,
+                                                     int xsize, int ysize, int zsize, float weight,unsigned int range,int type3d,int flag_verbose,
+                                                     float gpuMemory, int ngpus, int nx, int ny, int nz);

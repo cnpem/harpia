@@ -185,13 +185,21 @@ template void meanFilter3DGPU<unsigned int, float>(unsigned int* hostImage, floa
                                             int nx, int ny, int nz);
 
 template<typename in_dtype, typename out_dtype>
-void meanFilterChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize, int flag_verbose,
+void meanFilterChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, int ysize, int zsize, int type3d, int flag_verbose,
                        float gpuMemory, int ngpus, int nx, int ny, int nz)
 {
   if (ngpus == 0)
   {
       throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D. "
         "Please ensure a GPU is available to execute this function.");
+
+  }
+
+  else if (zsize==1 || type3d == 0 || nz == 1)
+  {
+    //calls 2d variant
+    mean_filtering(hostImage, hostOutput,xsize,ysize,zsize,nx,ny,1);
+    std::cout<<"2d variant\n";
 
   }
 
@@ -207,13 +215,13 @@ void meanFilterChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, in
 }
 
 template void meanFilterChunked<float, float>(float* hostImage, float* hostOutput,
-                                              int xsize, int ysize, int zsize, int flag_verbose,
+                                              int xsize, int ysize, int zsize, int type3d, int flag_verbose,
                                               float gpuMemory, int ngpus, int nx, int ny, int nz);
 
 template void meanFilterChunked<int, float>(int* hostImage, float* hostOutput,
-                                            int xsize, int ysize, int zsize, int flag_verbose,
+                                            int xsize, int ysize, int zsize, int type3d,int flag_verbose,
                                             float gpuMemory, int ngpus, int nx, int ny, int nz);
 
 template void meanFilterChunked<unsigned int, float>(unsigned int* hostImage, float* hostOutput,
-                                                     int xsize, int ysize, int zsize, int flag_verbose,
+                                                     int xsize, int ysize, int zsize, int type3d,int flag_verbose,
                                                      float gpuMemory, int ngpus, int nx, int ny, int nz);

@@ -80,6 +80,6 @@ void sobelFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsiz
 
 template<typename in_dtype, typename out_dtype>
 void sobelFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
-                          const int xsize, const int ysize, const int zsize,
+                          const int xsize, const int ysize, const int zsize, const int type3d,
                           const int verbose, int ngpus, const float safetyMargin);
 #endif  // SOBEL_FILTER_H

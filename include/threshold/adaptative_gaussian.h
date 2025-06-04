@@ -22,4 +22,17 @@ template <typename dtype>
 void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, int depth,
                               float sigma, float weight, bool type);
 
+
+template <typename in_dtype, typename out_dtype, typename kernel_dtype>
+void adaptativeGaussianThreshold3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
+                    const int ysize, const int zsize, const int verbose,
+                    int padding_bottom, int padding_top,
+                    kernel_dtype* kernel,
+                    int kernel_xsize, int kernel_ysize, int kernel_zsize, float weight);
+
+template<typename in_dtype, typename out_dtype>
+void adaptativeGaussianThresholdChunked(in_dtype* hostImage, out_dtype* hostOutput,
+                      const int xsize, const int ysize, const int zsize, float sigma, float weight, const int type3d,
+                      const int verbose, int ngpus,const float safetyMargin );
+
 #endif  // ADAPTATIVE_GAUSSIAN_H

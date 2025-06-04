@@ -210,17 +210,28 @@ template void gaussianFilter3DGPU<unsigned int, float, double>(unsigned int*, fl
 
 template<typename in_dtype, typename out_dtype>
 void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
-                      const int xsize, const int ysize, const int zsize, float sigma,
+                      const int xsize, const int ysize, const int zsize, float sigma, const int type3d,
                       const int verbose, int ngpus,const float safetyMargin )
 {
   if (ngpus == 0) {
     throw std::runtime_error("CPU implementation is not available for anisotropicDiffusion3D.");
-  } else {
+  }
+  
+  else if (zsize==1 || type3d == 0)
+  {
+    //calls 2d variant
+    gaussian_filtering(hostImage, hostOutput,xsize,ysize,zsize,sigma,0);
+    std::cout<<"2d variant\n";
+
+  }
+
+  
+  else {
     int ncopies = 1;
     const int kernelOperations = 1;
     double* kernel;
-    int gaussian_size = (int)ceil(2 * sigma + 1); 
-    get_gaussian_kernel_3d(&kernel,gaussian_size,gaussian_size,gaussian_size,sigma);  // kernel should be 3x3x3
+    int gaussian_size = (int)ceil(6 * sigma + 1); 
+    get_gaussian_kernel_3d(&kernel,gaussian_size,gaussian_size,gaussian_size,sigma); 
 
     chunkedExecutorKernel(gaussianFilter3DGPU<in_dtype, out_dtype, double>,
                           ncopies, safetyMargin, ngpus, kernelOperations,
@@ -229,9 +240,9 @@ void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
   }
 }
 
-template void gaussianFilterChunked<float, float>(float*, float*, const int, const int, const int, float, const int, int, const float);
-template void gaussianFilterChunked<int, float>(int*, float*, const int, const int, const int, float, const int, int, const float);
-template void gaussianFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, float, const int, int, const float);
+template void gaussianFilterChunked<float, float>(float*, float*, const int, const int, const int, float,const int, const int, int, const float);
+template void gaussianFilterChunked<int, float>(int*, float*, const int, const int, const int, float,const int, const int, int, const float);
+template void gaussianFilterChunked<unsigned int, float>(unsigned int*, float*, const int, const int, const int, float,const int, const int, int, const float);
 
 
 /*

@@ -297,7 +297,7 @@ void canny_filtering(dtype* hostImage, float* hostOutput,
 
 
     // get gaussian kernel size
-    int nx = (int)ceil(2*sigma+1);
+    int nx = (int)ceil(6*sigma+1);
     int ny = nx;
 
     //get gaussian kernel.

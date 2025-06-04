@@ -34,7 +34,7 @@ void gaussianFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int x
                     
 template<typename in_dtype, typename out_dtype>
 void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
-                      const int xsize, const int ysize, const int zsize, float sigma,
+                      const int xsize, const int ysize, const int zsize, float sigma, const int type3d,
                       const int verbose, int ngpus,const float safetyMargin);
 
 #endif  // GAUSSIAN_FILTER_H
