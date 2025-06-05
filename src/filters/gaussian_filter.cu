@@ -74,7 +74,7 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
 
   if (type == false) {
     //kernel size
-    int nx = (int)ceil(6 * sigma + 1);
+    int nx = (int)ceil(4 * sigma + 0.5);
     int ny = nx;
 
     double* kernel;
@@ -87,7 +87,7 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
     dim3 blockSize(32, 32);
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     for (int k = 0; k < zsize; ++k) {
       gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel, k,
@@ -96,17 +96,17 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
       cudaDeviceSynchronize();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(deviceKernel);
   }
 
   else {
     //kernel size
-    int nx = (int)ceil(6 * sigma + 1);
+    int nx = (int)ceil(4 * sigma + 0.5);
     int ny = nx;
     int nz = nx;
 
@@ -121,17 +121,17 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
                   (zsize + blockSize.z - 1) / blockSize.z);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     gaussian_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel,
                                                        xsize, ysize, zsize, nx, ny, nz);
 
     cudaDeviceSynchronize();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(deviceKernel);
   }

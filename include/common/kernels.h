@@ -262,16 +262,9 @@ static void get_gaussian_kernel_2d(double** kernel, int nx, int ny, float sigma)
   }
 
   for (int i = 0; i < nx * ny; i++) {
-    (*kernel)[i] = (*kernel)[i] / (2*sigma*sigma*PI);
+    (*kernel)[i] = (*kernel)[i] / normalization;
   }
 
-  printf("2D Gaussian Kernel (%dx%d):\n", nx, ny);
-  for (int i = 0; i < nx; i++) {
-    for (int j = 0; j < ny; j++) {
-      printf("%0.6f ", (*kernel)[i * ny + j]);
-    }
-    printf("\n");
-  }
 }
 
 static void get_gaussian_kernel_3d(double** kernel, int nx, int ny, int nz, float sigma) {
@@ -325,19 +318,8 @@ static void get_gaussian_kernel_3d(double** kernel, int nx, int ny, int nz, floa
   }
 
   for (int i = 0; i < nx * ny * nz; i++) {
-    (*kernel)[i] = (*kernel)[i] / (2*sigma*sigma*PI);
+    (*kernel)[i] = (*kernel)[i] / normalization;
   }
 
-  printf("3D Gaussian Kernel (%dx%dx%d):\n", nx, ny, nz);
-  for (int k = 0; k < nz; k++) {
-    printf("Slice z = %d:\n", k);
-    for (int i = 0; i < nx; i++) {
-      for (int j = 0; j < ny; j++) {
-        printf("%0.6f ", (*kernel)[k * nx * ny + i * ny + j]);
-      }
-      printf("\n");
-    }
-    printf("\n");
-  }
 }
 #endif  // KERNELS_H
