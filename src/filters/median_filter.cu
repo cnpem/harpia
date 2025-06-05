@@ -229,7 +229,7 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
     dim3 blockSize(32, 32);
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     for (int k = 0; k < zsize; ++k) {
       median_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel,
@@ -238,10 +238,10 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
       cudaDeviceSynchronize();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
   }
 
@@ -250,7 +250,7 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
     dim3 blockSize(32, 32);
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     for (int k = 0; k < zsize; ++k) {
       median_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, deviceKernel,
@@ -259,10 +259,10 @@ void median_filtering(dtype* image, dtype* output, int xsize, int ysize, int zsi
       cudaDeviceSynchronize();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
   }
 
   cudaMemcpy(output, deviceOutput, size * sizeof(dtype), cudaMemcpyDeviceToHost);

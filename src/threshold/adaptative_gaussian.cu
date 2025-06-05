@@ -105,7 +105,7 @@ void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, i
     dim3 blockSize(32, 32);
     dim3 gridSize((rows + blockSize.y - 1) / blockSize.y, (cols + blockSize.x - 1) / blockSize.x);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     for (int k = 0; k < slices; ++k) {
       local_gaussian_kernel_2d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, weight,
@@ -114,10 +114,10 @@ void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, i
     }
     cudaDeviceSynchronize();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(dev_kernel);
   }
@@ -140,7 +140,7 @@ void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, i
     dim3 gridSize((rows + blockSize.y - 1) / blockSize.y, (cols + blockSize.x - 1) / blockSize.x,
                   (slices + blockSize.z - 1) / blockSize.z);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     local_gaussian_kernel_3d<<<gridSize, blockSize>>>(dev_image, dev_output, dev_kernel, weight,
                                                       rows, cols, slices, rows_kernel, cols_kernel,
@@ -148,10 +148,10 @@ void local_gaussian_threshold(dtype* image, float* output, int rows, int cols, i
 
     cudaDeviceSynchronize();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(dev_kernel);
   }

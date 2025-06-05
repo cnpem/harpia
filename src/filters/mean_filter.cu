@@ -80,7 +80,7 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
     dim3 blockSize(32, 32);
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     for (int k = 0; k < zsize; ++k) {
       mean_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, xsize, ysize, k, nx,
@@ -89,10 +89,10 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
       cudaDeviceSynchronize();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
   }
 
@@ -102,17 +102,17 @@ void mean_filtering(dtype* image, float* output, int xsize, int ysize, int zsize
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
                   (zsize + blockSize.z - 1) / blockSize.z);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     mean_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput, xsize, ysize, zsize,
                                                    nx, ny, nz);
 
     cudaDeviceSynchronize();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
   }
 
   cudaMemcpy(output, deviceOutput, size * sizeof(float), cudaMemcpyDeviceToHost);

@@ -369,7 +369,7 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
     dim3 blockSize(32, 32);
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     for (int k = 0; k < zsize; ++k) {
       sobel_filter_kernel_2d<<<gridSize, blockSize>>>(deviceImage, deviceOutput,
@@ -378,10 +378,10 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
     }
     cudaDeviceSynchronize();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(deviceKernelHorizontal);
     cudaFree(deviceKernelVertical);
@@ -414,7 +414,7 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
     dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y,
                   (zsize + blockSize.z - 1) / blockSize.z);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     sobel_filter_kernel_3d<<<gridSize, blockSize>>>(deviceImage, deviceOutput,
                                                     deviceKernelHorizontal, deviceKernelVertical,
@@ -422,10 +422,10 @@ void sobel_filtering(dtype* image, float* output, int xsize, int ysize, int zsiz
 
     cudaDeviceSynchronize();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration =
+        //std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(deviceKernelHorizontal);
     cudaFree(deviceKernelVertical);

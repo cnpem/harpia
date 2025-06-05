@@ -286,7 +286,7 @@ void watershed(int* data, int* labels, int rows, int cols, int iterations)
     {
         return;
     }
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     initi(data,labels,states,mask,rows,cols);
 
@@ -300,9 +300,9 @@ void watershed(int* data, int* labels, int rows, int cols, int iterations)
 
     free(mask);
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
+    //auto end = std::chrono::high_resolution_clock::now();
+    //std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
     
 
     
