@@ -14,33 +14,20 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
     cucim_func = operation[3]
 
     # Call the timing and comparison function
-    print(operation_name)
-    if(skimage_func):
-        time_compare(
-            csv_data=csv_data,
-            machine=machine,
-            gpuMemory=gpuMemory,
-            ngpus=ngpus,
-            module_func=harpia_func,
-            skimage_func=skimage_func,
-            cucim_func=cucim_func,
-            image=image,
-            kernel=kernel,
-            operation=operation_name,
-            repetitions=repetitions
-        )
-    else:
-        time_module_only(
-            csv_data=csv_data,
-            machine=machine,
-            gpuMemory=gpuMemory,
-            ngpus=ngpus,
-            module_func=harpia_func,
-            image=image,
-            kernel=kernel,
-            operation=operation_name,
-            repetitions=repetitions
-        )
+    time_compare(
+        csv_data=csv_data,
+        machine=machine,
+        gpuMemory=gpuMemory,
+        ngpus=ngpus,
+        module_func=harpia_func,
+        skimage_func=skimage_func,
+        cucim_func=cucim_func,
+        image=image,
+        kernel=kernel,
+        operation=operation_name,
+        repetitions=repetitions
+    )
+
     print('\nFinish Test!')
     results_df = pd.DataFrame(csv_data)
     # Append to the file, only writing the header if the file does not exist

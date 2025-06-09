@@ -7,68 +7,89 @@ import cucim
 
 # Merged function to time, compare, and plot results with MSE instead of accuracy
 def time_compare(csv_data, machine, module_func, skimage_func, cucim_func, image, 
-                          kernel=None, show=False, operation="", repetitions=1, gpuMemory =0.4, 
-                          ngpus = -1, *args, **kwargs):
+                kernel=None, show=False, operation="", repetitions=1, gpuMemory =0.4, 
+                ngpus = -1, *args, **kwargs):
     module_times = []
     skimage_times = []
     cucim_times = []
 
+    module_time="N/A"
+    skimage_time="N/A"
+    faster_skimage="N/A"
+    cucim_time="N/A"
+    faster_cucim="N/A"
+
     # Time the module function multiple times
     if(kernel is None):
-        module_output = module_func(image, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            module_output = module_func(image, *args, gpuMemory= gpuMemory, ngpus = ngpus, **kwargs)
-            module_times.append(timeit.default_timer() - start)
+        if(module_func):
+            module_output = module_func(image, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
+            for _ in range(repetitions):
+                start = timeit.default_timer()
+                module_output = module_func(image, *args, gpuMemory= gpuMemory, ngpus = ngpus, **kwargs)
+                module_times.append(timeit.default_timer() - start)
+            print("harpia fineshed")
 
         # Time the scikit-image function multiple times
-        skimage_output = skimage_func(image) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            skimage_output = skimage_func(image)
-            skimage_times.append(timeit.default_timer() - start)
+        if(skimage_func):
+            skimage_output = skimage_func(image) #warm up run
+            for _ in range(repetitions):
+                start = timeit.default_timer()
+                skimage_output = skimage_func(image)
+                skimage_times.append(timeit.default_timer() - start)
+            print("skimage fineshed")
     
         # Time the cucim function multiple times
-        image_cucim = cp.asarray(image)
-        cucim_output = cucim_func(image_cucim) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            cucim_output = cucim_func(image)
-            cucim_times.append(timeit.default_timer() - start)
-        cucim_output = cucim_output.get()
+        if(cucim_func):
+            image_cucim = cp.asarray(image)
+            cucim_output = cucim_func(image_cucim) #warm up run
+            for _ in range(repetitions):
+                start = timeit.default_timer()
+                cucim_output = cucim_func(image)
+                cucim_times.append(timeit.default_timer() - start)
+            cucim_output = cucim_output.get()
+            print("cucim fineshed")
 
     else:
-        module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, ngpus = ngpus, **kwargs)
-            module_times.append(timeit.default_timer() - start)
+        if(module_func):
+            module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
+            for _ in range(repetitions):
+                start = timeit.default_timer()
+                module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, ngpus = ngpus, **kwargs)
+                module_times.append(timeit.default_timer() - start)
+            print("harpia fineshed")
 
         # Time the scikit-image function multiple times
-        skimage_output = skimage_func(image, kernel) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            skimage_output = skimage_func(image, kernel)
-            skimage_times.append(timeit.default_timer() - start)
-        
-        # Time the cucim function multiple times
-        image_cucim = cp.asarray(image)
-        kernel_cucim = cp.asarray(kernel)
-        cucim_output = cucim_func(image_cucim, kernel_cucim) #warm up run
-        for _ in range(repetitions):
-            start = timeit.default_timer()
-            cucim_output = cucim_func(image_cucim, kernel_cucim)
-            cucim_times.append(timeit.default_timer() - start)
-        cucim_output = cucim_output.get()
+        if(skimage_func):
+            skimage_output = skimage_func(image, kernel) #warm up run
+            for _ in range(repetitions):
+                start = timeit.default_timer()
+                skimage_output = skimage_func(image, kernel)
+                skimage_times.append(timeit.default_timer() - start)
+            print("skimage fineshed")
 
-    # Calculate mean times
-    module_time = np.mean(module_times)
-    skimage_time = np.mean(skimage_times)
-    cucim_time = np.mean(cucim_times)
+        # Time the cucim function multiple times        
+        if(cucim_func):
+            image_cucim = cp.asarray(image)
+            kernel_cucim = cp.asarray(kernel)
+            cucim_output = cucim_func(image_cucim, kernel_cucim) #warm up run
+            for _ in range(repetitions):
+                start = timeit.default_timer()
+                cucim_output = cucim_func(image_cucim, kernel_cucim)
+                cucim_times.append(timeit.default_timer() - start)
+            cucim_output = cucim_output.get()
+            print("cucim fineshed")
 
-    # Calculate Time ratio
-    faster_skimage = round(skimage_time/module_time, 2)
-    faster_cucim = round(module_time/cucim_time, 2)
+    # Calculate mean times and time ratio
+    if(module_func): module_time = np.mean(module_times)
+
+    if(skimage_func): 
+        skimage_time = np.mean(skimage_times)
+        if(module_func): faster_skimage = round(skimage_time/module_time, 2)
+
+    if(cucim_func):
+        cucim_time = np.mean(cucim_times)
+        if(module_func): faster_cucim = round(module_time/cucim_time, 2)
+
 
     # Get the image data type, size, and dimensions
     image_dtype = str(image.dtype)
