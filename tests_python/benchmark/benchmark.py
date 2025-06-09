@@ -5,9 +5,19 @@ import cupy as cp
 
 # Grayscale morphology operations
 from skimage.morphology import (
-    erosion, dilation, closing, opening,
-    white_tophat, black_tophat, reconstruction
+    erosion, 
+    dilation, 
+    closing, 
+    opening,
+    white_tophat, 
+    black_tophat, 
+    reconstruction
 )
+from skimage.filters import (
+    prewitt,
+    sobel,
+    gaussian)
+
 from cucim.skimage import morphology as cucim_morph
 
 # Binary morphology operations
@@ -84,18 +94,18 @@ def smooth_cucim(image, selem):
 
 # Instruction: Uncomment the image for which tests will be executed.
 
-# # IMAGE 1
-# print("reading small image...")
-# xsize = 190
-# ysize = 207
-# zsize_original = 100
-# zsize = 100
-# path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
-# path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-# img_num = 1
-# print("fineshed reading small image!")
+# IMAGE 1
+print("reading small image...")
+xsize = 190
+ysize = 207
+zsize_original = 100
+zsize = 100
+path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
+path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
+image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
+image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+img_num = 1
+print("fineshed reading small image!")
 
 # # IMAGE 2 (possibily with problem)
 # print("reading big image...")
@@ -109,18 +119,18 @@ def smooth_cucim(image, selem):
 # print("fineshed reading big image!")
 
 # IMAGE 3
-print("reading medium image...")
-xsize = 600
-ysize = 1520
-zsize = 1520
-path_grayscale = "../../example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw"
-path_binary = "../../example_images/binary/ILSIMG_600x1520x1520_16bits.raw"
-image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-img_num = 3
-print("fineshed reading medium image!")
+# print("reading medium image...")
+# xsize = 600
+# ysize = 1520
+# zsize = 1520
+# path_grayscale = "../../example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw"
+# path_binary = "../../example_images/binary/ILSIMG_600x1520x1520_16bits.raw"
+# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
+# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+# img_num = 3
+# print("fineshed reading medium image!")
 
-# # IMAGE 4
+# IMAGE 4
 # print("reading big image...")
 # xsize = 2052
 # ysize = 2052
@@ -152,15 +162,14 @@ operations_grayscale = [
     ("Bottom Hat 3D grayscale", black_tophat, bottom_hat, cucim_morph.black_tophat),
 ]
 operations_filters = [
-    ("Gaussian Filter 3D grayscale", None, gaussianFilter, "gaussianFilter"),
-    ("Mean Filter 3D grayscale", None, meanFilter, "meanFilter"),
-    ("Log Filter 3D grayscale", None, logFilter, "logFilter"),
-    ("Unsharp Mask Filter 3D grayscale", None, unsharpMaskFilter, "unsharpMaskFilter"),
-    ("Sobel Filter 3D grayscale", None, sobelFilter, "sobelFilter"),
-    ("Prewitt Filter 3D grayscale", None, prewittFilter, "prewittFilter"),
-    ("Anisotropic Diffusion Filter 3D grayscale", None, anisotropic_diffusion3D, "anisotropic_diffusion3D"), #only runs in float images
+    # ("Gaussian Filter 3D grayscale", None, gaussianFilter, "gaussianFilter"),
+    # ("Mean Filter 3D grayscale", None, meanFilter, "meanFilter"),
+    # ("Log Filter 3D grayscale", None, logFilter, "logFilter"),
+    # ("Unsharp Mask Filter 3D grayscale", None, unsharpMaskFilter, "unsharpMaskFilter"),
+    ("Sobel Filter 3D grayscale", sobel, sobelFilter, None),
+    ("Prewitt Filter 3D grayscale", prewitt, prewittFilter, None),
+    # ("Anisotropic Diffusion Filter 3D grayscale", None, anisotropic_diffusion3D, "anisotropic_diffusion3D"), #only runs in float images
 ]
-
 
 images_grayscale = [
     #("int32", f"image{img_num}_int32_grayscale"),
@@ -190,7 +199,7 @@ images_binary = [
 machine = 'harriet'
 ngpus_values = [1]
 gpuMemory_values = [0.4]
-repetitions = 4
+repetitions = 1
 
 for ngpus in ngpus_values:
     for gpuMemory in gpuMemory_values:
