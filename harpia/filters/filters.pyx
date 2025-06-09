@@ -205,9 +205,8 @@ cdef extern from "../../include/filters/median_filter.h":
                                   int nx, int ny, int nz)
 
 def median(np.ndarray[numeric, ndim=3] hostImage,
-         np.ndarray[numeric, ndim=3] hostOutput,
-         int xsize, int ysize, int zsize,
-         int nx, int ny, int nz):
+           np.ndarray[numeric, ndim=3] hostOutput = None,
+         int nx = 1, int ny = 1, int nz = 1):
     """
     Apply a median filter to a 3D hostImage.
 
@@ -221,11 +220,17 @@ def median(np.ndarray[numeric, ndim=3] hostImage,
         ny (int): Number of columns in the kernel.
         nz (int): Number of slices in the kernel.
     """
-    return median_filtering(&hostImage[0,0,0],
-                          &hostOutput[0,0,0],
-                          xsize, ysize, zsize,
-                          nx, ny, nz)
+    isize = Size(hostImage)
 
+    if hostOutput is None:
+        hostOutput = np.empty((isize.x, isize.y, isize.z), dtype=hostImage.dtype)
+
+    median_filtering(&hostImage[0,0,0],
+                          &hostOutput[0,0,0],
+                          isize.y, isize.x, isize.z,
+                          nx, ny, 1)
+
+    return hostOutput
 
 #Define the fused type for numeric types : float, double
 ctypedef fused real:

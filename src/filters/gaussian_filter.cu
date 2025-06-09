@@ -230,7 +230,7 @@ void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
     int ncopies = 1;
     const int kernelOperations = 1;
     double* kernel;
-    int gaussian_size = (int)ceil(6 * sigma + 1); 
+    int gaussian_size = (int)ceil(4 * sigma + 0.5); 
     get_gaussian_kernel_3d(&kernel,gaussian_size,gaussian_size,gaussian_size,sigma); 
 
     chunkedExecutorKernel(gaussianFilter3DGPU<in_dtype, out_dtype, double>,
