@@ -207,6 +207,7 @@ def get_all_extension_modules():
         "harpia.watershed",
         "harpia.distanceTransform",
         "harpia.fastGraphClustering",
+        "harpia.localBinaryPattern",
         "harpia.sparseUnmixing"    ]
     ext_modules = []
     with ThreadPoolExecutor() as executor:
