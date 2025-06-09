@@ -4,6 +4,7 @@ import numpy
 
 from libc.stdint cimport int16_t, uint16_t
 from libcpp cimport int
+from cython cimport boundscheck, wraparound, parallel
 
 from harpia.common import Size
 
@@ -37,6 +38,8 @@ cdef extern from "../../include/morphology/operations_binary.h":
                                                                int, int, MorphOp, int)
     void _fill_holes "fill_holes"[dtype](dtype*, dtype*, int, int, int, int, int, float, int)
 
+@boundscheck(False)
+@wraparound(False)
 def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                    float gpuMemory = 0.4, int ngpus = -1):
@@ -77,7 +80,9 @@ def erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
                     verbose, &kernel[0,0,0], ksize.x, ksize.y, ksize.z, gpuMemory, ngpus)
 
     return hostOutput
-    
+
+@boundscheck(False)
+@wraparound(False)    
 def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                     numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                     float gpuMemory = 0.4, int ngpus = -1):
@@ -119,7 +124,8 @@ def dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
     return hostOutput
 
-
+@boundscheck(False)
+@wraparound(False)
 def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                    float gpuMemory = 0.4, int ngpus = -1):
@@ -161,6 +167,8 @@ def closing_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
     return hostOutput
 
+@boundscheck(False)
+@wraparound(False)
 def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                    float gpuMemory = 0.4, int ngpus = -1):
@@ -202,6 +210,8 @@ def opening_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
     return hostOutput
 
+@boundscheck(False)
+@wraparound(False)
 def smooth_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel, 
                    numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
                    float gpuMemory = 0.4, int ngpus = -1):
@@ -245,6 +255,8 @@ def smooth_binary(numpy.ndarray[numeric, ndim=3] hostImage, int[:,:,:] kernel,
 
     return hostOutput
 
+@boundscheck(False)
+@wraparound(False)
 def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                             numpy.ndarray[numeric, ndim=3] hostMask, 
                             numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
@@ -287,6 +299,8 @@ def geodesic_erosion_binary(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return hostOutput
 
+@boundscheck(False)
+@wraparound(False)
 def geodesic_dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                              numpy.ndarray[numeric, ndim=3] hostMask, 
                              numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
@@ -329,6 +343,8 @@ def geodesic_dilation_binary(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return hostOutput
 
+@boundscheck(False)
+@wraparound(False)
 def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage, 
                           numpy.ndarray[numeric, ndim=3] hostMask, str operation, 
                           numpy.ndarray[numeric, ndim=3] hostOutput = None, int verbose = 0, 
@@ -378,6 +394,8 @@ def reconstruction_binary(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return hostOutput
 
+@boundscheck(False)
+@wraparound(False)
 def fill_holes(numpy.ndarray[numeric, ndim=3] hostImage, 
                numpy.ndarray[numeric, ndim=3] hostOutput = None,  int padding = 50, int verbose = 0, 
                float gpuMemory = 0.4, int ngpus = -1):
