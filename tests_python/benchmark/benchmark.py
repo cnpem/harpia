@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 import numpy as np                     # For array manipulation
 from framework import image, tests
+import cupy as cp
 
 # Grayscale morphology operations
 from skimage.morphology import (
     erosion, dilation, closing, opening,
     white_tophat, black_tophat, reconstruction
 )
+from cucim.skimage import morphology as cucim_morph
 
 # Binary morphology operations
 from skimage.morphology import binary_erosion, binary_dilation, binary_closing, binary_opening
@@ -69,24 +71,31 @@ def smooth_sk(image, selem):
     result = binary_closing(result, selem)
     return result
 
+def smooth_cucim(image, selem):
+    image = cp.asarray(image)
+    selem = cp.asarray(selem)
+    result = cucim_morph.binary_opening(image, selem)
+    result = cucim_morph.binary_closing(result, selem)
+    return result
+
 #############
 # Read Images
 #############
 
 # Instruction: Uncomment the image for which tests will be executed.
 
-# IMAGE 1
-print("reading small image...")
-xsize = 190
-ysize = 207
-zsize_original = 100
-zsize = 100
-path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
-path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
-image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-img_num = 1
-print("fineshed reading small image!")
+# # IMAGE 1
+# print("reading small image...")
+# xsize = 190
+# ysize = 207
+# zsize_original = 100
+# zsize = 100
+# path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
+# path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
+# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
+# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+# img_num = 1
+# print("fineshed reading small image!")
 
 # # IMAGE 2 (possibily with problem)
 # print("reading big image...")
@@ -99,17 +108,17 @@ print("fineshed reading small image!")
 # img_num = 2
 # print("fineshed reading big image!")
 
-# # IMAGE 3
-# print("reading medium image...")
-# xsize = 600
-# ysize = 1520
-# zsize = 1520
-# path_grayscale = "../../example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw"
-# path_binary = "../../example_images/binary/ILSIMG_600x1520x1520_16bits.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-# img_num = 3
-# print("fineshed reading medium image!")
+# IMAGE 3
+print("reading medium image...")
+xsize = 600
+ysize = 1520
+zsize = 1520
+path_grayscale = "../../example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw"
+path_binary = "../../example_images/binary/ILSIMG_600x1520x1520_16bits.raw"
+image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
+image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+img_num = 3
+print("fineshed reading medium image!")
 
 # # IMAGE 4
 # print("reading big image...")
@@ -133,14 +142,14 @@ kernel = custum_kernel3D()
 
 # GRAYSCALE
 operations_grayscale = [
-    ("Erosion 3D grayscale", erosion, erosion_grayscale, "erosion_grayscale"),
-    ("Dilation 3D grayscale", dilation, dilation_grayscale, "dilation_grayscale"),
-    ("Closing 3D grayscale", closing, closing_grayscale, "closing_grayscale"),
-    ("Opening 3D grayscale", opening, opening_grayscale, "opening_grayscale"),
+    ("Erosion 3D grayscale", erosion, erosion_grayscale, cucim_morph.erosion),
+    ("Dilation 3D grayscale", dilation, dilation_grayscale, cucim_morph.dilation),
+    ("Closing 3D grayscale", closing, closing_grayscale, cucim_morph.closing),
+    ("Opening 3D grayscale", opening, opening_grayscale, cucim_morph.opening),
 #    ("Geodesisc Erosion 3D grayscale", None, geodesic_erosion_grayscale, "geodesic_erosion_grayscale"),
 #    ("Geodesisc Dilation 3D grayscale", None, geodesic_dilation_grayscale, "geodesic_dilation_grayscale"),
-    ("Top Hat 3D grayscale", white_tophat, top_hat, "top_hat"),
-    ("Bottom Hat 3D grayscale", black_tophat, bottom_hat, "bottom_hat"),
+    ("Top Hat 3D grayscale", white_tophat, top_hat, cucim_morph.white_tophat),
+    ("Bottom Hat 3D grayscale", black_tophat, bottom_hat, cucim_morph.black_tophat),
 ]
 operations_filters = [
     ("Gaussian Filter 3D grayscale", None, gaussianFilter, "gaussianFilter"),
@@ -162,11 +171,11 @@ images_grayscale = [
 
 # BINARY
 operations_binary = [
-    ("Erosion 3D binary", erosion, erosion_binary, "erosion_binary"),
-    ("Dilation 3D binary", dilation, dilation_binary, "dilation_binary"),
-    ("Closing 3D binary", closing, closing_binary, "closing_binary"),
-    ("Opening 3D binary", opening, opening_binary, "opening_binary"),
-    ("Smoothing 3D binary", smooth_sk, smooth_binary, "smooth_binary"),
+    ("Erosion 3D binary", erosion, erosion_binary, cucim_morph.binary_erosion),
+    ("Dilation 3D binary", dilation, dilation_binary, cucim_morph.binary_dilation),
+    ("Closing 3D binary", closing, closing_binary, cucim_morph.binary_closing),
+    ("Opening 3D binary", opening, opening_binary, cucim_morph.binary_opening),
+    ("Smoothing 3D binary", smooth_sk, smooth_binary, smooth_cucim),
 #    ("Geodesisc Erosion 3D binary", None, geodesic_erosion_binary, "geodesic_erosion_binary"),
 #    ("Geodesisc Dilation 3D binary", None, geodesic_dilation_binary, "geodesic_dilation_binary"),
 ]
@@ -181,11 +190,11 @@ images_binary = [
 machine = 'harriet'
 ngpus_values = [1]
 gpuMemory_values = [0.4]
-repetitions = 1
+repetitions = 4
 
 for ngpus in ngpus_values:
     for gpuMemory in gpuMemory_values:
-        csv_file = f"results_cython/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
+        csv_file = f"results_cucim/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
 
         for img in images_grayscale:
             image_input = image_grayscale.astype(dtype=img[0])

@@ -1,15 +1,17 @@
 import timeit                           # For timing the function
 import numpy as np                     # For array manipulation
 import matplotlib.pyplot as plt         # For plotting images
+import cupy as cp
+import cucim
+
 
 # Merged function to time, compare, and plot results with MSE instead of accuracy
-def time_compare_and_plot(csv_data, machine, module_func, skimage_func, image, kernel=None, 
-                          plot=False, show=False, operation="", framework="", slice_num=0, 
-                          figsize=(18, 6), save_path=None, repetitions=1, gpuMemory =0.4,
+def time_compare(csv_data, machine, module_func, skimage_func, cucim_func, image, 
+                          kernel=None, show=False, operation="", repetitions=1, gpuMemory =0.4, 
                           ngpus = -1, *args, **kwargs):
-    fontsize = 18
     module_times = []
     skimage_times = []
+    cucim_times = []
 
     # Time the module function multiple times
     if(kernel is None):
@@ -26,6 +28,15 @@ def time_compare_and_plot(csv_data, machine, module_func, skimage_func, image, k
             skimage_output = skimage_func(image)
             skimage_times.append(timeit.default_timer() - start)
     
+        # Time the cucim function multiple times
+        image_cucim = cp.asarray(image)
+        cucim_output = cucim_func(image_cucim) #warm up run
+        for _ in range(repetitions):
+            start = timeit.default_timer()
+            cucim_output = cucim_func(image)
+            cucim_times.append(timeit.default_timer() - start)
+        cucim_output = cucim_output.get()
+
     else:
         module_output = module_func(image, kernel, *args, gpuMemory= gpuMemory, **kwargs) #warm up run
         for _ in range(repetitions):
@@ -39,18 +50,25 @@ def time_compare_and_plot(csv_data, machine, module_func, skimage_func, image, k
             start = timeit.default_timer()
             skimage_output = skimage_func(image, kernel)
             skimage_times.append(timeit.default_timer() - start)
+        
+        # Time the cucim function multiple times
+        image_cucim = cp.asarray(image)
+        kernel_cucim = cp.asarray(kernel)
+        cucim_output = cucim_func(image_cucim, kernel_cucim) #warm up run
+        for _ in range(repetitions):
+            start = timeit.default_timer()
+            cucim_output = cucim_func(image_cucim, kernel_cucim)
+            cucim_times.append(timeit.default_timer() - start)
+        cucim_output = cucim_output.get()
 
     # Calculate mean times
     module_time = np.mean(module_times)
     skimage_time = np.mean(skimage_times)
+    cucim_time = np.mean(cucim_times)
 
-    # Calculate Mean Squared Error
-    mse = np.mean((skimage_output.astype(np.float32) - module_output.astype(np.float32)) ** 2)
-    bitwise_diff = np.abs(skimage_output.astype(np.int32) - module_output.astype(np.int32))
-    total_pixels = np.prod(image.shape)
-    num_diff_pixels = np.count_nonzero(bitwise_diff)
-    pixel_accuracy = ((total_pixels - num_diff_pixels) / total_pixels) * 100
-    faster = round(skimage_time/module_time, 1)
+    # Calculate Time ratio
+    faster_skimage = round(skimage_time/module_time, 2)
+    faster_cucim = round(module_time/cucim_time, 2)
 
     # Get the image data type, size, and dimensions
     image_dtype = str(image.dtype)
@@ -65,46 +83,19 @@ def time_compare_and_plot(csv_data, machine, module_func, skimage_func, image, k
         'gpuMemory': gpuMemory, 
         'Module Time (s)': module_time,
         'Scikit-Image Time (s)': skimage_time,
-        'Time Ratio': faster,
+        'Scikit Time Ratio': faster_skimage,
+        'Cucim Time (s)': cucim_time,
+        'Cucim Time Ratio': faster_cucim,
         'Repetitions' : repetitions,
-        'Mean Squared Error': mse,
-        'Pixel Accuracy (%)': pixel_accuracy,
         'Image Data Type': image_dtype,
         'Image Size (MB)': image_size_mb,
         'Image Dimensions': image_shape
     })
 
-    # Plot results if specified
-    if plot:
-        if len(image.shape) == 3:
-            original_slice = image[slice_num, :, :]
-            slice_skimage = skimage_output[slice_num, :, :]
-            slice_module = module_output[slice_num, :, :]
-
-        plt.figure(figsize=figsize)
-        plt.subplot(1, 3, 1)
-        plt.imshow(original_slice, cmap='gray')
-        plt.title("Original Image", fontsize=fontsize)
-        plt.axis('off')
-        plt.subplot(1, 3, 2)
-        plt.imshow(slice_skimage, cmap='gray')
-        plt.title(f"{framework} {operation}", fontsize=fontsize)
-        plt.axis('off')
-        plt.subplot(1, 3, 3)
-        plt.imshow(slice_module, cmap='gray')
-        plt.title(f"Annotat3d {operation}", fontsize=fontsize)
-        plt.axis('off')
-        plt.tight_layout()
-        if save_path:
-            plt.savefig(save_path, bbox_inches='tight')
-        plt.show()
-
     # Print statistics
     if show:
         print(f"Operation: {module_func.__name__ if not operation else operation}")
         print(f"Module Time: {module_time:.4f} seconds")
-        print(f"Pixel Accuracy: {pixel_accuracy:.2f}%")
-        print(f"Mean Squared Error: {mse:.2f}")
         print(f"Image Data Type: {image_dtype}")
         print(f"Image Size: {image_size_mb} MB")
         print(f"Image Dimensions: {image_shape}")

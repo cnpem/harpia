@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from .time import time_module_only
-from .time_check import time_compare_and_plot
+from .time_check import time_compare
 
 def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kernel):
     # Loop over hardware and GPU parameters, images, and operations
@@ -11,26 +11,22 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
     operation_name = operation[0]
     skimage_func = operation[1]
     harpia_func = operation[2]
+    cucim_func = operation[3]
 
     # Call the timing and comparison function
     print(operation_name)
     if(skimage_func):
-        time_compare_and_plot(
+        time_compare(
             csv_data=csv_data,
             machine=machine,
             gpuMemory=gpuMemory,
             ngpus=ngpus,
             module_func=harpia_func,
             skimage_func=skimage_func,
+            cucim_func=cucim_func,
             image=image,
             kernel=kernel,
-            plot=False,
-            show=False,
             operation=operation_name,
-            framework="scikit",
-            slice_num=0,
-            figsize=(18, 6),
-            save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
             repetitions=repetitions
         )
     else:
@@ -42,12 +38,7 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
             module_func=harpia_func,
             image=image,
             kernel=kernel,
-            plot=False,
-            show=False,
             operation=operation_name,
-            slice_num=0,
-            figsize=(18, 6),
-            save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
             repetitions=repetitions
         )
     print('\nFinish Test!')
@@ -65,25 +56,21 @@ def run_no_kernel(csv_file, image, operation, machine, ngpus, repetitions, gpuMe
     operation_name = operation[0]
     skimage_func = operation[1]
     harpia_func = operation[2]
+    cucim_func = operation[3]
 
     # Call the timing and comparison function
     print(operation_name)
     if(skimage_func):
-        time_compare_and_plot(
+        time_compare(
             csv_data=csv_data,
             machine=machine,
             gpuMemory=gpuMemory,
             ngpus=ngpus,
             module_func=harpia_func,
             skimage_func=skimage_func,
+            cucim_func=cucim_func,
             image=image,
-            plot=False,
-            show=False,
             operation=operation_name,
-            framework="scikit",
-            slice_num=0,
-            figsize=(18, 6),
-            save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
             repetitions=repetitions
         )
     else:
@@ -94,12 +81,7 @@ def run_no_kernel(csv_file, image, operation, machine, ngpus, repetitions, gpuMe
             ngpus=ngpus,
             module_func=harpia_func,
             image=image,
-            plot=False,
-            show=False,
             operation=operation_name,
-            slice_num=0,
-            figsize=(18, 6),
-            save_path=f"plots/{operation_name.replace(' ', '_')}_{str(image.dtype)}.png",
             repetitions=repetitions
         )
     print('\nFinish Tests!')
