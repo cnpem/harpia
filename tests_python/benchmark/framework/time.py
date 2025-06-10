@@ -106,9 +106,9 @@ def time_compare(
     # ---- Optional Print ----
     if show:
         print(f"Operation: {operation or module_func.__name__}")
-        print(f"Module Time: {module_time:.4f} seconds")
-        print(f"Scikit Time: {skimage_time:.4f} seconds")
-        print(f"Cucim Time: {cucim_time:.4f} seconds")
+        print(f"Module Time: {module_time} seconds")
+        print(f"Scikit Time: {skimage_time} seconds")
+        print(f"Cucim Time: {cucim_time} seconds")
         print(f"Image Data Type: {image_dtype}")
         print(f"Image Size: {image_size_mb} MB")
         print(f"Image Dimensions: {image_shape}")
