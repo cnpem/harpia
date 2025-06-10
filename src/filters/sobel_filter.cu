@@ -69,24 +69,6 @@ void get_sobel_vertical_kernel_2d(float** kernel) {
 void get_sobel_horizontal_kernel_3d(float** kernel) {
   //adapted from: https://www.hindawi.com/journals/mpe/2016/4904279/
 
-  /*
-            
-                 +---------------+
-                /    -2  0  2   /|
-               /     -3  0  3  / |
-              /      -2  0  2 /  |
-             +---------------+   |
-            /    -3  0  3   /|  /
-           /     -6  0  6  / | /
-          /      -3  0  3 /  |/ 
-         +---------------+   +
-         |    -2  0  2   |  /
-         |    -3  0  3   | /
-         |    -2  0  2   |/
-         +---------------+
-
-    
-    */
 
   //kernel allocation.
   *kernel = (float*)malloc(27 * sizeof(float));
@@ -96,64 +78,46 @@ void get_sobel_horizontal_kernel_3d(float** kernel) {
   }
 
   //first plane
-  (*kernel)[0] = -2;
+  (*kernel)[0] = -1;
   (*kernel)[1] = 0;
-  (*kernel)[2] = 2;
+  (*kernel)[2] = 1;
 
-  (*kernel)[3] = -3;
+  (*kernel)[3] = -2;
   (*kernel)[4] = 0;
-  (*kernel)[5] = 3;
+  (*kernel)[5] = 2;
 
-  (*kernel)[6] = -2;
+  (*kernel)[6] = -1;
   (*kernel)[7] = 0;
-  (*kernel)[8] = 2;
+  (*kernel)[8] = 1;
 
   //second plane
-  (*kernel)[9] = -3;
+  (*kernel)[9] = -2;
   (*kernel)[10] = 0;
-  (*kernel)[11] = -3;
+  (*kernel)[11] = -2;
 
-  (*kernel)[12] = -6;
+  (*kernel)[12] = -4;
   (*kernel)[13] = 0;
-  (*kernel)[14] = 6;
+  (*kernel)[14] = 4;
 
-  (*kernel)[15] = -3;
+  (*kernel)[15] = -2;
   (*kernel)[16] = 0;
-  (*kernel)[17] = 3;
+  (*kernel)[17] = 2;
 
   //third plane
-  (*kernel)[18] = -2;
+  (*kernel)[18] = -1;
   (*kernel)[19] = 0;
-  (*kernel)[20] = 2;
+  (*kernel)[20] = 1;
 
-  (*kernel)[21] = -3;
+  (*kernel)[21] = -2;
   (*kernel)[22] = 0;
-  (*kernel)[23] = 3;
+  (*kernel)[23] = 2;
 
-  (*kernel)[24] = -2;
+  (*kernel)[24] = -1;
   (*kernel)[25] = 0;
-  (*kernel)[26] = 2;
+  (*kernel)[26] = 1;
 }
 
 void get_sobel_vertical_kernel_3d(float** kernel) {
-  /*
-            
-                 +---------------+
-                /    -2 -3 -2   /|
-               /      0  0  0  / |
-              /       2  3  2 /  |
-             +---------------+   |
-            /  -3  -6  -3   /|  /
-           /    0   0  0  /  | /
-          /     3   6  3 /   |/ 
-         +---------------+   +
-         |  -2  -3  -2   |  /
-         |   0   0   0   | /
-         |   2   3   2   |/
-         +---------------+
-
-    
-    */
 
   //kernel allocation.
   *kernel = (float*)malloc(27 * sizeof(float));
@@ -163,65 +127,47 @@ void get_sobel_vertical_kernel_3d(float** kernel) {
   }
 
   //first plane
-  (*kernel)[0] = -2;
-  (*kernel)[1] = -3;
-  (*kernel)[2] = -2;
+  (*kernel)[0] = -1;
+  (*kernel)[1] = -2;
+  (*kernel)[2] = -1;
 
   (*kernel)[3] = 0;
   (*kernel)[4] = 0;
   (*kernel)[5] = 0;
 
-  (*kernel)[6] = 2;
-  (*kernel)[7] = 3;
-  (*kernel)[8] = 2;
+  (*kernel)[6] = 1;
+  (*kernel)[7] = 2;
+  (*kernel)[8] = 1;
 
   //second plane
-  (*kernel)[9] = -3;
-  (*kernel)[10] = -6;
-  (*kernel)[11] = -3;
+  (*kernel)[9] = -2;
+  (*kernel)[10] = -4;
+  (*kernel)[11] = -2;
 
   (*kernel)[12] = 0;
   (*kernel)[13] = 0;
   (*kernel)[14] = 0;
 
-  (*kernel)[15] = 3;
-  (*kernel)[16] = 6;
-  (*kernel)[17] = 3;
+  (*kernel)[15] = 2;
+  (*kernel)[16] = 4;
+  (*kernel)[17] = 2;
 
   //third plane
-  (*kernel)[18] = -2;
-  (*kernel)[19] = -3;
-  (*kernel)[20] = -2;
+  (*kernel)[18] = -1;
+  (*kernel)[19] = -2;
+  (*kernel)[20] = -1;
 
   (*kernel)[21] = 0;
   (*kernel)[22] = 0;
   (*kernel)[23] = 0;
 
-  (*kernel)[24] = 2;
-  (*kernel)[25] = 3;
-  (*kernel)[26] = 2;
+  (*kernel)[24] = 1;
+  (*kernel)[25] = 2;
+  (*kernel)[26] = 1;
 }
 
 void get_sobel_depth_kernel_3d(float** kernel) {
 
-  /*
-            
-                 +---------------+
-                /    2  3  2    /|
-               /     3  6  3   / |
-              /      2  3  2  /  |
-             +---------------+   |
-            /     0  0  0   /|  /
-           /      0  0  0  / | /
-          /       0  0  0 /  |/ 
-         +---------------+   +
-         |  -2  -3  -2   |  /
-         |  -3  -6  -3   | /
-         |  -2  -3  -2   |/
-         +---------------+
-
-    
-    */
   //kernel allocation.
   *kernel = (float*)malloc(27 * sizeof(float));
 
@@ -230,17 +176,17 @@ void get_sobel_depth_kernel_3d(float** kernel) {
   }
 
   //first plane
-  (*kernel)[0] = 2;
-  (*kernel)[1] = 3;
-  (*kernel)[2] = 2;
+  (*kernel)[0] = -1;
+  (*kernel)[1] = -2;
+  (*kernel)[2] = -1;
 
-  (*kernel)[3] = 3;
-  (*kernel)[4] = 6;
-  (*kernel)[5] = 3;
+  (*kernel)[3] = -2;
+  (*kernel)[4] = -4;
+  (*kernel)[5] = -2;
 
-  (*kernel)[6] = 2;
-  (*kernel)[7] = 3;
-  (*kernel)[8] = 2;
+  (*kernel)[6] = -1;
+  (*kernel)[7] = -2;
+  (*kernel)[8] = -1;
 
   //second plane
   (*kernel)[9] = 0;
@@ -256,17 +202,17 @@ void get_sobel_depth_kernel_3d(float** kernel) {
   (*kernel)[17] = 0;
 
   //third plane
-  (*kernel)[18] = -2;
-  (*kernel)[19] = -3;
-  (*kernel)[20] = -2;
+  (*kernel)[18] = 1;
+  (*kernel)[19] = 2;
+  (*kernel)[20] = 1;
 
-  (*kernel)[21] = -3;
-  (*kernel)[22] = -6;
-  (*kernel)[23] = -3;
+  (*kernel)[21] = 2;
+  (*kernel)[22] = 4;
+  (*kernel)[23] = 2;
 
-  (*kernel)[24] = -2;
-  (*kernel)[25] = -3;
-  (*kernel)[26] = -2;
+  (*kernel)[24] = 1;
+  (*kernel)[25] = 2;
+  (*kernel)[26] = 1;
 }
 
 template <typename dtype>
