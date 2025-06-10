@@ -198,7 +198,7 @@ images_binary = [
 
 machine = 'harriet'
 ngpus_values = [1]
-gpuMemory_values = [0.4]
+gpuMemory_values = [0.1]
 repetitions = 1
 
 for ngpus in ngpus_values:
