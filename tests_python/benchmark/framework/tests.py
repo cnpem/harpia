@@ -1,53 +1,20 @@
 import os
 import pandas as pd
-from .time import time_module_only
-from .time_check import time_compare
+from .time import time_compare
 
 def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kernel):
     # Loop over hardware and GPU parameters, images, and operations
     csv_data = []
     print("")
     print(image.shape)
-    operation_name = operation[0]
-    skimage_func = operation[1]
-    harpia_func = operation[2]
-    cucim_func = operation[3]
+    operation_name = operation.get('name', None)
+    skimage_func = operation.get('skimage', None)
+    skimage_param = operation.get('skimage_param', {})
+    harpia_func = operation.get('custom', None)  # (was typo: 'custum')
+    cucim_func = operation.get('cucim', None)
 
     # Call the timing and comparison function
-    time_compare(
-        csv_data=csv_data,
-        machine=machine,
-        gpuMemory=gpuMemory,
-        ngpus=ngpus,
-        module_func=harpia_func,
-        skimage_func=skimage_func,
-        cucim_func=cucim_func,
-        image=image,
-        kernel=kernel,
-        operation=operation_name,
-        repetitions=repetitions
-    )
-
-    print('\nFinish Test!')
-    results_df = pd.DataFrame(csv_data)
-    # Append to the file, only writing the header if the file does not exist
-    results_df.to_csv(csv_file, mode='a', header=not os.path.exists(csv_file), index=False)
-
-    return results_df
-
-def run_no_kernel(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory):
-    # Loop over hardware and GPU parameters, images, and operations
-    csv_data = []
-    print("")
-    print(image.shape)
-    operation_name = operation[0]
-    skimage_func = operation[1]
-    harpia_func = operation[2]
-    cucim_func = operation[3]
-
-    # Call the timing and comparison function
-    print(operation_name)
-    if(skimage_func):
+    if kernel is not None:
         time_compare(
             csv_data=csv_data,
             machine=machine,
@@ -55,23 +22,29 @@ def run_no_kernel(csv_file, image, operation, machine, ngpus, repetitions, gpuMe
             ngpus=ngpus,
             module_func=harpia_func,
             skimage_func=skimage_func,
+            skimage_param=skimage_param,
             cucim_func=cucim_func,
             image=image,
+            kernel=kernel,
             operation=operation_name,
             repetitions=repetitions
         )
     else:
-        time_module_only(
+        time_compare(
             csv_data=csv_data,
             machine=machine,
             gpuMemory=gpuMemory,
             ngpus=ngpus,
             module_func=harpia_func,
+            skimage_func=skimage_func,
+            skimage_param=skimage_param,
+            cucim_func=cucim_func,
             image=image,
             operation=operation_name,
             repetitions=repetitions
         )
-    print('\nFinish Tests!')
+
+    print('\nFinish Test!')
     results_df = pd.DataFrame(csv_data)
     # Append to the file, only writing the header if the file does not exist
     results_df.to_csv(csv_file, mode='a', header=not os.path.exists(csv_file), index=False)

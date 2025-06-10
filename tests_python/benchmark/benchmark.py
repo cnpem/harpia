@@ -19,6 +19,7 @@ from skimage.filters import (
     gaussian)
 
 from cucim.skimage import morphology as cucim_morph
+from cucim.skimage import filters as cucim_filters
 
 # Binary morphology operations
 from skimage.morphology import binary_erosion, binary_dilation, binary_closing, binary_opening
@@ -150,51 +151,160 @@ kernel = custum_kernel3D()
 # Tests
 #############
 
-# GRAYSCALE
 operations_grayscale = [
-    ("Erosion 3D grayscale", erosion, erosion_grayscale, cucim_morph.erosion),
-    ("Dilation 3D grayscale", dilation, dilation_grayscale, cucim_morph.dilation),
-    ("Closing 3D grayscale", closing, closing_grayscale, cucim_morph.closing),
-    ("Opening 3D grayscale", opening, opening_grayscale, cucim_morph.opening),
-#    ("Geodesisc Erosion 3D grayscale", None, geodesic_erosion_grayscale, "geodesic_erosion_grayscale"),
-#    ("Geodesisc Dilation 3D grayscale", None, geodesic_dilation_grayscale, "geodesic_dilation_grayscale"),
-    ("Top Hat 3D grayscale", white_tophat, top_hat, cucim_morph.white_tophat),
-    ("Bottom Hat 3D grayscale", black_tophat, bottom_hat, cucim_morph.black_tophat),
+    {
+        "name": "Erosion 3D grayscale",
+        "skimage": erosion,
+        "custom": erosion_grayscale,
+        "cucim": cucim_morph.erosion
+    },
+    {
+        "name": "Dilation 3D grayscale",
+        "skimage": dilation,
+        "custom": dilation_grayscale,
+        "cucim": cucim_morph.dilation
+    },
+    {
+        "name": "Closing 3D grayscale",
+        "skimage": closing,
+        "custom": closing_grayscale,
+        "cucim": cucim_morph.closing
+    },
+    {
+        "name": "Opening 3D grayscale",
+        "skimage": opening,
+        "custom": opening_grayscale,
+        "cucim": cucim_morph.opening
+    },
+    # {
+    #     "name": "Geodesisc Erosion 3D grayscale",
+    #     "skimage": None,
+    #     "custom": geodesic_erosion_grayscale,
+    #     "cucim": "geodesic_erosion_grayscale"
+    # },
+    # {
+    #     "name": "Geodesisc Dilation 3D grayscale",
+    #     "skimage": None,
+    #     "custom": geodesic_dilation_grayscale,
+    #     "cucim": "geodesic_dilation_grayscale"
+    # },
+    {
+        "name": "Top Hat 3D grayscale",
+        "skimage": white_tophat,
+        "custom": top_hat,
+        "cucim": cucim_morph.white_tophat
+    },
+    {
+        "name": "Bottom Hat 3D grayscale",
+        "skimage": black_tophat,
+        "custom": bottom_hat,
+        "cucim": cucim_morph.black_tophat
+    },
 ]
+
 operations_filters = [
-    # ("Gaussian Filter 3D grayscale", None, gaussianFilter, "gaussianFilter"),
-    # ("Mean Filter 3D grayscale", None, meanFilter, "meanFilter"),
-    # ("Log Filter 3D grayscale", None, logFilter, "logFilter"),
-    # ("Unsharp Mask Filter 3D grayscale", None, unsharpMaskFilter, "unsharpMaskFilter"),
-    ("Sobel Filter 3D grayscale", sobel, sobelFilter, None),
-    ("Prewitt Filter 3D grayscale", prewitt, prewittFilter, None),
-    # ("Anisotropic Diffusion Filter 3D grayscale", None, anisotropic_diffusion3D, "anisotropic_diffusion3D"), #only runs in float images
+    {
+        "name": "Gaussian Filter 3D grayscale",
+        "skimage": gaussian,
+        "skimage_param":{'mode':'reflect'},
+        "custom": gaussianFilter,
+        "cucim": cucim_filters.gaussian,
+    },
+    # {
+    #     "name": "Mean Filter 3D grayscale",
+    #     "skimage": None,
+    #     "custom": meanFilter,
+    #     "cucim": "meanFilter"
+    # },
+    # {
+    #     "name": "Log Filter 3D grayscale",
+    #     "skimage": None,
+    #     "custom": logFilter,
+    #     "cucim": "logFilter"
+    # },
+    # {
+    #     "name": "Unsharp Mask Filter 3D grayscale",
+    #     "skimage": None,
+    #     "custom": unsharpMaskFilter,
+    #     "cucim": "unsharpMaskFilter"
+    # },
+    {
+        "name": "Sobel Filter 3D grayscale",
+        "skimage": sobel,
+        "custom": sobelFilter,
+        "cucim": cucim_filters.sobel
+    },
+    {
+        "name": "Prewitt Filter 3D grayscale",
+        "skimage": prewitt,
+        "custom": prewittFilter,
+        "cucim": cucim_filters.prewitt
+    },
+    # {
+    #     "name": "Anisotropic Diffusion Filter 3D grayscale",
+    #     "skimage": None,
+    #     "custom": anisotropic_diffusion3D,
+    #     "cucim": "anisotropic_diffusion3D"
+    # },
 ]
 
 images_grayscale = [
-    #("int32", f"image{img_num}_int32_grayscale"),
-    #("uint32", f"image{img_num}_uint32_grayscale"),
-    ("float32", f"image{img_num}_float32_grayscale"),
-   ]
+    "float32",
+    # "int32",
+    # "uint32",
+]
 
-
-# BINARY
 operations_binary = [
-    ("Erosion 3D binary", erosion, erosion_binary, cucim_morph.binary_erosion),
-    ("Dilation 3D binary", dilation, dilation_binary, cucim_morph.binary_dilation),
-    ("Closing 3D binary", closing, closing_binary, cucim_morph.binary_closing),
-    ("Opening 3D binary", opening, opening_binary, cucim_morph.binary_opening),
-    ("Smoothing 3D binary", smooth_sk, smooth_binary, smooth_cucim),
-#    ("Geodesisc Erosion 3D binary", None, geodesic_erosion_binary, "geodesic_erosion_binary"),
-#    ("Geodesisc Dilation 3D binary", None, geodesic_dilation_binary, "geodesic_dilation_binary"),
+    {
+        "name": "Erosion 3D binary",
+        "skimage": erosion,
+        "custom": erosion_binary,
+        "cucim": cucim_morph.binary_erosion
+    },
+    {
+        "name": "Dilation 3D binary",
+        "skimage": dilation,
+        "custom": dilation_binary,
+        "cucim": cucim_morph.binary_dilation
+    },
+    {
+        "name": "Closing 3D binary",
+        "skimage": closing,
+        "custom": closing_binary,
+        "cucim": cucim_morph.binary_closing
+    },
+    {
+        "name": "Opening 3D binary",
+        "skimage": opening,
+        "custom": opening_binary,
+        "cucim": cucim_morph.binary_opening
+    },
+    {
+        "name": "Smoothing 3D binary",
+        "skimage": smooth_sk,
+        "custom": smooth_binary,
+        "cucim": smooth_cucim
+    },
+    # {
+    #     "name": "Geodesisc Erosion 3D binary",
+    #     "skimage": None,
+    #     "custom": geodesic_erosion_binary,
+    #     "cucim": "geodesic_erosion_binary"
+    # },
+    # {
+    #     "name": "Geodesisc Dilation 3D binary",
+    #     "skimage": None,
+    #     "custom": geodesic_dilation_binary,
+    #     "cucim": "geodesic_dilation_binary"
+    # },
 ]
 
 images_binary = [
-    #("int16", f"image{img_num}_int16_binary"),
-    #("uint16", f"image{img_num}_uint16_binary"),
-    ("int32", f"image{img_num}_int32_binary"),
-    #("uint32", f"image{img_num}_uint32_binary"),
-   ]
+    "int32",
+    # "int16",
+    # "uint16",
+    # "uint32",
+]
 
 machine = 'harriet'
 ngpus_values = [1]
@@ -203,22 +313,23 @@ repetitions = 1
 
 for ngpus in ngpus_values:
     for gpuMemory in gpuMemory_values:
-        csv_file = f"results_cucim/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
+        #csv_file = f"results_cucim/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
+        csv_file = f"{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
 
-        for img in images_grayscale:
-            image_input = image_grayscale.astype(dtype=img[0])
+        for dtype in images_grayscale:
+            image_input = image_grayscale.astype(dtype=dtype)
             for operation in operations_filters:
                 # Attempt to run the test
-                results_df = tests.run_no_kernel(
-                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory)
+                results_df = tests.run(
+                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel = None)
             for operation in operations_grayscale:
                 # Attempt to run the test
                 results_df = tests.run(
                     csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel
                 )
 
-        for img in images_binary:
-            image_input = image_binary.astype(dtype=img[0])
+        for dtype in images_binary:
+            image_input = image_binary.astype(dtype=dtype)
             for operation in operations_binary:
                 # Attempt to run the test
                 results_df = tests.run(
