@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt         # For plotting images
 import cupy as cp
 import cucim
 
+from .gpu_memmory import MonitorProcess
+
 def time_function(func, repetitions, *f_args, **f_kwargs):
+
     sig = inspect.signature(func)
     parameters = sig.parameters
 
@@ -22,8 +25,10 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
     filtered_args = tuple(arg for arg in f_args if arg is not None)
 
     # Warm-up run
+    monitor = MonitorProcess(0.1)
     output = func(*filtered_args, **filtered_kwargs)  
-    
+    max_mem_usage = monitor.stop()
+
     # Time several runs
     times = []
     for _ in range(repetitions):
@@ -31,7 +36,7 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
         output = func(*filtered_args, **filtered_kwargs)
         times.append(time.perf_counter() - start)
 
-    return output, times, used_gpuMemory
+    return output, times, used_gpuMemory, max_mem_usage
 
 
 
@@ -57,11 +62,13 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
         pinned_mempool.free_all_blocks()
         
     if kernel is not None:
+        monitor = MonitorProcess(0.1)
         image_cucim = cp.asarray(image)
         kernel_cucim = cp.asarray(kernel)
         output = func(image_cucim, kernel_cucim, **filtered_kwargs)  # Warm-up run
         del image_cucim
         del kernel_cucim
+        max_mem_usage = monitor.stop()
         _clear_cupy_memblocks()
         for _ in range(repetitions):
             start = time.perf_counter()
@@ -85,8 +92,10 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
             times_gpu.append(time_gpu)
 
     else:
+        monitor = MonitorProcess(0.1)
         image_cucim = cp.asarray(image)
         output = func(image_cucim, **filtered_kwargs)  # Warm-up run
+        max_mem_usage = monitor.stop()
         del image_cucim
         _clear_cupy_memblocks()
         for _ in range(repetitions):
@@ -108,7 +117,7 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
             times_memory.append(time_mem)
             times_gpu.append(time_gpu)
             
-    return output, {'total':times, 'memory':times_memory, 'gpu':times_gpu}
+    return output, {'total':times, 'memory':times_memory, 'gpu':times_gpu}, max_mem_usage
 
 def time_compare(
     csv_data, machine, module_func, skimage_func, cucim_func, image, skimage_param = {},
@@ -116,29 +125,33 @@ def time_compare(
     *args, **kwargs):
 
     module_times, skimage_times, cucim_times = [], [], []
+    module_mem, skimage_mem, cucim_mem  = {}, {}, {}
     module_time = skimage_time = cucim_total_time = cucim_mem_time = cucim_gpu_time = "N/A"
     faster_skimage = faster_cucim = "N/A"
     used_gpuMemory = False
 
     # ---- Module (Harpia) ----
     if module_func:
-        module_output, module_times, used_gpuMemory = time_function(
+        module_output, module_times, used_gpuMemory, module_mem_usage = time_function(
             module_func,repetitions, image, kernel, *args, gpuMemory=gpuMemory, ngpus=ngpus, **kwargs
         )
+        module_mem = {f"harpia_gpu{i}(MiB)": mem for i, mem in enumerate(module_mem_usage)}
         print("harpia finished")
 
     # ---- Skimage ----
     if skimage_func:
-        skimage_output, skimage_times, used_gpuMemory = time_function(
+        skimage_output, skimage_times, used_gpuMemory, skimage_mem_usage = time_function(
             skimage_func, repetitions, image, kernel, **skimage_param
         )
+        skimage_mem = {f"skimage_gpu{i}(MiB)": mem for i, mem in enumerate(skimage_mem_usage)}
         print("skimage finished")
 
     # ---- CuCIM ----
     if cucim_func:
-        cucim_output, cucim_times = time_cucim(
+        cucim_output, cucim_times, cucim_mem_usage = time_cucim(
             cucim_func, repetitions, image, kernel
         )
+        cucim_mem = {f"cucim_gpu{i}(MiB)": mem for i, mem in enumerate(cucim_mem_usage)}
         print("cucim finished")
 
     # ---- Post Processing ----
@@ -158,7 +171,7 @@ def time_compare(
 
     # ---- Image Metadata ----
     image_dtype = str(image.dtype)
-    image_size_mb = round(image.nbytes / (1024 ** 2), 1)
+    image_size_mb = round(image.nbytes / (1024 ** 2), 1) #binary megabyte unit MiB (nvidia-smi compatible)
     image_shape = (image.shape[0], image.shape[1], image.shape[2])  # (X, Y, Z)
 
     # ---- CSV Logging ----
@@ -167,8 +180,8 @@ def time_compare(
         'Machine': machine,
         'Gpus': ngpus,
         'gpuMemory': logged_gpuMemory,
-        'Module Time (s)': module_time,
-        'Scikit-Image Time (s)': skimage_time,
+        'Harpia Time (s)': module_time,
+        'Scikit Time (s)': skimage_time,
         'Scikit Time Ratio': faster_skimage,
         'Cucim Total Time (s)': cucim_total_time,
         'Cucim Memory Time (s)': cucim_mem_time,
@@ -176,9 +189,13 @@ def time_compare(
         'Cucim Time Ratio': faster_cucim,
         'Repetitions': repetitions,
         'Image Data Type': image_dtype,
-        'Image Size (MB)': image_size_mb,
-        'Image Dimensions': image_shape
+        'Image Size (MiB)': image_size_mb,
+        'Image Dimensions': image_shape,
+        **module_mem,
+        **skimage_mem,
+        **cucim_mem
     })
+
 
     # ---- Optional Print ----
     if show:
