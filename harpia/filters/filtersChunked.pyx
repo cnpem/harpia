@@ -63,7 +63,7 @@ def gaussianFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     gaussianFilterChunked(&hostImage[0, 0, 0],
                           &hostOutput[0, 0, 0],
@@ -84,7 +84,7 @@ def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     nx = windowSize
     ny = windowSize
@@ -108,7 +108,7 @@ def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
 
     logFilterChunked(&hostImage[0, 0, 0],
@@ -131,7 +131,7 @@ def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     unsharpMaskChunked(&hostImage[0, 0, 0],
                      &hostOutput[0, 0, 0],
@@ -151,7 +151,7 @@ def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     sobelFilterChunked(&hostImage[0, 0, 0],
                      &hostOutput[0, 0, 0],
@@ -170,7 +170,7 @@ def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
 
     prewittFilterChunked(&hostImage[0, 0, 0],
