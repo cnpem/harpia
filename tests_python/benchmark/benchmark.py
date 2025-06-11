@@ -309,7 +309,7 @@ images_binary = [
 machine = 'harriet'
 ngpus_values = [1]
 gpuMemory_values = [0.4]
-repetitions = 1
+repetitions = 10
 
 for ngpus in ngpus_values:
     for gpuMemory in gpuMemory_values:
