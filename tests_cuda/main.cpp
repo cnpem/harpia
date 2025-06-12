@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     // test_operations_on_device();
     // test_chunked_executer(gpuMemory);
 
-    std::string machineName = "harriet";
+    std::string machineName = "aida";
 
     // Encode ngpus meaning in the filename
     std::string ngpu_str;
