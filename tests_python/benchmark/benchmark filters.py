@@ -206,7 +206,7 @@ images_grayscale = [
 
 machine = 'harriet'
 ngpus_values = [1]
-gpuMemory_values = [0.4]
+gpuMemory_values = [0.1]
 repetitions = 10
 
 for ngpus in ngpus_values:
@@ -220,5 +220,24 @@ for ngpus in ngpus_values:
                 # Attempt to run the test
                 results_df = tests.run(
                     csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel = None)
+                
+
+for ngpus in ngpus_values:
+    for gpuMemory in gpuMemory_values:
+        csv_file = f"{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
+
+        for dtype in images_grayscale:
+            image_input = image_grayscale.astype(dtype=dtype)
+            for operation in operations_thresholds:
+                results_df = tests.run(
+                    csv_file,
+                    image_input,
+                    operation,
+                    machine,
+                    ngpus,
+                    repetitions,
+                    gpuMemory,
+                    kernel=None,
+                )
 
 print(f"The End!")
