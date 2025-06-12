@@ -96,17 +96,17 @@ def smooth_cucim(image, selem):
 # Instruction: Uncomment the image for which tests will be executed.
 
 # IMAGE 1
-print("reading small image...")
-xsize = 190
-ysize = 207
-zsize_original = 100
-zsize = 100
-path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
-path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
-image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-img_num = 1
-print("fineshed reading small image!")
+# print("reading small image...")
+# xsize = 190
+# ysize = 207
+# zsize_original = 100
+# zsize = 100
+# path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
+# path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
+# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
+# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+# img_num = 1
+# print("fineshed reading small image!")
 
 # # IMAGE 2 (possibily with problem)
 # print("reading big image...")
@@ -132,17 +132,17 @@ print("fineshed reading small image!")
 # print("fineshed reading medium image!")
 
 # IMAGE 4
-# print("reading big image...")
-# xsize = 2052
-# ysize = 2052
-# zsize = 2048
+print("reading big image...")
+xsize = 2052
+ysize = 2052
+zsize = 2048
 
-# path_grayscale = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
-# path_binary = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/binary/Recon_2052x2052x2048_16bits.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'float32')
-# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-# img_num = 4
-# print("fineshed reading big image!")
+path_grayscale = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
+path_binary = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/binary/Recon_2052x2052x2048_16bits.raw"
+image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'float32')
+image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
+img_num = 4
+print("fineshed reading big image!")
 
 #Kernel
 kernel = custum_kernel3D()
@@ -306,18 +306,20 @@ images_binary = [
     # "uint32",
 ]
 
-machine = 'harriet'
+machine = 'aida'
 ngpus_values = [1]
 gpuMemory_values = [0.4]
-repetitions = 10
+repetitions = 1
+nslices = 50
 
 for ngpus in ngpus_values:
     for gpuMemory in gpuMemory_values:
         #csv_file = f"results_cucim/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
-        csv_file = f"{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
+        csv_file = f"results_aida/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
 
         for dtype in images_grayscale:
             image_input = image_grayscale.astype(dtype=dtype)
+            image_input = image_input[:nslices,:,:]
             for operation in operations_filters:
                 # Attempt to run the test
                 results_df = tests.run(
@@ -330,6 +332,7 @@ for ngpus in ngpus_values:
 
         for dtype in images_binary:
             image_input = image_binary.astype(dtype=dtype)
+            image_input = image_input[:nslices,:,:]
             for operation in operations_binary:
                 # Attempt to run the test
                 results_df = tests.run(

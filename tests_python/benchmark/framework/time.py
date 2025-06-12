@@ -204,5 +204,5 @@ def time_compare(
         print(f"Scikit Time: {skimage_time} seconds")
         print(f"Cucim Time: {cucim_total_time} seconds")
         print(f"Image Data Type: {image_dtype}")
-        print(f"Image Size: {image_size_mb} MB")
+        print(f"Image Size: {image_size_mb} MiB")
         print(f"Image Dimensions: {image_shape}")
