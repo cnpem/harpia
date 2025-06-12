@@ -137,8 +137,8 @@ xsize = 2052
 ysize = 2052
 zsize = 2048
 
-path_grayscale = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
-path_binary = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/binary/Recon_2052x2052x2048_16bits.raw"
+path_grayscale = "../../example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
+path_binary = "../../example_images/binary/Recon_2052x2052x2048_16bits.raw"
 image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'float32')
 image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
 img_num = 4
