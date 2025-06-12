@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np                     # For array manipulation
-from framework import image, tests
 import cupy as cp
+from framework import image, tests
 
 from skimage.filters import (
     prewitt,
@@ -12,13 +12,13 @@ from skimage.filters import (
     threshold_niblack,
     threshold_sauvola,
     threshold_mean,
-    threshold_gaussian
+    #threshold_gaussian
 )
 
 from cucim.skimage import filters as cucim_filters
 from cucim.skimage.filters import threshold_niblack as cucim_threshold_niblack
 from cucim.skimage.filters import threshold_sauvola as cucim_threshold_sauvola
-from cucim.skimage.filters import threshold_mean as cucim_threshold_mean
+#from cucim.skimage.filters import threshold_mean as cucim_threshold_mean
 from cucim.skimage.filters import threshold_local as cucim_threshold_local  # for gaussian-style (adaptive) thresholding
 
 # Custom filters chunked operations from harpia
@@ -44,12 +44,6 @@ from harpia.filters.filters import median,non_local_means
 import harpia
 print(harpia.__file__)
 
-def custum_kernel3D():
-    kernel_2d = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]], dtype=np.int32)
-    # Stack the 2D kernel to form a 3D kernel (3 layers)
-    kernel_3d = np.stack([kernel_2d, kernel_2d, kernel_2d])
-    return kernel_3d
-
 #############
 # Read Images
 #############
@@ -57,17 +51,15 @@ def custum_kernel3D():
 # Instruction: Uncomment the image for which tests will be executed.
 
 # IMAGE 1
-print("reading small image...")
-xsize = 190
-ysize = 207
-zsize_original = 100
-zsize = 100
-path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
-path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
-image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-img_num = 1
-print("fineshed reading small image!")
+#print("reading small image...")
+#xsize = 190
+#ysize = 207
+#zsize_original = 100
+#zsize = 100
+#path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
+#image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
+#img_num = 1
+#print("finished reading small image!")
 
 # # IMAGE 2 (possibily with problem)
 # print("reading big image...")
@@ -94,19 +86,17 @@ print("fineshed reading small image!")
 
 # IMAGE 4
 # print("reading big image...")
-# xsize = 2052
-# ysize = 2052
-# zsize = 2048
+xsize = 2052
+ysize = 2052
+zsize = 2048
 
-# path_grayscale = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
+path_grayscale = "../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
 # path_binary = "../../../../../../../../labs/tepui/home/camila.araujo/work/harpia/example_images/binary/Recon_2052x2052x2048_16bits.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'float32')
+image_grayscale = load(path_grayscale, xsize, ysize, zsize,'float32')[:100]
+zsize = 100
 # image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-# img_num = 4
-# print("fineshed reading big image!")
-
-#Kernel
-kernel = custum_kernel3D()
+img_num = 4
+print("finished reading big image!")
 
 #############
 # Tests
@@ -124,7 +114,7 @@ operations_filters = [
         "name": "Mean Filter 3D grayscale",
         "skimage": None,
         "custom": meanFilter,
-        "cucim": cucim_filters.rank.mean,  # 2D only – no 3D support in cucim
+        "cucim": None,  # 2D only – no 3D support in cucim
     },
     {
         "name": "Median Filter 3D grayscale",
@@ -144,12 +134,12 @@ operations_filters = [
         "custom": unsharpMaskFilter,
         "cucim": None  # Not available in cucim as of now
     },
-    {
-        "name": "Non local means Filter 3D grayscale",
-        "skimage": None,
-        "custom": non_local_means,
-        "cucim": None  # No NLM in cucim
-    },
+    #{
+    #    "name": "Non local means Filter 3D grayscale",
+    #    "skimage": None,
+    #    "custom": non_local_means,
+    #    "cucim": None  # No NLM in cucim
+    #},
     {
         "name": "Sobel Filter 3D grayscale",
         "skimage": sobel,
@@ -188,14 +178,14 @@ operations_thresholds = [
         "name": "Threshold Mean",
         "skimage": threshold_mean,
         "custom": meanThreshold,
-        "cucim": cucim_threshold_mean,
+        "cucim": None,
     },
-    {
-        "name": "Threshold Gaussian",
-        "skimage": threshold_gaussian,
-        "custom": gaussianThreshold,
-        "cucim": lambda img, **kwargs: cucim_threshold_local(img, method='gaussian', **kwargs)
-    }
+    #{
+    #    "name": "Threshold Gaussian",
+    #    "skimage": threshold_gaussian,
+    #    "custom": gaussianThreshold,
+    #    "cucim": lambda img, **kwargs: cucim_threshold_local(img, method='gaussian', **kwargs)
+    #}
 ]
 
 images_grayscale = [
