@@ -1,8 +1,8 @@
-#include <iostream>
-#include <cmath>
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <chrono>
+#include <cmath>
+#include <iostream>
 #include "../../include/localBinaryPattern/lbp.h"
 
 // Reflect padding device function
@@ -13,7 +13,7 @@ __device__ int reflect_lbp(int idx, int limit) {
 }
 
 template <typename in_dtype>
-__global__ void lbp(const in_dtype* devImage, float* devOutput,
+__global__ void lbp(in_dtype* devImage, float* devOutput,
                     int xsize, int ysize, int zsize, int idz)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -50,9 +50,9 @@ __global__ void lbp(const in_dtype* devImage, float* devOutput,
 }
 
 // Explicit instantiation of the lbp kernel
-template __global__ void lbp<int>(const int* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
-template __global__ void lbp<unsigned int>(const unsigned int* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
-template __global__ void lbp<float>(const float* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
+template __global__ void lbp<int>(int* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
+template __global__ void lbp<unsigned int>(unsigned int* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
+template __global__ void lbp<float>(float* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
 
 
 template <typename in_dtype>
@@ -85,6 +85,7 @@ void localBinaryPattern(in_dtype* hostImage, float* hostOutput, int xsize, int y
 }
 
 // Explicit template instantiations
-template void localBinaryPattern<int>(int* hostImage, float* hostOutput, int xsize, int ysize, int zsize);
-template void localBinaryPattern<unsigned int>(unsigned int* hostImage, float* hostOutput, int xsize, int ysize, int zsize);
-template void localBinaryPattern<float>(float* hostImage, float* hostOutput, int xsize, int ysize, int zsize);
+template void localBinaryPattern<float>(float*, float*, int, int, int);
+template void localBinaryPattern<int>(int* , float* , int, int, int);
+template void localBinaryPattern<unsigned int>(unsigned int*, float*, int, int, int);
+

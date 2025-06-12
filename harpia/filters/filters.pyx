@@ -223,7 +223,7 @@ def median(np.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = np.empty((isize.x, isize.y, isize.z), dtype=hostImage.dtype)
+        hostOutput = np.empty((isize.z, isize.y, isize.x), dtype=np.float32)
 
     median_filtering(&hostImage[0,0,0],
                           &hostOutput[0,0,0],

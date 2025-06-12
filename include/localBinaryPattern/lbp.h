@@ -3,10 +3,11 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <iostream>
 
 // LBP kernel declaration
 template <typename in_dtype>
-__global__ void lbp(const in_dtype* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
+__global__ void lbp(in_dtype* devImage, float* devOutput, int xsize, int ysize, int zsize, int idz);
 
 // Host wrapper
 template <typename in_dtype>

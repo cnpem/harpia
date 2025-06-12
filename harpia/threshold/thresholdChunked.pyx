@@ -53,7 +53,7 @@ def gaussianThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     adaptativeGaussianThresholdChunked(&hostImage[0, 0, 0],
                           &hostOutput[0, 0, 0],
@@ -72,7 +72,7 @@ def meanThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     nx = windowSize
     ny = windowSize
@@ -96,7 +96,7 @@ def niblackThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     nx = windowSize
     ny = windowSize
@@ -120,7 +120,7 @@ def sauvolaThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
     isize = Size(hostImage)
 
     if hostOutput is None:
-        hostOutput = numpy.empty((isize.x, isize.y, isize.z), dtype=numpy.float32)
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
     nx = windowSize
     ny = windowSize
