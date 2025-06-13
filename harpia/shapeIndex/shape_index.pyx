@@ -62,7 +62,8 @@ def hessian(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return H
 
-
+@boundscheck(False)
+@wraparound(False)
 def hessian_eigenvalues(numpy.ndarray[numeric, ndim=3] hostImage,
                         int step=1, int verbose=0,
                         float gpuMemory=0.4, int ngpus=-1):
@@ -103,7 +104,8 @@ def hessian_eigenvalues(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return eigen
 
-
+@boundscheck(False)
+@wraparound(False)
 def shape_index(numpy.ndarray[numeric, ndim=3] hostImage,
                 int step=1, int verbose=0,
                 float gpuMemory=0.4, int ngpus=-1):
