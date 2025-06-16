@@ -60,7 +60,7 @@ ngpus_values = [1]
 gpuMemory_values = [0.1]
 repetitions = 1
 reps = 10
-nslices = 1024
+nslices = 256
 
 image_sets = [
     ("binary", images_binary, image_binary, operations.binary_cucim),
@@ -70,7 +70,7 @@ image_sets = [
 for ngpus in ngpus_values:
     print("GPUs:", ngpus, "\n")
     #csv_file = f"results_cucim/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
-    csv_file = f"results_aida/{machine}_{ngpus}gpu_{repetitions}reps_cython_results_run2_cucim1024.csv"
+    csv_file = f"results_aida/{machine}_{ngpus}gpu_{repetitions}reps_cython_results_run2_cucim256.csv"
 
     for gpuMemory in gpuMemory_values:
         print("\ngpuMemory:", gpuMemory,"\n")
