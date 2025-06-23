@@ -36,7 +36,7 @@ def pixel_feature_extract(np.ndarray[numeric, ndim=3] hostImage,
                           dict features=None,
                           int verbose=0,
                           float gpuMemory=0.4,
-                          int ngpus=-1)::
+                          int ngpus=-1):
 
     isize = Size(hostImage)
     cdef int z, feature_index
@@ -55,8 +55,8 @@ def pixel_feature_extract(np.ndarray[numeric, ndim=3] hostImage,
     cdef bint Texture = features.get("Texture", False)
     cdef bint ShapeIndex = features.get("ShapeIndex", False)
     cdef bint LocalBinaryPattern = features.get("LocalBinaryPattern", False)
-    
-    cdef int feats_per_sigma = Intensity + Edges + 2 * Texture + LocalBinaryPattern + shapeIndex
+
+    cdef int feats_per_sigma = Intensity + Edges + 2 * Texture + LocalBinaryPattern + ShapeIndex
     print("Sigmas len", len(sigmas))
     cdef int total_features = len(sigmas) * feats_per_sigma
     print("Total features:", total_features)
@@ -79,21 +79,21 @@ def pixel_feature_extract(np.ndarray[numeric, ndim=3] hostImage,
             prewittFilterChunked(&blurred_3d[0, 0, 0], &results[feature_index, 0, 0, 0], isize.y, isize.x, isize.z, use_3d,
                     verbose, ngpus, gpuMemory)
             feature_index += 1
-        
+
         if Texture:
             eigenvalues = hessian_eigenvalues(blurred_3d, step=1, verbose=0, gpuMemory=0.4, ngpus=-1)
             results[feature_index, :, :, :] = eigenvalues[:, :, :, 0]
             results[feature_index + 1, :, :, :] = eigenvalues[:, :, :, 1]
             feature_index += 2
-        
+
         if LocalBinaryPattern:
             localBinaryPattern(&blurred_3d[0, 0, 0], &results[feature_index, 0, 0, 0], isize.y, isize.x, isize.z)
             feature_index += 1
 
-        if shapeIdex:
+        if ShapeIndex:
             results[feature_index, :] = hessian_eigenvalues(blurred_3d, step=1, verbose=0, gpuMemory=0.4, ngpus=-1)
             feature_index += 1
-                
+
     print("\n Feature extraction completed in {:.2f} seconds.\n".format(time() - start_time))
 
     return results
