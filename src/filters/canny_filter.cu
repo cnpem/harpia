@@ -194,7 +194,7 @@ __global__ void thresholding_2d(float* deviceImage, float low, float high, int x
 
     if (idx < xsize && idy < ysize)
     {
-        int imageIndex = idz * xsize * ysize + idy * xsize + idx;  // Corrected indexing for row-major order
+        int imageIndex = idz * xsize * ysize + idx * ysize + idy;  // Corrected indexing for row-major order
 
         float pixelValue = deviceImage[imageIndex];
 
@@ -236,14 +236,14 @@ __global__ void hysteresis_2d(float* deviceImage, int xsize, int ysize, int idz)
             if ((idx > 0 && idx < xsize - 1) && (idy > 0 && idy < ysize - 1))
             {
                 // Check the 8 neighbors for strong edges (255)
-                if (deviceImage[imageIndex - 1] == 255 ||                  // Left
-                    deviceImage[imageIndex + 1] == 255 ||                  // Right
-                    deviceImage[imageIndex - xsize] == 255 ||              // Top
-                    deviceImage[imageIndex + xsize] == 255 ||              // Bottom
-                    deviceImage[imageIndex - xsize - 1] == 255 ||          // Top-left
-                    deviceImage[imageIndex - xsize + 1] == 255 ||          // Top-right
-                    deviceImage[imageIndex + xsize - 1] == 255 ||          // Bottom-left
-                    deviceImage[imageIndex + xsize + 1] == 255)            // Bottom-right
+                if (deviceImage[imageIndex - 1] == 255 ||                        // Left
+                    deviceImage[imageIndex + 1] == 255 ||                        // Right
+                    deviceImage[imageIndex - ysize] == 255 ||                   // Top
+                    deviceImage[imageIndex + ysize] == 255 ||                   // Bottom
+                    deviceImage[imageIndex - ysize - 1] == 255 ||               // Top-left
+                    deviceImage[imageIndex - ysize + 1] == 255 ||               // Top-right
+                    deviceImage[imageIndex + ysize - 1] == 255 ||               // Bottom-left
+                    deviceImage[imageIndex + ysize + 1] == 255)                 // Bottom-right
                 {
                     isConnectedToStrongEdge = true;
                 }
@@ -251,14 +251,14 @@ __global__ void hysteresis_2d(float* deviceImage, int xsize, int ysize, int idz)
             else
             {
                 // Handle edge cases (pixels along the borders) separately
-                if (idx > 0 && deviceImage[imageIndex - 1] == 255) isConnectedToStrongEdge = true; // Left
-                if (idx < xsize - 1 && deviceImage[imageIndex + 1] == 255) isConnectedToStrongEdge = true; // Right
-                if (idy > 0 && deviceImage[imageIndex - xsize] == 255) isConnectedToStrongEdge = true; // Top
-                if (idy < ysize - 1 && deviceImage[imageIndex + xsize] == 255) isConnectedToStrongEdge = true; // Bottom
-                if (idx > 0 && idy > 0 && deviceImage[imageIndex - xsize - 1] == 255) isConnectedToStrongEdge = true; // Top-left
-                if (idx < xsize - 1 && idy > 0 && deviceImage[imageIndex - xsize + 1] == 255) isConnectedToStrongEdge = true; // Top-right
-                if (idx > 0 && idy < ysize - 1 && deviceImage[imageIndex + xsize - 1] == 255) isConnectedToStrongEdge = true; // Bottom-left
-                if (idx < xsize - 1 && idy < ysize - 1 && deviceImage[imageIndex + xsize + 1] == 255) isConnectedToStrongEdge = true; // Bottom-right
+                if (idx > 0 && deviceImage[imageIndex - 1] == 255) isConnectedToStrongEdge = true;                 // Left
+                if (idx < xsize - 1 && deviceImage[imageIndex + 1] == 255) isConnectedToStrongEdge = true;         // Right
+                if (idy > 0 && deviceImage[imageIndex - ysize] == 255) isConnectedToStrongEdge = true;             // Top
+                if (idy < ysize - 1 && deviceImage[imageIndex + ysize] == 255) isConnectedToStrongEdge = true;     // Bottom
+                if (idx > 0 && idy > 0 && deviceImage[imageIndex - ysize - 1] == 255) isConnectedToStrongEdge = true;           // Top-left
+                if (idx < xsize - 1 && idy > 0 && deviceImage[imageIndex - ysize + 1] == 255) isConnectedToStrongEdge = true;   // Top-right
+                if (idx > 0 && idy < ysize - 1 && deviceImage[imageIndex + ysize - 1] == 255) isConnectedToStrongEdge = true;   // Bottom-left
+                if (idx < xsize - 1 && idy < ysize - 1 && deviceImage[imageIndex + ysize + 1] == 255) isConnectedToStrongEdge = true; // Bottom-right
             }
 
             // Update the weak edge pixel based on connectivity to strong edges
@@ -273,7 +273,6 @@ __global__ void hysteresis_2d(float* deviceImage, int xsize, int ysize, int idz)
         }
     }
 }
-
 
 
 template<typename dtype>
@@ -297,7 +296,7 @@ void canny_filtering(dtype* hostImage, float* hostOutput,
 
 
     // get gaussian kernel size
-    int nx = (int)ceil(6*sigma+1);
+    int nx = (int)ceil(4*sigma+0.5);
     int ny = nx;
 
     //get gaussian kernel.
@@ -314,7 +313,7 @@ void canny_filtering(dtype* hostImage, float* hostOutput,
 
     //cuda kernel configuration
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.y - 1) / blockSize.y, (ysize + blockSize.x - 1) / blockSize.x);
+    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
 
     //apply gaussian blur
     for (int k = 0; k < zsize; k++)

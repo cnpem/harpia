@@ -60,6 +60,22 @@ def gaussianFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
 
+    """
+    Apply a 3D Gaussian filter to a volume using chunked GPU processing.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        sigma (float): Standard deviation of the Gaussian kernel.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Filtered 3D image.
+    """
+
     isize = Size(hostImage)
 
     if hostOutput is None:
@@ -80,6 +96,22 @@ def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                float gpuMemory = 0.4,
                int ngpus = -1,
                ):
+
+    """
+    Apply a 3D mean (box) filter to a volume using chunked GPU processing.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        windowSize (int): Size of the mean filter kernel in all dimensions.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Filtered 3D image.
+    """
 
     isize = Size(hostImage)
 
@@ -104,6 +136,21 @@ def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               int verbose = 0,
               float gpuMemory = 0.4,
               int ngpus = -1):
+    
+    """
+    Apply a Laplacian of Gaussian (LoG) filter to a 3D image using chunked GPU processing.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Filtered 3D image.
+    """
 
     isize = Size(hostImage)
 
@@ -127,6 +174,23 @@ def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
                       int verbose = 0,
                       float gpuMemory = 0.4,
                       int ngpus = -1):
+    """
+    Apply a 3D unsharp mask filter to enhance image details using GPU processing.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        sigma (float): Gaussian blur sigma for smoothing.
+        ammount (float): Sharpening intensity.
+        threshold (float): Intensity threshold for applying sharpening.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Sharpened 3D image.
+    """
     
     isize = Size(hostImage)
 
@@ -147,6 +211,20 @@ def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               int verbose = 0,
               float gpuMemory = 0.4,
               int ngpus = -1):
+    """
+    Apply a Sobel edge detection filter in 3D using chunked GPU processing.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Filtered 3D image emphasizing edges.
+    """
 
     isize = Size(hostImage)
 
@@ -166,6 +244,21 @@ def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               int verbose = 0,
               float gpuMemory = 0.4,
               int ngpus = -1):
+
+    """
+    Apply a Prewitt edge detection filter in 3D using GPU-based chunked processing.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Filtered 3D image emphasizing edges.
+    """
 
     isize = Size(hostImage)
 
