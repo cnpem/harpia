@@ -1,13 +1,12 @@
 # cython: boundscheck=False, wraparound=False
 import numpy as np
-from skimage.feature import local_binary_pattern
 from time import time
 
 cimport numpy as np
 cimport cython
 from cython cimport boundscheck, wraparound, parallel
 from harpia.common import Size
-
+from harpia.shape_index import hessian_eigenvalues
 #Define the fused type for numeric types : float, int, unsigned int
 ctypedef fused numeric:
     float
@@ -24,24 +23,40 @@ cdef extern from "../../include/filters/prewitt_filter.h":
     void prewittFilterChunked[numeric](numeric* hostImage, float* hostOutput,
                                        int xsize, int ysize, int zsize, int type3d,
                                        int flag_verbose, int ngpus, float gpuMemory)
+
+cdef extern from "../../include/localBinaryPattern/lbp.h":
+    void localBinaryPattern[numeric](numeric* hostImage, float* hostOutput, int xsize, int ysize, int zsize)
 #---------------------------------------------------------------------------------------------------
 
 @boundscheck(False)
 @wraparound(False)
 def pixel_feature_extract(np.ndarray[numeric, ndim=3] hostImage,
-                           list sigmas,
-                           bint use_3d,
-                           bint Intensity=True,
-                           bint Edges=True,
-                           bint Texture=False,
-                           int verbose=0,
-                           float gpuMemory=0.4,
-                           int ngpus=-1):
+                          list sigmas,
+                          bint use_3d,
+                          dict features=None,
+                          int verbose=0,
+                          float gpuMemory=0.4,
+                          int ngpus=-1)::
 
     isize = Size(hostImage)
     cdef int z, feature_index
 
-    cdef int feats_per_sigma = Intensity + Edges + Texture
+    if features is None:
+        features = {
+            "Intensity": True,
+            "Edges": True,
+            "Texture": True,
+            "ShapeIndex": False,
+            "LocalBinaryPattern": False,
+        }
+
+    cdef bint Intensity = features.get("Intensity", False)
+    cdef bint Edges = features.get("Edges", False)
+    cdef bint Texture = features.get("Texture", False)
+    cdef bint ShapeIndex = features.get("ShapeIndex", False)
+    cdef bint LocalBinaryPattern = features.get("LocalBinaryPattern", False)
+    
+    cdef int feats_per_sigma = Intensity + Edges + 2 * Texture + LocalBinaryPattern + shapeIndex
     print("Sigmas len", len(sigmas))
     cdef int total_features = len(sigmas) * feats_per_sigma
     print("Total features:", total_features)
@@ -65,11 +80,18 @@ def pixel_feature_extract(np.ndarray[numeric, ndim=3] hostImage,
                     verbose, ngpus, gpuMemory)
             feature_index += 1
         
-        # 3D LBP is not directly implemented. 2D is available in scikit-image. Run per slice.
         if Texture:
-            for z in range(isize.z):
-                    lbp = local_binary_pattern(blurred_3d[z], P=8, R=1, method='uniform')
-                    results[feature_index, z] = lbp.astype(np.float32)
+            eigenvalues = hessian_eigenvalues(blurred_3d, step=1, verbose=0, gpuMemory=0.4, ngpus=-1)
+            results[feature_index, :, :, :] = eigenvalues[:, :, :, 0]
+            results[feature_index + 1, :, :, :] = eigenvalues[:, :, :, 1]
+            feature_index += 2
+        
+        if LocalBinaryPattern:
+            localBinaryPattern(&blurred_3d[0, 0, 0], &results[feature_index, 0, 0, 0], isize.y, isize.x, isize.z)
+            feature_index += 1
+
+        if shapeIdex:
+            results[feature_index, :] = hessian_eigenvalues(blurred_3d, step=1, verbose=0, gpuMemory=0.4, ngpus=-1)
             feature_index += 1
                 
     print("\n Feature extraction completed in {:.2f} seconds.\n".format(time() - start_time))
