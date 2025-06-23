@@ -49,6 +49,24 @@ def gaussianThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    float sigma = 1, float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
+    """
+    Apply adaptive Gaussian thresholding to a 3D image using GPU chunking.
+
+    The threshold is computed by subtracting a weighted Gaussian-filtered value from the input.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image of numeric type.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        sigma (float): Standard deviation for Gaussian kernel.
+        weight (float): Constant subtracted from the mean (bias).
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Binarized image based on adaptive Gaussian threshold.
+    """
 
     isize = Size(hostImage)
 
@@ -68,6 +86,25 @@ def meanThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    int windowSize=1,float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
+    
+    """
+    Apply adaptive mean thresholding to a 3D image using GPU chunking.
+
+    The threshold is computed by subtracting a constant `weight` from the local mean in a window.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        windowSize (int): Size of the mean filter window (applied in all directions).
+        weight (float): Constant bias subtracted from local mean.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Adaptive mean thresholded binary volume.
+    """
 
     isize = Size(hostImage)
 
@@ -93,6 +130,27 @@ def niblackThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
 
+    """
+    Apply the Niblack thresholding method to a 3D image using GPU chunking.
+
+    The threshold is calculated as:  
+    **T = mean + weight × stddev**,  
+    where mean and stddev are computed over the local window.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        windowSize (int): Size of the local window.
+        weight (float): Scaling factor for the local standard deviation.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Binary result after Niblack thresholding.
+    """
+
     isize = Size(hostImage)
 
     if hostOutput is None:
@@ -116,6 +174,27 @@ def sauvolaThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    int windowSize=1,float weight = 0 , numeric range  = 1,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
+
+    """
+    Apply Sauvola thresholding to a 3D image using GPU chunking.
+
+    The threshold is computed as:  
+    **T = mean × (1 + weight × (stddev / range - 1))**
+
+    Parameters:
+        hostImage (ndarray): Input 3D image.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        windowSize (int): Neighborhood size for local statistics.
+        weight (float): Parameter `k` in the Sauvola formula.
+        range (numeric): Dynamic range of image intensity values.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose for number of chuncks in execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Binarized volume after Sauvola adaptive thresholding.
+    """
 
     isize = Size(hostImage)
 
