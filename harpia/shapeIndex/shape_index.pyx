@@ -23,6 +23,35 @@ def grad(numpy.ndarray[numeric, ndim=3] hostImage,
          int type3d=1,
          int verbose = 0, float gpuMemory = 0.4, int ngpus = -1,           
          int axis = 0, int step = 1):
+    
+    """
+    Compute the gradient of a 3D image along a specified axis using CUDA.
+
+    Parameters
+    ----------
+    hostImage : numpy.ndarray
+        Input 3D image of numeric types (float, int, unsigned int), shape (z, y, x).
+    hostOutput : numpy.ndarray, optional
+        Pre-allocated output array (float32), same shape as hostImage.
+        If None, a new array is allocated.
+    type3d : int, optional
+        Specifies whether to treat the input as 2D or 3D (currently unused).
+    verbose : int, optional
+        Verbosity level.
+    gpuMemory : float, optional
+        Fraction of GPU memory to allocate (reserved for future use).
+    ngpus : int, optional
+        Number of GPUs to use (-1 for automatic detection).
+    axis : int, optional
+        Axis along which to compute the gradient, y or x.
+    step : int, optional
+        Step size for finite differences.
+
+    Returns
+    -------
+    numpy.ndarray
+        Gradient of the input image along the specified axis, shape (z, y, x), dtype float32.
+    """
 
     isize = Size(hostImage)
 
@@ -42,6 +71,39 @@ def hessian(numpy.ndarray[numeric, ndim=3] hostImage,
             int type3d=1,
             int verbose=0, float gpuMemory=0.4, int ngpus=-1,
             int axis=0, int step=1):
+
+    """
+    Compute the 2D Hessian components of a 3D image slice-wise.
+
+    The Hessian matrix components returned are:
+    - d²f/dx²
+    - d²f/dy²
+    - d²f/dxdy (mixed partial derivative)
+
+    Parameters
+    ----------
+    hostImage : numpy.ndarray
+        Input 3D image array.
+    hostOutput : numpy.ndarray, optional
+        Not currently used; reserved for output.
+    type3d : int, optional
+        Specifies whether to treat the input as 2D or 3D.
+    verbose : int, optional
+        Verbosity level.
+    gpuMemory : float, optional
+        Fraction of GPU memory to allocate.
+    ngpus : int, optional
+        Number of GPUs to use.
+    axis : int, optional
+        Axis parameter (not used here).
+    step : int, optional
+        Step size for finite differences.
+
+    Returns
+    -------
+    tuple of numpy.ndarray
+        Tuple with three 3D float32 arrays corresponding to (d²f/dx², d²f/dy², d²f/dxdy).
+    """
 
     dfdx = grad(hostImage, step=step, axis=0,
                 gpuMemory=gpuMemory, verbose=verbose, ngpus=ngpus)
@@ -68,8 +130,25 @@ def hessian_eigenvalues(numpy.ndarray[numeric, ndim=3] hostImage,
                         int step=1, int verbose=0,
                         float gpuMemory=0.4, int ngpus=-1):
     """
-    Compute the 2x2 Hessian eigenvalues for each pixel in each slice of a 3D image in parallel.
-    Returns: numpy.ndarray of shape (z, y, x, 2)
+    Compute the two eigenvalues of the 2x2 Hessian matrix at each pixel for each slice in a 3D image.
+
+    Parameters
+    ----------
+    hostImage : numpy.ndarray
+        Input 3D image of numeric type.
+    step : int, optional
+        Finite difference step size.
+    verbose : int, optional
+        Verbosity flag.
+    gpuMemory : float, optional
+        Fraction of GPU memory to use.
+    ngpus : int, optional
+        Number of GPUs to use.
+
+    Returns
+    -------
+    numpy.ndarray
+        A 4D array of shape (z, y, x, 2), where the last dimension holds the eigenvalues (lambda1, lambda2).
     """
     cdef int z, y, x, i, j, k
     cdef float a, d, b, trace, delta, sqrt_delta, lambda1, lambda2
@@ -110,26 +189,31 @@ def shape_index(numpy.ndarray[numeric, ndim=3] hostImage,
                 int step=1, int verbose=0,
                 float gpuMemory=0.4, int ngpus=-1):
     """
-    Compute the shape index from a 3D image using the Hessian eigenvalues.
+    Compute the shape index scalar field from the eigenvalues of the Hessian matrix of a 3D image.
+
+    The shape index is defined as:
+    S = (2 / pi) * arctan((lambda2 + lambda1) / (lambda2 - lambda1))
+    where lambda1 and lambda2 are the Hessian eigenvalues at each pixel.
 
     Parameters
     ----------
-    hostImage : ndarray (z, y, x)
-        The inumpyut 3D image.
-    step : int
-        The finite difference step.
-    verbose : int
+    hostImage : numpy.ndarray
+        Input 3D image array.
+    step : int, optional
+        Finite difference step size.
+    verbose : int, optional
         Verbosity flag.
-    gpuMemory : float
+    gpuMemory : float, optional
         Fraction of GPU memory to use.
-    ngpus : int
+    ngpus : int, optional
         Number of GPUs to use.
 
     Returns
     -------
-    shape : ndarray (z, y, x)
-        The shape index scalar field.
+    numpy.ndarray
+        3D array of shape (z, y, x) with the computed shape index values.
     """
+
     cdef int z, y, x, i, j, k
     cdef float l1, l2, num, den, sidx
 
