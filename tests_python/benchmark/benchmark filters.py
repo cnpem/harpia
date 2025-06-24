@@ -32,6 +32,8 @@ from harpia.filters.filtersChunked import (
      anisotropic_diffusion3D,
 )
 
+from harpia.filters import filters as filtersNoChunked
+
 from harpia.threshold.thresholdChunked import(
     gaussianThreshold,
     meanThreshold,
