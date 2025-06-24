@@ -206,7 +206,7 @@ void meanFilterChunked(in_dtype* hostImage, out_dtype* hostOutput, int xsize, in
   else
   {
 
-    int ncopies = 1;
+    int ncopies = 2;
     chunkedExecutor(meanFilter3DGPU<in_dtype,out_dtype>, ncopies, gpuMemory, ngpus,
                     hostImage, hostOutput, xsize, ysize, zsize, flag_verbose, nx, ny, nz);
 

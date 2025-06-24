@@ -246,7 +246,7 @@ void adaptativeGaussianThresholdChunked(in_dtype* hostImage, out_dtype* hostOutp
 
   
   else {
-    int ncopies = 1;
+    int ncopies = 2;
     const int kernelOperations = 1;
     double* kernel;
     int gaussian_size = (int)ceil(6 * sigma + 1); 
