@@ -55,26 +55,24 @@ images_binary = [
     # "uint32",
 ]
 
-machine = 'aida'
-ngpus_values = [1]
-gpuMemory_values = [0.1]
+machine = 'mary'
+ngpus = 1
+gpuMemory_values = [0.05, 0.1]
 repetitions = 1
-reps = 10
-nslices = 1024
+reps = 30
+nslices_values = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
 
 image_sets = [
-    ("binary", images_binary, image_binary, operations.binary_cucim),
-    ("grayscale", images_grayscale, image_grayscale, operations.grayscale_cucim)
+    #("binary", images_binary, image_binary, operations.binary_custom),
+    ("grayscale_filters", images_grayscale, image_grayscale, operations.grayscale_custom_filters)
 ]
 
-for ngpus in ngpus_values:
-    print("GPUs:", ngpus, "\n")
-    #csv_file = f"results_cucim/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
-    csv_file = f"results_aida/{machine}_{ngpus}gpu_{repetitions}reps_cython_results_run2_cucim1024.csv"
-
-    for gpuMemory in gpuMemory_values:
+for gpuMemory in gpuMemory_values:
+    for nslices in nslices_values:
         print("\ngpuMemory:", gpuMemory,"\n")
         for image_type, dtypes, image, ops in image_sets:
+            csv_file = f"results_mary/{machine}_{reps}reps_custom{nslices}_{image_type}_{gpuMemory}gpuMemory.csv"
+            print("Saving to file: ", csv_file)
             for dtype in dtypes:
                 image_input = image.astype(dtype=dtype)
                 image_input = image_input[:nslices,:,:]  # Uncomment if needed

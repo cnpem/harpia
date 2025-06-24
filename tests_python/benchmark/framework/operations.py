@@ -318,25 +318,34 @@ operations_thresholds = [
     #}
 ]
 
-grayscale = morphology_grayscale + operations_filters + operations_thresholds
+grayscale = operations_thresholds + morphology_grayscale + operations_filters
+grayscale_no_threashold = morphology_grayscale + operations_filters
 
 binary  = morphology_binary
 
 def filter_operations_by_framework(operations, keep_key):
-    """Returns a new list of operations keeping only one framework function."""
+    """Returns a new list of operations keeping only one framework function,
+    and includes only those where keep_key is not None.
+    """
     other_keys = {"skimage", "custom", "cucim"} - {keep_key}
     new_ops = []
     for op in operations:
-        op_filtered = op.copy()
-        for key in other_keys:
-            op_filtered[key] = None
-        new_ops.append(op_filtered)
+        if op.get(keep_key) is not None:
+            op_filtered = op.copy()
+            for key in other_keys:
+                op_filtered[key] = None
+            new_ops.append(op_filtered)
     return new_ops
 
 # Create 3 framework-specific versions
 grayscale_skimage = filter_operations_by_framework(grayscale, "skimage")
 grayscale_custom  = filter_operations_by_framework(grayscale, "custom")
+grayscale_custom_morphology  = filter_operations_by_framework(morphology_grayscale, "custom")
+grayscale_custom_threashold  = filter_operations_by_framework(operations_thresholds, "custom")
+grayscale_custom_filters  = filter_operations_by_framework(operations_filters, "custom")
+
 grayscale_cucim   = filter_operations_by_framework(grayscale, "cucim")
+grayscale_cucim_no_threashold = filter_operations_by_framework(grayscale_no_threashold, "cucim")
 
 binary_skimage = filter_operations_by_framework(binary, "skimage")
 binary_custom  = filter_operations_by_framework(binary, "custom")
