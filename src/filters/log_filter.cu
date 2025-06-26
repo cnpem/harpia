@@ -307,7 +307,7 @@ void logFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
   }
   
   else {
-    int ncopies = 1;
+    int ncopies = 2;
     const int kernelOperations = 1;
     float* kernel;
     get_laplacian_kernel_3d(&kernel);  // kernel should be 3x3x3

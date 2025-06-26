@@ -487,7 +487,7 @@ void sobelFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
   }
   
   else {
-    int ncopies = 1;
+    int ncopies = 2;
     const int kernelOperations = 1;
     float* dummyKernel = nullptr;  // not used, but placeholder for compatibility
 
