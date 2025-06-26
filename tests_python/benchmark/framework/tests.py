@@ -12,6 +12,7 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
     skimage_param = operation.get('skimage_param', {})
     harpia_func = operation.get('custom', None)  # (was typo: 'custum')
     cucim_func = operation.get('cucim', None)
+    cucim_param = operation.get('cucim_param', {})
 
     # Call the timing and comparison function
     if kernel is not None:
@@ -24,6 +25,7 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
             skimage_func=skimage_func,
             skimage_param=skimage_param,
             cucim_func=cucim_func,
+            cucim_param=cucim_param,
             image=image,
             kernel=kernel,
             operation=operation_name,
@@ -39,6 +41,7 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
             skimage_func=skimage_func,
             skimage_param=skimage_param,
             cucim_func=cucim_func,
+            cucim_param=cucim_param,
             image=image,
             operation=operation_name,
             repetitions=repetitions

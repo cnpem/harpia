@@ -59,26 +59,27 @@ machine = 'mary'
 ngpus = 1
 gpuMemory_values = [0.05]
 repetitions = 1
-reps = 1
-#nslices_values = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
-nslices_values  = [2048]
+reps = 30
+nslices_values = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
 
 image_sets = [
+    ("grayscale_morph", images_grayscale, image_grayscale, operations.grayscale_custom_morphology),
+    ("grayscale_threashold", images_grayscale, image_grayscale, operations.grayscale_custom_threashold),
     ("binary", images_binary, image_binary, operations.binary_custom),
-    ("grayscale_morph", images_grayscale, image_grayscale, operations.grayscale)
 ]
 
 for gpuMemory in gpuMemory_values:
     for nslices in nslices_values:
         print("\ngpuMemory:", gpuMemory,"\n")
         for image_type, dtypes, image, ops in image_sets:
-            csv_file = f"results_mary/{machine}_{reps}reps_custom{nslices}_{image_type}_{gpuMemory}gpuMemory.csv"
+            csv_file = f"results_mary/RUN3/{machine}_{reps}reps_custom{nslices}_{image_type}_{gpuMemory}gpuMemory.csv"
             print("Saving to file: ", csv_file)
             for dtype in dtypes:
                 image_input = image.astype(dtype=dtype)
                 image_input = image_input[:nslices,:,:]  # Uncomment if needed
                 for _ in range(reps):
                     for operation in ops:
+                        print("Operation: ", operation['name'])
                         kernel = operation["kernel"]
                         results_df = tests.run(
                             csv_file, 

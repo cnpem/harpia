@@ -57,38 +57,35 @@ images_binary = [
 
 machine = 'mary'
 ngpus = 1
-gpuMemory_values = [0.05]
+gpuMemory = 0.1
 repetitions = 1
 reps = 30
-#nslices_values = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
-nslices_values = [2048]
+nslices_values = [256, 512]
 
 image_sets = [
-    #("binary", images_binary, image_binary, operations.binary_custom),
-    ("grayscale_filters", images_grayscale, image_grayscale, operations.grayscale_custom_filters)
+#    ("binary", images_binary, image_binary, operations.binary_cucim),
+    ("grayscale", images_grayscale, image_grayscale, operations.grayscale_cucim_no_threashold)
 ]
 
-for gpuMemory in gpuMemory_values:
-    for nslices in nslices_values:
-        print("\ngpuMemory:", gpuMemory,"\n")
-        for image_type, dtypes, image, ops in image_sets:
-            csv_file = f"results_mary/{machine}_{reps}reps_custom{nslices}_{image_type}_{gpuMemory}gpuMemory.csv"
-            print("Saving to file: ", csv_file)
-            for dtype in dtypes:
-                image_input = image.astype(dtype=dtype)
-                image_input = image_input[:nslices,:,:]  # Uncomment if needed
-                for _ in range(reps):
-                    for operation in ops:
-                        kernel = operation["kernel"]
-                        results_df = tests.run(
-                            csv_file, 
-                            image_input, 
-                            operation, 
-                            machine, 
-                            ngpus, 
-                            repetitions, 
-                            gpuMemory, 
-                            kernel
-                        )
+for nslices in nslices_values:
+    for image_type, dtypes, image, ops in image_sets:
+        csv_file = f"results_mary/{machine}_{reps}reps_cucim{nslices}_{image_type}.csv"
+        print("Saving to file: ", csv_file)
+        for dtype in dtypes:
+            image_input = image.astype(dtype=dtype)
+            image_input = image_input[:nslices,:,:]  # Uncomment if needed
+            for _ in range(reps):
+                for operation in ops:
+                    kernel = operation["kernel"]
+                    results_df = tests.run(
+                        csv_file, 
+                        image_input, 
+                        operation, 
+                        machine, 
+                        ngpus, 
+                        repetitions, 
+                        gpuMemory, 
+                        kernel
+                    )
 
 print(f"The End!")

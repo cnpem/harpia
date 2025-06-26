@@ -1,9 +1,2 @@
-python3 benchmark_custom.py
-python3 benchmark_custom_morph2048.py
-python3 benchmark_custom_threashold.py
-python3 benchmark_custom_filters.py
-python3 benchmark_skimage256.py
-python3 benchmark_skimage512_binary.py
-python3 benchmark_skimage512_grayscale.py
-python3 benchmark_custom_extra.py
-python3 benchmark_skimage.py
+python3 benchmark_cucim_grayscale.py
+python3 benchmark_cucim_grayscale256_512.py

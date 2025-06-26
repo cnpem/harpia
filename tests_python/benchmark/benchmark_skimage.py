@@ -60,7 +60,8 @@ ngpus = 1
 gpuMemory = 0.1
 repetitions = 1
 reps = 30
-nslices_values = [1024, 2048]
+nslices_values = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+#more slices takes too long to execute
 
 image_sets = [
     ("binary", images_binary, image_binary, operations.binary_skimage),

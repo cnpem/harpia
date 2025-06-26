@@ -60,7 +60,7 @@ ngpus = 1
 gpuMemory = 0.1
 repetitions = 1
 reps = 30
-nslices_values = [32, 16, 8, 4, 2, 1]
+nslices_values = [1, 2, 4, 8, 16, 32, 64, 128]
 
 image_sets = [
 #    ("binary", images_binary, image_binary, operations.binary_cucim),

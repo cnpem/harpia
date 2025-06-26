@@ -120,9 +120,9 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
     return output, {'total':times, 'memory':times_memory, 'gpu':times_gpu}, mem_usage
 
 def time_compare(
-    csv_data, machine, module_func, skimage_func, cucim_func, image, skimage_param = {},
-    kernel=None, show=True, operation="", repetitions=1, gpuMemory=0.4, ngpus=-1, 
-    *args, **kwargs):
+    csv_data, machine, module_func, skimage_func, cucim_func, image, skimage_param = {}, 
+    cucim_param = {}, kernel=None, show=True, operation="", repetitions=1, gpuMemory=0.4, 
+    ngpus=-1, *args, **kwargs):
 
     module_times, skimage_times, cucim_times = [], [], []
     module_mem, skimage_mem, cucim_mem  = {}, {}, {}
@@ -149,7 +149,7 @@ def time_compare(
     # ---- CuCIM ----
     if cucim_func:
         cucim_output, cucim_times, cucim_mem_usage = time_cucim(
-            cucim_func, repetitions, image, kernel
+            cucim_func, repetitions, image, kernel, **cucim_param
         )
         cucim_mem = {f"cucim_gpu{i}(MiB)": mem for i, mem in enumerate(cucim_mem_usage)}
         print("cucim finished")

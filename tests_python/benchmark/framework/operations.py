@@ -26,7 +26,7 @@ from skimage.filters import (
     threshold_niblack,
     threshold_sauvola,
     threshold_mean,
-    #threshold_gaussian
+    threshold_local
 )
 
 #----------------------------------------
@@ -225,30 +225,6 @@ operations_filters = [
         "kernel":None,
         "multi-gpu": True
     },
-    {
-        "name": "Mean Filter 3D grayscale",
-        # "skimage": None,
-        "custom": meanFilter,
-        "cucim": None,
-        "kernel":None,
-        "multi-gpu": True  # 2D only – no 3D support in cucim
-    },
-    {
-        "name": "Log Filter 3D grayscale",
-        "skimage": None,
-        "custom": logFilter,
-        "cucim": None,
-        "kernel":None,
-        "multi-gpu": True  
-    },
-    {
-        "name": "Unsharp Mask Filter 3D grayscale",
-        "skimage": None,
-        "custom": unsharpMaskFilter,
-        "cucim": None,
-        "kernel":None,
-        "multi-gpu": True   # Not available in cucim as of now
-    },
     #{
     #    "name": "Non local means Filter 3D grayscale",
     #    "skimage": None,
@@ -263,14 +239,7 @@ operations_filters = [
         "kernel":None,
         "multi-gpu": True 
     },
-    {
-        "name": "Prewitt Filter 3D grayscale",
-        "skimage": prewitt,
-        "custom": prewittFilter,
-        "cucim": cucim_filters.prewitt,
-        "kernel":None,
-        "multi-gpu": True 
-    },
+
     # {
     #     "name": "Median Filter 3D grayscale",
     #     "skimage": None,
@@ -286,6 +255,38 @@ operations_filters = [
         "kernel":None,
         "multi-gpu": True   
     },
+        {
+        "name": "Mean Filter 3D grayscale",
+        "skimage": None,
+        "custom": meanFilter,
+        "cucim": None,
+        "kernel":None,
+        "multi-gpu": True  # 2D only – no 3D support in cucim
+    },
+    {
+        "name": "Prewitt Filter 3D grayscale",
+        "skimage": prewitt,
+        "custom": prewittFilter,
+        "cucim": cucim_filters.prewitt,
+        "kernel":None,
+        "multi-gpu": True 
+    },
+    {
+        "name": "Log Filter 3D grayscale",
+        "skimage": None,
+        "custom": logFilter,
+        "cucim": None,
+        "kernel":None,
+        "multi-gpu": True  
+    },
+    # {
+    #     "name": "Unsharp Mask Filter 3D grayscale",
+    #     "skimage": None,
+    #     "custom": unsharpMaskFilter,
+    #     "cucim": None,
+    #     "kernel":None,
+    #     "multi-gpu": True   # Not available in cucim as of now
+    # },
 ]
 
 operations_thresholds = [
@@ -310,17 +311,18 @@ operations_thresholds = [
         "cucim": None,
         "kernel":None 
     },
-    #{
+    # {
     #    "name": "Threshold Gaussian",
-    #    "skimage": threshold_gaussian,
+    #    "skimage": threshold_local,
+    #    "skimage_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
     #    "custom": gaussianThreshold,
-    #    "cucim": lambda img, **kwargs: cucim_threshold_local(img, method='gaussian', **kwargs)
-    #}
+    #    "cucim": cucim_filters.threshold_local,
+    #    "cucim_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
+    #    "kernel":None 
+    # }
 ]
 
-grayscale = operations_thresholds + morphology_grayscale + operations_filters
-grayscale_no_threashold = morphology_grayscale + operations_filters
-
+grayscale = operations_filters + operations_thresholds + morphology_grayscale
 binary  = morphology_binary
 
 def filter_operations_by_framework(operations, keep_key):
@@ -345,7 +347,7 @@ grayscale_custom_threashold  = filter_operations_by_framework(operations_thresho
 grayscale_custom_filters  = filter_operations_by_framework(operations_filters, "custom")
 
 grayscale_cucim   = filter_operations_by_framework(grayscale, "cucim")
-grayscale_cucim_no_threashold = filter_operations_by_framework(grayscale_no_threashold, "cucim")
+grayscale_cucim_no_threashold = filter_operations_by_framework(morphology_grayscale + operations_filters, "cucim")
 
 binary_skimage = filter_operations_by_framework(binary, "skimage")
 binary_custom  = filter_operations_by_framework(binary, "custom")
