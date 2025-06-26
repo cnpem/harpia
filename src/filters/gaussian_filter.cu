@@ -45,6 +45,33 @@ __global__ void gaussian_filter_kernel_3d(dtype* image, float* output, double* d
   }
 }
 
+//used in the chunked version
+template <typename dtype>
+__global__ void gaussian_filter_kernel_3d_chunked(dtype* image, float* output, double* deviceKernel,
+                                     int xsize, int ysize, int zsize, int nx, int ny, int nz,
+                                     int padding_bottom, int padding_top) {
+  const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const unsigned int idz = blockIdx.z * blockDim.z + threadIdx.z;
+
+  if (idx < xsize && idy < ysize && idz < zsize) {
+    double temp;
+
+    const size_t index = static_cast<size_t>(idz) * xsize * ysize +
+                         static_cast<size_t>(idx) * ysize +
+                         static_cast<size_t>(idy);
+
+    // Apply convolution on padded memory
+    convolution3d_chunked(image, &temp, deviceKernel,
+                               idx, idy, idz,
+                               xsize, ysize, zsize,
+                               padding_bottom, padding_top,
+                               nx, ny, nz);
+
+    output[index] = sqrtf(temp * temp);
+  }
+}
+
 template __global__ void gaussian_filter_kernel_2d<int>(int* image, float* output,
                                                         double* deviceKernel, int idz, int xsize,
                                                         int ysize, int zsize, int nx, int ny);
@@ -58,6 +85,17 @@ template __global__ void gaussian_filter_kernel_3d<int>(int* image, float* outpu
 template __global__ void gaussian_filter_kernel_3d<float>(float* image, float* output,
                                                           double* deviceKernel, int xsize, int ysize,
                                                           int zsize, int nx, int ny, int nz);
+
+template __global__ void gaussian_filter_kernel_3d_chunked<int>(int* image, float* output,
+                                                        double* deviceKernel, int xsize, int ysize,
+                                                        int zsize, int nx, int ny, int nz,
+                                                        int padding_bottom, int padding_top);
+
+template __global__ void gaussian_filter_kernel_3d_chunked<float>(float* image, float* output,
+                                                          double* deviceKernel, int xsize, int ysize,
+                                                          int zsize, int nx, int ny, int nz,
+                                                          int padding_bottom, int padding_top);
+
 
 template <typename dtype>
 void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int zsize, float sigma,
@@ -102,6 +140,7 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
     //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(deviceKernel);
+    free(kernel);
   }
 
   else {
@@ -134,6 +173,7 @@ void gaussian_filtering(dtype* image, float* output, int xsize, int ysize, int z
     //std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
 
     cudaFree(deviceKernel);
+    free(kernel);
   }
 
   cudaMemcpy(output, deviceOutput, size * sizeof(float), cudaMemcpyDeviceToHost);
@@ -154,53 +194,68 @@ template void gaussian_filtering<unsigned int>(unsigned int* image, float* outpu
 //chunked executor version
 template <typename in_dtype, typename out_dtype, typename kernel_dtype>
 void gaussianFilter3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
-                    const int ysize, const int zsize, const int verbose,
-                    int padding_bottom, int padding_top,
-                    kernel_dtype* kernel,
-                    int kernel_xsize, int kernel_ysize, int kernel_zsize)
+                         const int ysize, const int zsize, const int flag_verbose,
+                         int padding_bottom, int padding_top,
+                         kernel_dtype* kernel,
+                         int kernel_xsize, int kernel_ysize, int kernel_zsize)
 {
-
   const int paddedZsize = padding_bottom + zsize + padding_top;
-  const unsigned int totalSize = xsize * ysize * paddedZsize;
-  const int offset = padding_bottom * xsize * ysize;
+  const size_t totalSize = static_cast<size_t>(xsize) * ysize * paddedZsize;
+  const size_t offset = static_cast<size_t>(padding_bottom) * xsize * ysize;
 
-  in_dtype* deviceImage;
+  size_t inputBytes = totalSize * sizeof(in_dtype);
+  size_t outputBytes = static_cast<size_t>(xsize) * ysize * zsize * sizeof(out_dtype);
+  size_t kernelBytes = kernel_xsize * kernel_ysize * kernel_zsize * sizeof(kernel_dtype);
+
+  in_dtype *i_deviceImage, *deviceImage, *i_hostImage;
   out_dtype* deviceOutput;
-  cudaMalloc((void**)&deviceImage, totalSize * sizeof(in_dtype));
-  cudaMalloc((void**)&deviceOutput, totalSize * sizeof(out_dtype));
-
-  cudaMemcpy(deviceImage, hostImage, totalSize * sizeof(in_dtype), cudaMemcpyHostToDevice);
-
   kernel_dtype* deviceKernel;
-  cudaMalloc((void**)&deviceKernel, kernel_xsize * kernel_ysize * kernel_zsize * sizeof(kernel_dtype));
-  cudaMemcpy(deviceKernel, kernel, kernel_xsize * kernel_ysize * kernel_zsize * sizeof(kernel_dtype), cudaMemcpyHostToDevice);
 
+  // Allocate memory
+  CHECK(cudaMalloc((void**)&i_deviceImage, inputBytes));
+  CHECK(cudaMalloc((void**)&deviceOutput, outputBytes));
+  CHECK(cudaMalloc((void**)&deviceKernel, kernelBytes));
+
+  // Offset host pointer for padding
+  i_hostImage = hostImage - offset;
+
+  // Copy padded image and kernel to device
+  CHECK(cudaMemcpy(i_deviceImage, i_hostImage, inputBytes, cudaMemcpyHostToDevice));
+  CHECK(cudaMemcpy(deviceKernel, kernel, kernelBytes, cudaMemcpyHostToDevice));
+
+  // Adjust device pointer to the start of the unpadded region
+  deviceImage = i_deviceImage + offset;
+
+  // Define grid and block
   dim3 block(8, 8, 8);
-  if (zsize == 1)
-    block = dim3(32, 32, 1);
+  if (zsize == 1) block = dim3(32, 32, 1);
 
   dim3 grid((xsize + block.x - 1) / block.x,
             (ysize + block.y - 1) / block.y,
             (zsize + block.z - 1) / block.z);
 
-  if (verbose == 1) {
-    printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
-    printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+  if (flag_verbose) {
+    std::cout << "grid: (" << grid.x << "," << grid.y << "," << grid.z << ")\n";
+    std::cout << "block: (" << block.x << "," << block.y << "," << block.z << ")\n";
   }
 
-  gaussian_filter_kernel_3d<<<grid, block>>>(deviceImage+ offset,
-                                             deviceOutput+ offset,
-                                             deviceKernel,
-                                             xsize, ysize, zsize, 
-                                             kernel_xsize, kernel_ysize, kernel_zsize);
+  // Launch kernel
+  gaussian_filter_kernel_3d<<<grid, block>>>(
+      deviceImage,
+      deviceOutput,
+      deviceKernel,
+      xsize, ysize, zsize,
+      kernel_xsize, kernel_ysize, kernel_zsize);
 
-  cudaDeviceSynchronize();
-  cudaMemcpy(hostOutput, deviceOutput + offset, xsize * ysize * zsize * sizeof(out_dtype), cudaMemcpyDeviceToHost);
+  CHECK(cudaDeviceSynchronize());
 
-  cudaFree(deviceKernel);
-  cudaFree(deviceImage);
+  // Copy output to host
+  CHECK(cudaMemcpy(hostOutput, deviceOutput, outputBytes, cudaMemcpyDeviceToHost));
+
+  // Cleanup
+  cudaFree(i_deviceImage);
   cudaFree(deviceOutput);
-
+  cudaFree(deviceKernel);
 }
 
 template void gaussianFilter3DGPU<float, float, double>(float*, float*, const int, const int, const int, const int, int, int, double*, int, int, int);
@@ -237,6 +292,8 @@ void gaussianFilterChunked(in_dtype* hostImage, out_dtype* hostOutput,
                           ncopies, safetyMargin, ngpus, kernelOperations,
                           hostImage, hostOutput, xsize, ysize, zsize, verbose,
                           kernel, gaussian_size, gaussian_size, gaussian_size);
+
+  free(kernel);
   }
 }
 

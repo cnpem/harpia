@@ -3,6 +3,7 @@ from cython.parallel import prange
 cimport numpy as np
 import numpy as np
 from libcpp cimport bool
+from harpia.common import Size
 
 #Define the fused type for numeric types : float, int, unsigned int
 ctypedef fused numeric:
@@ -15,29 +16,36 @@ cdef extern from "../../include/threshold/adaptative_gaussian.h":
     void local_gaussian_threshold[numeric](numeric* image, float* output, int rows, int cols, int depth, float sigma, float weight, bool type)
 
 def local_gaussian(np.ndarray[numeric, ndim=3] image,
-                   np.ndarray[np.float32_t, ndim=3] output,
-                   int rows, int cols, int depth,
-                   float sigma, float weight, bool type):
+                   np.ndarray[np.float32_t, ndim=3] output = None,
+                   float sigma = 1.0, float weight = 0.0, bool type = 1):
     """
-    Apply a local Gaussian threshold to a 3D image.
+    Apply a local Gaussian adaptive threshold to a 3D image.
+
+    The threshold is computed as:  
+    **T = Gaussian(image) - weight**
 
     Parameters:
-        image (np.ndarray[numeric, ndim=3]): Input 3D image array.
-        output (np.ndarray[np.float32_t, ndim=3]): Output 3D array to store the thresholded result.
-        rows (int): Number of rows in the image.
-        cols (int): Number of columns in the image.
-        depth (int): Number of depth slices in the image.
-        sigma (float): Standard deviation for Gaussian kernel.
-        weight (float): Weight parameter for thresholding.
-        type (bool): Type of thresholding (specific to implementation).
+        image (ndarray): Input 3D image of numeric type.
+        output (ndarray, optional): Output array (float32) to store thresholded result.
+                                    If None, a new array will be allocated.
+        sigma (float): Standard deviation of the Gaussian kernel.
+        weight (float): Bias subtracted from the filtered value.
+        type (bool): If True, apply 3D filtering; if False, slice-by-slice.
 
     Returns:
-        None
+        ndarray: The thresholded output image.
     """
-    return local_gaussian_threshold(&image[0,0,0],
-                                    &output[0,0,0],
-                                    rows, cols, depth,
-                                    sigma, weight, type)
+    isize = Size(image)
+
+    if output is None:
+        output = np.empty((isize.z, isize.y, isize.x), dtype=np.float32)
+
+    local_gaussian_threshold(&image[0, 0, 0],
+                             &output[0, 0, 0],
+                             isize.y, isize.x, isize.z,
+                             sigma, weight, type)
+
+    return output
 
 #Local Mean Threshold
 cdef extern from "../../include/threshold/adaptative_mean.h":
@@ -46,32 +54,37 @@ cdef extern from "../../include/threshold/adaptative_mean.h":
                                        int rows_kernel, int cols_kernel, int depth_kernel)
 
 def local_mean(np.ndarray[numeric, ndim=3] image,
-               np.ndarray[np.float32_t, ndim=3] output,
-               float weight,
-               int rows, int cols, int depth,
-               int rows_kernel, int cols_kernel, int depth_kernel):
+               np.ndarray[np.float32_t, ndim=3] output = None,
+               float weight = 0.0,
+               int windowSize = 3):
     """
     Apply a local mean threshold to a 3D image.
 
+    The threshold is computed as:
+    **T = LocalMean(image neighborhood) - weight**
+
     Parameters:
-        image (np.ndarray[numeric, ndim=3]): Input 3D image array.
-        output (np.ndarray[np.float32_t, ndim=3]): Output 3D array to store the thresholded result.
-        weight (float): Weight parameter for thresholding.
-        rows (int): Number of rows in the image.
-        cols (int): Number of columns in the image.
-        depth (int): Number of depth slices in the image.
-        rows_kernel (int): Number of rows in the kernel.
-        cols_kernel (int): Number of columns in the kernel.
-        depth_kernel (int): Number of depth slices in the kernel.
+        image (ndarray): Input 3D image of numeric type.
+        output (ndarray, optional): Output binary image (float32).
+                                    If None, a new array will be allocated.
+        weight (float): Constant bias to subtract from the local mean.
+        windowSize (int): Size of the local neighborhood in all three dimensions (isotropic).
 
     Returns:
-        None
+        ndarray: Thresholded binary result.
     """
-    return local_mean_threshold(&image[0,0,0],
-                                &output[0,0,0],
-                                weight,
-                                rows, cols, depth,
-                                rows_kernel, cols_kernel, depth_kernel)
+    isize = Size(image)
+
+    if output is None:
+        output = np.empty((isize.z, isize.y, isize.x), dtype=np.float32)
+
+    local_mean_threshold(&image[0, 0, 0],
+                         &output[0, 0, 0],
+                         weight,
+                         isize.y, isize.x, isize.z,
+                         windowSize, windowSize, windowSize)
+
+    return output
 
 #Niblack Threshold
 cdef extern from "../../include/threshold/niblack.h":
@@ -80,32 +93,37 @@ cdef extern from "../../include/threshold/niblack.h":
                                     int rows_kernel, int cols_kernel, int depth_kernel)
 
 def niblack(np.ndarray[numeric, ndim=3] image,
-            np.ndarray[np.float32_t, ndim=3] output,
-            float weight,
-            int rows, int cols, int depth,
-            int rows_kernel, int cols_kernel, int depth_kernel):
+            np.ndarray[np.float32_t, ndim=3] output = None,
+            float weight = 0.0,
+            int windowSize = 3):
     """
     Apply a Niblack threshold to a 3D image.
 
+    The threshold is computed as:
+    **T = local_mean + weight × local_stddev**
+
     Parameters:
-        image (np.ndarray[numeric, ndim=3]): Input 3D image array.
-        output (np.ndarray[np.float32_t, ndim=3]): Output 3D array to store the thresholded result.
-        weight (float): Weight parameter for thresholding.
-        rows (int): Number of rows in the image.
-        cols (int): Number of columns in the image.
-        depth (int): Number of depth slices in the image.
-        rows_kernel (int): Number of rows in the kernel.
-        cols_kernel (int): Number of columns in the kernel.
-        depth_kernel (int): Number of depth slices in the kernel.
+        image (ndarray): Input 3D image of numeric type.
+        output (ndarray, optional): Output array (float32) to store the result.
+                                    If None, it will be auto-allocated.
+        weight (float): Scaling factor for the local standard deviation.
+        windowSize (int): Size of the cubic neighborhood used for computing local stats.
 
     Returns:
-        None
+        ndarray: Binary output image after Niblack thresholding.
     """
-    return niblack_threshold(&image[0,0,0],
-                             &output[0,0,0],
-                             weight,
-                             rows, cols, depth,
-                             rows_kernel, cols_kernel, depth_kernel)
+    isize = Size(image)
+
+    if output is None:
+        output = np.empty((isize.z, isize.y, isize.x), dtype=np.float32)
+
+    niblack_threshold(&image[0, 0, 0],
+                      &output[0, 0, 0],
+                      weight,
+                      isize.y, isize.x, isize.z,
+                      windowSize, windowSize, windowSize)
+
+    return output
 
 #Sauvola Threshold
 cdef extern from "../../include/threshold/sauvola.h":
@@ -114,33 +132,39 @@ cdef extern from "../../include/threshold/sauvola.h":
                                     int rows_kernel, int cols_kernel, int depth_kernel)
 
 def sauvola(np.ndarray[numeric, ndim=3] image,
-            np.ndarray[np.float32_t, ndim=3] output,
-            float weight, float range,
-            int rows, int cols, int depth,
-            int rows_kernel, int cols_kernel, int depth_kernel):
+            np.ndarray[np.float32_t, ndim=3] output = None,
+            float weight = 0.0,
+            float range = 1.0,
+            int windowSize = 3):
     """
     Apply a Sauvola threshold to a 3D image.
 
+    The threshold is computed as:
+    **T = local_mean × (1 + weight × (local_stddev / range - 1))**
+
     Parameters:
-        image (np.ndarray[numeric, ndim=3]): Input 3D image array.
-        output (np.ndarray[np.float32_t, ndim=3]): Output 3D array to store the thresholded result.
-        weight (float): Weight parameter for thresholding.
-        range (float): Range parameter for thresholding.
-        rows (int): Number of rows in the image.
-        cols (int): Number of columns in the image.
-        depth (int): Number of depth slices in the image.
-        rows_kernel (int): Number of rows in the kernel.
-        cols_kernel (int): Number of columns in the kernel.
-        depth_kernel (int): Number of depth slices in the kernel.
+        image (ndarray): Input 3D image of numeric type.
+        output (ndarray, optional): Output array (float32) to store the thresholded result.
+                                    If None, a new array is allocated automatically.
+        weight (float): Multiplier for the local standard deviation.
+        range (float): Expected dynamic range of the standard deviation (typically 128 or 1).
+        windowSize (int): Size of the local cubic window used for thresholding.
 
     Returns:
-        None
+        ndarray: Binary output image after Sauvola thresholding.
     """
-    return sauvola_threshold(&image[0,0,0],
-                             &output[0,0,0],
-                             weight, range,
-                             rows, cols, depth,
-                             rows_kernel, cols_kernel, depth_kernel)
+    isize = Size(image)
+
+    if output is None:
+        output = np.empty((isize.z, isize.y, isize.x), dtype=np.float32)
+
+    sauvola_threshold(&image[0, 0, 0],
+                      &output[0, 0, 0],
+                      weight, range,
+                      isize.y, isize.x, isize.z,
+                      windowSize, windowSize, windowSize)
+
+    return output
 
 
 # Otsu Threshold

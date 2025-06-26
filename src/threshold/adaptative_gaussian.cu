@@ -60,6 +60,33 @@ __global__ void local_gaussian_kernel_3d(dtype* image, float* output, double* de
   }
 }
 
+//for chunked version
+template <typename dtype>
+__global__ void local_gaussian_kernel_3d_chunked(dtype* image, float* output, double* dev_kernel,
+                                         float weight, int rows, int cols, int depth,
+                                         int rows_kernel, int cols_kernel, int depth_kernel,
+                                         int padding_bottom, int padding_top) {
+  const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+  const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+
+  if (idx < rows && idy < cols && idz < depth) {
+    double temp;
+
+    convolution3d_chunked(image, &temp, dev_kernel, idx, idy, idz, rows, cols, depth,padding_bottom,padding_top, rows_kernel,
+                  cols_kernel, depth_kernel);
+
+    double T_local_gaussian = temp - weight;
+
+    if (image[idz * rows * cols + idx * cols + idy] > T_local_gaussian) {
+      output[idz * rows * cols + idx * cols + idy] = 255;
+      return;
+    }
+
+    output[idz * rows * cols + idx * cols + idy] = 0;
+  }
+}
+
 template __global__ void local_gaussian_kernel_2d<int>(int* image, float* output, double* dev_kernel,
                                                        float weight, int idz, int rows, int cols,
                                                        int slices, int rows_kernel,
@@ -174,27 +201,40 @@ template void local_gaussian_threshold<unsigned int>(unsigned int* image, float*
 //chunked executor version
 template <typename in_dtype, typename out_dtype, typename kernel_dtype>
 void adaptativeGaussianThreshold3DGPU(in_dtype* hostImage, out_dtype* hostOutput, const int xsize,
-                    const int ysize, const int zsize, const int verbose,
-                    int padding_bottom, int padding_top,
-                    kernel_dtype* kernel,
-                    int kernel_xsize, int kernel_ysize, int kernel_zsize, float weight)
+                                      const int ysize, const int zsize, const int flag_verbose,
+                                      int padding_bottom, int padding_top,
+                                      kernel_dtype* kernel,
+                                      int kernel_xsize, int kernel_ysize, int kernel_zsize,
+                                      float weight)
 {
-
   const int paddedZsize = padding_bottom + zsize + padding_top;
-  const unsigned int totalSize = xsize * ysize * paddedZsize;
-  const int offset = padding_bottom * xsize * ysize;
+  const size_t totalSize = static_cast<size_t>(xsize) * ysize * paddedZsize;
+  const size_t offset = static_cast<size_t>(padding_bottom) * xsize * ysize;
 
-  in_dtype* deviceImage;
+  size_t inputBytes = totalSize * sizeof(in_dtype);
+  size_t outputBytes = static_cast<size_t>(xsize) * ysize * zsize * sizeof(out_dtype);
+  size_t kernelBytes = kernel_xsize * kernel_ysize * kernel_zsize * sizeof(kernel_dtype);
+
+  in_dtype *i_deviceImage, *deviceImage, *i_hostImage;
   out_dtype* deviceOutput;
-  cudaMalloc((void**)&deviceImage, totalSize * sizeof(in_dtype));
-  cudaMalloc((void**)&deviceOutput, totalSize * sizeof(out_dtype));
-
-  cudaMemcpy(deviceImage, hostImage, totalSize * sizeof(in_dtype), cudaMemcpyHostToDevice);
-
   kernel_dtype* deviceKernel;
-  cudaMalloc((void**)&deviceKernel, kernel_xsize * kernel_ysize * kernel_zsize * sizeof(kernel_dtype));
-  cudaMemcpy(deviceKernel, kernel, kernel_xsize * kernel_ysize * kernel_zsize * sizeof(kernel_dtype), cudaMemcpyHostToDevice);
 
+  // 1. Allocate device memory
+  CHECK(cudaMalloc((void**)&i_deviceImage, inputBytes));
+  CHECK(cudaMalloc((void**)&deviceOutput, outputBytes));
+  CHECK(cudaMalloc((void**)&deviceKernel, kernelBytes));
+
+  // 2. Adjust host image pointer to include padding
+  i_hostImage = hostImage - offset;
+
+  // 3. Copy data to device
+  CHECK(cudaMemcpy(i_deviceImage, i_hostImage, inputBytes, cudaMemcpyHostToDevice));
+  CHECK(cudaMemcpy(deviceKernel, kernel, kernelBytes, cudaMemcpyHostToDevice));
+
+  // 4. Set the image pointer to the non-padded region
+  deviceImage = i_deviceImage + offset;
+
+  // 5. Configure CUDA grid and block dimensions
   dim3 block(8, 8, 8);
   if (zsize == 1)
     block = dim3(32, 32, 1);
@@ -203,24 +243,26 @@ void adaptativeGaussianThreshold3DGPU(in_dtype* hostImage, out_dtype* hostOutput
             (ysize + block.y - 1) / block.y,
             (zsize + block.z - 1) / block.z);
 
-  if (verbose == 1) {
-    printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
-    printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+  if (flag_verbose) {
+    std::cout << "grid: (" << grid.x << "," << grid.y << "," << grid.z << ")\n";
+    std::cout << "block: (" << block.x << "," << block.y << "," << block.z << ")\n";
   }
 
-  local_gaussian_kernel_3d<<<grid, block>>>(deviceImage+ offset,
-                                             deviceOutput+ offset,
-                                             deviceKernel,weight,
-                                             xsize, ysize, zsize, 
-                                             kernel_xsize, kernel_ysize, kernel_zsize);
+  // 6. Launch kernel
+  local_gaussian_kernel_3d<<<grid, block>>>(
+      deviceImage, deviceOutput, deviceKernel, weight,
+      xsize, ysize, zsize,
+      kernel_xsize, kernel_ysize, kernel_zsize);
 
-  cudaDeviceSynchronize();
-  cudaMemcpy(hostOutput, deviceOutput + offset, xsize * ysize * zsize * sizeof(out_dtype), cudaMemcpyDeviceToHost);
+  CHECK(cudaDeviceSynchronize());
 
-  cudaFree(deviceKernel);
-  cudaFree(deviceImage);
+  // 7. Copy result back to host
+  CHECK(cudaMemcpy(hostOutput, deviceOutput, outputBytes, cudaMemcpyDeviceToHost));
+
+  // 8. Free memory
+  cudaFree(i_deviceImage);
   cudaFree(deviceOutput);
-
+  cudaFree(deviceKernel);
 }
 
 template void adaptativeGaussianThreshold3DGPU<float, float, double>(float*, float*, const int, const int, const int, const int, int, int, double*, int, int, int, float);
@@ -246,7 +288,7 @@ void adaptativeGaussianThresholdChunked(in_dtype* hostImage, out_dtype* hostOutp
 
   
   else {
-    int ncopies = 1;
+    int ncopies = 2;
     const int kernelOperations = 1;
     double* kernel;
     int gaussian_size = (int)ceil(6 * sigma + 1); 
