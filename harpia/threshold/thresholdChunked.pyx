@@ -92,7 +92,6 @@ def niblackThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    int windowSize=3,float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
-
     isize = Size(hostImage)
 
     if hostOutput is None:
