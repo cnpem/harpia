@@ -186,6 +186,7 @@ def hessian_eigenvalues(numpy.ndarray[numeric, ndim=3] hostImage,
 @boundscheck(False)
 @wraparound(False)
 def shape_index(numpy.ndarray[numeric, ndim=3] hostImage,
+                numpy.ndarray[numpy.float32_t, ndim=4] eigen = None,
                 int step=1, int verbose=0,
                 float gpuMemory=0.4, int ngpus=-1):
     """
@@ -217,11 +218,13 @@ def shape_index(numpy.ndarray[numeric, ndim=3] hostImage,
     cdef int z, y, x, i, j, k
     cdef float l1, l2, num, den, sidx
 
-    cdef numpy.ndarray[numpy.float32_t, ndim=4] eigen = hessian_eigenvalues(hostImage,
-                                                                      step=step,
-                                                                      verbose=verbose,
-                                                                      gpuMemory=gpuMemory,
-                                                                      ngpus=ngpus)
+    if eigen is None:
+        eigen = hessian_eigenvalues(hostImage,
+                                    step=step,
+                                    verbose=verbose,
+                                    gpuMemory=gpuMemory,
+                                    ngpus=ngpus)
+
     z, y, x = eigen.shape[0], eigen.shape[1], eigen.shape[2]
     cdef numpy.ndarray[numpy.float32_t, ndim=3] shape = numpy.empty((z, y, x), dtype=numpy.float32)
 
