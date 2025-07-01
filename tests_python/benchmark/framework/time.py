@@ -27,7 +27,7 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
     # Warm-up run
     monitor = MonitorProcess(0.1)
     output = func(*filtered_args, **filtered_kwargs)  
-    max_mem_usage = monitor.stop()
+    mem_usage = monitor.stop()
 
     # Time several runs
     times = []
@@ -36,7 +36,7 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
         output = func(*filtered_args, **filtered_kwargs)
         times.append(time.perf_counter() - start)
 
-    return output, times, used_gpuMemory, max_mem_usage
+    return output, times, used_gpuMemory, mem_usage
 
 
 
@@ -68,8 +68,8 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
         output = func(image_cucim, kernel_cucim, **filtered_kwargs)  # Warm-up run
         del image_cucim
         del kernel_cucim
-        max_mem_usage = monitor.stop()
         _clear_cupy_memblocks()
+        mem_usage = monitor.stop()
         for _ in range(repetitions):
             start = time.perf_counter()
             image_cucim = cp.asarray(image)
@@ -95,7 +95,7 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
         monitor = MonitorProcess(0.1)
         image_cucim = cp.asarray(image)
         output = func(image_cucim, **filtered_kwargs)  # Warm-up run
-        max_mem_usage = monitor.stop()
+        mem_usage = monitor.stop()
         del image_cucim
         _clear_cupy_memblocks()
         for _ in range(repetitions):
@@ -117,12 +117,12 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
             times_memory.append(time_mem)
             times_gpu.append(time_gpu)
             
-    return output, {'total':times, 'memory':times_memory, 'gpu':times_gpu}, max_mem_usage
+    return output, {'total':times, 'memory':times_memory, 'gpu':times_gpu}, mem_usage
 
 def time_compare(
-    csv_data, machine, module_func, skimage_func, cucim_func, image, skimage_param = {},
-    kernel=None, show=True, operation="", repetitions=1, gpuMemory=0.4, ngpus=-1, 
-    *args, **kwargs):
+    csv_data, machine, module_func, skimage_func, cucim_func, image, skimage_param = {}, 
+    cucim_param = {}, kernel=None, show=True, operation="", repetitions=1, gpuMemory=0.4, 
+    ngpus=-1, *args, **kwargs):
 
     module_times, skimage_times, cucim_times = [], [], []
     module_mem, skimage_mem, cucim_mem  = {}, {}, {}
@@ -149,7 +149,7 @@ def time_compare(
     # ---- CuCIM ----
     if cucim_func:
         cucim_output, cucim_times, cucim_mem_usage = time_cucim(
-            cucim_func, repetitions, image, kernel
+            cucim_func, repetitions, image, kernel, **cucim_param
         )
         cucim_mem = {f"cucim_gpu{i}(MiB)": mem for i, mem in enumerate(cucim_mem_usage)}
         print("cucim finished")

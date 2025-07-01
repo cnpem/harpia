@@ -1,0 +1,2 @@
+python3 benchmark_cucim_grayscale.py
+python3 benchmark_cucim_grayscale256_512.py

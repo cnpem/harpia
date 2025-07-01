@@ -83,7 +83,7 @@ def gaussianThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
 
 def meanThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
-                   int windowSize=1,float weight = 0 ,int type3d=1,
+                   int windowSize=3,float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
     
@@ -126,10 +126,9 @@ def meanThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
 
 def niblackThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
-                   int windowSize=1,float weight = 0 ,int type3d=1,
+                   int windowSize=3,float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
-
     """
     Apply the Niblack thresholding method to a 3D image using GPU chunking.
 
@@ -171,7 +170,7 @@ def niblackThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
 
 def sauvolaThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
-                   int windowSize=1,float weight = 0 , numeric range  = 1,int type3d=1,
+                   int windowSize=3,float weight = 0 , numeric range  = 1,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
                    ):
 

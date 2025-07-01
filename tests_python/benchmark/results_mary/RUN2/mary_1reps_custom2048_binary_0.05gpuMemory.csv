@@ -1,0 +1,6 @@
+Operation,Machine,Gpus,gpuMemory,Harpia Time (s),Scikit Time (s),Scikit Time Ratio,Cucim Total Time (s),Cucim Memory Time (s),Cucim Gpu Time (s),Cucim Time Ratio,Repetitions,Image Data Type,Image Size (MiB),Image Dimensions,harpia_gpu0(MiB),harpia_gpu1(MiB),harpia_gpu2(MiB)
+Erosion 3D binary,mary,1,0.05,7.415738980052993,N/A,N/A,N/A,N/A,N/A,N/A,1,int32,32896.1,"(2048, 2052, 2052)",608.0,2798.0,608.0
+Dilation 3D binary,mary,1,0.05,7.413204244920053,N/A,N/A,N/A,N/A,N/A,N/A,1,int32,32896.1,"(2048, 2052, 2052)",608.0,2798.0,608.0
+Closing 3D binary,mary,1,0.05,8.550072535988875,N/A,N/A,N/A,N/A,N/A,N/A,1,int32,32896.1,"(2048, 2052, 2052)",608.0,2734.0,608.0
+Opening 3D binary,mary,1,0.05,8.713229072047397,N/A,N/A,N/A,N/A,N/A,N/A,1,int32,32896.1,"(2048, 2052, 2052)",608.0,2734.0,608.0
+Smoothing 3D binary,mary,1,0.05,8.409034586045891,N/A,N/A,N/A,N/A,N/A,N/A,1,int32,32896.1,"(2048, 2052, 2052)",608.0,2830.0,608.0
