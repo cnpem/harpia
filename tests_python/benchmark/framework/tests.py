@@ -11,6 +11,7 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
     skimage_func = operation.get('skimage', None)
     skimage_param = operation.get('skimage_param', {})
     harpia_func = operation.get('custom', None)  # (was typo: 'custum')
+    harpia_param = operation.get('harpia', {})
     cucim_func = operation.get('cucim', None)
     cucim_param = operation.get('cucim_param', {})
 
@@ -21,7 +22,8 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
             machine=machine,
             gpuMemory=gpuMemory,
             ngpus=ngpus,
-            module_func=harpia_func,
+            harpia_func=harpia_func,
+            harpia_param=harpia_param,
             skimage_func=skimage_func,
             skimage_param=skimage_param,
             cucim_func=cucim_func,
@@ -37,7 +39,8 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
             machine=machine,
             gpuMemory=gpuMemory,
             ngpus=ngpus,
-            module_func=harpia_func,
+            harpia_func=harpia_func,
+            harpia_param=harpia_param,
             skimage_func=skimage_func,
             skimage_param=skimage_param,
             cucim_func=cucim_func,

@@ -104,7 +104,7 @@ def custum_kernel3D():
     return kernel_3d
 
 def smooth_sk(image, selem):
-    result = opening(image, selem)
+    result = binary_opening(image, selem)
     result = binary_closing(result, selem)
     return result
 
@@ -125,7 +125,7 @@ morphology_grayscale = [
     {
         "name": "Erosion 3D grayscale",
         "skimage": erosion,
-        "custom": erosion_grayscale,
+        "harpia": erosion_grayscale,
         "cucim": cucim_morph.erosion,
         "kernel":kernel,
         "multi-gpu": True
@@ -133,7 +133,7 @@ morphology_grayscale = [
     {
         "name": "Dilation 3D grayscale",
         "skimage": dilation,
-        "custom": dilation_grayscale,
+        "harpia": dilation_grayscale,
         "cucim": cucim_morph.dilation,
         "kernel":kernel,
         "multi-gpu": True
@@ -141,7 +141,7 @@ morphology_grayscale = [
     {
         "name": "Closing 3D grayscale",
         "skimage": closing,
-        "custom": closing_grayscale,
+        "harpia": closing_grayscale,
         "cucim": cucim_morph.closing,
         "kernel":kernel,
         "multi-gpu": True
@@ -149,7 +149,7 @@ morphology_grayscale = [
     {
         "name": "Opening 3D grayscale",
         "skimage": opening,
-        "custom": opening_grayscale,
+        "harpia": opening_grayscale,
         "cucim": cucim_morph.opening,
         "kernel":kernel,
         "multi-gpu": True
@@ -157,7 +157,7 @@ morphology_grayscale = [
     {
         "name": "Top Hat 3D grayscale",
         "skimage": white_tophat,
-        "custom": top_hat,
+        "harpia": top_hat,
         "cucim": cucim_morph.white_tophat,
         "kernel":kernel,
         "multi-gpu": True
@@ -165,7 +165,7 @@ morphology_grayscale = [
     {
         "name": "Bottom Hat 3D grayscale",
         "skimage": black_tophat,
-        "custom": bottom_hat,
+        "harpia": bottom_hat,
         "cucim": cucim_morph.black_tophat,
         "kernel":kernel,
         "multi-gpu": True
@@ -175,32 +175,32 @@ morphology_grayscale = [
 morphology_binary = [
     {
         "name": "Erosion 3D binary",
-        "skimage": erosion,
-        "custom": erosion_binary,
+        "skimage": binary_erosion,
+        "harpia": erosion_binary,
         "cucim": cucim_morph.binary_erosion,
         "kernel":kernel,
         "multi-gpu": True
     },
     {
         "name": "Dilation 3D binary",
-        "skimage": dilation,
-        "custom": dilation_binary,
+        "skimage": binary_dilation,
+        "harpia": dilation_binary,
         "cucim": cucim_morph.binary_dilation,
         "kernel":kernel,
         "multi-gpu": True
     },
     {
         "name": "Closing 3D binary",
-        "skimage": closing,
-        "custom": closing_binary,
+        "skimage": binary_closing,
+        "harpia": closing_binary,
         "cucim": cucim_morph.binary_closing,
         "kernel":kernel,
         "multi-gpu": True
     },
     {
         "name": "Opening 3D binary",
-        "skimage": opening,
-        "custom": opening_binary,
+        "skimage": binary_opening,
+        "harpia": opening_binary,
         "cucim": cucim_morph.binary_opening,
         "kernel":kernel,
         "multi-gpu": True
@@ -208,7 +208,7 @@ morphology_binary = [
     {
         "name": "Smoothing 3D binary",
         "skimage": smooth_sk,
-        "custom": smooth_binary,
+        "harpia": smooth_binary,
         "cucim": smooth_cucim,
         "kernel":kernel,
         "multi-gpu": True
@@ -217,10 +217,18 @@ morphology_binary = [
 
 operations_filters = [
     {
+        "name": "Anisotropic Diffusion Filter 3D grayscale",
+        "skimage": None,
+        "harpia": anisotropic_diffusion3D,
+        "cucim": None, # Not implemented in cucim
+        "kernel":None,
+        "multi-gpu": True   
+    },
+    {
         "name": "Gaussian Filter 3D grayscale",
         "skimage": gaussian,
         "skimage_param": {'mode': 'reflect'},
-        "custom": gaussianFilter,
+        "harpia": gaussianFilter,
         "cucim": cucim_filters.gaussian,
         "kernel":None,
         "multi-gpu": True
@@ -228,13 +236,13 @@ operations_filters = [
     #{
     #    "name": "Non local means Filter 3D grayscale",
     #    "skimage": None,
-    #    "custom": non_local_means,
+    #    "harpia": non_local_means,
     #    "cucim": None  # No NLM in cucim
     #},
     {
         "name": "Sobel Filter 3D grayscale",
         "skimage": sobel,
-        "custom": sobelFilter,
+        "harpia": sobelFilter,
         "cucim": cucim_filters.sobel,
         "kernel":None,
         "multi-gpu": True 
@@ -243,22 +251,14 @@ operations_filters = [
     # {
     #     "name": "Median Filter 3D grayscale",
     #     "skimage": None,
-    #     "custom": median,
+    #     "harpia": median,
     #     "cucim": cucim_filters.median,
     #     "kernel":None   # 2D support; 3D needs manual handling
     # },
-    {
-        "name": "Anisotropic Diffusion Filter 3D grayscale",
-        "skimage": None,
-        "custom": anisotropic_diffusion3D,
-        "cucim": None, # Not implemented in cucim
-        "kernel":None,
-        "multi-gpu": True   
-    },
         {
         "name": "Mean Filter 3D grayscale",
         "skimage": None,
-        "custom": meanFilter,
+        "harpia": meanFilter,
         "cucim": None,
         "kernel":None,
         "multi-gpu": True  # 2D only – no 3D support in cucim
@@ -266,7 +266,7 @@ operations_filters = [
     {
         "name": "Prewitt Filter 3D grayscale",
         "skimage": prewitt,
-        "custom": prewittFilter,
+        "harpia": prewittFilter,
         "cucim": cucim_filters.prewitt,
         "kernel":None,
         "multi-gpu": True 
@@ -274,52 +274,52 @@ operations_filters = [
     {
         "name": "Log Filter 3D grayscale",
         "skimage": None,
-        "custom": logFilter,
+        "harpia": logFilter,
         "cucim": None,
         "kernel":None,
         "multi-gpu": True  
     },
-    # {
-    #     "name": "Unsharp Mask Filter 3D grayscale",
-    #     "skimage": None,
-    #     "custom": unsharpMaskFilter,
-    #     "cucim": None,
-    #     "kernel":None,
-    #     "multi-gpu": True   # Not available in cucim as of now
-    # },
+    {
+        "name": "Unsharp Mask Filter 3D grayscale",
+        "skimage": None,
+        "harpia": unsharpMaskFilter,
+        "cucim": None,
+        "kernel":None,
+        "multi-gpu": True   # Not available in cucim as of now
+    },
 ]
 
 operations_thresholds = [
     {
         "name": "Threshold Niblack",
         "skimage": threshold_niblack,
-        "custom": niblackThreshold,  
+        "harpia": niblackThreshold,  
         "cucim": cucim_filters.threshold_niblack,
         "kernel":None 
     },
     {
         "name": "Threshold Sauvola",
         "skimage": threshold_sauvola,
-        "custom": sauvolaThreshold,
+        "harpia": sauvolaThreshold,
         "cucim": cucim_filters.threshold_sauvola,
         "kernel":None 
     },
     {
         "name": "Threshold Mean",
         "skimage": threshold_mean,
-        "custom": meanThreshold,
+        "harpia": meanThreshold,
         "cucim": None,
         "kernel":None 
     },
-    # {
-    #    "name": "Threshold Gaussian",
-    #    "skimage": threshold_local,
-    #    "skimage_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
-    #    "custom": gaussianThreshold,
-    #    "cucim": cucim_filters.threshold_local,
-    #    "cucim_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
-    #    "kernel":None 
-    # }
+    {
+       "name": "Threshold Gaussian",
+       "skimage": threshold_local,
+       "skimage_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
+       "harpia": gaussianThreshold,
+       "cucim": cucim_filters.threshold_local,
+       "cucim_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
+       "kernel":None 
+    }
 ]
 
 grayscale = operations_filters + operations_thresholds + morphology_grayscale
@@ -329,7 +329,7 @@ def filter_operations_by_framework(operations, keep_key):
     """Returns a new list of operations keeping only one framework function,
     and includes only those where keep_key is not None.
     """
-    other_keys = {"skimage", "custom", "cucim"} - {keep_key}
+    other_keys = {"skimage", "harpia", "cucim"} - {keep_key}
     new_ops = []
     for op in operations:
         if op.get(keep_key) is not None:
@@ -340,15 +340,15 @@ def filter_operations_by_framework(operations, keep_key):
     return new_ops
 
 # Create 3 framework-specific versions
-grayscale_skimage = filter_operations_by_framework(grayscale, "skimage")
-grayscale_custom  = filter_operations_by_framework(grayscale, "custom")
-grayscale_custom_morphology  = filter_operations_by_framework(morphology_grayscale, "custom")
-grayscale_custom_threashold  = filter_operations_by_framework(operations_thresholds, "custom")
-grayscale_custom_filters  = filter_operations_by_framework(operations_filters, "custom")
+skimage_binary = filter_operations_by_framework(binary, "skimage")
+skimage_grayscale = filter_operations_by_framework(grayscale, "skimage")
 
-grayscale_cucim   = filter_operations_by_framework(grayscale, "cucim")
-grayscale_cucim_no_threashold = filter_operations_by_framework(morphology_grayscale + operations_filters, "cucim")
+harpia_binary  = filter_operations_by_framework(binary, "harpia")
+harpia_filters  = filter_operations_by_framework(operations_filters, "harpia")
+harpia_grayscale  = filter_operations_by_framework(operations_thresholds + morphology_grayscale, 
+                                                   "harpia")
 
-binary_skimage = filter_operations_by_framework(binary, "skimage")
-binary_custom  = filter_operations_by_framework(binary, "custom")
-binary_cucim   = filter_operations_by_framework(binary, "cucim")
+cucim_bianry   = filter_operations_by_framework(binary, "cucim")
+cucim_grayscale   = filter_operations_by_framework(grayscale, "cucim")
+cucim_grayscale_no_threashold = filter_operations_by_framework(morphology_grayscale + operations_filters, 
+                                                               "cucim")
