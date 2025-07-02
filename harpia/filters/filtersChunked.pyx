@@ -274,7 +274,7 @@ def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     return hostOutput
 
 def anisotropic_diffusion3D(numpy.ndarray[real, ndim=3] hostImage, 
-                            numpy.ndarray[real, ndim=3] hostOutput = None, int total_iterations=50, 
+                            numpy.ndarray[real, ndim=3] hostOutput = None, int total_iterations=10, 
                             float delta_t=0.1, float kappa=30, int diffusion_option=3, int flag_verbose=0, 
                             float gpuMemory=0.4, int ngpus = -1):
     """
