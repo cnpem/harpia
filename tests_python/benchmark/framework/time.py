@@ -27,7 +27,7 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
     # Warm-up run
     monitor = MonitorProcess(0.1)
     output = func(*filtered_args, **filtered_kwargs)  
-    max_mem_usage = monitor.stop()
+    mem_usage = monitor.stop()
 
     # Time several runs
     times = []
@@ -36,7 +36,7 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
         output = func(*filtered_args, **filtered_kwargs)
         times.append(time.perf_counter() - start)
 
-    return output, times, used_gpuMemory, max_mem_usage
+    return output, times, used_gpuMemory, mem_usage
 
 
 
@@ -68,8 +68,8 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
         output = func(image_cucim, kernel_cucim, **filtered_kwargs)  # Warm-up run
         del image_cucim
         del kernel_cucim
-        max_mem_usage = monitor.stop()
         _clear_cupy_memblocks()
+        mem_usage = monitor.stop()
         for _ in range(repetitions):
             start = time.perf_counter()
             image_cucim = cp.asarray(image)
@@ -95,7 +95,7 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
         monitor = MonitorProcess(0.1)
         image_cucim = cp.asarray(image)
         output = func(image_cucim, **filtered_kwargs)  # Warm-up run
-        max_mem_usage = monitor.stop()
+        mem_usage = monitor.stop()
         del image_cucim
         _clear_cupy_memblocks()
         for _ in range(repetitions):
@@ -117,30 +117,31 @@ def time_cucim(func, repetitions, image, kernel, **f_kwargs):
             times_memory.append(time_mem)
             times_gpu.append(time_gpu)
             
-    return output, {'total':times, 'memory':times_memory, 'gpu':times_gpu}, max_mem_usage
+    return output, {'total':times, 'memory':times_memory, 'gpu':times_gpu}, mem_usage
 
 def time_compare(
-    csv_data, machine, module_func, skimage_func, cucim_func, image, skimage_param = {},
-    kernel=None, show=True, operation="", repetitions=1, gpuMemory=0.4, ngpus=-1, 
-    *args, **kwargs):
+    csv_data, machine, harpia_func, skimage_func, cucim_func, image, skimage_param = {},
+    harpia_param = {}, cucim_param = {}, kernel=None, show=True, operation="", 
+    repetitions=1, gpuMemory=0.4, ngpus=-1):
 
-    module_times, skimage_times, cucim_times = [], [], []
-    module_mem, skimage_mem, cucim_mem  = {}, {}, {}
-    module_time = skimage_time = cucim_total_time = cucim_mem_time = cucim_gpu_time = "N/A"
+    harpia_times, skimage_times, cucim_times = [], [], []
+    harpia_mem, skimage_mem, cucim_mem  = {}, {}, {}
+    harpia_time = skimage_time = cucim_total_time = cucim_mem_time = cucim_gpu_time = "N/A"
     faster_skimage = faster_cucim = "N/A"
     used_gpuMemory = False
 
-    # ---- Module (Harpia) ----
-    if module_func:
-        module_output, module_times, used_gpuMemory, module_mem_usage = time_function(
-            module_func,repetitions, image, kernel, *args, gpuMemory=gpuMemory, ngpus=ngpus, **kwargs
+    # ---- Harpia ----
+    if harpia_func:
+        _, harpia_times, used_gpuMemory, module_mem_usage = time_function(
+            harpia_func,repetitions, image, kernel, gpuMemory=gpuMemory, ngpus=ngpus, 
+            **harpia_param
         )
-        module_mem = {f"harpia_gpu{i}(MiB)": mem for i, mem in enumerate(module_mem_usage)}
+        harpia_mem = {f"harpia_gpu{i}(MiB)": mem for i, mem in enumerate(module_mem_usage)}
         print("harpia finished")
 
     # ---- Skimage ----
     if skimage_func:
-        skimage_output, skimage_times, used_gpuMemory, skimage_mem_usage = time_function(
+        _, skimage_times, used_gpuMemory, skimage_mem_usage = time_function(
             skimage_func, repetitions, image, kernel, **skimage_param
         )
         skimage_mem = {f"skimage_gpu{i}(MiB)": mem for i, mem in enumerate(skimage_mem_usage)}
@@ -148,24 +149,24 @@ def time_compare(
 
     # ---- CuCIM ----
     if cucim_func:
-        cucim_output, cucim_times, cucim_mem_usage = time_cucim(
-            cucim_func, repetitions, image, kernel
+        _, cucim_times, cucim_mem_usage = time_cucim(
+            cucim_func, repetitions, image, kernel, **cucim_param
         )
         cucim_mem = {f"cucim_gpu{i}(MiB)": mem for i, mem in enumerate(cucim_mem_usage)}
         print("cucim finished")
 
     # ---- Post Processing ----
-    if module_times: module_time = np.mean(module_times)
+    if harpia_times: harpia_time = np.mean(harpia_times)
     if skimage_times:
         skimage_time = np.mean(skimage_times)
-        if module_times:
-            faster_skimage = round(skimage_time / module_time, 2)
+        if harpia_times:
+            faster_skimage = round(skimage_time / harpia_time, 2)
     if cucim_times:
         cucim_total_time = np.mean(cucim_times['total'])
         cucim_mem_time = np.mean(cucim_times['memory'])
         cucim_gpu_time = np.mean(cucim_times['gpu'])
-        if module_times:
-            faster_cucim = round(cucim_total_time / module_time, 2)
+        if harpia_times:
+            faster_cucim = round(cucim_total_time / harpia_time, 2)
 
     logged_gpuMemory = gpuMemory if used_gpuMemory else 0
 
@@ -176,11 +177,11 @@ def time_compare(
 
     # ---- CSV Logging ----
     csv_data.append({
-        'Operation': operation or module_func.__name__,
+        'Operation': operation or harpia_func.__name__,
         'Machine': machine,
         'Gpus': ngpus,
         'gpuMemory': logged_gpuMemory,
-        'Harpia Time (s)': module_time,
+        'Harpia Time (s)': harpia_time,
         'Scikit Time (s)': skimage_time,
         'Scikit Time Ratio': faster_skimage,
         'Cucim Total Time (s)': cucim_total_time,
@@ -191,7 +192,7 @@ def time_compare(
         'Image Data Type': image_dtype,
         'Image Size (MiB)': image_size_mb,
         'Image Dimensions': image_shape,
-        **module_mem,
+        **harpia_mem,
         **skimage_mem,
         **cucim_mem
     })
@@ -199,8 +200,8 @@ def time_compare(
 
     # ---- Optional Print ----
     if show:
-        print(f"Operation: {operation or module_func.__name__}")
-        print(f"Module Time: {module_time} seconds")
+        print(f"Operation: {operation or harpia_func.__name__}")
+        print(f"Harpia Time: {harpia_time} seconds")
         print(f"Scikit Time: {skimage_time} seconds")
         print(f"Cucim Time: {cucim_total_time} seconds")
         print(f"Image Data Type: {image_dtype}")

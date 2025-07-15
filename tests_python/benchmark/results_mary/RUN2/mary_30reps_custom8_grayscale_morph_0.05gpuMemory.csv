@@ -1,0 +1,181 @@
+Operation,Machine,Gpus,gpuMemory,Harpia Time (s),Scikit Time (s),Scikit Time Ratio,Cucim Total Time (s),Cucim Memory Time (s),Cucim Gpu Time (s),Cucim Time Ratio,Repetitions,Image Data Type,Image Size (MiB),Image Dimensions,harpia_gpu0(MiB),harpia_gpu1(MiB),harpia_gpu2(MiB)
+Erosion 3D grayscale,mary,1,0.05,0.029977605096064508,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.02962485607713461,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03291310102213174,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.0337883090833202,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03376346093136817,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03262084408197552,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029887347016483545,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030005838023498654,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03415904496796429,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03379010106436908,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.032649458036758006,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03392455691937357,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030036173993721604,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029652347089722753,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03215981903485954,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.033270426909439266,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.034401276032440364,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.032893850933760405,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.0297891260124743,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030206996016204357,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03286435699556023,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03325042698998004,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03313430899288505,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.033779534976929426,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029609080986119807,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029828306986019015,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.032878467929549515,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03323918906971812,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03417400794569403,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.033484834944829345,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.02966728003229946,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029892974998801947,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03193164092954248,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.033105715992860496,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.032851457013748586,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03349983796942979,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030106010963208973,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.028722857008688152,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.032673073932528496,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03324932500254363,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03263890207745135,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03260800405405462,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029183391015976667,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.02977297198958695,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.035376596031710505,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03341223404277116,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.032309378031641245,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.034180397051386535,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.03168070793617517,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029874496976844966,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03300284792203456,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.031796374008990824,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03334283805452287,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.033702787943184376,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030782285029999912,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029325698036700487,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03579580690711737,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03193817101418972,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03281388897448778,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.032785756047815084,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.028825173969380558,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030120362993329763,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.033223103964701295,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03307492798194289,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03364902606699616,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03296375798527151,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.028666111058555543,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.02892844204325229,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03252028999850154,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.031798957963474095,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03272799798287451,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.032353935996070504,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030075643910095096,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030011216062121093,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03296253609005362,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03301101003307849,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.0334925870411098,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03249933896586299,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030007010092958808,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.02982980792876333,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03308986104093492,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03282747103367001,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03232961893081665,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03370109503157437,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029120143968611956,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029740000958554447,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03349336807150394,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03305282397195697,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.033573410008102655,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.033456200966611505,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029899435001425445,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.03035553195513785,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.032921624020673335,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03200155799277127,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.0345763930818066,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03278643800877035,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029961530002765357,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030312476097606122,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03291673609055579,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03353358991444111,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.033321996103040874,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03391689504496753,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.02870371798053384,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029719389975070953,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.0331474490230903,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03358599008060992,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03376886900514364,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03331764996983111,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030531341093592346,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.028990375925786793,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.032186790951527655,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.033363529946655035,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.032682258053682745,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03311405796557665,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030279917060397565,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030084077967330813,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.033416380058042705,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03295232099480927,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.033477233024314046,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.0337553279241547,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029661091044545174,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.02908297791145742,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03280830092262477,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.033552789012901485,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03332884598057717,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03355699498206377,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029721944010816514,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.03043610497843474,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03196807706262916,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03192420001141727,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03372663399204612,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03360532794613391,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029807965038344264,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029703455977141857,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03288660093676299,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03251279890537262,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03359408106189221,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03337137203197926,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.02984842797741294,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.02999846695456654,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.032870294991880655,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03317689406685531,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03276822005864233,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03334513201843947,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.028808207949623466,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030178210930898786,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.032968065002933145,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.032824545982293785,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.033296347013674676,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.033305902034044266,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029855678090825677,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030632345005869865,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03351654298603535,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.031757015036419034,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03348396404180676,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.033794137998484075,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.02968386502470821,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.030316172051243484,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03281290805898607,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.032028508954681456,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03252630005590618,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03358926496002823,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.030430285958573222,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.03063491906505078,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.033129772054962814,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.033321214956231415,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.033567341044545174,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.032893761061131954,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.029761192970909178,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.029608160024508834,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.033316997927613556,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03291746799368411,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03339758107904345,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03418177994899452,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Erosion 3D grayscale,mary,1,0.05,0.02880145702511072,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Dilation 3D grayscale,mary,1,0.05,0.03002584900241345,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Closing 3D grayscale,mary,1,0.05,0.03212989401072264,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Opening 3D grayscale,mary,1,0.05,0.03205051296390593,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Top Hat 3D grayscale,mary,1,0.05,0.03246899205259979,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0
+Bottom Hat 3D grayscale,mary,1,0.05,0.03503054706379771,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,128.5,"(8, 2052, 2052)",608.0,608.0,608.0

@@ -1,342 +1,182 @@
 #!/usr/bin/env python3
-import numpy as np                     # For array manipulation
-from framework import image, tests
-import cupy as cp
-
-# Grayscale morphology operations
-from skimage.morphology import (
-    erosion, 
-    dilation, 
-    closing, 
-    opening,
-    white_tophat, 
-    black_tophat, 
-    reconstruction
-)
-from skimage.filters import (
-    prewitt,
-    sobel,
-    gaussian)
-
-from cucim.skimage import morphology as cucim_morph
-from cucim.skimage import filters as cucim_filters
-
-# Binary morphology operations
-from skimage.morphology import binary_erosion, binary_dilation, binary_closing, binary_opening
-
-# Workaround to allow importing harpia python module locally
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)))
+import time
+import argparse
+from tqdm import tqdm
+from datetime import datetime
 
-# Custom morphology operations from harpia for binary images
-from harpia.morphology.operations_binary import (
-     erosion_binary,
-     dilation_binary,
-     closing_binary,
-     opening_binary,
-     smooth_binary,
-     geodesic_erosion_binary,
-     geodesic_dilation_binary,
-     reconstruction_binary,
-     fill_holes
-)
+from framework import image, tests
+from framework import operations
 
-# Custom morphology operations from harpia for grayscale images
-from harpia.morphology.operations_grayscale import (
-     erosion_grayscale,
-     dilation_grayscale,
-     closing_grayscale,
-     opening_grayscale,
-     geodesic_erosion_grayscale,
-     geodesic_dilation_grayscale,
-     reconstruction_grayscale,
-     top_hat,
-     bottom_hat,
-     top_hat_reconstruction,
-     bottom_hat_reconstruction,
-)
+# --- CLI Arguments ---
+parser = argparse.ArgumentParser(description="Run benchmark tests")
+parser.add_argument("--img_num", type=int, default=4, help="Image number (1 or 4)")
+parser.add_argument("--framework", type=str, default=None, help="Filter by specific framework")
+args = parser.parse_args()
 
-# Custom filters chunked operations from harpia
-from harpia.filters.filtersChunked import (
-     gaussianFilter,
-     meanFilter,
-     logFilter,
-     unsharpMaskFilter,
-     sobelFilter,
-     prewittFilter,
-     anisotropic_diffusion3D,
-)
-
-import harpia
-print(harpia.__file__)
-
-def custum_kernel3D():
-    kernel_2d = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]], dtype=np.int32)
-    # Stack the 2D kernel to form a 3D kernel (3 layers)
-    kernel_3d = np.stack([kernel_2d, kernel_2d, kernel_2d])
-    return kernel_3d
-
-def smooth_sk(image, selem):
-    result = opening(image, selem)
-    result = binary_closing(result, selem)
-    return result
-
-def smooth_cucim(image, selem):
-    image = cp.asarray(image)
-    selem = cp.asarray(selem)
-    result = cucim_morph.binary_opening(image, selem)
-    result = cucim_morph.binary_closing(result, selem)
-    return result
-
-#############
-# Read Images
-#############
-
-# Instruction: Uncomment the image for which tests will be executed.
-
-# IMAGE 1
-# print("reading small image...")
-# xsize = 190
-# ysize = 207
-# zsize_original = 100
-# zsize = 100
-# path_grayscale = "../../example_images/grayscale/crua_A_190x207x100_16b.raw"
-# path_binary = "../../example_images/binary/crua_A_190x207x100_16b.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-# img_num = 1
-# print("fineshed reading small image!")
-
-# # IMAGE 2 (possibily with problem)
-# print("reading big image...")
-# xsize = 2048
-# ysize = 2048
-# zsize = 1964
-# path_grayscale = "../../../../../../../../beamlines/mogno/proposals/20180217/data/Soil_Experiment/testes_segmentacao/PBV29_Talita/tomoFiltered_masked_2048x2048x1964_16bit.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-# image_binary = image.binarize(image_grayscale, dtype_out = 'uint16')
-# img_num = 2
-# print("fineshed reading big image!")
-
-# IMAGE 3
-# print("reading medium image...")
-# xsize = 600
-# ysize = 1520
-# zsize = 1520
-# path_grayscale = "../../example_images/grayscale/ILSIMG_600x1520x1520_16bits.raw"
-# path_binary = "../../example_images/binary/ILSIMG_600x1520x1520_16bits.raw"
-# image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'uint16')
-# image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-# img_num = 3
-# print("fineshed reading medium image!")
-
-# IMAGE 4
-print("reading big image...")
-xsize = 2052
-ysize = 2052
-zsize = 2048
-
-path_grayscale = "../../example_images/grayscale/Recon_2052x2052x2048_32bits.raw"
-path_binary = "../../example_images/binary/Recon_2052x2052x2048_16bits.raw"
-image_grayscale = image.load(path_grayscale, xsize, ysize, zsize,'float32')
-image_binary = image.load(path_binary, xsize, ysize, zsize,'uint16')
-img_num = 4
-print("fineshed reading big image!")
-
-#Kernel
-kernel = custum_kernel3D()
-
-#############
-# Tests
-#############
-
-operations_grayscale = [
-    {
-        "name": "Erosion 3D grayscale",
-        "skimage": erosion,
-        "custom": erosion_grayscale,
-        "cucim": cucim_morph.erosion
+# --- Image Configuration ---
+image_configs = {
+    1: {
+        "name": "small",
+        "xsize": 190, "ysize": 207, "zsize": 100,
+        "grayscale_path": "../../example_images/grayscale/crua_A_190x207x100_16b.raw",
+        "binary_path": "../../example_images/binary/crua_A_190x207x100_16b.raw",
+        "grayscale_dtype": "uint16",
+        "binary_dtype": "uint16"
     },
-    {
-        "name": "Dilation 3D grayscale",
-        "skimage": dilation,
-        "custom": dilation_grayscale,
-        "cucim": cucim_morph.dilation
-    },
-    {
-        "name": "Closing 3D grayscale",
-        "skimage": closing,
-        "custom": closing_grayscale,
-        "cucim": cucim_morph.closing
-    },
-    {
-        "name": "Opening 3D grayscale",
-        "skimage": opening,
-        "custom": opening_grayscale,
-        "cucim": cucim_morph.opening
-    },
-    # {
-    #     "name": "Geodesisc Erosion 3D grayscale",
-    #     "skimage": None,
-    #     "custom": geodesic_erosion_grayscale,
-    #     "cucim": "geodesic_erosion_grayscale"
-    # },
-    # {
-    #     "name": "Geodesisc Dilation 3D grayscale",
-    #     "skimage": None,
-    #     "custom": geodesic_dilation_grayscale,
-    #     "cucim": "geodesic_dilation_grayscale"
-    # },
-    {
-        "name": "Top Hat 3D grayscale",
-        "skimage": white_tophat,
-        "custom": top_hat,
-        "cucim": cucim_morph.white_tophat
-    },
-    {
-        "name": "Bottom Hat 3D grayscale",
-        "skimage": black_tophat,
-        "custom": bottom_hat,
-        "cucim": cucim_morph.black_tophat
-    },
-]
+    4: {
+        "name": "big",
+        "xsize": 2052, "ysize": 2052, "zsize": 2048,
+        "grayscale_path": "../../example_images/grayscale/Recon_2052x2052x2048_32bits.raw",
+        "binary_path": "../../example_images/binary/Recon_2052x2052x2048_16bits.raw",
+        "grayscale_dtype": "float32",
+        "binary_dtype": "uint16"
+    }
+}
 
-operations_filters = [
-    {
-        "name": "Gaussian Filter 3D grayscale",
-        "skimage": gaussian,
-        "skimage_param":{'mode':'reflect'},
-        "custom": gaussianFilter,
-        "cucim": cucim_filters.gaussian,
-    },
-    # {
-    #     "name": "Mean Filter 3D grayscale",
-    #     "skimage": None,
-    #     "custom": meanFilter,
-    #     "cucim": "meanFilter"
-    # },
-    # {
-    #     "name": "Log Filter 3D grayscale",
-    #     "skimage": None,
-    #     "custom": logFilter,
-    #     "cucim": "logFilter"
-    # },
-    # {
-    #     "name": "Unsharp Mask Filter 3D grayscale",
-    #     "skimage": None,
-    #     "custom": unsharpMaskFilter,
-    #     "cucim": "unsharpMaskFilter"
-    # },
-    {
-        "name": "Sobel Filter 3D grayscale",
-        "skimage": sobel,
-        "custom": sobelFilter,
-        "cucim": cucim_filters.sobel
-    },
-    {
-        "name": "Prewitt Filter 3D grayscale",
-        "skimage": prewitt,
-        "custom": prewittFilter,
-        "cucim": cucim_filters.prewitt
-    },
-    # {
-    #     "name": "Anisotropic Diffusion Filter 3D grayscale",
-    #     "skimage": None,
-    #     "custom": anisotropic_diffusion3D,
-    #     "cucim": "anisotropic_diffusion3D"
-    # },
-]
+# --- Settings ---
+machine = 'harriet'
+ngpus = 1
+gpuMemory = 0.1
+repetitions = 1
+reps = 30
 
-images_grayscale = [
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+results_dir = f"results/{timestamp}"
+os.makedirs(results_dir, exist_ok=True)
+log_file_path = os.path.join(results_dir, "log.txt")
+log_file = open(log_file_path, "w")
+
+def log(msg):
+    print(msg)
+    log_file.write(msg + "\n")
+
+# --- Load Selected Image ---
+cfg = image_configs[args.img_num]
+log(f"Reading {cfg['name']} image...")
+start = time.time()
+image_grayscale = image.load(cfg['grayscale_path'], cfg['xsize'], cfg['ysize'], cfg['zsize'], cfg['grayscale_dtype'])
+image_binary = image.load(cfg['binary_path'], cfg['xsize'], cfg['ysize'], cfg['zsize'], cfg['binary_dtype'])
+end = time.time()
+log("Finished reading image!")
+log(f"Reading time: {end - start:.2f}s")
+
+# --- Image dtypes ---
+image_types_grayscale = [
     "float32",
     # "int32",
     # "uint32",
 ]
 
-operations_binary = [
-    {
-        "name": "Erosion 3D binary",
-        "skimage": erosion,
-        "custom": erosion_binary,
-        "cucim": cucim_morph.binary_erosion
-    },
-    {
-        "name": "Dilation 3D binary",
-        "skimage": dilation,
-        "custom": dilation_binary,
-        "cucim": cucim_morph.binary_dilation
-    },
-    {
-        "name": "Closing 3D binary",
-        "skimage": closing,
-        "custom": closing_binary,
-        "cucim": cucim_morph.binary_closing
-    },
-    {
-        "name": "Opening 3D binary",
-        "skimage": opening,
-        "custom": opening_binary,
-        "cucim": cucim_morph.binary_opening
-    },
-    {
-        "name": "Smoothing 3D binary",
-        "skimage": smooth_sk,
-        "custom": smooth_binary,
-        "cucim": smooth_cucim
-    },
-    # {
-    #     "name": "Geodesisc Erosion 3D binary",
-    #     "skimage": None,
-    #     "custom": geodesic_erosion_binary,
-    #     "cucim": "geodesic_erosion_binary"
-    # },
-    # {
-    #     "name": "Geodesisc Dilation 3D binary",
-    #     "skimage": None,
-    #     "custom": geodesic_dilation_binary,
-    #     "cucim": "geodesic_dilation_binary"
-    # },
-]
-
-images_binary = [
+image_types_binary = [
     "int32",
     # "int16",
     # "uint16",
     # "uint32",
 ]
 
-machine = 'aida'
-ngpus_values = [1]
-gpuMemory_values = [0.4]
-repetitions = 1
-nslices = 50
+# --- Configurations ---
+configurations = [
+    {
+        "framework": "harpia",
+        "image_type": "binary",
+        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
+        "dtypes": image_types_binary,
+        "image": image_binary,
+        "operations": operations.harpia_binary
+    },
+    {
+        "framework": "harpia",
+        "image_type": "grayscale",
+        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
+        "dtypes": image_types_grayscale,
+        "image": image_grayscale,
+        "operations": operations.harpia_grayscale
+    },
+    {
+        "framework": "harpia",
+        "image_type": "grayscale",
+        "nslices": [1, 2],  #[1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
+        "dtypes": image_types_grayscale,
+        "image": image_grayscale,
+        "operations": operations.harpia_filters
+    },
+    {
+        "framework": "skimage",
+        "image_type": "binary",
+        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
+        "dtypes": image_types_binary,
+        "image": image_binary,
+        "operations": operations.skimage_binary
+    },
+    {
+        "framework": "skimage",
+        "image_type": "grayscale",
+        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
+        "dtypes": image_types_grayscale,
+        "image": image_grayscale,
+        "operations": operations.skimage_grayscale
+    },
+    {
+        "framework": "cucim",
+        "image_type": "binary",
+        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
+        "dtypes": image_types_binary,
+        "image": image_binary,
+        "operations": operations.cucim_bianry
+    },
+    {
+        "framework": "cucim",
+        "image_type": "grayscale",
+        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128],
+        "dtypes": image_types_grayscale,
+        "image": image_grayscale,
+        "operations": operations.cucim_grayscale
+    },
+    {
+        "framework": "cucim",
+        "image_type": "grayscale",
+        "nslices": [1, 2],  #[256, 512],
+        "dtypes": image_types_grayscale,
+        "image": image_grayscale,
+        "operations": operations.cucim_grayscale_no_threashold
+    }
+]
 
-for ngpus in ngpus_values:
-    for gpuMemory in gpuMemory_values:
-        #csv_file = f"results_cucim/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
-        csv_file = f"results_aida/{machine}_{ngpus}gpu_{repetitions}reps_cython_results.csv"
+# --- Run Tests ---
 
-        for dtype in images_grayscale:
-            image_input = image_grayscale.astype(dtype=dtype)
-            image_input = image_input[:nslices,:,:]
-            for operation in operations_filters:
-                # Attempt to run the test
-                results_df = tests.run(
-                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel = None)
-            for operation in operations_grayscale:
-                # Attempt to run the test
-                results_df = tests.run(
-                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel
-                )
+log(f"\nMachine '{machine}' with {reps} reps, image #{args.img_num} ({cfg['name']}).")
 
-        for dtype in images_binary:
-            image_input = image_binary.astype(dtype=dtype)
-            image_input = image_input[:nslices,:,:]
-            for operation in operations_binary:
-                # Attempt to run the test
-                results_df = tests.run(
-                    csv_file, image_input, operation, machine, ngpus, repetitions, gpuMemory, kernel
-                )
+start = time.time()
+for config in configurations:
+    if args.framework and config["framework"] != args.framework:
+        continue
 
-print(f"The End!")
+    for nslices in config["nslices"]:
+        csv_file = os.path.join(results_dir, f"{machine}_{reps}reps_{config['framework']}_{nslices}_{config['image_type']}.csv")
+        log(f"\nSaving to file: {csv_file}")
+        for dtype in config["dtypes"]:
+            image_input = config["image"].astype(dtype=dtype)
+            image_input = image_input[:nslices, :, :]
+            for _ in tqdm(range(reps), desc=f"{config['framework']}_{config['image_type']}_{dtype}_{nslices}"):
+                for operation in config["operations"]:
+                    kernel = operation["kernel"]
+                    try:
+                        tests.run(
+                            csv_file,
+                            image_input,
+                            operation,
+                            machine,
+                            ngpus,
+                            repetitions,
+                            gpuMemory,
+                            kernel
+                        )
+                    except Exception as e:
+                        log(f"[ERROR] Framework: {config['framework']} | Op: {kernel} | Slices: {nslices} | Dtype: {dtype}\n  {str(e)}")
+
+end = time.time()
+log("\n✅ All tests completed!")
+log(f"Total executin time: {end - start:.2f}s")
+
+log_file.close()

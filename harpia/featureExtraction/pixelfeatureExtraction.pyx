@@ -6,7 +6,8 @@ cimport numpy as np
 cimport cython
 from cython cimport boundscheck, wraparound, parallel
 from harpia.common import Size
-from harpia.shape_index import hessian_eigenvalues
+from harpia.shapeIndex.shape_index import hessian_eigenvalues, shape_index
+#---------------------------------------------------------------------------------------------------
 #Define the fused type for numeric types : float, int, unsigned int
 ctypedef fused numeric:
     float
@@ -80,18 +81,19 @@ def pixel_feature_extract(np.ndarray[numeric, ndim=3] hostImage,
                     verbose, ngpus, gpuMemory)
             feature_index += 1
 
+        eigenvalues = None
         if Texture:
             eigenvalues = hessian_eigenvalues(blurred_3d, step=1, verbose=0, gpuMemory=0.4, ngpus=-1)
             results[feature_index, :, :, :] = eigenvalues[:, :, :, 0]
             results[feature_index + 1, :, :, :] = eigenvalues[:, :, :, 1]
             feature_index += 2
 
-        if LocalBinaryPattern:
-            localBinaryPattern(&blurred_3d[0, 0, 0], &results[feature_index, 0, 0, 0], isize.y, isize.x, isize.z)
+        if ShapeIndex:
+            results[feature_index, :] = shape_index(blurred_3d, eigen = eigenvalues,step=1, verbose=0, gpuMemory=0.4, ngpus=-1)
             feature_index += 1
 
-        if ShapeIndex:
-            results[feature_index, :] = hessian_eigenvalues(blurred_3d, step=1, verbose=0, gpuMemory=0.4, ngpus=-1)
+        if LocalBinaryPattern:
+            localBinaryPattern(&blurred_3d[0, 0, 0], &results[feature_index, 0, 0, 0], isize.y, isize.x, isize.z)
             feature_index += 1
 
     print("\n Feature extraction completed in {:.2f} seconds.\n".format(time() - start_time))
