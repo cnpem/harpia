@@ -1,4 +1,0 @@
-Operation,Machine,Gpus,gpuMemory,Harpia Time (s),Scikit Time (s),Scikit Time Ratio,Cucim Total Time (s),Cucim Memory Time (s),Cucim Gpu Time (s),Cucim Time Ratio,Repetitions,Image Data Type,Image Size (MiB),Image Dimensions,harpia_gpu0(MiB),harpia_gpu1(MiB),harpia_gpu2(MiB)
-Threshold Niblack,mary,1,0.05,39.603548052953556,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,5076.0,608.0
-Threshold Sauvola,mary,1,0.05,39.64950508601032,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,5076.0,608.0
-Threshold Mean,mary,1,0.05,7.24176579201594,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,5076.0,608.0

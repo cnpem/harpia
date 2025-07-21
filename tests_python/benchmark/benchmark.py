@@ -35,7 +35,7 @@ image_configs = {
 }
 
 # --- Settings ---
-machine = 'harriet'
+machine = 'mary'
 ngpus = 1
 gpuMemory = 0.1
 repetitions = 1

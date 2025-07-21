@@ -1,7 +1,0 @@
-Operation,Machine,Gpus,gpuMemory,Harpia Time (s),Scikit Time (s),Scikit Time Ratio,Cucim Total Time (s),Cucim Memory Time (s),Cucim Gpu Time (s),Cucim Time Ratio,Repetitions,Image Data Type,Image Size (MiB),Image Dimensions,harpia_gpu0(MiB),harpia_gpu1(MiB),harpia_gpu2(MiB)
-Erosion 3D grayscale,mary,1,0.05,7.450898912968114,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,2798.0,608.0
-Dilation 3D grayscale,mary,1,0.05,7.476099580060691,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,2798.0,608.0
-Closing 3D grayscale,mary,1,0.05,8.542776839924045,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,2734.0,608.0
-Opening 3D grayscale,mary,1,0.05,8.503439064021222,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,2734.0,608.0
-Top Hat 3D grayscale,mary,1,0.05,8.531327778939158,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,2734.0,608.0
-Bottom Hat 3D grayscale,mary,1,0.05,8.484415194950998,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,32896.1,"(2048, 2052, 2052)",608.0,2734.0,608.0
