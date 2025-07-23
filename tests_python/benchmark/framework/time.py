@@ -124,6 +124,8 @@ def time_compare(
     harpia_param = {}, cucim_param = {}, kernel=None, show=True, operation="", 
     repetitions=1, gpuMemory=0.4, ngpus=-1):
 
+    print("harpia_func:", harpia_func)
+
     harpia_times, skimage_times, cucim_times = [], [], []
     harpia_mem, skimage_mem, cucim_mem  = {}, {}, {}
     harpia_time = skimage_time = cucim_total_time = cucim_mem_time = cucim_gpu_time = "N/A"

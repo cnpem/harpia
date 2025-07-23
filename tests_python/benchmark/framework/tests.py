@@ -10,8 +10,8 @@ def run(csv_file, image, operation, machine, ngpus, repetitions, gpuMemory, kern
     operation_name = operation.get('name', None)
     skimage_func = operation.get('skimage', None)
     skimage_param = operation.get('skimage_param', {})
-    harpia_func = operation.get('custom', None)  # (was typo: 'custum')
-    harpia_param = operation.get('harpia', {})
+    harpia_func = operation.get('harpia', None)  # (was typo: 'custum')
+    harpia_param = operation.get('harpia_param', {})
     cucim_func = operation.get('cucim', None)
     cucim_param = operation.get('cucim_param', {})
 
