@@ -80,7 +80,7 @@ configurations = [
     {
         "framework": "harpia",
         "image_type": "binary",
-        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
+        "nslices": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
         "dtypes": image_types_binary,
         "image": image_binary,
         "operations": operations.harpia_binary
@@ -88,7 +88,7 @@ configurations = [
     {
         "framework": "harpia",
         "image_type": "grayscale",
-        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
+        "nslices": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
         "dtypes": image_types_grayscale,
         "image": image_grayscale,
         "operations": operations.harpia_grayscale
@@ -96,15 +96,15 @@ configurations = [
     {
         "framework": "harpia",
         "image_type": "grayscale",
-        "nslices": [1, 2],  #[1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
+        "nslices": [1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
         "dtypes": image_types_grayscale,
         "image": image_grayscale,
-        "operations": operations.harpia_filters
+        "operations": operations.harpia_gauss #these operations give segemntation fault for 2 slices
     },
     {
         "framework": "skimage",
         "image_type": "binary",
-        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
+        "nslices": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512], #bigger iamges take too long to execute
         "dtypes": image_types_binary,
         "image": image_binary,
         "operations": operations.skimage_binary
@@ -112,7 +112,7 @@ configurations = [
     {
         "framework": "skimage",
         "image_type": "grayscale",
-        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
+        "nslices": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512], #bigger iamges take too long to execute
         "dtypes": image_types_grayscale,
         "image": image_grayscale,
         "operations": operations.skimage_grayscale
@@ -120,7 +120,7 @@ configurations = [
     {
         "framework": "cucim",
         "image_type": "binary",
-        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
+        "nslices": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512], #maximun size executable in one DGX GPU
         "dtypes": image_types_binary,
         "image": image_binary,
         "operations": operations.cucim_bianry
@@ -128,7 +128,7 @@ configurations = [
     {
         "framework": "cucim",
         "image_type": "grayscale",
-        "nslices": [1, 2],  #[1, 2, 4, 8, 16, 32, 64, 128],
+        "nslices": [1, 2, 4, 8, 16, 32, 64, 128],  #maximun size executable in one DGX GPU
         "dtypes": image_types_grayscale,
         "image": image_grayscale,
         "operations": operations.cucim_grayscale
@@ -136,7 +136,7 @@ configurations = [
     {
         "framework": "cucim",
         "image_type": "grayscale",
-        "nslices": [1, 2],  #[256, 512],
+        "nslices": [256, 512],  #only these operations execute for these sizes in one DGX GPU
         "dtypes": image_types_grayscale,
         "image": image_grayscale,
         "operations": operations.cucim_grayscale_no_threashold

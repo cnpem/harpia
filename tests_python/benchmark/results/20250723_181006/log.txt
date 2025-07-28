@@ -1,0 +1,10 @@
+Reading big image...
+Finished reading image!
+Reading time: 275.19s
+
+Machine 'aida' with 30 reps, image #4 (big).
+
+Saving to file: results/20250723_181006/aida_30reps_cucim_512_grayscale.csv
+(moved to results/20250722_230142/aida_30reps_cucim_512_grayscale.csv)
+✅ All tests completed!
+Total executin time: 4842.70s

@@ -215,6 +215,8 @@ morphology_binary = [
     },
 ]
 
+
+
 operations_filters = [
     {
         "name": "Anisotropic Diffusion Filter 3D grayscale",
@@ -228,7 +230,7 @@ operations_filters = [
         "name": "Gaussian Filter 3D grayscale",
         "skimage": gaussian,
         "skimage_param": {'mode': 'reflect'},
-        "harpia": gaussianFilter,
+        "harpia": None, #gaussianFilter,
         "cucim": cucim_filters.gaussian,
         "kernel":None,
         "multi-gpu": True
@@ -282,7 +284,7 @@ operations_filters = [
     {
         "name": "Unsharp Mask Filter 3D grayscale",
         "skimage": None,
-        "harpia": unsharpMaskFilter,
+        "harpia": None, #unsharpMaskFilter,
         "cucim": None,
         "kernel":None,
         "multi-gpu": True   # Not available in cucim as of now
@@ -315,12 +317,13 @@ operations_thresholds = [
        "name": "Threshold Gaussian",
        "skimage": threshold_local,
        "skimage_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
-       "harpia": gaussianThreshold,
+       "harpia": None,# gaussianThreshold,
        "cucim": cucim_filters.threshold_local,
        "cucim_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
        "kernel":None 
     }
 ]
+
 
 grayscale = operations_filters + operations_thresholds + morphology_grayscale
 binary  = morphology_binary
@@ -344,11 +347,70 @@ skimage_binary = filter_operations_by_framework(binary, "skimage")
 skimage_grayscale = filter_operations_by_framework(grayscale, "skimage")
 
 harpia_binary  = filter_operations_by_framework(binary, "harpia")
-harpia_filters  = filter_operations_by_framework(operations_filters, "harpia")
-harpia_grayscale  = filter_operations_by_framework(operations_thresholds + morphology_grayscale, 
-                                                   "harpia")
+harpia_grayscale  = filter_operations_by_framework(morphology_grayscale + operations_filters +
+                                                   operations_thresholds, "harpia")
 
 cucim_bianry   = filter_operations_by_framework(binary, "cucim")
 cucim_grayscale   = filter_operations_by_framework(grayscale, "cucim")
 cucim_grayscale_no_threashold = filter_operations_by_framework(morphology_grayscale + operations_filters, 
                                                                "cucim")
+
+operations_cucim_grayscale_512_aida =[
+    {
+        "name": "Erosion 3D grayscale",
+        "skimage": erosion,
+        "harpia": erosion_grayscale,
+        "cucim": cucim_morph.erosion,
+        "kernel":kernel,
+        "multi-gpu": True
+    },
+    {
+        "name": "Dilation 3D grayscale",
+        "skimage": dilation,
+        "harpia": dilation_grayscale,
+        "cucim": cucim_morph.dilation,
+        "kernel":kernel,
+        "multi-gpu": True
+    },
+    {
+        "name": "Gaussian Filter 3D grayscale",
+        "skimage": gaussian,
+        "skimage_param": {'mode': 'reflect'},
+        "harpia": gaussianFilter,
+        "cucim": cucim_filters.gaussian,
+        "kernel":None,
+        "multi-gpu": True
+    },
+]
+cucim_grayscale_512_aida = filter_operations_by_framework(operations_cucim_grayscale_512_aida, 
+                                                               "cucim")
+
+operations_harpia_gauss = [
+    {
+       "name": "Threshold Gaussian",
+       "skimage": None, #threshold_local,
+       "skimage_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
+       "harpia": gaussianThreshold,
+       "cucim": None, #cucim_filters.threshold_local,
+       "cucim_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
+       "kernel":None 
+    },
+    {
+        "name": "Gaussian Filter 3D grayscale",
+        "skimage": None, # gaussian,
+        "skimage_param": {'mode': 'reflect'},
+        "harpia": gaussianFilter,
+        "cucim": None, # cucim_filters.gaussian,
+        "kernel":None,
+        "multi-gpu": True
+    },
+    {
+        "name": "Unsharp Mask Filter 3D grayscale",
+        "skimage": None,
+        "harpia": unsharpMaskFilter,
+        "cucim": None,
+        "kernel":None,
+        "multi-gpu": True   # Not available in cucim as of now
+    },
+]
+harpia_gauss  = filter_operations_by_framework(operations_harpia_gauss, "harpia")

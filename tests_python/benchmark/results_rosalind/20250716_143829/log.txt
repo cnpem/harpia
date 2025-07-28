@@ -1,0 +1,423 @@
+Reading big image...
+Finished reading image!
+Reading time: 9.44s
+
+Machine 'rosalind' with 30 reps, image #4 (big).
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_1_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_2_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_4_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_8_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_16_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_32_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_64_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_128_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_256_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_512_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_1024_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_2048_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_1_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_2_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_4_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_8_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_16_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_32_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_64_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_128_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_256_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_512_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_1024_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_2048_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_1_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_4_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_8_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_16_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_32_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_64_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_128_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_256_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_512_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_1024_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_harpia_2048_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_1_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_2_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_4_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_8_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_16_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_32_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_64_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_128_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_256_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_512_binary.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_1_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_2_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_4_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_8_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_16_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_32_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_64_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_128_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_256_grayscale.csv
+
+Saving to file: results_rosalind/20250716_143829/rosalind_30reps_cucim_512_grayscale.csv
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: None | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,088,704 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,087,680 bytes).
+[ERROR] Framework: cucim | Op: [[[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]
+
+ [[1 1 1]
+  [1 1 1]
+  [1 1 1]]] | Slices: 512 | Dtype: float32
+  Out of memory allocating 8,623,521,792 bytes (allocated so far: 34,494,089,216 bytes).

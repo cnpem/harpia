@@ -16,7 +16,7 @@ dist/
 harpia/**/*.cpp
 
 #test files
-**.png
+**/**.png
 #**.csv
 
 #ignore jupyter notebook checkpointfiles
