@@ -136,7 +136,7 @@ def time_compare(
     # ---- Harpia ----
     if harpia_func:
         _, harpia_times, used_gpuMemory, module_mem_usage = time_function(
-            harpia_func,repetitions, image, kernel, gpuMemory=gpuMemory, ngpus=ngpus, 
+            harpia_func, repetitions, image, kernel, gpuMemory=gpuMemory, ngpus=ngpus, 
             **harpia_param
         )
         harpia_mem = {f"harpia_gpu{i}(MiB)": mem for i, mem in enumerate(module_mem_usage)}
