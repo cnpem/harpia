@@ -161,6 +161,54 @@ __device__ float compute_second_derivative_at_point(float* d_image, int x, int y
     
     return 0.0f;
 }
+
+__device__ float compute_first_derivative_backward_forward(float* d_image, int x, int y, int z,
+                                          int xsize, int ysize, int zsize,
+                                          int axis, int step,
+                                          int direction) {
+    int offset = z * xsize * ysize;
+
+    // Backward difference
+    if (direction == -1) {
+        if (axis == 0) { // x-axis
+            if (x - 2 * step >= 0) {
+                int idx0 = offset + y * xsize + x;
+                int idx1 = offset + y * xsize + (x - step);
+                int idx2 = offset + y * xsize + (x - 2 * step);
+                return (3.0f * d_image[idx0] - 4.0f * d_image[idx1] + d_image[idx2]) / (2.0f * step);
+            }
+        } else if (axis == 1) { // y-axis
+            if (y - 2 * step >= 0) {
+                int idx0 = offset + y * xsize + x;
+                int idx1 = offset + (y - step) * xsize + x;
+                int idx2 = offset + (y - 2 * step) * xsize + x;
+                return (3.0f * d_image[idx0] - 4.0f * d_image[idx1] + d_image[idx2]) / (2.0f * step);
+            }
+        }
+    }
+    // Forward difference (direction == +1)
+    else {
+        if (axis == 0) { // x-axis
+            if (x + 2 * step < xsize) {
+                int idx0 = offset + y * xsize + x;
+                int idx1 = offset + y * xsize + (x + step);
+                int idx2 = offset + y * xsize + (x + 2 * step);
+                return (-3.0f * d_image[idx0] + 4.0f * d_image[idx1] - d_image[idx2]) / (2.0f * step);
+            }
+        } else if (axis == 1) { // y-axis
+            if (y + 2 * step < ysize) {
+                int idx0 = offset + y * xsize + x;
+                int idx1 = offset + (y + step) * xsize + x;
+                int idx2 = offset + (y + 2 * step) * xsize + x;
+                return (-3.0f * d_image[idx0] + 4.0f * d_image[idx1] - d_image[idx2]) / (2.0f * step);
+            }
+        }
+    }
+
+    // Out of bounds
+    return 0.0f;
+}
+
 // Device function to compute mixed partial derivative (d²f/dxdy)
 __device__ float compute_mixed_derivative_at_point(float* d_image, int x, int y, int z,
                                                    int xsize, int ysize, int zsize, int step) {
@@ -175,9 +223,92 @@ __device__ float compute_mixed_derivative_at_point(float* d_image, int x, int y,
 
         return (d_image[idx_pp] - d_image[idx_pm] - d_image[idx_mp] + d_image[idx_mm]) /
                (4.0f * step * step);
+    } 
+    // x boundary (x backward/forward and y centered)
+    else if ((x + step >= xsize || x - step < 0) && y + step < ysize && y - step >= 0) {
+        // forward by default, change to backward if at right boundary
+        int direction = 1;
+        if (x + step >= xsize) {
+            direction = -1;
+        }
+        
+        // Check if we have enough points for the boundary method
+        if ((direction == 1 && x + 2 * step >= xsize) || 
+            (direction == -1 && x - 2 * step < 0)) {
+            return 0.0f; // Not enough points
+        }
+        
+        // calculate forward/backward for each centered term of the equation
+        float fxyp = compute_first_derivative_backward_forward(d_image, x, y + step, z, 
+                                                              xsize, ysize, zsize, 0, step, direction);
+        float fxyn = compute_first_derivative_backward_forward(d_image, x, y - step, z, 
+                                                              xsize, ysize, zsize, 0, step, direction);
+        return (fxyp - fxyn) / (2.0f * step);
     }
-    /////////////////////////////////////////////////////////////////////////////////////
-    //TODO: Boundary check for this one too
+    // y boundary (x centered and y backward/forward)
+    else if (x + step < xsize && x - step >= 0 && (y + step >= ysize || y - step < 0)) {
+        // forward by default
+        int direction = 1;
+        // change to backward if we are at top boundary
+        if (y + step >= ysize) {
+            direction = -1;
+        }
+        
+        // Check if we have enough points for the boundary method
+        if ((direction == 1 && y + 2 * step >= ysize) || 
+            (direction == -1 && y - 2 * step < 0)) {
+            return 0.0f; // Not enough points
+        }
+        
+        float fyxp = compute_first_derivative_backward_forward(d_image, x + step, y, z, 
+                                                              xsize, ysize, zsize, 1, step, direction);
+        float fyxn = compute_first_derivative_backward_forward(d_image, x - step, y, z, 
+                                                              xsize, ysize, zsize, 1, step, direction);
+
+        return (fyxp - fyxn) / (2.0f * step);
+    } 
+    // corner i.e xy boundary (x forward/backward and y forward/backward)
+    else if ((x + step >= xsize || x - step < 0) && (y + step >= ysize || y - step < 0)) {
+        // forward by default, change if at boundary
+        int directiony = 1;
+        if (y + step >= ysize) {
+            directiony = -1;
+        }
+
+        int directionx = 1;
+        if (x + step >= xsize) {
+            directionx = -1;
+        }
+
+        // Check if we have enough points for the boundary method
+        if ((directionx == 1 && x + 2 * step >= xsize) || 
+            (directionx == -1 && x - 2 * step < 0) ||
+            (directiony == 1 && y + 2 * step >= ysize) || 
+            (directiony == -1 && y - 2 * step < 0)) {
+            return 0.0f; // Not enough points
+        }
+        
+        // calculate forward/backward in x
+        // df(x,y)/dx
+        float fxy = compute_first_derivative_backward_forward(d_image, x, y, z, 
+                                                             xsize, ysize, zsize, 0, step, directionx);
+        // df(x,y+∆y)/dx
+        float fxyp = compute_first_derivative_backward_forward(d_image, x, y + directiony * step, z, 
+                                                              xsize, ysize, zsize, 0, step, directionx);
+        // df(x,y+2∆y)/dx
+        float fxyp2 = compute_first_derivative_backward_forward(d_image, x, y + 2 * directiony * step, z, 
+                                                               xsize, ysize, zsize, 0, step, directionx);
+
+        // Apply finite difference in y direction
+        if (directiony == 1) {
+            // Forward difference: (-3f₀ + 4f₁ - f₂) / (2Δy)
+            return (-3.0f * fxy + 4.0f * fxyp - fxyp2) / (2.0f * step);
+        } else {
+            // Backward difference: (3f₀ - 4f₋₁ + f₋₂) / (2Δy)
+            return (3.0f * fxy - 4.0f * fxyp + fxyp2) / (2.0f * step);
+        }
+    }
+    
     return 0.0f;
 }
 
