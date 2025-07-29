@@ -384,7 +384,6 @@ operations_cucim_grayscale_512_aida =[
 ]
 cucim_grayscale_512_aida = filter_operations_by_framework(operations_cucim_grayscale_512_aida, 
                                                                "cucim")
-
 operations_harpia_gauss = [
     {
        "name": "Threshold Gaussian",
@@ -395,6 +394,8 @@ operations_harpia_gauss = [
        "cucim_param": {'method': 'gaussian', 'block_size':7, 'mode':'reflect'},
        "kernel":None 
     },
+]
+filters_harpia_gauss = [
     {
         "name": "Gaussian Filter 3D grayscale",
         "skimage": None, # gaussian,
@@ -413,4 +414,8 @@ operations_harpia_gauss = [
         "multi-gpu": True   # Not available in cucim as of now
     },
 ]
-harpia_gauss  = filter_operations_by_framework(operations_harpia_gauss, "harpia")
+harpia_gauss  = filter_operations_by_framework(operations_harpia_gauss+filters_harpia_gauss, "harpia")
+
+filter_harpia  = filter_operations_by_framework(operations_filters, "harpia")
+filter_harpia_gauss  = filter_operations_by_framework(filters_harpia_gauss, "harpia")
+threashold_harpia_gauss  = filter_operations_by_framework(operations_harpia_gauss, "harpia")

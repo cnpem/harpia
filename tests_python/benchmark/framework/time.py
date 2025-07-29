@@ -24,11 +24,15 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
     # Filter out 'None' from positional arguments (this deals with existing or not 'kernel')
     filtered_args = tuple(arg for arg in f_args if arg is not None)
 
-    # Warm-up run
-    # monitor = MonitorProcess(0.1)
-    # output = func(*filtered_args, **filtered_kwargs)  
-    # mem_usage = monitor.stop()
-    mem_usage = ['N/A'] #temp -> only for faster tests
+    # Warm-up run-------
+    monitor = MonitorProcess(0.1)
+    output = func(*filtered_args, **filtered_kwargs)  
+    mem_usage = monitor.stop()
+    #-------------------
+
+    # Warm-up run-------
+    #mem_usage = ['N/A'] #temp -> only for faster tests
+    #--------------------
 
     # Time several runs
     times = []
