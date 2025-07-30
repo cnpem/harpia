@@ -339,8 +339,8 @@ __global__ void hessian_eigenvalues_kernel(float* d_image, float* d_eigen1, floa
     float lambda2 = (trace - sqrt_delta) * 0.5f;
     
     // Store eigenvalues in interleaved format
-    d_eigen1[idx] = dfdxdx;
-    d_eigen2[idx] = dfdxdy;
+    d_eigen1[idx] = lambda1;
+    d_eigen2[idx] = lambda2;
 }
 
 // CUDA kernel for computing shape index directly from image
