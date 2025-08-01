@@ -107,12 +107,28 @@ void chunkedExecutorFillHoles(Func func, int ncopies, const float safetyMargin, 
                               dtype* image, dtype* output, int padding, const int xsize, 
                               const int ysize, const int zsize, const int verbose, Args... args);
 
+template <typename Func, typename in_dtype, typename out_dtype, typename... Args>
+void chunkedExecutorPixelFeatures(Func func, int ncopies, int nFeatures, const float safetyMargin, int ngpus, 
+                     in_dtype* image, out_dtype* output, const int xsize, const int ysize, const int zsize, 
+                     const int verbose, Args... args);
+
+template <typename Func, typename dtype, typename... Args>
+void chunkedExecutorSuperpixelFeatures(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                             dtype* image, int* superpixel, float* output, 
+                             const int xsize, const int ysize, const int zsize,
+                             int nsuperpixels, int nfeatures, bool mean, bool min, bool max,
+                             const int verbose, Args... args);
+
+
+                             
 // Includes the implementation to prevent linkage errors during compilation,  
 // similar to defining the function in the header.
 #include "../../src/chunkedExecutor/chunkedExecutor.cu"
 #include "../../src/chunkedExecutor/chunkedExecutorKernel.cu"
 #include "../../src/chunkedExecutor/chunkedExecutorGeodesic.cu"
 #include "../../src/chunkedExecutor/chunkedExecutorFillHoles.cu"
+#include "../../src/chunkedExecutor/chunkedExecutorPixel.cu"
+#include "../../src/chunkedExecutor/chunkedExecutorSuperpixel.cu"
 
 #endif  // CHUNKED_EXECUTOR_H
 
