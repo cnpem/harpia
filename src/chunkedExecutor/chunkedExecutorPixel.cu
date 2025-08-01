@@ -13,9 +13,9 @@ void chunkedExecutorPixelFeatures(Func func, int ncopies, int nFeatures, const f
 
   // Calculate slice size and memory usage
   int sliceSize = xsize * ysize;
-  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(in_dtype) * ncopies * static_cast<size_t>(nFeatures);
+  size_t sliceBytes = static_cast<size_t>(sliceSize) * sizeof(in_dtype) * ncopies;
   
-  unsigned int total_volume = xsize * ysize * zsize;
+  size_t total_volume = (size_t)xsize * ysize * zsize; 
 
   // Get number of available devices
   int ngpus_available;
@@ -65,7 +65,7 @@ void chunkedExecutorPixelFeatures(Func func, int ncopies, int nFeatures, const f
       printf("ActualChunkSize:%d\n", chunkSize);
     }
   }
-
+  
   // Process image in chunks
   int z_offset = 0;
   int deviceCount = 0;
@@ -79,11 +79,12 @@ void chunkedExecutorPixelFeatures(Func func, int ncopies, int nFeatures, const f
     }
     if (verbose) {
       printf("i_ref ptr: %p | max ptr: %p\n", (void*)i_ref, (void*)(image + zsize * sliceSize));
-      printf("o_ref ptr: %p | max ptr: %p\n", (void*)o_ref, (void*)(o_ref + chunkSize * sliceSize * nFeatures));
+      printf("o_ref ptr: %p | max ptr: %p\n", (void*)o_ref, (void*)(o_ref + deviceCount * chunkSize * sliceSize));
     }
     func(i_ref, o_ref, xsize, ysize, chunkSize, z_offset, total_volume, verbose, args...);
+    
     i_ref += chunkSize * sliceSize;
-    o_ref += chunkSize * sliceSize;
+    //o_ref += chunkSize * sliceSize;
     deviceCount += 1;
   }
 

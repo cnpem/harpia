@@ -5,8 +5,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-void superpixel_feature_extract(
-    float* hostImage,
+void DeviceSuperpixelPooling2D(float* hostImage,
     int* hostSuperPixel,
     float* hostOutput,
     int xsize, int ysize, int zsize,
@@ -19,9 +18,11 @@ void superpixel_feature_extract(
     bool texture,
     bool shapeIndex,
     bool localBinaryPattern,
-    bool output_mean = true,
-    bool output_min = false,
-    bool output_max = false,
-    int verbose = 0);
+    bool output_mean,
+    bool output_min,
+    bool output_max,
+    int flag_verbose, 
+    float gpuMemory, 
+    int ngpus);
 
 #endif

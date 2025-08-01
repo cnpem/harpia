@@ -331,7 +331,7 @@ __global__ void hessian_eigenvalues_kernel(float* d_image, float* d_eigen1, floa
     float dfdxdy  = compute_mixed_derivative_at_point(d_image, x, y, slice_idx, 
                                                     xsize, ysize, zsize, step);
     // Compute eigenvalues
-    float trace = dfdxdx + dfdxdy;
+    float trace = dfdxdx + dfdydy;
     float delta = (dfdxdx - dfdydy) * (dfdxdx - dfdydy) + 4.0f * dfdxdy * dfdxdy;
     float sqrt_delta = sqrtf(delta);
     
@@ -363,7 +363,7 @@ __global__ void shape_index_kernel(float* d_image, float* d_shape_index,
                                                     xsize, ysize, zsize, step);
     
     // Compute eigenvalues
-    float trace = dfdxdx + dfdxdy;
+    float trace = dfdxdx + dfdydy;
     float delta = (dfdxdx - dfdydy) * (dfdxdx - dfdydy) + 4.0f * dfdxdy * dfdxdy;
     float sqrt_delta = sqrtf(delta);
     
@@ -445,7 +445,7 @@ __global__ void hessian_analysis_kernel(float* d_image, float* d_eigen1, float* 
                                                     xsize, ysize, zsize, step);
     
     // Compute eigenvalues
-    float trace = dfdxdx + dfdxdy;
+    float trace = dfdxdx + dfdydy;
     float delta = (dfdxdx - dfdydy) * (dfdxdx - dfdydy) + 4.0f * dfdxdy * dfdxdy;
     float sqrt_delta = sqrtf(delta);
     

@@ -15,8 +15,7 @@ ctypedef fused numeric:
     unsigned int
 
 cdef extern from "../../include/superpixelExtraction/pooling_superpixel.h":
-    void superpixel_feature_extract(
-        float* hostImage,
+    void DeviceSuperpixelPooling2D(float* hostImage,
         int* hostSuperPixel,
         float* hostOutput,
         int xsize, int ysize, int zsize,
@@ -32,7 +31,9 @@ cdef extern from "../../include/superpixelExtraction/pooling_superpixel.h":
         bint output_mean,
         bint output_min,
         bint output_max,
-        int verbose)
+        int flag_verbose, 
+        float gpuMemory, 
+        int ngpus)
 
 def superpixel_pooling_feature(np.ndarray[np.float32_t, ndim=3] hostImage,
                    np.ndarray[int, ndim=3] hostSuperPixelImage,
@@ -87,7 +88,7 @@ def superpixel_pooling_feature(np.ndarray[np.float32_t, ndim=3] hostImage,
     if hostOutput is None:
         hostOutput = np.empty((numSuperpixels, total_features), dtype=np.float32)
 
-    superpixel_feature_extract(
+    DeviceSuperpixelPooling2D(
         &hostImage[0, 0, 0],
         &hostSuperPixelImage[0, 0, 0],
         &hostOutput[0, 0],
@@ -104,7 +105,9 @@ def superpixel_pooling_feature(np.ndarray[np.float32_t, ndim=3] hostImage,
         output_mean,
         output_min,
         output_max,
-        verbose
+        verbose, 
+        gpuMemory, 
+        ngpus
     )
 
     return hostOutput
