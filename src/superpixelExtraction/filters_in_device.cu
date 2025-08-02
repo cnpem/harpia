@@ -36,13 +36,13 @@ void applyGaussianFilterDevice2D(
     
     // Configure 2D grid and block sizes
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
+    dim3 gridSize((ysize + blockSize.x - 1) / blockSize.x, (xsize + blockSize.y - 1) / blockSize.y);
     
     // Apply filter slice by slice
     for (int k = 0; k < zsize; ++k) {
         gaussian_filter_kernel_2d<<<gridSize, blockSize>>>(
             d_image, d_image_smoothed, d_kernel, k,
-            xsize, ysize, zsize, ksize, ksize
+            ysize, xsize, zsize, ksize, ksize
         );
     }
     CHECK(cudaDeviceSynchronize());
@@ -71,13 +71,13 @@ void applyPrewittFilterDevice2D(
     CHECK(cudaMemcpy(deviceKernelVertical, kernelVertical, 9 * sizeof(float), cudaMemcpyHostToDevice));
 
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
+    dim3 gridSize((ysize + blockSize.x - 1) / blockSize.x, (xsize + blockSize.y - 1) / blockSize.y);
 
     // Apply Prewitt filter slice by slice
     for (int k = 0; k < zsize; ++k) {
         prewitt_filter_kernel_2d<<<gridSize, blockSize>>>(
             d_image_smoothed, d_temp_image,
-            deviceKernelHorizontal, deviceKernelVertical, k, xsize, ysize,
+            deviceKernelHorizontal, deviceKernelVertical, k, ysize, xsize,
           zsize);
     }
 
@@ -97,12 +97,12 @@ void applyLocalBinaryPatternDevice2D(
     
     // Configure 2D grid and block sizes
     dim3 blockSize(32, 32);
-    dim3 gridSize((xsize + blockSize.x - 1) / blockSize.x, (ysize + blockSize.y - 1) / blockSize.y);
+    dim3 gridSize((ysize + blockSize.x - 1) / blockSize.x, (xsize + blockSize.y - 1) / blockSize.y);
     
     // Apply LBP slice by slice
     for (int k = 0; k < zsize; ++k) {
         lbp<<<gridSize, blockSize>>>(
-            d_image_smoothed, d_temp_image, xsize, ysize, zsize, k
+            d_image_smoothed, d_temp_image, ysize, xsize, zsize, k
         );
     }
     CHECK(cudaDeviceSynchronize());
