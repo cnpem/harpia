@@ -1,0 +1,123 @@
+Reading big image...
+Finished reading image!
+Reading time: 276.64s
+
+Machine 'mary' with 30 reps, gpuMemory [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4],image #4 (big).
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_4_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_8_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_16_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_32_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_64_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_128_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_256_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_512_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1024_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2048_binary_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_4_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_8_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_16_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_32_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_64_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_128_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_256_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_512_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1024_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2048_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_4_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_8_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_16_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_32_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_64_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_128_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_256_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_512_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1024_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2048_grayscale_0.1gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_4_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_8_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_16_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_32_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_64_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_128_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_256_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_512_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1024_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2048_binary_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_4_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_8_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_16_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_32_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_64_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_128_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_256_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_512_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_1024_grayscale_0.15gpuMem.csv
+
+Saving to file: results/20250729_154639/mary_30reps_harpia_2048_grayscale_0.15gpuMem.csv

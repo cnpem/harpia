@@ -18,7 +18,8 @@ harpia/**/*.cpp
 #test files
 **/**.png
 #**.csv
+**/cufile.log
 
 #ignore jupyter notebook checkpointfiles
-.ipynb_checkpoints/
+**/.ipynb_checkpoints/**
 
