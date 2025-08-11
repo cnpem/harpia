@@ -1,17 +1,8 @@
-pre-commit>=3.6.2
-black>=24.3.0
-flake8>=7.0.0
-flake8-docstrings>=1.6.0
-interrogate>=1.5.0
-isort>=5.13.2
-versioneer>=0.29
-commitizen>=3.20.0
-gitlint>=0.19.1
-
+#build dependencies
+cython==3.1.2
 numpy==1.22.3
-opencv-python==4.9.0.80
-scikit-image==0.18.3
-matplotlib
-cython>=0.29.5
+
+#opencv-python==4.9.0.80
+#scikit-image==0.18.3
 
 
