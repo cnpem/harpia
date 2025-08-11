@@ -31,7 +31,7 @@ def time_function(func, repetitions, *f_args, **f_kwargs):
     #-------------------
 
     # Warm-up run-------
-    #mem_usage = ['N/A'] #temp -> only for faster tests
+    #mem_usage = ['N/A'] #temp -> use this warm up version only for faster tests
     #--------------------
 
     # Time several runs
