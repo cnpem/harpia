@@ -1,14 +1,14 @@
 #build dependencies
 cython==3.1.2
-numpy==1.22.3
+numpy==1.22.4
 
 #test dependencies
-#opencv-python==4.9.0.80
 scikit-image==0.18.3
 matplotlib==3.8.4
 tqdm==4.67.1
 pandas==2.3.1
 GPUtil==1.4.0
+notebook==7.4.5
 
 #linters dependencies
 black==24.3.0

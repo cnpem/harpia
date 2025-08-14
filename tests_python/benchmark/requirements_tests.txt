@@ -1,6 +1,0 @@
-pandas==2.3.0
-harpia==2.3.3
-matplotlib
-#for cuda 11.2
-cupy-cuda112
-cucim-cu11
