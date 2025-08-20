@@ -1,12 +1,14 @@
 #include <cuda_runtime.h>
 #include <thrust/fill.h>
 #include <thrust/device_vector.h>
+#include <thrust/execution_policy.h>
 #include <omp.h>
 #include <cmath>
 #include <vector>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <float.h>
 
 #include "../../include/superpixelExtraction/pooling_superpixel.h"
 #include "../../include/superpixelExtraction/filters_in_device.h"
