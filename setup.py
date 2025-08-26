@@ -206,6 +206,7 @@ def get_all_extension_modules():
         "harpia.threshold",
         "harpia.watershed",
         "harpia.distanceTransform",
+        "harpia.superpixel",
         "harpia.fastGraphClustering",
         "harpia.sparseUnmixing",
         "harpia.featureExtraction",
