@@ -90,55 +90,48 @@ void initi(int* data, int* labels, int* states, int* mask, int rows, int cols)
     {
         for (int j = 0; j < cols; j++)
         {
-            int p = i * cols + j;  // Current pixel index
-            int max_neighbor_idx = p;  // Initialize as current pixel
-            int max_value = data[p];
-            
+            int p = i * cols + j;
+            int min_neighbor_idx = p;
+            int min_value = data[p];
+
             get_8_neighbors(mask, i, j, rows, cols);
-            
-            // Find the neighbor q with the maximum intensity value
+
             for (int q = 0; q < 8; q++)
             {
-                if (mask[q] == -1) continue; // Skip out-of-bounds neighbors
-
-                // Compare the current neighbor's value with the max_value
-                if (data[mask[q]] > max_value)
+                if (mask[q] == -1) continue;
+                if (data[mask[q]] < min_value)
                 {
-                    max_value = data[mask[q]];
-                    max_neighbor_idx = mask[q];
+                    min_value = data[mask[q]];
+                    min_neighbor_idx = mask[q];
                 }
             }
-            
-            // Set label and state based on the comparison results
-            if (max_value < data[p])
+
+            if (min_value < data[p])
             {
-                labels[p] = max_neighbor_idx;  // Assign label from the maximum neighbor
-                states[p] = 0;  // Non-zero gradient
+                labels[p] = min_neighbor_idx;
+                states[p] = 0;  // downhill
             }
-            else if (max_value > data[p])
+            else if (min_value > data[p])
             {
-                labels[p] = p;  // Label it as itself
-                states[p] = 1;  // Set as local minima
+                labels[p] = p;
+                states[p] = 1;  // local minima
             }
-            else  // max_value == data[p]
+            else
             {
-                if (max_neighbor_idx > p)
+                if (min_neighbor_idx > p)
                 {
-                    labels[p] = max_neighbor_idx;
-                    states[p] = 2;  // Plateau with higher neighbor index
+                    labels[p] = min_neighbor_idx;
+                    states[p] = 2;  // plateau (borrow neighbor)
                 }
                 else
                 {
                     labels[p] = p;
-                    states[p] = 3;  // Plateau with lower or equal neighbor index
+                    states[p] = 3;  // plateau self
                 }
             }
         }
     }
 }
-
-
-
 
 void plateau(int* data, int* labels, int* states, int* mask, int rows, int cols)
 {
@@ -198,34 +191,28 @@ void plateau(int* data, int* labels, int* states, int* mask, int rows, int cols)
 }
 
 
-void propagation(int* labels, int rows, int cols, int iterations)
+void propagation(int* labels, int rows, int cols, int RR)
 {
-    /**/
-    int change = 0;
-
-    while (change==0)
+    bool change = true;
+    while (change)
     {
-        change = 1;
-    
+        change = false;
+
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
             {
-                for (int k = 0; k < iterations && labels[i * cols + j] != labels[labels[i * cols + j]] ; k++)
+                int p = i * cols + j;
+
+                // Try to shortcut RR times
+                for (int k = 0; k < RR && labels[p] != labels[labels[p]]; k++)
                 {
-                    //Update label(p) to label(label(p))
-                    labels[i * cols + j] = labels[labels[i * cols + j]];
-
-                    //mark for changes
-                    change = 0;
+                    labels[p] = labels[labels[p]];
+                    change = true;
                 }
-                
             }
-            
         }
-
-    }  
-
+    }
 }
 
 
