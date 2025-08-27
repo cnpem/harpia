@@ -9,6 +9,7 @@ ctypedef fused integer:
 # Extern declaration for the Local Gaussian Threshold function from C/C++ library
 cdef extern from "../../include/watershed/watershed.h":
     void watershed(int* data, int* labels, int rows, int cols, int iterations)
+    void hierarchicalWatershed(int* data, int* labels, int rows, int cols, int levels)
 
 
 def watershed_cpu(np.ndarray[int, ndim=2] data,
@@ -18,6 +19,15 @@ def watershed_cpu(np.ndarray[int, ndim=2] data,
     return watershed(&data[0,0],
                      &labels[0,0],
                      rows, cols, iterations)
+
+
+def watershed_hierarchical(np.ndarray[int, ndim=2] data,
+                   np.ndarray[int, ndim=2] labels,
+                   int rows, int cols, int levels):
+
+    return hierarchicalWatershed(&data[0,0],
+                     &labels[0,0],
+                     rows, cols, levels)
 
 
 cdef extern from "../../include/watershed/marker_based_watershed.h":

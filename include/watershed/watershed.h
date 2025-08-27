@@ -18,4 +18,6 @@
  */
 void watershed(int* data, int* labels, int rows, int cols, int iterations);
 
+void hierarchicalWatershed(int* data, int* labels, int rows, int cols, int levels);
+
 #endif // WATERSHED_H
