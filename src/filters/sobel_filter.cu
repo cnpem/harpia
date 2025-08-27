@@ -93,7 +93,7 @@ void get_sobel_horizontal_kernel_3d(float** kernel) {
   //second plane
   (*kernel)[9] = -2;
   (*kernel)[10] = 0;
-  (*kernel)[11] = -2;
+  (*kernel)[11] = 2;
 
   (*kernel)[12] = -4;
   (*kernel)[13] = 0;
