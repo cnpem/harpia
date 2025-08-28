@@ -44,13 +44,13 @@ void get_laplacian_kernel_3d(float** kernel) {
         Laplacian hostKernel has the form:
 
                   +--------------+
-                 /     0 0 0    /|
-                /      0 1 0   / |
-               /       0 0 0  /  |
+                 /   0  0  0    /|
+                /    0  1  0   / |
+               /     0  0  0  /  |
               +--------------+   |
-             /  0  1  0     /|  /
-            /   1 -6  1    / | /
-           /    0  1  0   /  |/
+             /   0  1  0    /|  /
+            /    1 -6  1   / | /
+           /     0  1  0  /  |/
           +--------------+   +
           |   0  0  0    |  /
           |   0  1  0    | /
@@ -138,7 +138,7 @@ __global__ void log_filter_kernel_3d(dtype* image, float* output, float* deviceK
 
     convolution3d(image, &temp, deviceKernel, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
 
-    output[index] = (float)sqrtf(temp * temp);
+    output[index] = temp;
   }
 }
 
@@ -165,7 +165,7 @@ __global__ void log_filter_kernel_3d_chunked(dtype* image, float* output, float*
                                padding_bottom, padding_top,
                                3, 3, 3);
 
-    output[index] = sqrtf(temp * temp);
+    output[index] = temp;
   }
 }
 

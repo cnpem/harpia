@@ -86,6 +86,7 @@ python3 tests_python/compilation_test.py
    ```
    2. for cuda 12
    ```
-   pip install cupy-cuda12x==12.4.0 cucim-cu12==23.10.0
+   pip install cupy-cuda12x==13.6.0
+   pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com cucim-cu12
    ```
 

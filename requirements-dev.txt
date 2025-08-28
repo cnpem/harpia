@@ -1,6 +1,7 @@
 #build dependencies
 cython==3.1.2
-numpy==1.22.4
+numpy==1.26.4
+more_itertools==10.7.0
 
 #test dependencies
 scikit-image==0.18.3
@@ -9,6 +10,7 @@ tqdm==4.67.1
 pandas==2.3.1
 GPUtil==1.4.0
 notebook==7.4.5
+seaborn==0.13.2
 
 #linters dependencies
 black==24.3.0

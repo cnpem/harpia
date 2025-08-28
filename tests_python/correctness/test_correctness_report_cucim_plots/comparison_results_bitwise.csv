@@ -1,0 +1,6 @@
+Operation,Framework,Image Shape,Image Size (MiB),Accuracy,Mean Bitwise Difference,Std Dev of Bitwise Difference
+Threshold Savoula 3D,cuCIM,"(100, 207, 190)",15.00,99.92064581744215,0.20,7.18
+Threshold Savoula 3D,cuCIM,"(100, 207, 190)",15.00,99.92120518688024,0.20,7.16
+Threshold Local Gaussian 3D,cuCIM,"(100, 207, 190)",15.00,99.88690566997204,0.29,8.57
+Threshold Local Gaussian 3D,cuCIM,"(100, 207, 190)",15.00,99.91812865497076,0.21,7.29
+Threshold Local Mean 3D,cuCIM,"(100, 207, 190)",15.00,99.91812865497076,0.21,7.29
