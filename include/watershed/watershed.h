@@ -18,6 +18,22 @@
  */
 void watershed(int* data, int* labels, int rows, int cols, int iterations);
 
+void watershed3d(int* data, int* labels, int rows, int cols, int depth, int iterations);
+
 void hierarchicalWatershed(int* data, int* labels, int rows, int cols, int levels);
+
+void hierarchicalWatershed3d(int* data, int* labels,
+                             int rows, int cols, int depth,
+                             int levels);
+
+void hierarchicalWatershed_2d_batched(int* image,
+                                      int rows, int cols, int depth,
+                                      int* labels,
+                                      int levels,
+                                      int dz);
+
+template<typename in_dtype>
+void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols);
+
 
 #endif // WATERSHED_H

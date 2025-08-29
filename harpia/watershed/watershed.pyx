@@ -2,15 +2,39 @@ cimport cython
 cimport numpy as np
 from libcpp cimport bool
 
+ctypedef fused numeric:
+    float
+    int
+    unsigned int
+
 # Define the fused type for integer types: float, int, unsigned int
 ctypedef fused integer:
     int
 
-# Extern declaration for the Local Gaussian Threshold function from C/C++ library
+# Extern declaration for the Watershed functions from C/C++ library
 cdef extern from "../../include/watershed/watershed.h":
     void watershed(int* data, int* labels, int rows, int cols, int iterations)
     void hierarchicalWatershed(int* data, int* labels, int rows, int cols, int levels)
 
+    void watershed3d(int* data, int* labels, int rows, int cols, int depth, int iterations)
+    void hierarchicalWatershed3d(int* data, int* labels, int rows, int cols, int depth, int levels)
+
+    void hierarchicalWatershed_2d_batched(int* image,
+                                      int rows, int cols, int depth,
+                                      int* labels,
+                                      int levels,
+                                      int dz)
+
+    void watershed_gpu[numeric](numeric* h_image, int* h_labels, int rows, int cols)
+
+
+def watershed_GPU(np.ndarray[int, ndim=2] image,
+                   np.ndarray[int, ndim=2] labels,
+                   int rows, int cols):
+
+    return watershed_gpu(&image[0,0],
+                     &labels[0,0],
+                     rows, cols)
 
 def watershed_cpu(np.ndarray[int, ndim=2] data,
                    np.ndarray[int, ndim=2] labels,
@@ -22,12 +46,41 @@ def watershed_cpu(np.ndarray[int, ndim=2] data,
 
 
 def watershed_hierarchical(np.ndarray[int, ndim=2] data,
-                   np.ndarray[int, ndim=2] labels,
-                   int rows, int cols, int levels):
+                            np.ndarray[int, ndim=2] labels,
+                            int rows, int cols, int levels):
 
     return hierarchicalWatershed(&data[0,0],
-                     &labels[0,0],
-                     rows, cols, levels)
+                                 &labels[0,0],
+                                 rows, cols, levels)
+
+
+def watershed3d_cpu(np.ndarray[int, ndim=3] data,
+                    np.ndarray[int, ndim=3] labels,
+                    int rows, int cols, int depth, int iterations):
+
+    return watershed3d(&data[0,0,0],
+                       &labels[0,0,0],
+                       rows, cols, depth, iterations)
+
+
+def watershed3d_hierarchical(np.ndarray[int, ndim=3] data,
+                             np.ndarray[int, ndim=3] labels,
+                             int rows, int cols, int depth, int levels):
+
+    return hierarchicalWatershed3d(&data[0,0,0],
+                                   &labels[0,0,0],
+                                   rows, cols, depth, levels)
+
+
+def watershed2d_hierarchical_batches(np.ndarray[int, ndim=3] data,
+                                     np.ndarray[int, ndim=3] labels,
+                                     int rows, int cols, int depth,
+                                     int levels, int dz=16):
+
+    hierarchicalWatershed_2d_batched(<int*> data.data,
+                                     rows, cols, depth,
+                                     <int*> labels.data,
+                                     levels, dz)
 
 
 cdef extern from "../../include/watershed/marker_based_watershed.h":
