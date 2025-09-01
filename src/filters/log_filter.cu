@@ -119,7 +119,7 @@ __global__ void log_filter_kernel_2d(dtype* image, float* output, float* deviceK
 
     convolution2d(image + idz * xsize * ysize, &temp, deviceKernel, idx, idy, xsize, ysize, 3, 3);
 
-    output[index] = (float)sqrtf(temp * temp);
+    output[index] = temp;
   }
 }
 

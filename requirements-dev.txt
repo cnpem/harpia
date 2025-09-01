@@ -1,10 +1,11 @@
 #build dependencies
 cython==3.1.2
-numpy==1.26.4
+numpy==1.24.3
 more_itertools==10.7.0
 
 #test dependencies
-scikit-image==0.18.3
+scipy==1.9.1
+scikit-image==0.20.0
 matplotlib==3.8.4
 tqdm==4.67.1
 pandas==2.3.1

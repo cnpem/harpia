@@ -130,7 +130,7 @@ def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return hostOutput
 
-def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
+def laplaceFilter(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
               int type3d = 1,
               int verbose = 0,
