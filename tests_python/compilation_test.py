@@ -23,9 +23,12 @@ print(dir(harpia.filters.filtersOperations))
 print("\n📂 filtersChunked:")
 print(dir(harpia.filters.filtersChunked))
 
-print("\n📂 functions operations_binary:")
-print(dir(harpia.morphology.operations_binary))
+print("\n📂 morphology:")
+print(dir(harpia.morphology))
+
+print("\n📂 operations_binary:")
+print(dir(harpia.morphology_old.operations_binary))
 
 print("\n📂 operations_grayscale:")
-print(dir(harpia.morphology.operations_grayscale))
+print(dir(harpia.morphology_old.operations_grayscale))
 

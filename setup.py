@@ -200,7 +200,7 @@ def get_all_extension_modules():
     submodules = [
         "harpia",
         "harpia.common",
-        "harpia.morphology",
+        "harpia.morphology_old",
         "harpia.filters",
         "harpia.quantification",
         "harpia.threshold",
