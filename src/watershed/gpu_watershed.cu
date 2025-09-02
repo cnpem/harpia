@@ -8,9 +8,8 @@
 
 // Sort pixel indices by intensity
 template<typename in_dtype>
-void build_sorted_index(const in_dtype* h_image, int rows, int cols, int* sorted_idx)
+void build_sorted_index(const in_dtype* h_image, int* sorted_idx, int N)
 {
-    int N = rows * cols;
     std::vector<int> idx(N);
     for (int i = 0; i < N; ++i) idx[i] = i;
 
@@ -165,9 +164,9 @@ __global__ void finalize_gpu(int* labels, int xsize, int ysize)
 
 
 template<typename in_dtype>
-void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols)
+void watershed_gpu(const in_dtype* h_image, int* h_labels, int ysize, int xsize)
 {
-    const int N = rows * cols;
+    const int N = ysize * xsize;
 
     // --- Allocate device memory ---
     in_dtype* d_image;
@@ -197,18 +196,18 @@ void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols)
 
     // --- Build sorted index on host ---
     int* h_sorted_idx = new int[N];
-    build_sorted_index(h_image, rows, cols, h_sorted_idx);
+    build_sorted_index(h_image, h_sorted_idx, N);
     cudaMemcpy(d_sorted_idx, h_sorted_idx, N * sizeof(int), cudaMemcpyHostToDevice);
     delete[] h_sorted_idx;
 
     // --- Kernel launch config ---
     dim3 block(32, 32);
-    dim3 grid((cols + block.x - 1) / block.x,
-              (rows + block.y - 1) / block.y);
+    dim3 grid((xsize + block.x - 1) / block.x,
+              (ysize + block.y - 1) / block.y);
 
     // --- Step 1: Initialization ---
     initi_gpu<<<grid, block>>>(d_image, d_labels, d_states,
-                               d_dx, d_dy, cols, rows);
+                               d_dx, d_dy, xsize, ysize);
     cudaDeviceSynchronize();
 
     // --- Step 2: Plateau resolution ---
@@ -219,7 +218,7 @@ void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols)
 
         plateau_gpu<<<grid, block>>>(d_image, d_labels, d_states,
                                      d_dx, d_sorted_idx, d_changed,
-                                     cols, rows);
+                                     xsize, ysize);
         cudaDeviceSynchronize();
 
         cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
@@ -230,18 +229,18 @@ void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols)
         h_change = 0;
         cudaMemcpy(d_changed, &h_change, sizeof(int), cudaMemcpyHostToDevice);
 
-        propagation_gpu<<<grid, block>>>(d_labels, d_changed, cols, rows,150);
+        propagation_gpu<<<grid, block>>>(d_labels, d_changed, xsize, ysize,5);
         cudaDeviceSynchronize();
 
         cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
     } while (h_change);
 
     // --- Step 4: Merge ---
-    merge_gpu<<<grid, block>>>(d_labels, d_states, d_dx, d_dy, cols, rows);
+    merge_gpu<<<grid, block>>>(d_labels, d_states, d_dx, d_dy, xsize, ysize);
     cudaDeviceSynchronize();
 
     // --- Step 5: Finalize ---
-    finalize_gpu<<<grid, block>>>(d_labels, cols, rows);
+    finalize_gpu<<<grid, block>>>(d_labels, xsize, ysize);
     cudaDeviceSynchronize();
 
     // --- Copy back ---
@@ -261,3 +260,198 @@ void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols)
 template void watershed_gpu<float>(const float*, int*, int, int);
 template void watershed_gpu<int>(const int*, int*, int, int);
 template void watershed_gpu<unsigned int>(const unsigned int*, int*, int, int);
+
+// -----------------------------------------------------------------------------
+// identify_newmin kernel (templated on input type)
+// -----------------------------------------------------------------------------
+template<typename in_dtype>
+__global__ void identify_newmin_gpu(const in_dtype* d_image, const int* d_labels,
+                                    int* d_newmin,
+                                    const int* dx, const int* dy,
+                                    int xsize, int ysize)
+{
+    const int x = blockIdx.x * blockDim.x + threadIdx.x;
+    const int y = blockIdx.y * blockDim.y + threadIdx.y;
+    if (x >= xsize || y >= ysize) return;
+
+    const int p = y * xsize + x;
+    const int lp = d_labels[p];
+    const int Ip = (int)d_image[p];  // cast to int for comparisons
+
+    for (int k = 0; k < 4; ++k) {
+        int nx = x + dx[k];
+        int ny = y + dy[k];
+        if (nx < 0 || ny < 0 || nx >= xsize || ny >= ysize) continue;
+
+        int q = ny * xsize + nx;
+        if (d_labels[q] == lp) continue;
+
+        int Iq = (int)d_image[q];
+        int h = (Ip > Iq) ? Ip : Iq; // max(I(p), I(q))
+        atomicMin(&d_newmin[lp], h);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// update_image_with_newmin kernel (templated on input type)
+// -----------------------------------------------------------------------------
+template<typename in_dtype>
+__global__ void update_image_with_newmin_gpu(in_dtype* d_image, const int* d_labels,
+                                             const int* d_newmin,
+                                             int xsize, int ysize)
+{
+    const int x = blockIdx.x * blockDim.x + threadIdx.x;
+    const int y = blockIdx.y * blockDim.y + threadIdx.y;
+    if (x >= xsize || y >= ysize) return;
+
+    const int p = y * xsize + x;
+    int lp = d_labels[p];
+    int nm = d_newmin[lp];
+
+    if (nm != INT_MAX && static_cast<int>(d_image[p]) < nm) {
+        d_image[p] = static_cast<in_dtype>(nm);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// explicit instantiations for identify/update kernels
+// -----------------------------------------------------------------------------
+template __global__ void identify_newmin_gpu<float>(const float*, const int*, int*, const int*, const int*, int, int);
+template __global__ void identify_newmin_gpu<int>(const int*, const int*, int*, const int*, const int*, int, int);
+template __global__ void identify_newmin_gpu<unsigned int>(const unsigned int*, const int*, int*, const int*, const int*, int, int);
+
+template __global__ void update_image_with_newmin_gpu<float>(float*, const int*, const int*, int, int);
+template __global__ void update_image_with_newmin_gpu<int>(int*, const int*, const int*, int, int);
+template __global__ void update_image_with_newmin_gpu<unsigned int>(unsigned int*, const int*, const int*, int, int);
+
+// -----------------------------------------------------------------------------
+// watershed_device: runs watershed entirely on device memory
+// -----------------------------------------------------------------------------
+template<typename in_dtype>
+void watershed_device(const in_dtype* d_image, int* d_labels, int* d_states,
+                      int* d_changed,
+                      const int* d_dx, const int* d_dy,
+                      int xsize, int ysize, int N)
+{
+    dim3 block(32,32);
+    dim3 grid((xsize + block.x - 1) / block.x,
+              (ysize + block.y - 1) / block.y);
+
+    // init
+    initi_gpu<<<grid, block>>>(d_image, d_labels, d_states, d_dx, d_dy, xsize, ysize);
+    cudaDeviceSynchronize();
+
+    // plateau resolution
+    int h_change;
+    do {
+        h_change = 0;
+        cudaMemcpy(d_changed, &h_change, sizeof(int), cudaMemcpyHostToDevice);
+
+        plateau_gpu<<<grid, block>>>(d_image, d_labels, d_states, d_dx, d_dy,
+                                     d_changed, xsize, ysize);
+        cudaDeviceSynchronize();
+
+        cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
+    } while (h_change);
+
+    // propagation
+    do {
+        h_change = 0;
+        cudaMemcpy(d_changed, &h_change, sizeof(int), cudaMemcpyHostToDevice);
+
+        propagation_gpu<<<grid, block>>>(d_labels, d_changed, xsize, ysize, 5);
+        cudaDeviceSynchronize();
+
+        cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
+    } while (h_change);
+
+    // merge
+    merge_gpu<<<grid, block>>>(d_labels, d_states, d_dx, d_dy, xsize, ysize);
+    cudaDeviceSynchronize();
+
+    // finalize
+    finalize_gpu<<<grid, block>>>(d_labels, xsize, ysize);
+    cudaDeviceSynchronize();
+}
+
+// explicit instantiations
+template void watershed_device<float>(const float*, int*, int*, int*, const int*, const int*, int, int, int);
+template void watershed_device<int>(const int*, int*, int*, int*, const int*, const int*, int, int, int);
+template void watershed_device<unsigned int>(const unsigned int*, int*, int*, int*, const int*, const int*, int, int, int);
+
+// -----------------------------------------------------------------------------
+// hierarchical watershed GPU
+// -----------------------------------------------------------------------------
+template<typename in_dtype>
+void hierarchicalWatershed_gpu(const in_dtype* h_image, int* h_labels,
+                               int ysize, int xsize, int levels)
+{
+    const int N = ysize * xsize;
+
+    // device memory
+    in_dtype* d_image;
+    int* d_labels;
+    int* d_states;
+    int* d_changed;
+    int* d_dx;
+    int* d_dy;
+    int* d_newmin;
+
+    cudaMalloc(&d_image,  N * sizeof(in_dtype));
+    cudaMalloc(&d_labels, N * sizeof(int));
+    cudaMalloc(&d_states, N * sizeof(int));
+    cudaMalloc(&d_changed, sizeof(int));
+    cudaMalloc(&d_dx, 4 * sizeof(int));
+    cudaMalloc(&d_dy, 4 * sizeof(int));
+    cudaMalloc(&d_newmin, N * sizeof(int));
+
+    cudaMemcpy(d_image, h_image, N * sizeof(in_dtype), cudaMemcpyHostToDevice);
+
+    int h_dx[4] = {1, -1, 0, 0};
+    int h_dy[4] = {0, 0, 1, -1};
+    cudaMemcpy(d_dx, h_dx, 4 * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dy, h_dy, 4 * sizeof(int), cudaMemcpyHostToDevice);
+
+    dim3 block(32,32);
+    dim3 grid((xsize + 31)/32, (ysize + 31)/32);
+
+    // --- level 0 watershed ---
+    watershed_device(d_image, d_labels, d_states, d_changed,
+                     d_dx, d_dy, xsize, ysize, N);
+
+    // --- subsequent levels ---
+    for (int l = 1; l < levels; ++l) {
+        // reset newmin
+        cudaMemset(d_newmin, 0x7F, N * sizeof(int)); // fill with INT_MAX
+
+        // Step V: identify new minima
+        identify_newmin_gpu<<<grid, block>>>(d_image, d_labels, d_newmin,
+                                             d_dx, d_dy, xsize, ysize);
+        cudaDeviceSynchronize();
+
+        // Step VI: update image according to newmin
+        update_image_with_newmin_gpu<in_dtype><<<grid, block>>>(d_image, d_labels,
+                                                                d_newmin,
+                                                                xsize, ysize);
+        cudaDeviceSynchronize();
+
+        // rerun watershed on updated image
+        watershed_device(d_image, d_labels, d_states, d_changed,
+                         d_dx, d_dy, xsize, ysize, N);
+    }
+
+    cudaMemcpy(h_labels, d_labels, N * sizeof(int), cudaMemcpyDeviceToHost);
+
+    cudaFree(d_image);
+    cudaFree(d_labels);
+    cudaFree(d_states);
+    cudaFree(d_changed);
+    cudaFree(d_dx);
+    cudaFree(d_dy);
+    cudaFree(d_newmin);
+}
+
+// explicit instantiations
+template void hierarchicalWatershed_gpu<float>(const float*, int*, int, int, int);
+template void hierarchicalWatershed_gpu<int>(const int*, int*, int, int, int);
+template void hierarchicalWatershed_gpu<unsigned int>(const unsigned int*, int*, int, int, int);

@@ -27,14 +27,23 @@ cdef extern from "../../include/watershed/watershed.h":
 
     void watershed_gpu[numeric](numeric* h_image, int* h_labels, int rows, int cols)
 
+    void hierarchicalWatershed_gpu[numeric](const numeric* h_image, int* h_labels,
+                               int ysize, int xsize, int levels)
 
-def watershed_GPU(np.ndarray[int, ndim=2] image,
+
+def watershed_GPU(np.ndarray[numeric, ndim=2] image,
                    np.ndarray[int, ndim=2] labels,
                    int rows, int cols):
 
     return watershed_gpu(&image[0,0],
                      &labels[0,0],
                      rows, cols)
+
+
+def hierarchicalWatershed_GPU(np.ndarray[numeric, ndim=2] image,
+                              np.ndarray[int, ndim=2] labels,
+                              int rows, int cols, int levels):
+    return hierarchicalWatershed_gpu(&image[0,0], &labels[0,0], rows, cols, levels)
 
 def watershed_cpu(np.ndarray[int, ndim=2] data,
                    np.ndarray[int, ndim=2] labels,

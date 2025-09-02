@@ -35,5 +35,8 @@ void hierarchicalWatershed_2d_batched(int* image,
 template<typename in_dtype>
 void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols);
 
+template<typename in_dtype>
+void hierarchicalWatershed_gpu(const in_dtype* h_image, int* h_labels,
+                               int ysize, int xsize, int levels);
 
 #endif // WATERSHED_H
