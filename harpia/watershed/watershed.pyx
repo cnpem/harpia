@@ -30,6 +30,9 @@ cdef extern from "../../include/watershed/watershed.h":
     void hierarchicalWatershed_gpu[numeric](const numeric* h_image, int* h_labels,
                                int ysize, int xsize, int levels)
 
+    void hierarchicalWatershed_gpu_3d[numeric](const numeric* hostImage, int* hostLabels,
+                                  int zsize, int ysize, int xsize, int levels)
+
 
 def watershed_GPU(np.ndarray[numeric, ndim=2] image,
                    np.ndarray[int, ndim=2] labels,
@@ -42,8 +45,14 @@ def watershed_GPU(np.ndarray[numeric, ndim=2] image,
 
 def hierarchicalWatershed_GPU(np.ndarray[numeric, ndim=2] image,
                               np.ndarray[int, ndim=2] labels,
-                              int rows, int cols, int levels):
-    return hierarchicalWatershed_gpu(&image[0,0], &labels[0,0], rows, cols, levels)
+                              int ysize, int xsize, int levels):
+    return hierarchicalWatershed_gpu(&image[0,0], &labels[0,0], ysize, xsize, levels)
+
+
+def hierarchicalWatershed3D_GPU(np.ndarray[numeric, ndim=3] image,
+                              np.ndarray[int, ndim=3] labels,
+                              int rows, int cols, int depth, int levels):
+    return hierarchicalWatershed_gpu_3d(&image[0,0,0], &labels[0,0,0], depth, rows, cols, levels)
 
 def watershed_cpu(np.ndarray[int, ndim=2] data,
                    np.ndarray[int, ndim=2] labels,

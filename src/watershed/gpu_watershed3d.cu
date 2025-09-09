@@ -1,0 +1,493 @@
+#include "../../include/watershed/watershed.h"
+#include "../../include/common/union_find.h"
+#include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <algorithm>
+#include <vector>
+#include <climits>
+
+// ------------------------------------------------------------
+// Utilities
+// ------------------------------------------------------------
+__host__ __device__ __forceinline__
+int index3d(int x, int y, int z, int xsize, int ysize, int /*zsize*/) {
+    // layout: (z, y, x) with x fastest
+    return (z * ysize + y) * xsize + x;
+}
+
+// ------------------------------------------------------------
+// INIT (3D): determine min neighbor and set labels/states
+// states:
+// 0 -> downhill (points to strictly lower-intensity neighbor)
+// 1 -> local minimum (root)
+// 2 -> plateau borrow (same intensity; adopt larger index neighbor)
+// 3 -> plateau self   (same intensity; self-root until merge/resolve)
+// ------------------------------------------------------------
+template<typename in_dtype>
+__global__ void initi_gpu_3d(const in_dtype* deviceImage,
+                             int* deviceLabels,
+                             int* deviceStates,
+                             const int* d_dx, const int* d_dy, const int* d_dz,
+                             int xsize, int ysize, int zsize)
+{
+    const int idx = blockIdx.x * blockDim.x + threadIdx.x; // x
+    const int idy = blockIdx.y * blockDim.y + threadIdx.y; // y
+    const int idz = blockIdx.z * blockDim.z + threadIdx.z; // z
+    if (idx >= xsize || idy >= ysize || idz >= zsize) return;
+
+    const int p = index3d(idx, idy, idz, xsize, ysize, zsize);
+    const int orig_val = (int)deviceImage[p];
+
+    int min_val = orig_val;
+    int min_idx = p;
+
+    // 6-neighbors (±x, ±y, ±z)
+    for (int k = 0; k < 6; ++k) {
+        const int nx = idx + d_dx[k];
+        const int ny = idy + d_dy[k];
+        const int nz = idz + d_dz[k];
+        if (nx < 0 || ny < 0 || nz < 0 || nx >= xsize || ny >= ysize || nz >= zsize) continue;
+
+        const int q = index3d(nx, ny, nz, xsize, ysize, zsize);
+        const int vq = (int)deviceImage[q];
+
+        // prefer strictly smaller; if tie, prefer larger linear index
+        if (vq < min_val || (vq == min_val && q > min_idx)) {
+            min_val = vq;
+            min_idx = q;
+        }
+    }
+
+    if (min_val < orig_val) {
+        deviceLabels[p] = min_idx; deviceStates[p] = 0;  // downhill
+    } else if (min_val > orig_val) {
+        deviceLabels[p] = p;       deviceStates[p] = 1;  // strict local minimum
+    } else {
+        if (min_idx > p) { deviceLabels[p] = min_idx; deviceStates[p] = 2; } // plateau borrow
+        else              { deviceLabels[p] = p;       deviceStates[p] = 3; } // plateau self
+    }
+}
+
+// explicit instantiations
+template __global__ void initi_gpu_3d<float>(const float*, int*, int*, const int*, const int*, const int*, int, int, int);
+template __global__ void initi_gpu_3d<int>(const int*, int*, int*, const int*, const int*, const int*, int, int, int);
+template __global__ void initi_gpu_3d<unsigned int>(const unsigned int*, int*, int*, const int*, const int*, const int*, int, int, int);
+
+// ------------------------------------------------------------
+// PLATEAU RESOLUTION (3D): resolve non-minimal plateau pixels
+// Looks for equal-intensity downhill neighbors to borrow
+// ------------------------------------------------------------
+template<typename in_dtype>
+__global__ void plateau_gpu_3d(const in_dtype* deviceImage,
+                               int* deviceLabels,
+                               int* deviceStates,
+                               const int* d_dx, const int* d_dy, const int* d_dz,
+                               int* d_changed,
+                               int xsize, int ysize, int zsize)
+{
+    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+    if (idx >= xsize || idy >= ysize || idz >= zsize) return;
+
+    const int p = index3d(idx, idy, idz, xsize, ysize, zsize);
+    const int Sp = deviceStates[p];
+    if (Sp < 2) return; // only non-minimal plateau pixels (2 or 3)
+
+    const int Ip = (int)deviceImage[p];
+
+    for (int k = 0; k < 6; ++k) {
+        const int nx = idx + d_dx[k];
+        const int ny = idy + d_dy[k];
+        const int nz = idz + d_dz[k];
+        if (nx < 0 || ny < 0 || nz < 0 || nx >= xsize || ny >= ysize || nz >= zsize) continue;
+
+        const int q = index3d(nx, ny, nz, xsize, ysize, zsize);
+        if (deviceStates[q] == 0 && (int)deviceImage[q] == Ip) {
+            deviceLabels[p] = q;
+            deviceStates[p] = 0;
+            atomicExch(d_changed, 1);
+            break;
+        }
+    }
+}
+
+// explicit instantiations
+template __global__ void plateau_gpu_3d<float>(const float*, int*, int*, const int*, const int*, const int*, int*, int, int, int);
+template __global__ void plateau_gpu_3d<int>(const int*, int*, int*, const int*, const int*, const int*, int*, int, int, int);
+template __global__ void plateau_gpu_3d<unsigned int>(const unsigned int*, int*, int*, const int*, const int*, const int*, int*, int, int, int);
+
+// ------------------------------------------------------------
+// PROPAGATION (3D): pointer-jumping / path compression (RR steps)
+// ------------------------------------------------------------
+__global__ void propagation_gpu_3d(int* deviceLabels, int* d_changed,
+                                   int xsize, int ysize, int zsize, int RR)
+{
+    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+    if (idx >= xsize || idy >= ysize || idz >= zsize) return;
+
+    const int N = xsize * ysize * zsize;
+    const int p = index3d(idx, idy, idz, xsize, ysize, zsize);
+
+    int cur = deviceLabels[p];
+    if (cur < 0 || cur >= N) return;
+
+    bool did_change = false;
+    for (int r = 0; r < RR; ++r) {
+        const int parent = deviceLabels[cur];
+        if (parent == cur) break;          // root
+        const int newlabel = deviceLabels[parent];
+        if (newlabel == deviceLabels[p]) break;
+        deviceLabels[p] = newlabel;        // shorten
+        cur = deviceLabels[p];
+        did_change = true;
+    }
+    if (did_change) atomicExch(d_changed, 1);
+}
+
+// ------------------------------------------------------------
+// MERGE (3D): union minimal plateau labels (only q > p to reduce races)
+// ------------------------------------------------------------
+__global__ void merge_gpu_3d(int* deviceLabels, const int* deviceStates,
+                             const int* d_dx, const int* d_dy, const int* d_dz,
+                             int xsize, int ysize, int zsize)
+{
+    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+    if (idx >= xsize || idy >= ysize || idz >= zsize) return;
+
+    const int p = index3d(idx, idy, idz, xsize, ysize, zsize);
+    if (deviceStates[p] < 2) return; // only plateau
+
+    for (int k = 0; k < 6; ++k) {
+        const int nx = idx + d_dx[k];
+        const int ny = idy + d_dy[k];
+        const int nz = idz + d_dz[k];
+        if (nx < 0 || ny < 0 || nz < 0 || nx >= xsize || ny >= ysize || nz >= zsize) continue;
+
+        const int q = index3d(nx, ny, nz, xsize, ysize, zsize);
+        if (q <= p) continue;          // reduce duplicate unions
+        if (deviceStates[q] < 2) continue;
+        union_gpu(deviceLabels, p, q); // your device union
+    }
+}
+
+// ------------------------------------------------------------
+// FINALIZE (3D): compress label pointers (device inline_Compress)
+// ------------------------------------------------------------
+__global__ void finalize_gpu_3d(int* deviceLabels, int xsize, int ysize, int zsize)
+{
+    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+    if (idx >= xsize || idy >= ysize || idz >= zsize) return;
+
+    const int p = index3d(idx, idy, idz, xsize, ysize, zsize);
+    inline_Compress(deviceLabels, p);
+}
+
+// ------------------------------------------------------------
+// Base watershed: HOST API (3D)
+// hostImage shape convention: (zsize, ysize, xsize)
+// ------------------------------------------------------------
+template<typename in_dtype>
+void watershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
+                      int zsize, int ysize, int xsize)
+{
+    const int N = xsize * ysize * zsize;
+
+    // device memory
+    in_dtype* deviceImage = nullptr;
+    int *deviceLabels = nullptr, *deviceStates = nullptr;
+    int *d_changed = nullptr;
+    int *d_dx = nullptr, *d_dy = nullptr, *d_dz = nullptr;
+
+    cudaMalloc(&deviceImage,  N * sizeof(in_dtype));
+    cudaMalloc(&deviceLabels, N * sizeof(int));
+    cudaMalloc(&deviceStates, N * sizeof(int));
+    cudaMalloc(&d_changed, sizeof(int));
+    cudaMalloc(&d_dx, 6 * sizeof(int));
+    cudaMalloc(&d_dy, 6 * sizeof(int));
+    cudaMalloc(&d_dz, 6 * sizeof(int));
+
+    cudaMemcpy(deviceImage, hostImage, N * sizeof(in_dtype), cudaMemcpyHostToDevice);
+
+    // 6-neighborhood offsets
+    int h_dx[6] = {  1, -1,  0,  0,  0,  0 };
+    int h_dy[6] = {  0,  0,  1, -1,  0,  0 };
+    int h_dz[6] = {  0,  0,  0,  0,  1, -1 };
+    cudaMemcpy(d_dx, h_dx, 6 * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dy, h_dy, 6 * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dz, h_dz, 6 * sizeof(int), cudaMemcpyHostToDevice);
+
+    // launch config
+    dim3 block(8, 8, 8);
+    dim3 grid((xsize + block.x - 1) / block.x,
+              (ysize + block.y - 1) / block.y,
+              (zsize + block.z - 1) / block.z);
+
+    // Step 1: init
+    initi_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates, d_dx, d_dy, d_dz,
+                                  xsize, ysize, zsize);
+    cudaDeviceSynchronize();
+
+    // Step 2: plateau resolve (until no change)
+    int h_change;
+    do {
+        h_change = 0;
+        cudaMemcpy(d_changed, &h_change, sizeof(int), cudaMemcpyHostToDevice);
+
+        plateau_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates,
+                                        d_dx, d_dy, d_dz,
+                                        d_changed, xsize, ysize, zsize);
+        cudaDeviceSynchronize();
+
+        cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
+    } while (h_change);
+
+    // Step 3: propagation (pointer jumping) until stable
+    do {
+        h_change = 0;
+        cudaMemcpy(d_changed, &h_change, sizeof(int), cudaMemcpyHostToDevice);
+
+        propagation_gpu_3d<<<grid, block>>>(deviceLabels, d_changed,
+                                            xsize, ysize, zsize, /*RR=*/5);
+        cudaDeviceSynchronize();
+
+        cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
+    } while (h_change);
+
+    // Step 4: merge plateau components
+    merge_gpu_3d<<<grid, block>>>(deviceLabels, deviceStates, d_dx, d_dy, d_dz,
+                                  xsize, ysize, zsize);
+    cudaDeviceSynchronize();
+
+    // Step 5: finalize (compress)
+    finalize_gpu_3d<<<grid, block>>>(deviceLabels, xsize, ysize, zsize);
+    cudaDeviceSynchronize();
+
+    // copy back
+    cudaMemcpy(hostLabels, deviceLabels, N * sizeof(int), cudaMemcpyDeviceToHost);
+
+    // free
+    cudaFree(deviceImage);
+    cudaFree(deviceLabels);
+    cudaFree(deviceStates);
+    cudaFree(d_changed);
+    cudaFree(d_dx);
+    cudaFree(d_dy);
+    cudaFree(d_dz);
+}
+
+// explicit instantiations
+template void watershed_gpu_3d<float>(const float*, int*, int, int, int);
+template void watershed_gpu_3d<int>(const int*, int*, int, int, int);
+template void watershed_gpu_3d<unsigned int>(const unsigned int*, int*, int, int, int);
+
+// ------------------------------------------------------------
+// LEVEL-SET SUPPORT (3D): identify new minima at region borders
+// d_newmin must be size N and prefilled with INT_MAX
+// ------------------------------------------------------------
+template<typename in_dtype>
+__global__ void identify_newmin_gpu_3d(const in_dtype* deviceImage,
+                                       const int* deviceLabels,
+                                       int* d_newmin,
+                                       const int* d_dx, const int* d_dy, const int* d_dz,
+                                       int xsize, int ysize, int zsize)
+{
+    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+    if (idx >= xsize || idy >= ysize || idz >= zsize) return;
+
+    const int p  = index3d(idx, idy, idz, xsize, ysize, zsize);
+    const int lp = deviceLabels[p];
+    const int Ip = (int)deviceImage[p];
+
+    for (int k = 0; k < 6; ++k) {
+        const int nx = idx + d_dx[k];
+        const int ny = idy + d_dy[k];
+        const int nz = idz + d_dz[k];
+        if (nx < 0 || ny < 0 || nz < 0 || nx >= xsize || ny >= ysize || nz >= zsize) continue;
+
+        const int q  = index3d(nx, ny, nz, xsize, ysize, zsize);
+        if (deviceLabels[q] == lp) continue;
+
+        const int Iq = (int)deviceImage[q];
+        const int h  = (Ip > Iq) ? Ip : Iq; // max(I(p), I(q))
+        atomicMin(&d_newmin[lp], h);
+    }
+}
+
+// ------------------------------------------------------------
+// Update image by new minima (3D)
+// ------------------------------------------------------------
+template<typename in_dtype>
+__global__ void update_image_with_newmin_gpu_3d(in_dtype* deviceImage,
+                                                const int* deviceLabels,
+                                                const int* d_newmin,
+                                                int xsize, int ysize, int zsize)
+{
+    const int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const int idy = blockIdx.y * blockDim.y + threadIdx.y;
+    const int idz = blockIdx.z * blockDim.z + threadIdx.z;
+    if (idx >= xsize || idy >= ysize || idz >= zsize) return;
+
+    const int p  = index3d(idx, idy, idz, xsize, ysize, zsize);
+    const int lp = deviceLabels[p];
+    const int nm = d_newmin[lp];
+
+    if (nm != INT_MAX && (int)deviceImage[p] < nm) {
+        deviceImage[p] = static_cast<in_dtype>(nm);
+    }
+}
+
+// explicit instantiations
+template __global__ void identify_newmin_gpu_3d<float>(const float*, const int*, int*, const int*, const int*, const int*, int, int, int);
+template __global__ void identify_newmin_gpu_3d<int>(const int*, const int*, int*, const int*, const int*, const int*, int, int, int);
+template __global__ void identify_newmin_gpu_3d<unsigned int>(const unsigned int*, const int*, int*, const int*, const int*, const int*, int, int, int);
+
+template __global__ void update_image_with_newmin_gpu_3d<float>(float*, const int*, const int*, int, int, int);
+template __global__ void update_image_with_newmin_gpu_3d<int>(int*, const int*, const int*, int, int, int);
+template __global__ void update_image_with_newmin_gpu_3d<unsigned int>(unsigned int*, const int*, const int*, int, int, int);
+
+// ------------------------------------------------------------
+// Device-only watershed pass (3D)
+// ------------------------------------------------------------
+template<typename in_dtype>
+void watershed_device_3d(const in_dtype* deviceImage,
+                         int* deviceLabels,
+                         int* deviceStates,
+                         int* d_changed,
+                         const int* d_dx, const int* d_dy, const int* d_dz,
+                         int xsize, int ysize, int zsize, int N)
+{
+    dim3 block(8, 8, 8);
+    dim3 grid((xsize + block.x - 1) / block.x,
+              (ysize + block.y - 1) / block.y,
+              (zsize + block.z - 1) / block.z);
+
+    initi_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates, d_dx, d_dy, d_dz,
+                                  xsize, ysize, zsize);
+    cudaDeviceSynchronize();
+
+    int h_change;
+    do {
+        h_change = 0;
+        cudaMemcpy(d_changed, &h_change, sizeof(int), cudaMemcpyHostToDevice);
+
+        plateau_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates,
+                                        d_dx, d_dy, d_dz,
+                                        d_changed, xsize, ysize, zsize);
+        cudaDeviceSynchronize();
+
+        cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
+    } while (h_change);
+
+    do {
+        h_change = 0;
+        cudaMemcpy(d_changed, &h_change, sizeof(int), cudaMemcpyHostToDevice);
+
+        propagation_gpu_3d<<<grid, block>>>(deviceLabels, d_changed,
+                                            xsize, ysize, zsize, /*RR=*/5);
+        cudaDeviceSynchronize();
+
+        cudaMemcpy(&h_change, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
+    } while (h_change);
+
+    merge_gpu_3d<<<grid, block>>>(deviceLabels, deviceStates, d_dx, d_dy, d_dz,
+                                  xsize, ysize, zsize);
+    cudaDeviceSynchronize();
+
+    finalize_gpu_3d<<<grid, block>>>(deviceLabels, xsize, ysize, zsize);
+    cudaDeviceSynchronize();
+}
+
+// explicit instantiations
+template void watershed_device_3d<float>(const float*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
+template void watershed_device_3d<int>(const int*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
+template void watershed_device_3d<unsigned int>(const unsigned int*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
+
+// ------------------------------------------------------------
+// Hierarchical watershed (3D) — levels >= 1
+// ------------------------------------------------------------
+template<typename in_dtype>
+void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
+                                  int zsize, int ysize, int xsize, int levels)
+{
+    const int N = xsize * ysize * zsize;
+
+    // device buffers
+    in_dtype*  deviceImage = nullptr;
+    int* deviceLabels = nullptr;
+    int* deviceStates = nullptr;
+    int* d_changed    = nullptr;
+    int *d_dx=nullptr, *d_dy=nullptr, *d_dz=nullptr;
+    int* d_newmin     = nullptr;
+
+    cudaMalloc(&deviceImage,  N * sizeof(in_dtype));
+    cudaMalloc(&deviceLabels, N * sizeof(int));
+    cudaMalloc(&deviceStates, N * sizeof(int));
+    cudaMalloc(&d_changed, sizeof(int));
+    cudaMalloc(&d_dx, 6 * sizeof(int));
+    cudaMalloc(&d_dy, 6 * sizeof(int));
+    cudaMalloc(&d_dz, 6 * sizeof(int));
+    cudaMalloc(&d_newmin, N * sizeof(int));
+
+    cudaMemcpy(deviceImage, hostImage, N * sizeof(in_dtype), cudaMemcpyHostToDevice);
+
+    int h_dx[6] = {  1, -1,  0,  0,  0,  0 };
+    int h_dy[6] = {  0,  0,  1, -1,  0,  0 };
+    int h_dz[6] = {  0,  0,  0,  0,  1, -1 };
+    cudaMemcpy(d_dx, h_dx, 6 * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dy, h_dy, 6 * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dz, h_dz, 6 * sizeof(int), cudaMemcpyHostToDevice);
+
+    dim3 block(8, 8, 8);
+    dim3 grid((xsize + block.x - 1) / block.x,
+              (ysize + block.y - 1) / block.y,
+              (zsize + block.z - 1) / block.z);
+
+    // level 0
+    watershed_device_3d(deviceImage, deviceLabels, deviceStates, d_changed,
+                        d_dx, d_dy, d_dz, xsize, ysize, zsize, N);
+
+    // higher levels
+    for (int l = 1; l < levels; ++l) {
+        // reset newmin to INT_MAX
+        cudaMemset(d_newmin, 0x7F, N * sizeof(int));
+
+        identify_newmin_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, d_newmin,
+                                                d_dx, d_dy, d_dz,
+                                                xsize, ysize, zsize);
+        cudaDeviceSynchronize();
+
+        update_image_with_newmin_gpu_3d<in_dtype><<<grid, block>>>(deviceImage, deviceLabels,
+                                                                   d_newmin,
+                                                                   xsize, ysize, zsize);
+        cudaDeviceSynchronize();
+
+        watershed_device_3d(deviceImage, deviceLabels, deviceStates, d_changed,
+                            d_dx, d_dy, d_dz, xsize, ysize, zsize, N);
+    }
+
+    cudaMemcpy(hostLabels, deviceLabels, N * sizeof(int), cudaMemcpyDeviceToHost);
+
+    cudaFree(deviceImage);
+    cudaFree(deviceLabels);
+    cudaFree(deviceStates);
+    cudaFree(d_changed);
+    cudaFree(d_dx);
+    cudaFree(d_dy);
+    cudaFree(d_dz);
+    cudaFree(d_newmin);
+}
+
+// explicit instantiations
+template void hierarchicalWatershed_gpu_3d<float>(const float*, int*, int, int, int, int);
+template void hierarchicalWatershed_gpu_3d<int>(const int*, int*, int, int, int, int);
+template void hierarchicalWatershed_gpu_3d<unsigned int>(const unsigned int*, int*, int, int, int, int);

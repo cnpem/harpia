@@ -39,4 +39,8 @@ template<typename in_dtype>
 void hierarchicalWatershed_gpu(const in_dtype* h_image, int* h_labels,
                                int ysize, int xsize, int levels);
 
+template<typename in_dtype>
+void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
+                                  int zsize, int ysize, int xsize, int levels);
+
 #endif // WATERSHED_H
