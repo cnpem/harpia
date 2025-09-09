@@ -193,129 +193,110 @@ void snic_grayscale_heap(const float* image, int width, int height,
     std::free(pq.PQ);
 }
 
-void snic_grayscale_heap_2d_batched(const float* image, int width, int height,
-                                    float spacing, int* labels, float m, int batch_size) {
-    int num_batches = (height + batch_size - 1) / batch_size;
-
+void snic_grayscale_heap_2d_batched(const float* image, int width, int height, int depth,
+                                    float spacing, int* labels, float m, int dz) {
+    const int num_batches = (depth + dz - 1)/dz;
     int global_label_offset = 0;
 
     #pragma omp parallel
     {
-        int* local_labels = (int*)malloc(sizeof(int) * width * batch_size);
-        Centroid* centroids = (Centroid*)malloc(sizeof(Centroid) *
-                                    ((width / spacing + 1) * (batch_size / spacing + 1)));
-
         #pragma omp for schedule(dynamic)
-        for (int b = 0; b < num_batches; ++b) {
-            int y_start = b * batch_size;
-            int y_end = std::min(y_start + batch_size, height);
-            int local_height = y_end - y_start;
+        for (int b=0;b<num_batches;b++) {
+            int z_start = b*dz;
+            int z_end = std::min(z_start+dz, depth);
+            int local_depth = z_end - z_start;
+            int plane = width*height;
+            int local_size = plane*local_depth;
 
-            const float* local_image = &image[y_start * width];
+            int* local_labels = (int*)std::malloc(sizeof(int)*local_size);
+            if (!local_labels) continue;
+            for (int i=0;i<local_size;i++) local_labels[i]=-1;
 
-            // Initialize local labels
-            for (int i = 0; i < width * local_height; ++i)
-                local_labels[i] = -1;
+            const float* local_image = &image[(size_t)z_start*plane];
 
             PriorityQueueSNIC pq;
-            init_priority_queue(&pq, width * local_height);
+            init_priority_queue(&pq, local_size);
 
-            int num_y = std::max(1, (int)(local_height / spacing));
-            int num_x = std::max(1, (int)(width / spacing));
-            float step_y = (float)local_height / num_y;
-            float step_x = (float)width / num_x;
+            // Determine seed grid
+            int num_y = std::max(1,(int)std::floor(height/spacing));
+            int num_x = std::max(1,(int)std::floor(width/spacing));
+            float step_y=(float)height/num_y;
+            float step_x=(float)width/num_x;
+            float ss = std::sqrt((float)(width*height)/((float)num_x*num_y));
 
-            float ss = sqrtf((float)(width * local_height) / (num_x * num_y));
+            Centroid* centroids = (Centroid*)std::malloc(sizeof(Centroid)*num_x*num_y*local_depth);
+            if (!centroids) { std::free(local_labels); std::free(pq.PQ); continue; }
 
-            // Seed placement
-            int k = 0;
-            for (int i = 0; i < num_y; ++i) {
-                int y = (int)(step_y * (i + 0.5f));
-                if (y >= local_height) continue;
-                for (int j = 0; j < num_x; ++j) {
-                    int x = (int)(step_x * (j + 0.5f));
-                    if (x >= width) continue;
-
-                    int idx = y * width + x;
-                    centroids[k] = (Centroid){
-                        .intensity_sum = local_image[idx],
-                        .x_sum = x, .y_sum = y, .count = 1
-                    };
-                    insert_min_heap(&pq, 0.0f, x, y, k);
-                    k++;
+            int k=0;
+            for (int dz_i=0;dz_i<local_depth;dz_i++) {
+                const float* slice = &local_image[dz_i*plane];
+                for (int i=0;i<num_y;i++) {
+                    int y=(int)(step_y*(i+0.5f));
+                    if (y>=height) continue;
+                    for (int j=0;j<num_x;j++) {
+                        int x=(int)(step_x*(j+0.5f));
+                        if (x>=width) continue;
+                        int idx = IDX(x,y,width);
+                        centroids[k]=(Centroid){ slice[idx], x, y, 1 };
+                        insert_min_heap(&pq, 0.0f, x, y, k);
+                        k++;
+                    }
                 }
             }
 
-            if (k == 0) continue;
+            static const int dx[4]={0,-1,1,0};
+            static const int dy[4]={-1,0,0,1};
 
-            // Region growing (4-connected)
-            while (pq.size > 0) {
-                float dist;
-                int x, y, label;
-                extract_min(&pq, &dist, &x, &y, &label);
-
-                int idx = y * width + x;
-                if (local_labels[idx] != -1) continue;
-
-                local_labels[idx] = label;
+            while (pq.size>0) {
+                float dist; int x,y,label;
+                extract_min(&pq,&dist,&x,&y,&label);
+                int dz_i = label / (num_x*num_y); // assign slice index based on seed order
+                int idx_local = dz_i*plane + y*width + x;
+                if (local_labels[idx_local]!=-1) continue;
+                local_labels[idx_local]=label;
 
                 Centroid* c = &centroids[label];
-                float intensity = local_image[idx];
-
+                float intensity = local_image[dz_i*plane + y*width + x];
                 c->intensity_sum += intensity;
                 c->x_sum += x;
                 c->y_sum += y;
                 c->count += 1;
 
-                int dx[4] = {0, -1, 1, 0};
-                int dy[4] = {-1, 0, 0, 1};
+                float cx=(float)c->x_sum/c->count;
+                float cy=(float)c->y_sum/c->count;
 
-                float cx = (float)c->x_sum / c->count;
-                float cy = (float)c->y_sum / c->count;
-
-                for (int d = 0; d < 4; d++) {
-                    int nx = x + dx[d];
-                    int ny = y + dy[d];
-                    if (nx < 0 || ny < 0 || nx >= width || ny >= local_height)
-                        continue;
-
-                    int nidx = ny * width + nx;
-                    if (local_labels[nidx] != -1) continue;
-
+                for (int d=0;d<4;d++) {
+                    int nx=x+dx[d]; int ny=y+dy[d];
+                    if (nx<0||ny<0||nx>=width||ny>=height) continue;
+                    int nidx = dz_i*plane + ny*width + nx;
+                    if (local_labels[nidx]!=-1) continue;
                     float n_intensity = local_image[nidx];
-                    float dxs = nx - cx;
-                    float dys = ny - cy;
-                    float spatial_sq = dxs * dxs + dys * dys;
-
-                    if (spatial_sq <= 4 * ss * ss) {
-                        float dval = compute_distance(n_intensity, nx, ny, c, ss, m);
-                        insert_min_heap(&pq, dval, nx, ny, label);
+                    float dxs=nx-cx, dys=ny-cy;
+                    float spatial_sq = dxs*dxs + dys*dys;
+                    if (spatial_sq <= 4.0f*ss*ss) {
+                        float dval = compute_distance(n_intensity,nx,ny,c,ss,m);
+                        insert_min_heap(&pq,dval,nx,ny,label);
                     }
                 }
             }
 
-            // Apply label offset safely
-            int my_offset = 0;
+            int my_offset=0;
             #pragma omp critical
             {
                 my_offset = global_label_offset;
                 global_label_offset += k;
             }
 
-            for (int y = 0; y < local_height; ++y) {
-                for (int x = 0; x < width; ++x) {
-                    int local_idx = y * width + x;
-                    int global_idx = (y + y_start) * width + x;
-                    if (local_labels[local_idx] != -1)
-                        labels[global_idx] = local_labels[local_idx] + my_offset;
+            for (int dz_i=0;dz_i<local_depth;dz_i++)
+                for (int i=0;i<plane;i++) {
+                    int ll = local_labels[dz_i*plane + i];
+                    if (ll!=-1) labels[(z_start+dz_i)*plane + i] = ll + my_offset;
                 }
-            }
 
-            free(pq.PQ);
+            std::free(centroids);
+            std::free(local_labels);
+            std::free(pq.PQ);
         }
-
-        free(local_labels);
-        free(centroids);
     }
 }
 

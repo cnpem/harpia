@@ -11,8 +11,8 @@ ctypedef fused numeric:
 cdef extern from "../../include/superpixel/snic.h":
     void snic_grayscale_heap(const float* image, int width, int height,
                              float spacing, int* labels, float m)
-    void snic_grayscale_heap_2d_batched(const float* image, int width, int height,
-                                    float spacing, int* labels, float m, int batch_size)
+    void snic_grayscale_heap_2d_batched(const float* image, int width, int height, int depth,
+                                    float spacing, int* labels, float m, int dz)
     void snic_grayscale_heap_3d(const float* image, int width, int height, int depth,
                                 float spacing, int* labels, float m)
     void snic_grayscale_heap_3d_batched(const float* image, int width, int height, int depth,
@@ -50,7 +50,7 @@ def SNIC2D(np.ndarray[float, ndim=2] hostImage,
 
 def SNIC2DBatches(np.ndarray[np.float32_t, ndim=3] hostImage,
                   np.ndarray[int, ndim=3] hostLabels = None,
-                  float spacing = 5, float m = 10.0, int batch_size = 8):
+                  float spacing = 5, float m = 10.0, int batch_size = 32):
     """
     Apply SNIC to multiple 2D slices at once (batched along axis 0).
 
@@ -72,7 +72,7 @@ def SNIC2DBatches(np.ndarray[np.float32_t, ndim=3] hostImage,
         hostLabels = np.empty((num_slices, height, width), dtype=np.int32)
 
     snic_grayscale_heap_2d_batched(&hostImage[0, 0, 0],
-                                   width, height,
+                                   width, height,num_slices,
                                    spacing, &hostLabels[0, 0, 0], m, batch_size)
 
     return hostLabels
