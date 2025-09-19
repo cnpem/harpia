@@ -1,5 +1,6 @@
 #include "../../include/watershed/watershed.h"
 #include "../../include/common/union_find.h"
+#include "../../include/common/chunkedExecutor.h"
 #include <iostream>
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -29,6 +30,7 @@ __global__ void initi_gpu_3d(const in_dtype* deviceImage,
                              int* deviceLabels,
                              int* deviceStates,
                              const int* d_dx, const int* d_dy, const int* d_dz,
+                             int nNbrs,
                              int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x; // x
@@ -37,13 +39,14 @@ __global__ void initi_gpu_3d(const in_dtype* deviceImage,
     if (idx >= xsize || idy >= ysize || idz >= zsize) return;
 
     const int p = index3d(idx, idy, idz, xsize, ysize, zsize);
+
     const int orig_val = (int)deviceImage[p];
 
     int min_val = orig_val;
     int min_idx = p;
 
-    // 6-neighbors (±x, ±y, ±z)
-    for (int k = 0; k < 6; ++k) {
+    // loop over neighbors (nNbrs = 6 or 26)
+    for (int k = 0; k < nNbrs; ++k) {
         const int nx = idx + d_dx[k];
         const int ny = idy + d_dy[k];
         const int nz = idz + d_dz[k];
@@ -69,11 +72,6 @@ __global__ void initi_gpu_3d(const in_dtype* deviceImage,
     }
 }
 
-// explicit instantiations
-template __global__ void initi_gpu_3d<float>(const float*, int*, int*, const int*, const int*, const int*, int, int, int);
-template __global__ void initi_gpu_3d<int>(const int*, int*, int*, const int*, const int*, const int*, int, int, int);
-template __global__ void initi_gpu_3d<unsigned int>(const unsigned int*, int*, int*, const int*, const int*, const int*, int, int, int);
-
 // ------------------------------------------------------------
 // PLATEAU RESOLUTION (3D): resolve non-minimal plateau pixels
 // Looks for equal-intensity downhill neighbors to borrow
@@ -83,6 +81,7 @@ __global__ void plateau_gpu_3d(const in_dtype* deviceImage,
                                int* deviceLabels,
                                int* deviceStates,
                                const int* d_dx, const int* d_dy, const int* d_dz,
+                               int nNbrs,
                                int* d_changed,
                                int xsize, int ysize, int zsize)
 {
@@ -97,7 +96,7 @@ __global__ void plateau_gpu_3d(const in_dtype* deviceImage,
 
     const int Ip = (int)deviceImage[p];
 
-    for (int k = 0; k < 6; ++k) {
+    for (int k = 0; k < nNbrs; ++k) {
         const int nx = idx + d_dx[k];
         const int ny = idy + d_dy[k];
         const int nz = idz + d_dz[k];
@@ -113,13 +112,9 @@ __global__ void plateau_gpu_3d(const in_dtype* deviceImage,
     }
 }
 
-// explicit instantiations
-template __global__ void plateau_gpu_3d<float>(const float*, int*, int*, const int*, const int*, const int*, int*, int, int, int);
-template __global__ void plateau_gpu_3d<int>(const int*, int*, int*, const int*, const int*, const int*, int*, int, int, int);
-template __global__ void plateau_gpu_3d<unsigned int>(const unsigned int*, int*, int*, const int*, const int*, const int*, int*, int, int, int);
-
 // ------------------------------------------------------------
 // PROPAGATION (3D): pointer-jumping / path compression (RR steps)
+// (unchanged — doesn't use neighbors)
 // ------------------------------------------------------------
 __global__ void propagation_gpu_3d(int* deviceLabels, int* d_changed,
                                    int xsize, int ysize, int zsize, int RR)
@@ -153,6 +148,7 @@ __global__ void propagation_gpu_3d(int* deviceLabels, int* d_changed,
 // ------------------------------------------------------------
 __global__ void merge_gpu_3d(int* deviceLabels, const int* deviceStates,
                              const int* d_dx, const int* d_dy, const int* d_dz,
+                             int nNbrs,
                              int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -163,7 +159,7 @@ __global__ void merge_gpu_3d(int* deviceLabels, const int* deviceStates,
     const int p = index3d(idx, idy, idz, xsize, ysize, zsize);
     if (deviceStates[p] < 2) return; // only plateau
 
-    for (int k = 0; k < 6; ++k) {
+    for (int k = 0; k < nNbrs; ++k) {
         const int nx = idx + d_dx[k];
         const int ny = idy + d_dy[k];
         const int nz = idz + d_dz[k];
@@ -178,6 +174,7 @@ __global__ void merge_gpu_3d(int* deviceLabels, const int* deviceStates,
 
 // ------------------------------------------------------------
 // FINALIZE (3D): compress label pointers (device inline_Compress)
+// (unchanged)
 // ------------------------------------------------------------
 __global__ void finalize_gpu_3d(int* deviceLabels, int xsize, int ysize, int zsize)
 {
@@ -193,12 +190,22 @@ __global__ void finalize_gpu_3d(int* deviceLabels, int xsize, int ysize, int zsi
 // ------------------------------------------------------------
 // Base watershed: HOST API (3D)
 // hostImage shape convention: (zsize, ysize, xsize)
+// neighborhood flag: 6 or 27 (we interpret 27 => full 3x3x3 => 26 neighbors)
 // ------------------------------------------------------------
 template<typename in_dtype>
 void watershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
-                      int zsize, int ysize, int xsize)
+                      int xsize, int ysize, int zsize,
+                      int neighborhood /* 6 or 27 */)
 {
     const int N = xsize * ysize * zsize;
+
+    int nNbrs = 6;
+    if (neighborhood == 6) nNbrs = 6;
+    else if (neighborhood == 27) nNbrs = 26;
+    else {
+        // fallback, treat any other value as 6-neighborhood
+        nNbrs = 6;
+    }
 
     // device memory
     in_dtype* deviceImage = nullptr;
@@ -210,19 +217,39 @@ void watershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
     cudaMalloc(&deviceLabels, N * sizeof(int));
     cudaMalloc(&deviceStates, N * sizeof(int));
     cudaMalloc(&d_changed, sizeof(int));
-    cudaMalloc(&d_dx, 6 * sizeof(int));
-    cudaMalloc(&d_dy, 6 * sizeof(int));
-    cudaMalloc(&d_dz, 6 * sizeof(int));
+    cudaMalloc(&d_dx, nNbrs * sizeof(int));
+    cudaMalloc(&d_dy, nNbrs * sizeof(int));
+    cudaMalloc(&d_dz, nNbrs * sizeof(int));
 
     cudaMemcpy(deviceImage, hostImage, N * sizeof(in_dtype), cudaMemcpyHostToDevice);
 
-    // 6-neighborhood offsets
-    int h_dx[6] = {  1, -1,  0,  0,  0,  0 };
-    int h_dy[6] = {  0,  0,  1, -1,  0,  0 };
-    int h_dz[6] = {  0,  0,  0,  0,  1, -1 };
-    cudaMemcpy(d_dx, h_dx, 6 * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_dy, h_dy, 6 * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_dz, h_dz, 6 * sizeof(int), cudaMemcpyHostToDevice);
+    // prepare host offset arrays depending on nNbrs
+    std::vector<int> h_dx(nNbrs), h_dy(nNbrs), h_dz(nNbrs);
+
+    if (nNbrs == 6) {
+        h_dx = {  1, -1,  0,  0,  0,  0 };
+        h_dy = {  0,  0,  1, -1,  0,  0 };
+        h_dz = {  0,  0,  0,  0,  1, -1 };
+    } else {
+        // full 3x3x3 neighborhood excluding center (26 neighbors)
+        int idx = 0;
+        for (int dz = -1; dz <= 1; ++dz) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    if (dx == 0 && dy == 0 && dz == 0) continue;
+                    h_dx[idx] = dx;
+                    h_dy[idx] = dy;
+                    h_dz[idx] = dz;
+                    ++idx;
+                }
+            }
+        }
+        // idx should be 26
+    }
+
+    cudaMemcpy(d_dx, h_dx.data(), nNbrs * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dy, h_dy.data(), nNbrs * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dz, h_dz.data(), nNbrs * sizeof(int), cudaMemcpyHostToDevice);
 
     // launch config
     dim3 block(8, 8, 8);
@@ -232,7 +259,7 @@ void watershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
 
     // Step 1: init
     initi_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates, d_dx, d_dy, d_dz,
-                                  xsize, ysize, zsize);
+                                  nNbrs, xsize, ysize, zsize);
     cudaDeviceSynchronize();
 
     // Step 2: plateau resolve (until no change)
@@ -243,6 +270,7 @@ void watershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
 
         plateau_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates,
                                         d_dx, d_dy, d_dz,
+                                        nNbrs,
                                         d_changed, xsize, ysize, zsize);
         cudaDeviceSynchronize();
 
@@ -263,7 +291,7 @@ void watershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
 
     // Step 4: merge plateau components
     merge_gpu_3d<<<grid, block>>>(deviceLabels, deviceStates, d_dx, d_dy, d_dz,
-                                  xsize, ysize, zsize);
+                                  nNbrs, xsize, ysize, zsize);
     cudaDeviceSynchronize();
 
     // Step 5: finalize (compress)
@@ -283,20 +311,15 @@ void watershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
     cudaFree(d_dz);
 }
 
-// explicit instantiations
-template void watershed_gpu_3d<float>(const float*, int*, int, int, int);
-template void watershed_gpu_3d<int>(const int*, int*, int, int, int);
-template void watershed_gpu_3d<unsigned int>(const unsigned int*, int*, int, int, int);
-
 // ------------------------------------------------------------
-// LEVEL-SET SUPPORT (3D): identify new minima at region borders
-// d_newmin must be size N and prefilled with INT_MAX
+// identify_newmin_gpu_3d: updated to use nNbrs
 // ------------------------------------------------------------
 template<typename in_dtype>
 __global__ void identify_newmin_gpu_3d(const in_dtype* deviceImage,
                                        const int* deviceLabels,
                                        int* d_newmin,
                                        const int* d_dx, const int* d_dy, const int* d_dz,
+                                       int nNbrs,
                                        int xsize, int ysize, int zsize)
 {
     const int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -308,7 +331,7 @@ __global__ void identify_newmin_gpu_3d(const in_dtype* deviceImage,
     const int lp = deviceLabels[p];
     const int Ip = (int)deviceImage[p];
 
-    for (int k = 0; k < 6; ++k) {
+    for (int k = 0; k < nNbrs; ++k) {
         const int nx = idx + d_dx[k];
         const int ny = idy + d_dy[k];
         const int nz = idz + d_dz[k];
@@ -324,7 +347,7 @@ __global__ void identify_newmin_gpu_3d(const in_dtype* deviceImage,
 }
 
 // ------------------------------------------------------------
-// Update image by new minima (3D)
+// Update image by new minima (3D) -- unchanged
 // ------------------------------------------------------------
 template<typename in_dtype>
 __global__ void update_image_with_newmin_gpu_3d(in_dtype* deviceImage,
@@ -346,15 +369,6 @@ __global__ void update_image_with_newmin_gpu_3d(in_dtype* deviceImage,
     }
 }
 
-// explicit instantiations
-template __global__ void identify_newmin_gpu_3d<float>(const float*, const int*, int*, const int*, const int*, const int*, int, int, int);
-template __global__ void identify_newmin_gpu_3d<int>(const int*, const int*, int*, const int*, const int*, const int*, int, int, int);
-template __global__ void identify_newmin_gpu_3d<unsigned int>(const unsigned int*, const int*, int*, const int*, const int*, const int*, int, int, int);
-
-template __global__ void update_image_with_newmin_gpu_3d<float>(float*, const int*, const int*, int, int, int);
-template __global__ void update_image_with_newmin_gpu_3d<int>(int*, const int*, const int*, int, int, int);
-template __global__ void update_image_with_newmin_gpu_3d<unsigned int>(unsigned int*, const int*, const int*, int, int, int);
-
 // ------------------------------------------------------------
 // Device-only watershed pass (3D)
 // ------------------------------------------------------------
@@ -364,6 +378,7 @@ void watershed_device_3d(const in_dtype* deviceImage,
                          int* deviceStates,
                          int* d_changed,
                          const int* d_dx, const int* d_dy, const int* d_dz,
+                         int nNbrs,
                          int xsize, int ysize, int zsize, int N)
 {
     dim3 block(8, 8, 8);
@@ -372,7 +387,7 @@ void watershed_device_3d(const in_dtype* deviceImage,
               (zsize + block.z - 1) / block.z);
 
     initi_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates, d_dx, d_dy, d_dz,
-                                  xsize, ysize, zsize);
+                                  nNbrs, xsize, ysize, zsize);
     cudaDeviceSynchronize();
 
     int h_change;
@@ -382,6 +397,7 @@ void watershed_device_3d(const in_dtype* deviceImage,
 
         plateau_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, deviceStates,
                                         d_dx, d_dy, d_dz,
+                                        nNbrs,
                                         d_changed, xsize, ysize, zsize);
         cudaDeviceSynchronize();
 
@@ -400,24 +416,20 @@ void watershed_device_3d(const in_dtype* deviceImage,
     } while (h_change);
 
     merge_gpu_3d<<<grid, block>>>(deviceLabels, deviceStates, d_dx, d_dy, d_dz,
-                                  xsize, ysize, zsize);
+                                  nNbrs, xsize, ysize, zsize);
     cudaDeviceSynchronize();
 
     finalize_gpu_3d<<<grid, block>>>(deviceLabels, xsize, ysize, zsize);
     cudaDeviceSynchronize();
 }
 
-// explicit instantiations
-template void watershed_device_3d<float>(const float*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
-template void watershed_device_3d<int>(const int*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
-template void watershed_device_3d<unsigned int>(const unsigned int*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
-
 // ------------------------------------------------------------
 // Hierarchical watershed (3D) — levels >= 1
 // ------------------------------------------------------------
 template<typename in_dtype>
 void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
-                                  int zsize, int ysize, int xsize, int levels)
+                                  int xsize, int ysize, int zsize, int flag_verbose, int levels,
+                                  int neighborhood /* 6 or 27 */)
 {
     const int N = xsize * ysize * zsize;
 
@@ -429,32 +441,56 @@ void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
     int *d_dx=nullptr, *d_dy=nullptr, *d_dz=nullptr;
     int* d_newmin     = nullptr;
 
+    int nNbrs = (neighborhood == 27) ? 26 : 6;
+
     cudaMalloc(&deviceImage,  N * sizeof(in_dtype));
     cudaMalloc(&deviceLabels, N * sizeof(int));
     cudaMalloc(&deviceStates, N * sizeof(int));
     cudaMalloc(&d_changed, sizeof(int));
-    cudaMalloc(&d_dx, 6 * sizeof(int));
-    cudaMalloc(&d_dy, 6 * sizeof(int));
-    cudaMalloc(&d_dz, 6 * sizeof(int));
+    cudaMalloc(&d_dx, nNbrs * sizeof(int));
+    cudaMalloc(&d_dy, nNbrs * sizeof(int));
+    cudaMalloc(&d_dz, nNbrs * sizeof(int));
     cudaMalloc(&d_newmin, N * sizeof(int));
 
     cudaMemcpy(deviceImage, hostImage, N * sizeof(in_dtype), cudaMemcpyHostToDevice);
 
-    int h_dx[6] = {  1, -1,  0,  0,  0,  0 };
-    int h_dy[6] = {  0,  0,  1, -1,  0,  0 };
-    int h_dz[6] = {  0,  0,  0,  0,  1, -1 };
-    cudaMemcpy(d_dx, h_dx, 6 * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_dy, h_dy, 6 * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_dz, h_dz, 6 * sizeof(int), cudaMemcpyHostToDevice);
+    std::vector<int> h_dx(nNbrs), h_dy(nNbrs), h_dz(nNbrs);
+    if (nNbrs == 6) {
+        h_dx = {  1, -1,  0,  0,  0,  0 };
+        h_dy = {  0,  0,  1, -1,  0,  0 };
+        h_dz = {  0,  0,  0,  0,  1, -1 };
+    } else {
+        int idx = 0;
+        for (int dz = -1; dz <= 1; ++dz) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    if (dx == 0 && dy == 0 && dz == 0) continue;
+                    h_dx[idx] = dx;
+                    h_dy[idx] = dy;
+                    h_dz[idx] = dz;
+                    ++idx;
+                }
+            }
+        }
+    }
+    cudaMemcpy(d_dx, h_dx.data(), nNbrs * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dy, h_dy.data(), nNbrs * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_dz, h_dz.data(), nNbrs * sizeof(int), cudaMemcpyHostToDevice);
 
     dim3 block(8, 8, 8);
     dim3 grid((xsize + block.x - 1) / block.x,
               (ysize + block.y - 1) / block.y,
               (zsize + block.z - 1) / block.z);
 
+     if (flag_verbose==1) {
+        printf("grid.x %d grid.y %d grid.z %d\n", grid.x, grid.y, grid.z);
+        printf("block.x %d block.y %d block.z %d\n", block.x, block.y, block.z);
+    }
+
     // level 0
     watershed_device_3d(deviceImage, deviceLabels, deviceStates, d_changed,
-                        d_dx, d_dy, d_dz, xsize, ysize, zsize, N);
+                        d_dx, d_dy, d_dz, nNbrs,
+                        xsize, ysize, zsize, N);
 
     // higher levels
     for (int l = 1; l < levels; ++l) {
@@ -462,7 +498,7 @@ void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
         cudaMemset(d_newmin, 0x7F, N * sizeof(int));
 
         identify_newmin_gpu_3d<<<grid, block>>>(deviceImage, deviceLabels, d_newmin,
-                                                d_dx, d_dy, d_dz,
+                                                d_dx, d_dy, d_dz, nNbrs,
                                                 xsize, ysize, zsize);
         cudaDeviceSynchronize();
 
@@ -472,7 +508,8 @@ void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
         cudaDeviceSynchronize();
 
         watershed_device_3d(deviceImage, deviceLabels, deviceStates, d_changed,
-                            d_dx, d_dy, d_dz, xsize, ysize, zsize, N);
+                            d_dx, d_dy, d_dz, nNbrs,
+                            xsize, ysize, zsize, N);
     }
 
     cudaMemcpy(hostLabels, deviceLabels, N * sizeof(int), cudaMemcpyDeviceToHost);
@@ -487,7 +524,78 @@ void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
     cudaFree(d_newmin);
 }
 
-// explicit instantiations
-template void hierarchicalWatershed_gpu_3d<float>(const float*, int*, int, int, int, int);
-template void hierarchicalWatershed_gpu_3d<int>(const int*, int*, int, int, int, int);
-template void hierarchicalWatershed_gpu_3d<unsigned int>(const unsigned int*, int*, int, int, int, int);
+
+
+// ------------------- explicit instantiations -------------------
+// add instantiations for templates that now accept nNbrs where needed
+template __global__ void initi_gpu_3d<float>(const float*, int*, int*, const int*, const int*, const int*, int, int, int, int);
+template __global__ void initi_gpu_3d<int>(const int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
+template __global__ void initi_gpu_3d<unsigned int>(const unsigned int*, int*, int*, const int*, const int*, const int*, int, int, int, int);
+
+template __global__ void plateau_gpu_3d<float>(const float*, int*, int*, const int*, const int*, const int*, int, int*, int, int, int);
+template __global__ void plateau_gpu_3d<int>(const int*, int*, int*, const int*, const int*, const int*, int, int*, int, int, int);
+template __global__ void plateau_gpu_3d<unsigned int>(const unsigned int*, int*, int*, const int*, const int*, const int*, int, int*, int, int, int);
+
+// identify_newmin instantiations
+template __global__ void identify_newmin_gpu_3d<float>(const float*, const int*, int*, const int*, const int*, const int*, int, int, int, int);
+template __global__ void identify_newmin_gpu_3d<int>(const int*, const int*, int*, const int*, const int*, const int*, int, int, int, int);
+template __global__ void identify_newmin_gpu_3d<unsigned int>(const unsigned int*, const int*, int*, const int*, const int*, const int*, int, int, int, int);
+
+// update image instantiations (unchanged signatures)
+template __global__ void update_image_with_newmin_gpu_3d<float>(float*, const int*, const int*, int, int, int);
+template __global__ void update_image_with_newmin_gpu_3d<int>(int*, const int*, const int*, int, int, int);
+template __global__ void update_image_with_newmin_gpu_3d<unsigned int>(unsigned int*, const int*, const int*, int, int, int);
+
+// device-level and host-level templates
+template void watershed_gpu_3d<float>(const float*, int*, int, int, int, int);
+template void watershed_gpu_3d<int>(const int*, int*, int, int, int, int);
+template void watershed_gpu_3d<unsigned int>(const unsigned int*, int*, int, int, int, int);
+
+template void watershed_device_3d<float>(const float*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int, int);
+template void watershed_device_3d<int>(const int*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int, int);
+template void watershed_device_3d<unsigned int>(const unsigned int*, int*, int*, int*, const int*, const int*, const int*, int, int, int, int, int);
+
+template void hierarchicalWatershed_gpu_3d<float>(const float*, int*, int, int, int, int, int,int);
+template void hierarchicalWatershed_gpu_3d<int>(const int*, int*, int, int, int, int, int,int);
+template void hierarchicalWatershed_gpu_3d<unsigned int>(const unsigned int*, int*, int, int, int,int, int, int);
+
+
+
+template<typename in_dtype>
+void hierarchicalWatershedChunked(in_dtype* hostImage, int* hostLabels,
+                                  int xsize, int ysize, int zsize,
+                                  int levels, int neighborhood,
+                                  float gpuMemory, int ngpus, int flag_verbose)
+{
+    if(ngpus == 0)
+    {
+        throw std::runtime_error("CPU implementation is not available. Ensure a GPU is available.");
+    }
+
+    else
+    {
+        int ncopies = 3;  // same as meanFilterChunked
+        chunkedExecutor(hierarchicalWatershed_gpu_3d<in_dtype>, ncopies, gpuMemory, ngpus,
+                        hostImage, hostLabels, xsize, ysize, zsize,
+                        flag_verbose, levels, neighborhood);
+    }
+}
+
+
+// ------------------------------------------------------------
+// Template instantiations for hierarchicalWatershedChunked
+// ------------------------------------------------------------
+template void hierarchicalWatershedChunked<float>(float* hostImage, int* hostLabels,
+                                                  int xsize, int ysize, int zsize,
+                                                  int levels, int neighborhood,
+                                                  float gpuMemory, int ngpus, int flag_verbose);
+
+template void hierarchicalWatershedChunked<int>(int* hostImage, int* hostLabels,
+                                                int xsize, int ysize, int zsize,
+                                                int levels, int neighborhood,
+                                                float gpuMemory, int ngpus, int flag_verbose);
+
+template void hierarchicalWatershedChunked<unsigned int>(unsigned int* hostImage, int* hostLabels,
+                                                         int xsize, int ysize, int zsize,
+                                                         int levels, int neighborhood,
+                                                         float gpuMemory, int ngpus, int flag_verbose);

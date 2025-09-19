@@ -41,6 +41,20 @@ void hierarchicalWatershed_gpu(const in_dtype* h_image, int* h_labels,
 
 template<typename in_dtype>
 void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
-                                  int zsize, int ysize, int xsize, int levels);
+                                  int xsize, int ysize, int zsize, int flag_verbose, int levels, int neighborhood);
+
+template<typename in_dtype>
+void hierarchicalWatershedChunked(in_dtype* hostImage, int* hostLabels,
+                                  int xsize, int ysize, int zsize,
+                                  int levels, int neighborhood,
+                                  float gpuMemory, int ngpus, int flag_verbose);
+
+
+template<typename in_dtype>
+void hierarchicalWatershedChunkedKernel(in_dtype* hostImage, int* hostLabels,
+                                        int xsize, int ysize, int zsize,
+                                        int levels, int neighborhood,
+                                        float safetyMargin, int ngpus,
+                                        int flag_verbose);
 
 #endif // WATERSHED_H

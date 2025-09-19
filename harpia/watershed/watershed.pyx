@@ -1,6 +1,8 @@
 cimport cython
 cimport numpy as np
+import numpy as np
 from libcpp cimport bool
+from harpia.common import Size
 
 ctypedef fused numeric:
     float
@@ -31,7 +33,39 @@ cdef extern from "../../include/watershed/watershed.h":
                                int ysize, int xsize, int levels)
 
     void hierarchicalWatershed_gpu_3d[numeric](const numeric* hostImage, int* hostLabels,
-                                  int zsize, int ysize, int xsize, int levels)
+                                  int xsize, int ysize, int zsize, int flag_verbose, int levels,int neighborhood)
+
+
+    void hierarchicalWatershedChunked[numeric](numeric* hostImage, int* hostLabels,
+                                  int xsize, int ysize, int zsize,
+                                  int levels, int neighborhood,
+                                  float gpuMemory, int ngpus, int flag_verbose)
+
+
+def hierarchicalWatershedChunked_GPU(np.ndarray[numeric, ndim=3] hostImage,
+                                     np.ndarray[int, ndim=3] hostLabels = None,
+                                     int levels = 3,
+                                     int neighborhood = 26,
+                                     float gpuMemory = 0.4,
+                                     int ngpus = -1,
+                                     int verbose = 1):
+
+    isize = Size(hostImage)
+
+    if hostLabels is None:
+        hostLabels = np.empty((isize.z, isize.y, isize.x), dtype=np.int32)
+
+    if verbose:
+        print(f"Volume: {isize.z}x{isize.y}x{isize.x}, levels={levels}, neighborhood={neighborhood}")
+
+    hierarchicalWatershedChunked(
+        &hostImage[0,0,0],
+        &hostLabels[0,0,0],
+        isize.x, isize.y, isize.z,
+        levels, neighborhood,
+        gpuMemory, ngpus, verbose
+    )
+    return hostLabels
 
 
 def watershed_GPU(np.ndarray[numeric, ndim=2] image,
@@ -51,8 +85,8 @@ def hierarchicalWatershed_GPU(np.ndarray[numeric, ndim=2] image,
 
 def hierarchicalWatershed3D_GPU(np.ndarray[numeric, ndim=3] image,
                               np.ndarray[int, ndim=3] labels,
-                              int rows, int cols, int depth, int levels):
-    return hierarchicalWatershed_gpu_3d(&image[0,0,0], &labels[0,0,0], depth, rows, cols, levels)
+                              int rows, int cols, int depth, int verbose, int levels, int neighborhood):
+    return hierarchicalWatershed_gpu_3d(&image[0,0,0], &labels[0,0,0], rows, cols, depth, verbose, levels,neighborhood)
 
 def watershed_cpu(np.ndarray[int, ndim=2] data,
                    np.ndarray[int, ndim=2] labels,
