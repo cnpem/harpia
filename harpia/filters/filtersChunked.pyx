@@ -54,7 +54,7 @@ cdef extern from '../../include/filters/anisotropic_diffusion.h':
 
 #---------------------------------------------------------------------------------------------------
 
-def gaussianFilter(numpy.ndarray[numeric, ndim=3] hostImage,
+def gaussian(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
                    float sigma = 1, int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
@@ -88,7 +88,7 @@ def gaussianFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     
     return hostOutput
 
-def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
+def mean(numpy.ndarray[numeric, ndim=3] hostImage,
                numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
                int windowSize = 3,
                int type3d = 1,
@@ -130,7 +130,7 @@ def meanFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return hostOutput
 
-def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
+def laplace(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
               int type3d = 1,
               int verbose = 0,
@@ -165,9 +165,9 @@ def logFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return hostOutput
 
-def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
+def unsharp_mask(numpy.ndarray[numeric, ndim=3] hostImage,
                       numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
-                      float sigma = 1,
+                      float radius = 1,
                       float ammount = 1,
                       float threshold = 0,
                       int type3d = 1,
@@ -180,7 +180,7 @@ def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     Parameters:
         hostImage (ndarray): Input 3D image.
         hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
-        sigma (float): Gaussian blur sigma for smoothing.
+        radius (float): Equals to  the gaussian blur sigma value for smoothing.
         ammount (float): Sharpening intensity.
         threshold (float): Intensity threshold for applying sharpening.
         type3d (int): Use full 3D filtering (1) or slice-wise (0).
@@ -200,12 +200,12 @@ def unsharpMaskFilter(numpy.ndarray[numeric, ndim=3] hostImage,
     unsharpMaskChunked(&hostImage[0, 0, 0],
                      &hostOutput[0, 0, 0],
                      isize.y, isize.x, isize.z,
-                     sigma, ammount, threshold, type3d,
+                     radius, ammount, threshold, type3d,
                      verbose, ngpus, gpuMemory)
 
     return hostOutput
 
-def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
+def sobel(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
               int type3d = 1,
               int verbose = 0,
@@ -238,7 +238,7 @@ def sobelFilter(numpy.ndarray[numeric, ndim=3] hostImage,
 
     return hostOutput
 
-def prewittFilter(numpy.ndarray[numeric, ndim=3] hostImage,
+def prewitt(numpy.ndarray[numeric, ndim=3] hostImage,
               numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
               int type3d  = 1,
               int verbose = 0,
