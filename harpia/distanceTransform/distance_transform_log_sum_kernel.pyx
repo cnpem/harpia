@@ -1,7 +1,9 @@
 cimport cython
 from cython.parallel import prange
-import numpy as np
-cimport numpy as np
+import numpy 
+cimport numpy
+from harpia.common import Size
+
 
 ctypedef fused numeric:
     int
@@ -15,7 +17,7 @@ def parallel_fftfreq(int n, double d = 1.0):
     n: size of the input
     d: sample spacing
     """
-    cdef np.ndarray[np.float64_t, ndim=1] result = np.empty(n, dtype=np.float64)
+    cdef numpy.ndarray[numpy.float64_t, ndim=1] result = numpy.empty(n, dtype=numpy.float64)
     cdef int i
 
     # Compute half of the frequency bins (0 to n//2)
@@ -31,47 +33,68 @@ def parallel_fftfreq(int n, double d = 1.0):
 
 #parallel element-wise multiplication
 
-def distance_transform(np.ndarray[numeric, ndim=3] hostImage,
-                       float lmbd, float thresh,
-                       int xsize, int ysize, int zsize):
+def distance_transform_edt(numpy.ndarray[numeric, ndim=3] hostImage,
+                           numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
+                           float lmbd = 1e-3, float thresh = 1,
+                           int verbose = 0):
     """
     Distance transform using a Gaussian-like kernel defined directly in frequency space.
+
+    Parameters:
+        hostImage (ndarray): Input 3D binary image.
+        hostOutput (ndarray, optional): Output array (float32) to store result. Auto-created if None.
+        lmbd (float): Lambda parameter for log-sum approximation.
+        thresh (float): Threshold for frequency cutoff.
+        verbose (int): Verbosity level.
+
+    Returns:
+        ndarray: Distance transform result.
     """
 
-    # FFT of the image (with constant padding to avoid reflection issues)
-    imageFFT = np.fft.fftn(np.logical_not(hostImage).astype(np.float32), s=(xsize, ysize, zsize)).astype(np.complex64)
+    # Get image dimensions
+    isize = Size(hostImage)
 
-    print("Image FFT completed")
+    if hostOutput is None:
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
 
-    # Create the frequency grid, ensuring symmetry across all axes
-    fx = parallel_fftfreq(xsize)[:, np.newaxis, np.newaxis]
-    fy = parallel_fftfreq(ysize)[np.newaxis, :, np.newaxis]
-    fz = parallel_fftfreq(zsize)[np.newaxis, np.newaxis, :]
+    # FFT of the inverted binary image (constant padding to avoid reflection issues)
+    imageFFT = numpy.fft.fftn(numpy.logical_not(hostImage).astype(numpy.float32),
+                              s=(isize.z, isize.y, isize.x)).astype(numpy.complex64)
+    if verbose:
+        print("Image FFT completed")
 
-    d = (fx**2 + fy**2 + fz**2)
+    # Frequency grid
+    fz = parallel_fftfreq(isize.z)[:, numpy.newaxis, numpy.newaxis]
+    fy = parallel_fftfreq(isize.y)[numpy.newaxis, :, numpy.newaxis]
+    fx = parallel_fftfreq(isize.x)[numpy.newaxis, numpy.newaxis, :]
 
-    d = np.where(d > thresh, np.inf, d)
-    # Create the Gaussian kernel directly in the frequency domain
-    gaussian_filter_freq = np.exp(- (d / lmbd))
+    d = fx**2 + fy**2 + fz**2
+    d = numpy.where(d > thresh, numpy.inf, d)
 
-    print("Frequency domain Gaussian filter created")
+    # Gaussian-like filter in frequency space
+    gaussian_filter_freq = numpy.exp(-(d / lmbd))
+    if verbose:
+        print("Frequency domain Gaussian filter created")
 
-    # Apply the Gaussian filter in frequency space
+    # Convolution in frequency space
     convolvedImageFFT = imageFFT * gaussian_filter_freq
+    if verbose:
+        print("Convolution in frequency space completed")
 
-    print("Convolution in frequency space completed")
-
-    # Inverse FFT to get the final result
-    convolvedImage = np.fft.irfftn(convolvedImageFFT, s=(xsize, ysize, zsize)).astype(np.float32)
-
-    print("Inverse FFT completed")
+    # Inverse FFT
+    convolvedImage = numpy.fft.irfftn(convolvedImageFFT,
+                                      s=(isize.z, isize.y, isize.x)).astype(numpy.float32)
+    if verbose:
+        print("Inverse FFT completed")
 
     # Clip to avoid log of zero
-    convolvedImage = np.clip(convolvedImage, 1e-32, None)
-    print('Clipping completed')
+    convolvedImage = numpy.clip(convolvedImage, 1e-32, None)
+    if verbose:
+        print("Clipping completed")
 
-    # Calculate the distance transform
-    distanceImage = -lmbd * np.log(convolvedImage).astype(np.float32)
-    print('Distance transform completed')
-    
-    return distanceImage
+    # Distance transform
+    hostOutput[:] = (-lmbd * numpy.log(convolvedImage)).astype(numpy.float32)
+    if verbose:
+        print("Distance transform completed")
+
+    return hostOutput
