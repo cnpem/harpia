@@ -18,4 +18,43 @@
  */
 void watershed(int* data, int* labels, int rows, int cols, int iterations);
 
+void watershed3d(int* data, int* labels, int rows, int cols, int depth, int iterations);
+
+void hierarchicalWatershed(int* data, int* labels, int rows, int cols, int levels);
+
+void hierarchicalWatershed3d(int* data, int* labels,
+                             int rows, int cols, int depth,
+                             int levels);
+
+void hierarchicalWatershed_2d_batched(int* image,
+                                      int rows, int cols, int depth,
+                                      int* labels,
+                                      int levels,
+                                      int dz);
+
+template<typename in_dtype>
+void watershed_gpu(const in_dtype* h_image, int* h_labels, int rows, int cols);
+
+template<typename in_dtype>
+void hierarchicalWatershed_gpu(const in_dtype* h_image, int* h_labels,
+                               int ysize, int xsize, int levels);
+
+template<typename in_dtype>
+void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
+                                  int xsize, int ysize, int zsize, int flag_verbose, int levels, int neighborhood);
+
+template<typename in_dtype>
+void hierarchicalWatershedChunked(in_dtype* hostImage, int* hostLabels,
+                                  int xsize, int ysize, int zsize,
+                                  int levels, int neighborhood,
+                                  float gpuMemory, int ngpus, int flag_verbose);
+
+
+template<typename in_dtype>
+void hierarchicalWatershedChunkedKernel(in_dtype* hostImage, int* hostLabels,
+                                        int xsize, int ysize, int zsize,
+                                        int levels, int neighborhood,
+                                        float safetyMargin, int ngpus,
+                                        int flag_verbose);
+
 #endif // WATERSHED_H
