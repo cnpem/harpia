@@ -7,35 +7,16 @@
 #include "../../include/common/chunkedExecutor.h"
 
 void get_laplacian_kernel_2d(float** kernel) {
-  /*
-
-        Laplacian hostKernel has the form:
-
-          +-----------------+
-          |   -1  -1  -1    |
-          |   -1   8  -1    |
-          |   -1  -1  -1    |
-          +-----------------+
-
-    */
-
+  // 4*center - sum of neighbors
+  //  [ 0 -1  0
+  //   -1  4 -1
+  //    0 -1  0 ]
   *kernel = (float*)malloc(sizeof(float) * 9);
+  if (!*kernel) return;
 
-  if (!*kernel) {
-    return;
-  }
-
-  (*kernel)[0] = -1;
-  (*kernel)[1] = -1;
-  (*kernel)[2] = -1;
-
-  (*kernel)[3] = -1;
-  (*kernel)[4] = 8;
-  (*kernel)[5] = -1;
-
-  (*kernel)[6] = -1;
-  (*kernel)[7] = -1;
-  (*kernel)[8] = -1;
+  (*kernel)[0]=0;  (*kernel)[1]=-1; (*kernel)[2]=0;
+  (*kernel)[3]=-1; (*kernel)[4]=+4; (*kernel)[5]=-1;
+  (*kernel)[6]=0;  (*kernel)[7]=-1; (*kernel)[8]=0;
 }
 
 void get_laplacian_kernel_3d(float** kernel) {
@@ -72,7 +53,7 @@ void get_laplacian_kernel_3d(float** kernel) {
   (*kernel)[2] = 0;
 
   (*kernel)[3] = 0;
-  (*kernel)[4] = 1;
+  (*kernel)[4] = -1;
   (*kernel)[5] = 0;
 
   (*kernel)[6] = 0;
@@ -81,15 +62,15 @@ void get_laplacian_kernel_3d(float** kernel) {
 
   //second plane
   (*kernel)[9] = 0;
-  (*kernel)[10] = 1;
+  (*kernel)[10] = -1;
   (*kernel)[11] = 0;
 
-  (*kernel)[12] = 1;
-  (*kernel)[13] = -6;
-  (*kernel)[14] = 1;
+  (*kernel)[12] = -1;
+  (*kernel)[13] = 6;
+  (*kernel)[14] = -1;
 
   (*kernel)[15] = 0;
-  (*kernel)[16] = 1;
+  (*kernel)[16] = -1;
   (*kernel)[17] = 0;
 
   //third plane
@@ -98,7 +79,7 @@ void get_laplacian_kernel_3d(float** kernel) {
   (*kernel)[20] = 0;
 
   (*kernel)[21] = 0;
-  (*kernel)[22] = 1;
+  (*kernel)[22] = -1;
   (*kernel)[23] = 0;
 
   (*kernel)[24] = 0;
@@ -119,7 +100,7 @@ __global__ void log_filter_kernel_2d(dtype* image, float* output, float* deviceK
 
     convolution2d(image + idz * xsize * ysize, &temp, deviceKernel, idx, idy, xsize, ysize, 3, 3);
 
-    output[index] = (float)sqrtf(temp * temp);
+    output[index] = (float)temp;
   }
 }
 
@@ -138,7 +119,7 @@ __global__ void log_filter_kernel_3d(dtype* image, float* output, float* deviceK
 
     convolution3d(image, &temp, deviceKernel, idx, idy, idz, xsize, ysize, zsize, 3, 3, 3);
 
-    output[index] = (float)sqrtf(temp * temp);
+    output[index] = (float)temp;
   }
 }
 
@@ -165,7 +146,7 @@ __global__ void log_filter_kernel_3d_chunked(dtype* image, float* output, float*
                                padding_bottom, padding_top,
                                3, 3, 3);
 
-    output[index] = sqrtf(temp * temp);
+    output[index] = (float)temp;
   }
 }
 
