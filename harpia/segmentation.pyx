@@ -4,7 +4,7 @@ import numpy as np
 from libcpp cimport bool
 from harpia.common import Size
 
-cdef extern from "../../include/morphology/morph_snakes_2d.h":
+cdef extern from "../include/morphology/morph_snakes_2d.h":
     void morph_geodesic_active_contour(float* hostImage, bool* initLs, const int iterations, const float balloonForce, const float threshold, const int smoothing, bool* hostOutput,
                         const int xsize, const int ysize,
                         const int flag_verbose)
@@ -13,7 +13,7 @@ cdef extern from "../../include/morphology/morph_snakes_2d.h":
                          const int xsize, const int ysize,
                          const int flag_verbose)
     
-def morph_2D_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bool, ndim=2] initLs, int iterations, float threshold, float balloonForce, int smoothing, int flag_verbose=0):
+def morphological_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] gimage, int num_iter, np.ndarray[bool, ndim=2] init_level_set, int smoothing = 1, float threshold = 0.4, float balloon = 1, int flag_verbose=0):
     """Morphological Geodesic Active Contours (MorphGAC).
 
     Geodesic active contours implemented with morphological operators. It can
@@ -33,10 +33,14 @@ def morph_2D_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] hostImage,
         perform this preprocessing. Note that the quality of
         `morphological_geodesic_active_contour` might greatly depend on this
         preprocessing.
-    initLs :(ysize, xsize) bool array
-        Initial level set. 
-    iterations : int
+    num_iter : int
         Number of iterations to run
+    init_level_set : (ysize, xsize) bool array
+        Initial level set. 
+    smoothing : int, optional
+        Number of times the smoothing operator is applied per iteration.
+        Reasonable values are around 1-4. Larger values lead to smoother
+        segmentations.
     threshold : float, optional
         Areas of the image with a value smaller than this threshold will be
         considered borders. The evolution of the contour will stop in this
@@ -48,11 +52,7 @@ def morph_2D_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] hostImage,
         while a positive value will expand the contour in these areas. Setting
         this to zero will disable the balloon force.
         Effectively in the code, it only matter if it's positive, negative or zero.
-    smoothing : int, optional
-        Number of times the smoothing operator is applied per iteration.
-        Reasonable values are around 1-4. Larger values lead to smoother
-        segmentations.
-    flag_verbose: bool, optional
+    flag_verbose : bool, optional
         If set to a non-zero value, the function will print
         the grid and block dimensions used for kernel execution to the console. This
         is useful for debugging and performance analysis to understand how the computation
@@ -85,29 +85,27 @@ def morph_2D_geodesic_active_contour(np.ndarray[np.float32_t, ndim=2] hostImage,
            2014, DOI 10.1109/TPAMI.2013.106
     """
     #apply padding
-    hostImage = np.pad(hostImage, pad_width=1, mode="edge")
-    initLs = np.pad(initLs, pad_width=1, mode="edge")
+    gimage = np.pad(gimage, pad_width=1, mode="edge")
+    init_level_set = np.pad(init_level_set, pad_width=1, mode="edge")
     # Ensure input arrays are C-contiguous
-    hostImage = np.ascontiguousarray(hostImage, dtype=np.float32)
-    initLs = np.ascontiguousarray(initLs, dtype=np.bool_)
+    gimage = np.ascontiguousarray(gimage, dtype=np.float32)
+    init_level_set = np.ascontiguousarray(init_level_set, dtype=np.bool_)
 
     # Define variables
-    isize = Size(hostImage)
+    isize = Size(gimage)
 
     # Create the output array
     cdef np.ndarray[bool, ndim=2] hostOutput = np.zeros((isize.y, isize.x), dtype=np.bool_)
 
     # Call the external C function
     morph_geodesic_active_contour(
-        &hostImage[0, 0], &initLs[0, 0], iterations, balloonForce, threshold, smoothing,
+        &gimage[0, 0], &init_level_set[0, 0], num_iter, balloon, threshold, smoothing,
         &hostOutput[0, 0], isize.x, isize.y, flag_verbose
     )
-    #remove padding
-    hostImage = hostImage[1:-1, 1:-1]
 
     return hostOutput[1:-1, 1:-1]
 
-def morph_2D_chan_vese(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bool, ndim=2] initLs, int iterations, float lambda1, float lambda2, int smoothing, int flag_verbose=0):
+def morphological_chan_vese(np.ndarray[np.float32_t, ndim=2] image, int num_iter, np.ndarray[bool, ndim=2] init_level_set, int smoothing = 1, float lambda1 = 1, float lambda2 = 1, int flag_verbose = 0):
     """Morphological Active Contours without Edges (MorphACWE)
 
     Active contours without edges implemented with morphological operators. It
@@ -118,12 +116,12 @@ def morph_2D_chan_vese(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bo
 
     Parameters
     ----------
-    hostImage : (ysize, xsize) float array
+    image : (ysize, xsize) float array
         Grayscale image or volume to be segmented.
-    initLs :(ysize, xsize) bool array
-        Initial level set. 
-    iterations : int
+    num_iter : int
         Number of iterations to run
+    init_level_set : (ysize, xsize) bool array
+        Initial level set. 
     smoothing : int, optional
         Number of times the smoothing operator is applied per iteration.
         Reasonable values are around 1-4. Larger values lead to smoother
@@ -136,7 +134,7 @@ def morph_2D_chan_vese(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bo
         Weight parameter for the inner region. If `lambda2` is larger than
         `lambda1`, the inner region will contain a larger range of values than
         the outer region.
-    flag_verbose: bool, optional
+    flag_verbose : bool, optional
         If set to a non-zero value, the function will print
         the grid and block dimensions used for kernel execution to the console. This
         is useful for debugging and performance analysis to understand how the computation
@@ -165,31 +163,28 @@ def morph_2D_chan_vese(np.ndarray[np.float32_t, ndim=2] hostImage, np.ndarray[bo
     ----------
     .. [1] A Morphological Approach to Curvature-based Evolution of Curves and
            Surfaces, Pablo Márquez-Neila, Luis Baumela, Luis Álvarez. In IEEE
-           Transactions on Pattern Analysis and Machine Intelligence (PAMI),
+           Transactions on Pattern Analysis and Machine Intelligence (PANI),
            2014, DOI 10.1109/TPAMI.2013.106
     """
 
     #apply padding
-    hostImage = np.pad(hostImage, pad_width=1, mode="edge")
-    initLs = np.pad(initLs, pad_width=1, mode="edge")
+    image = np.pad(image, pad_width=1, mode="edge")
+    init_level_set = np.pad(init_level_set, pad_width=1, mode="edge")
 
     # Ensure input arrays are C-contiguous
-    hostImage = np.ascontiguousarray(hostImage, dtype=np.float32)
-    initLs = np.ascontiguousarray(initLs, dtype=np.bool_)
+    image = np.ascontiguousarray(image, dtype=np.float32)
+    init_level_set = np.ascontiguousarray(init_level_set, dtype=np.bool_)
 
     # Get image size
-    isize = Size(hostImage)
+    isize = Size(image)
 
     # Create the output array
     cdef np.ndarray[bool, ndim=2] hostOutput = np.zeros((isize.y, isize.x), dtype=np.bool_)
 
     # Call the external C function
     morph_chan_vese(
-        &hostImage[0, 0], &initLs[0, 0], iterations, lambda1, lambda2, smoothing,
+        &image[0, 0], &init_level_set[0, 0], num_iter, lambda1, lambda2, smoothing,
         &hostOutput[0, 0], isize.x, isize.y, flag_verbose
     )
-
-    #remove padding
-    hostImage = hostImage[1:-1, 1:-1]
 
     return hostOutput[1:-1, 1:-1]
