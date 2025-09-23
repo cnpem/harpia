@@ -44,7 +44,7 @@ cdef extern from "../../include/threshold/sauvola.h":
 
 
 #---------------------------------------------------------------------------------------------------
-def gaussianThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
+def threshold_gaussian(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
                    float sigma = 1, float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
@@ -81,7 +81,7 @@ def gaussianThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
     return hostOutput
 
 
-def meanThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
+def threshold_mean(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
                    int windowSize=3,float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
@@ -124,7 +124,67 @@ def meanThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
     return hostOutput
 
 
-def niblackThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
+
+def threshold_local(numpy.ndarray[numeric, ndim=3] hostImage,
+                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
+                    int block_size = 3,
+                    float sigma = 1.0,
+                    float offset = 0.0,
+                    str method = "gaussian",
+                    int type3d = 1,
+                    int verbose = 0,
+                    float gpuMemory = 0.4,
+                    int ngpus = -1):
+    """
+    Apply adaptive thresholding to a 3D image using GPU chunking.
+
+    This function mimics `skimage.filters.threshold_local`.
+
+    Parameters:
+        hostImage (ndarray): Input 3D image of numeric type.
+        hostOutput (ndarray, optional): Output array (float32) to store the result. Auto-created if None.
+        block_size (int): Window size for local filtering (used for 'mean' method).
+        sigma (float): Standard deviation for Gaussian kernel (used for 'gaussian' method).
+        offset (float): Constant subtracted from the local mean/gaussian.
+        method ({"gaussian", "mean"}): Method for computing local threshold.
+        type3d (int): Use full 3D filtering (1) or slice-wise (0).
+        verbose (int): Verbose output for chunk execution.
+        gpuMemory (float): Fraction of GPU memory to use (0–1).
+        ngpus (int): Number of GPUs to utilize (-1 = all available).
+
+    Returns:
+        ndarray: Binarized image based on adaptive threshold.
+    """
+
+    isize = Size(hostImage)
+
+    if hostOutput is None:
+        hostOutput = numpy.empty((isize.z, isize.y, isize.x), dtype=numpy.float32)
+
+    if method == "gaussian":
+        adaptativeGaussianThresholdChunked(
+            &hostImage[0, 0, 0],
+            &hostOutput[0, 0, 0],
+            isize.y, isize.x, isize.z,
+            sigma, offset, type3d, verbose, ngpus, gpuMemory
+        )
+    elif method == "mean":
+        nx = block_size
+        ny = block_size
+        nz = block_size
+        adaptativeMeanThresholdChunked(
+            &hostImage[0, 0, 0],
+            &hostOutput[0, 0, 0],
+            isize.y, isize.x, isize.z,
+            offset, type3d, verbose, gpuMemory, ngpus,
+            nx, ny, nz
+        )
+    else:
+        raise ValueError(f"Unknown method: {method}. Use 'gaussian' or 'mean'.")
+
+    return hostOutput
+
+def threshold_niblack(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
                    int windowSize=3,float weight = 0 ,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
@@ -168,7 +228,7 @@ def niblackThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
     return hostOutput
 
 
-def sauvolaThreshold(numpy.ndarray[numeric, ndim=3] hostImage,
+def threshold_sauvola(numpy.ndarray[numeric, ndim=3] hostImage,
                    numpy.ndarray[numpy.float32_t, ndim=3] hostOutput = None,
                    int windowSize=3,float weight = 0 , numeric range  = 1,int type3d=1,
                    int verbose = 0, float gpuMemory = 0.4, int ngpus = -1
