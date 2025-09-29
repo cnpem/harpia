@@ -10,3 +10,6 @@ from .distance_transform_log_sum_kernel import*
 from .featureExtraction import *
 
 __version__ = _version.get_versions()["version"]
+
+from . import _version
+__version__ = _version.get_versions()['version']
