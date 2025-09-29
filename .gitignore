@@ -39,3 +39,29 @@
 
 # debug information files
 *.dwo
+
+#ignore singularity images
+*.sif
+
+#raw example images (they may be too big)
+***.raw
+**/foo/
+
+#build files
+harpia.egg-info/
+obj/
+Test
+build/
+dist/
+**.so
+**/__pycache__
+harpia/**/*.cpp
+
+#test files
+**/**.png
+#**.csv
+**/cufile.log
+
+#ignore jupyter notebook checkpointfiles
+**/.ipynb_checkpoints/**
+

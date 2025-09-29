@@ -1,0 +1,3 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Scikit-Image Time (s),Time Ratio,Repetitions,Mean Squared Error,Pixel Accuracy (%),Image Data Type,Image Size (MB),Image Dimensions
+Erosion 3D grayscale,harriet,1,0.2,16.166930831968784,291.58840864300726,18.0,10,0.0,100.0,int32,32896.1,"(2048, 2052, 2052)"
+Erosion 3D grayscale,harriet,1,0.2,42.880359324626625,N/A,N/A,1,N/A,N/A,int32,32896.1,"(2048, 2052, 2052)"

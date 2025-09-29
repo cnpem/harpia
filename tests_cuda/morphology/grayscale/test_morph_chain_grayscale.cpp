@@ -1,0 +1,126 @@
+#include <stdio.h>
+#include <sys/time.h>
+#include <time.h>
+#include <cstring>
+#include <string>
+
+#include "../../../include/common/chunkedExecutor.h"
+#include "../../../include/morphology/morph_chain_grayscale.h"
+#include "../../../include/morphology/structuring_elements.h"
+#include "../../../include/tests/morphology/test_image_processing.h"
+#include "../../../include/tests/morphology/test_morph_chain_grayscale.h"
+#include "../../../include/tests/morphology/test_util.h"
+
+void test_morph_chain_grayscale_on_device(const std::string& filename, const int xsize,
+                                          const int ysize, const int zsize, int* kernel,
+                                          const int kernel_xsize, const int kernel_ysize,
+                                          const int kernel_zsize, MorphChain chain,
+                                          float memoryOccupancy, int ngpus, const int flag_check,
+                                          const int flag_verbose, const int flag_float) {
+
+  const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
+  printf("\nTest grayscale %s on device\n", (closing_flag ? "closing" : "opening"));
+
+  // set input dimension
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
+
+  size_t nBytes = size * sizeof(float);
+
+  if (flag_verbose)
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
+
+  float *host_A, *device_ref;  //pointers for host memory
+  host_A = (float*)malloc(nBytes);
+  device_ref = (float*)calloc(size, sizeof(float));
+
+  // set input data
+  read_input(host_A, filename, size, flag_verbose, flag_float);
+
+  // device erosion
+  int ncopies = 3;
+  int operations = 2;
+  chunkedExecutorKernel(morph_chain_grayscale_on_device<float>, ncopies, memoryOccupancy, ngpus,
+                        operations, host_A, device_ref, xsize, ysize, zsize, flag_verbose, kernel,
+                        kernel_xsize, kernel_ysize, kernel_zsize, chain);
+
+  if (flag_check) {
+    float* host_ref;
+    host_ref = (float*)calloc(size, sizeof(float));
+
+    // erosion
+    morph_chain_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                                  kernel_ysize, kernel_zsize, chain);
+
+    check_result(host_ref, device_ref, xsize, ysize, zsize);
+
+    free(host_ref);
+  }
+
+  free(host_A);
+  free(device_ref);
+}
+
+void test_morph_chain_grayscale_on_host(const std::string& filename, const int xsize,
+                                        const int ysize, const int zsize, int* kernel,
+                                        const int kernel_xsize, const int kernel_ysize,
+                                        const int kernel_zsize, MorphChain chain,
+                                        const int flag_show, const int flag_check,
+                                        const int flag_verbose, const int flag_float) {
+
+  const int closing_flag = (chain.operation1 == DILATION) && (chain.operation2 == EROSION);
+  printf("\nTest grayscale %s on host\n", (closing_flag ? "closing" : "opening"));
+
+  // set input dimension
+  size_t size = static_cast<size_t>(xsize) * static_cast<size_t>(ysize) * static_cast<size_t>(zsize);
+
+  size_t nBytes = size * sizeof(float);
+  if (flag_verbose)
+    printf("Matrix size:   %zu (%d.%d.%d)\n", size, xsize, ysize, zsize);
+
+  float *host_A, *host_ref;  //pointers for host memory
+  host_A = (float*)malloc(nBytes);
+  host_ref = (float*)calloc(size, sizeof(float));
+
+  // set input data
+  read_input(host_A, filename, size, flag_verbose, flag_float);
+  if (flag_show)
+    show_image_3D(host_A, xsize, ysize, zsize, "Input Image");
+
+  // operation on host
+  morph_chain_grayscale_on_host(host_A, host_ref, xsize, ysize, zsize, kernel, kernel_xsize,
+                                kernel_ysize, kernel_zsize, chain);
+  if (flag_show)
+    show_image_3D(host_ref, xsize, ysize, zsize, "Result Image");
+
+  if (flag_check) {
+    if (kernel_zsize > 1) {
+      printf(
+          "WARNING: Results will not match, openCV is done slice by slice, it "
+          "is incompatible with kernel zsize: %d",
+          kernel_zsize);
+    }
+    float *opencv_ref, *opencv_tmp;
+    opencv_ref = (float*)calloc(size, sizeof(float));
+    opencv_tmp = (float*)malloc(nBytes);
+
+    // openCV operation
+    morphology_3D_openCV(host_A, opencv_tmp, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
+                         chain.operation1);
+    morphology_3D_openCV(opencv_tmp, opencv_ref, xsize, ysize, zsize, kernel_xsize, kernel_ysize,
+                         chain.operation2);
+    if (flag_show)
+      show_image_3D(opencv_ref, xsize, ysize, zsize, "Result openCV");
+
+    check_result(host_ref, opencv_ref, xsize, ysize, zsize);
+
+    free(opencv_ref);
+    free(opencv_tmp);
+  }
+
+  if (flag_show)
+    cv::waitKey(0);
+
+  //free host memory
+  free(host_A);
+  free(host_ref);
+}

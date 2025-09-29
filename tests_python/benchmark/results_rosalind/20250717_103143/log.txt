@@ -1,0 +1,7 @@
+Reading big image...
+Finished reading image!
+Reading time: 35.62s
+
+Machine 'rosalind' with 200 reps, image #4 (big).
+
+Saving to file: results_rosalind/20250717_103143/rosalind_200reps_harpia_2048_binary.csv

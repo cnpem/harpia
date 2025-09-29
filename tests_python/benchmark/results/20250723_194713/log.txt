@@ -1,0 +1,78 @@
+Reading big image...
+Finished reading image!
+Reading time: 280.73s
+
+Machine 'aida' with 30 reps, image #4 (big).
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_1_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_2_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_4_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_8_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_16_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_32_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_64_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_128_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_256_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_512_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_1024_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_2048_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_2_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_1_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_4_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_8_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_16_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_32_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_64_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_128_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_256_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_512_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_1024_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_2048_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_1_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_4_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_8_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_16_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_32_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_64_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_128_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_256_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_512_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_1024_grayscale.csv
+
+Saving to file: results/20250723_194713/aida_30reps_harpia_2048_grayscale.csv
+
+✅ All tests completed!
+Total executin time: 19436.17s

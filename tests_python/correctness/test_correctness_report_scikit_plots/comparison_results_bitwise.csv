@@ -1,0 +1,5 @@
+Operation,Framework,Image Shape,Image Size (MiB),Accuracy,Mean Bitwise Difference,Std Dev of Bitwise Difference
+Threshold Savoula 3D,scikit,"(100, 207, 190)",15.00,99.92064581744215,0.20,7.18
+Threshold Niblack 3D,scikit,"(100, 207, 190)",15.00,99.92120518688024,0.20,7.16
+Threshold Local Gaussian 3D,scikit,"(100, 207, 190)",15.00,99.88693109585557,0.29,8.57
+Threshold Mean 3D,scikit,"(100, 207, 190)",15.00,99.94365624205442,0.14,6.05

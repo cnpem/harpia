@@ -1,0 +1,2 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Scikit-Image Time (s),Time Ratio,Repetitions,Mean Squared Error,Pixel Accuracy (%),Image Data Type,Image Size (MB),Image Dimensions
+Smoothing 3D binary,harriet,2,0.2,0.007846530620008707,0.23338867933489382,29.7,10,0.0,100.0,int32,15.0,"(100, 207, 190)"

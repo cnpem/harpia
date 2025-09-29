@@ -1,0 +1,55 @@
+default_language_version:
+    python: python3
+exclude: 'docs'
+repos:
+    - repo: https://github.com/psf/black
+      rev: 24.3.0
+      hooks:
+          - id: black
+            args: ['--line-length=100', './']
+            files: '(\.pyi?|wscript|ipynb)$'
+            always_run: true
+            additional_dependencies: ['click==8.0.4']
+            stages: [pre-commit]
+    - repo: https://github.com/pycqa/flake8
+      rev: 7.0.0
+      hooks:
+          - id: flake8
+            files: ^tests_python/
+            always_run: true
+            args: ['--config', '.flake8']
+            stages: [pre-commit]
+    - repo: https://github.com/timothycrosley/isort
+      rev: 5.13.2
+      hooks:
+          - id: isort
+            files: ^tests_python/
+            always_run: true
+            args: ['--profile', 'black', '.']
+            stages: [pre-commit]
+    - repo: https://github.com/econchick/interrogate
+      rev: 1.7.0
+      hooks:
+          - id: interrogate
+            files: ^tests_python/
+            always_run: true
+            args: [-vv, -i, --fail-under=70, --ignore-module]
+            stages: [pre-commit]
+    - repo: local
+      hooks:
+        - id: clang-format
+          name: clang-format
+          description: Format files with ClangFormat.
+          entry: clang-format
+          language: system
+          files: \.(cu|cuh|h|hpp|cpp|inl)$
+          args: ['-i', '--fallback-style=none']
+          stages: [pre-commit]
+    - repo: https://github.com/jorisroovers/gitlint
+      rev: "v0.19.1"
+      hooks:
+          - id: gitlint
+            language: python
+            entry: gitlint
+            args: [--staged, --msg-filename]
+            stages: [commit-msg]

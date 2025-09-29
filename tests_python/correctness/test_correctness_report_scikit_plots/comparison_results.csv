@@ -1,0 +1,23 @@
+Operation,Framework,Image Shape,Image Size (MiB),Accuracy,Mean Relative Error,Std Dev of Relative Error
+Non-local-means 3D,scikit,"(1, 207, 190)",0.15,99.80,0.20,0.21
+Unsharp Mask 3D,scikit,"(100, 207, 190)",15.00,99.98,0.02,0.03
+Median 3D,scikit,"(100, 207, 190)",15.00,99.61,0.39,0.41
+Mean 3D,scikit,"(100, 207, 190)",15.00,99.99,0.01,0.03
+Sobel 3D,scikit,"(100, 207, 190)",15.00,99.47,0.53,5.65
+Prewitt 3D,scikit,"(100, 207, 190)",15.00,99.38,0.62,6.87
+Gaussian 3D,scikit,"(100, 207, 190)",15.00,99.98,0.02,0.03
+LoG 3D,scikit,"(100, 207, 190)",15.00,-214066.77,214166.77,125263488.00
+Erosion 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Dilation 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Opening 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Closing 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Recosntruction,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Recosntruction,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+TopHat 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+BottomHat 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Erosion 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Dilation 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Opening 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Closing 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+recosntruction 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00
+Smoothing 3D,scikit,"(100, 207, 190)",15.00,100.00,0.00,0.00

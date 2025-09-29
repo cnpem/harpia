@@ -1,0 +1,2 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Scikit-Image Time (s),Time Ratio,Repetitions,Mean Squared Error,Pixel Accuracy (%),Image Data Type,Image Size (MB),Image Dimensions
+Opening 3D grayscale,harriet,1,0.2,0.007700715027749538,0.2092683373019099,27.2,10,0.0,100.0,int32,15.0,"(100, 207, 190)"

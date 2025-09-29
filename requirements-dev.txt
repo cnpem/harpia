@@ -1,0 +1,26 @@
+#build dependencies
+cython==3.1.2
+numpy==1.24.3
+more_itertools==10.7.0
+
+#test dependencies
+scipy==1.9.1
+scikit-image==0.20.0
+matplotlib==3.8.4
+tqdm==4.67.1
+pandas==2.3.1
+GPUtil==1.4.0
+notebook==7.4.5
+seaborn==0.13.2
+
+#linters dependencies
+black==24.3.0
+commitizen==3.20.0
+flake8==7.0.0
+flake8-docstrings==1.6.0
+gitlint==0.19.1
+interrogate==1.5.0
+isort==5.13.2
+pre-commit==3.6.2
+versioneer==0.29
+

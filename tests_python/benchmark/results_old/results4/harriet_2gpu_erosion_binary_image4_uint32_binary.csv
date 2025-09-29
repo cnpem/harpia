@@ -1,0 +1,2 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Scikit-Image Time (s),Time Ratio,Repetitions,Mean Squared Error,Pixel Accuracy (%),Image Data Type,Image Size (MB),Image Dimensions
+Erosion 3D binary,harriet,2,0.2,9.92615751135163,167.1390864330111,16.8,10,0.0,100.0,uint32,32896.1,"(2048, 2052, 2052)"

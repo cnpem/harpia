@@ -1,0 +1,2 @@
+Operation,Machine,Gpus,gpuMemory,Module Time (s),Scikit-Image Time (s),Time Ratio,Repetitions,Mean Squared Error,Pixel Accuracy (%),Image Data Type,Image Size (MB),Image Dimensions
+Opening 3D binary,harriet,1,0.2,0.004045555740594864,0.08635348770767451,21.3,10,0.0,100.0,uint8,3.8,"(100, 207, 190)"

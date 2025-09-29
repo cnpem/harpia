@@ -1,0 +1,7 @@
+Reading big image...
+Finished reading image!
+Reading time: 280.08s
+
+Machine 'aida' with 30 reps, image #4 (big).
+
+Saving to file: results/20250724_111958/aida_30reps_harpia_2048_grayscale.csv

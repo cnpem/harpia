@@ -1,0 +1,511 @@
+Operation,Machine,Gpus,gpuMemory,Harpia Time (s),Scikit Time (s),Scikit Time Ratio,Cucim Total Time (s),Cucim Memory Time (s),Cucim Gpu Time (s),Cucim Time Ratio,Repetitions,Image Data Type,Image Size (MiB),Image Dimensions,harpia_gpu0(MiB)
+Erosion 3D grayscale,aida,1,0.05,1.4010850579943508,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3842346750025172,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5425064750015736,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5611260480072815,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5720747310115257,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5721436039893888,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.396498114001588,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.382393617008347,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5450701590016251,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5616993570001796,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5721146409923676,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.571703585999785,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.394922225998016,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3840008299885085,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5436899320047814,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5624639879970346,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5702159139909782,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5695131469983608,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3946891689993208,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.382945014993311,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5462374750059098,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5605702489992836,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5688664149929537,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5720337890088558,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.396716014991398,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3809883760113735,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.545052397006657,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5599580949929077,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5703566980082542,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5747391110053286,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3978871519939275,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3856993189983768,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.546395681987633,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5625737770023989,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5762208550004289,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5732354600040708,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3973235279991059,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.386260293002124,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5464060850063106,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5616751600027783,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5738725660048658,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5740750709956046,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3971252149931388,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3846840620099101,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5471061919961357,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5599485879938584,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.573143670000718,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5708826449990738,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3974208759900648,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3847776809998322,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5470830899866996,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.560300434997771,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5659428520011716,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.567024018993834,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3923935970087769,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3804806129919598,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.541208781010937,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.556472626994946,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5672951320011634,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5678663050057366,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3899636120040668,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3794495840120362,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5455797419999726,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5572579439904075,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.567017910987488,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5694034350017319,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3957457399956184,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3826170060056029,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5415878019994125,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5608637880068272,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5671512949920725,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5683483610046096,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3905490799952531,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3793526619992917,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5404463540035067,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5596721159963636,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.568007406007382,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5673747320106486,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.392411324006389,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3826823209965369,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.541181405991665,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5589499519992387,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5654008870042162,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5685583620070247,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3958307120046811,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3788754099950893,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5436970070004463,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.557358051999472,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5671190380089683,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5693266870075604,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3938243470038287,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3834388620016398,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5438876480038743,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5567780950077577,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5694190609938232,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5680182429932756,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3929478289937833,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3787933140120003,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.541701023990754,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.554613843007246,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5684145309933228,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.567958590996568,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3954383409873117,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3821291549975285,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5427522230020259,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5554485229949933,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5692282520030858,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.56846195399703,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3961355589999584,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3784532599966042,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5437568530032877,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.555898343998706,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5688072970078792,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5659435409907019,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3978578270034632,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3781135169992922,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5432488429942168,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5579247179994127,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5694787070096936,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.564514097000938,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3971523310028715,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.377527596996515,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5420298470126,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5559171399945626,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5692913029924966,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5676109549967805,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3948815940093482,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3825939609960187,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5443588130001444,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5597528970101848,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5690793120011222,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.567883992989664,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3929668819910148,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3819360749912448,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5420090480038198,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.559190141997533,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5683954380074283,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5700272570102243,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3953712189977523,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.381886970004416,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5439176380023127,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5598471050034277,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5684235509979771,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.57123927900102,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3943801429995801,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3856039210077142,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.545659543000511,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5639788200060138,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.569540965007036,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5700068480073242,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3944312270032242,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3841238890017848,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5459204460057663,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5644983730016975,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5712863659864524,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.574121801997535,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3960486849973677,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3852118069917196,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.543489486008184,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5625633320014458,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5723157619941048,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5697718220035313,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3984651849896181,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3820956390118226,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5453116830030922,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5613324320001993,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5726356170052895,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5706344330101274,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3981770480022533,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3821841839962872,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5467795380100142,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5588877160043921,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5687070439889794,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5703739789896645,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Erosion 3D grayscale,aida,1,0.05,1.3970927860063966,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Dilation 3D grayscale,aida,1,0.05,1.3803650610061595,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Closing 3D grayscale,aida,1,0.05,1.5455577959946822,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Opening 3D grayscale,aida,1,0.05,1.5595073570002569,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Top Hat 3D grayscale,aida,1,0.05,1.5682905440044124,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Bottom Hat 3D grayscale,aida,1,0.05,1.5682405609986745,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8230883490032284,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.538213343010284,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4112501659983536,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.377857519997633,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4103002079937141,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3640776480024215,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.897643218995654,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8305706409882987,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5398796769877663,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4115686020086287,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3795342189987423,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.410703323999769,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.362964992003981,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.916841024009045,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8193436760047916,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5390892589930445,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4145780180115253,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3779100270039635,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4114166329964064,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3640782690054039,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.718536861997563,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8393300370080397,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5433270920038922,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4181773769960273,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3855057039909298,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4149235030054115,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3710473149985773,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.686755346003338,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8051588390080724,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5350251130003016,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4134630890039261,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3797464669914916,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4103039960027672,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.363343431003159,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.091898965009023,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.829026734994841,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5401039210119052,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4104158980044303,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3833271369949216,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.410352620005142,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3671737809927436,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.23994510799821,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.816907688000356,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.541977490996942,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4150956440134905,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3816229660005774,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4142112289991928,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3669181669974932,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.05747282601078,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.832085228001233,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.542378504993394,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.411465824014158,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3784622899984242,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4101284259959357,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3657431669998914,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.03009322899743,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.834792023000773,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5409038880025037,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4135282520001056,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3799701089883456,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.412559725009487,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3673848480102606,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.649654969995026,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8215396860032342,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.540069679991575,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.411325694003608,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.383121625010972,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4107975049992092,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.367848326000967,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.956131975995959,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8277034189959522,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.53995789399778,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4109256640076637,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3810875460039824,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4112509959959425,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3662268110056175,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.958743664989015,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.835509758995613,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5389598050096538,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4142472889943747,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.382075914007146,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4101765389932552,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.5418790620024083,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.357914195003104,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.846067388993106,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.542041637992952,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4140898269979516,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3838921990100062,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4133352979988558,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3680658920056885,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.83724109600007,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.825111919999472,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5433836209995206,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4152469170076074,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3921352790057426,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4063018830056535,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.365934624991496,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.081884968996746,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8398872100078734,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5365534510056023,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4113181209977483,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3764349309931276,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4070965260034427,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.364067354996223,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.852810461001354,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8241721720114583,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.540141182995285,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4094550120062195,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3797823729983065,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4112984539970057,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3687189890042646,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.035501580990967,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8116231550084194,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5402396620047512,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4124459320009919,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3788598739920417,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4119493500038516,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.364663770000334,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.21612670000468,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8095844670024235,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5387642400019104,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4106078100012382,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3800129010051023,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4097701479913667,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3661075749987504,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.918350077001378,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.829586878986447,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5376817829965148,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.411445151999942,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3837772339902585,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4152893159916857,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3639607609948143,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.710851458003162,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,3.0081503910041647,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.6310675809945678,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4119440430076793,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3751085909898393,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4110906400019303,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3656375669961562,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.97118271200452,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8329048849991523,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5375892700103577,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4098876869975356,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.377173100001528,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.408615206994,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.364430404995801,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.989905073991395,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8346708140015835,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5387083160021575,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4136854399985168,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3787389520002762,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4130682149989298,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3644220039859647,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.777161466001417,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8336225539969746,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.536611785995774,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4088045259995852,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3806567569990875,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.41244927799562,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.367196730003343,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.08981768800004,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8135926200047834,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5406098890089197,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4137211720080813,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.379405952990055,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4110328499955358,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3661322990083136,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.666396343993256,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.841138526011491,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.540655543009052,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4117505900067044,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3791507540008752,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4098191609955393,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3649804830056382,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.160678051004652,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8399464979884215,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5396827789954841,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.407488126991666,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3806105190014932,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4173997050093021,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3684667619963875,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.94578010000987,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8092267039901344,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5442005920049269,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4139125590008916,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3844657099980395,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4135331860015867,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3687196999962907,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.076872562000062,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.836616172004142,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5452979450055864,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4135188590007601,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.384122360002948,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4105924180039437,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3656918970082188,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,10.079843799001537,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8117041510122363,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5421220310090575,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.4129032600030769,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3818511370045599,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.4120275450113695,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3668304059974616,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.845685822001542,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Anisotropic Diffusion Filter 3D grayscale,aida,1,0.05,2.8394599559978815,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Gaussian Filter 3D grayscale,aida,1,0.05,1.5369689729996026,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Sobel Filter 3D grayscale,aida,1,0.05,1.414614150999114,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Mean Filter 3D grayscale,aida,1,0.05,1.3799494720005896,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Prewitt Filter 3D grayscale,aida,1,0.05,1.409918788005598,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Log Filter 3D grayscale,aida,1,0.05,1.3648910269985208,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Unsharp Mask Filter 3D grayscale,aida,1,0.05,9.827962424009456,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9399231010029325,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9131640039995546,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3724797639879398,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8823037420079345,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9195606230059639,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9170817449921742,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3807131189969368,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8874396869941847,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9222669059963664,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9186605580034666,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3799694799963618,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8901587659929646,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.922094986992306,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9189576110074995,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3791479039937258,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.890384015001473,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9245938590029255,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9234927979996428,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3859218129946385,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.894034955999814,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9248528399912175,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9199235559935914,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3800895710010082,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8890892869967502,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9272087940044003,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9213763370062225,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.380401828995673,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8906348859891295,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9228960960026598,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.917064319990459,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.380801375998999,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.889598877998651,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9202595300012035,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9160680679924553,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3784638910001377,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8876213649928104,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.920703070005402,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9181757749902317,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.378833131006104,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.888453434992698,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9244732429942815,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9212206619995413,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3824079149926547,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8909752920008032,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9253305300080683,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9194985070062103,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.386338602998876,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8939118269918254,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9273960110003827,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9227152620005654,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3810576879914152,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8887553099921206,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9271322139975382,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9237366140005179,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3820244780072244,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.89152101300715,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9217822799982969,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.917312503006542,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3798705770022934,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.886837768004625,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9227504239970585,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9178498209948884,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3800563149998197,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8863700210058596,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9251515679934528,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9172394429915585,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3808972679980798,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.890762374008773,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9202307629893767,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9198333219974302,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.381666226006928,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.888954226000351,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9217664670140948,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.920898013995611,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3819581099960487,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8873234569909982,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9240431090001948,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9179844809987117,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.383973571995739,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8886200029955944,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.922957493996364,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.920134773987229,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3780480540008284,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8892024740052875,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9218234490108443,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9204032800043933,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3801987570041092,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8909093889960786,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.923587180004688,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.912109518001671,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3754687199980253,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.88296210700355,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.918181507004192,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9139953429985326,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3742536409990862,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8872991829994135,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9156657760031521,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.914706051000394,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.374687408999307,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8846353340049973,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.916880350006977,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.913911386000109,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3771663160005119,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8829769320000196,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9183857269963482,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9136909209919395,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3771216199966148,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8829459480039077,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9165578440006357,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9154652289871592,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3755050729960203,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8843687120097456,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9152425350039266,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9159726070065517,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3740138650027802,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8859694949933328,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Niblack,aida,1,0.05,1.9157088960055262,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Sauvola,aida,1,0.05,1.9154108479997376,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Mean,aida,1,0.05,1.3751910260034492,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A
+Threshold Gaussian,aida,1,0.05,1.8850804579997202,N/A,N/A,N/A,N/A,N/A,N/A,1,float32,4112.0,"(256, 2052, 2052)",N/A

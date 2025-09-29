@@ -1,0 +1,19 @@
+Operation,Machine,Gpus,gpuMemory,Harpia Time (s),Scikit Time (s),Scikit Time Ratio,Cucim Total Time (s),Cucim Memory Time (s),Cucim Gpu Time (s),Cucim Time Ratio,Repetitions,Image Data Type,Image Size (MiB),Image Dimensions,harpia_gpu0(MiB)
+Erosion 3D grayscale,mary,1,0.4,15.512036541400448,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34320.0
+Dilation 3D grayscale,mary,1,0.4,7.155248523200134,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34320.0
+Closing 3D grayscale,mary,1,0.4,8.078363442599947,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Opening 3D grayscale,mary,1,0.4,8.199865418200352,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Top Hat 3D grayscale,mary,1,0.4,8.287593768200896,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Bottom Hat 3D grayscale,mary,1,0.4,8.268004155800009,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Erosion 3D grayscale,mary,1,0.4,17.7678959664001,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34320.0
+Dilation 3D grayscale,mary,1,0.4,7.34701380680126,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34320.0
+Closing 3D grayscale,mary,1,0.4,8.364556989000267,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Opening 3D grayscale,mary,1,0.4,8.28459634239989,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Top Hat 3D grayscale,mary,1,0.4,8.464762346200587,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Bottom Hat 3D grayscale,mary,1,0.4,8.497170915199968,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Erosion 3D grayscale,mary,1,0.4,7.329428746800841,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34320.0
+Dilation 3D grayscale,mary,1,0.4,7.359751191800024,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34320.0
+Closing 3D grayscale,mary,1,0.4,8.25457295160013,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Opening 3D grayscale,mary,1,0.4,8.202102407799975,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Top Hat 3D grayscale,mary,1,0.4,8.346924732400657,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0
+Bottom Hat 3D grayscale,mary,1,0.4,8.3685419043999,N/A,N/A,N/A,N/A,N/A,N/A,5,float32,32896.1,"(2048, 2052, 2052)",34254.0

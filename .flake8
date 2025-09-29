@@ -1,0 +1,21 @@
+# See https://flake8.pycqa.org/en/latest/user/configuration.html for more about flake8 rules.
+
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    docs,
+    container
+max-line-length=100
+max-doc-length=100
+ignore=D107,E203,E251,E262,E265,E266,E402,E501,F401,F403,W291,W293,W503,W504
+; # D107 -> Docstring on __init__ files
+; # E262,E265,E266 -> be less optionated about the way to write comments
+; # E402 -> module level import not at top of file
+; # E501,W503,E203,W504,E251 -> let black handle for formatting
+; # F401 -> Imported but unused on __init__ files
+; # F403 -> Do not allow imports with * ('from .module_name import *')
+; # W291,W293 -> trailing whitespace in docstrings
+docstring-convention=google

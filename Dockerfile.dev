@@ -1,0 +1,17 @@
+FROM nvcr.io/nvidia/pytorch:22.02-py3
+
+# Set the working directory
+WORKDIR /workspace
+
+# Copy the requirements file and install the dependencies
+COPY requirements.txt ./
+RUN python3 -m pip install -r requirements.txt
+RUN rm -r requirements.txt
+
+# Install Jupyter Notebook
+RUN python3 -m pip install notebook
+
+# Expose the port for Jupyter Notebook
+EXPOSE 8888
+
+CMD ["bash"]

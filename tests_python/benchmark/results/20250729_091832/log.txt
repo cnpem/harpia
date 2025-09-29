@@ -1,0 +1,18 @@
+Reading big image...
+Finished reading image!
+Reading time: 263.42s
+
+Machine 'mary' with 30 reps, image #4 (big).
+
+Saving to file: results/20250729_091832/mary_30reps_harpia_1_grayscale_filter.csv
+
+Saving to file: results/20250729_091832/mary_30reps_harpia_2_grayscale_filter.csv
+
+Saving to file: results/20250729_091832/mary_30reps_harpia_256_grayscale_filter.csv
+
+Saving to file: results/20250729_091832/mary_30reps_harpia_1_grayscale_filter.csv
+
+Saving to file: results/20250729_091832/mary_30reps_harpia_256_grayscale_filter.csv
+
+✅ All tests completed!
+Total executin time: 756.39s
