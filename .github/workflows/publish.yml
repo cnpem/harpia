@@ -1,38 +1,96 @@
-name: Build and Publish to PyPI
+name: Build container, build wheel, publish to PyPI
 
 on:
   push:
+    branches:
+      - main
     tags:
-      - "v*"   # only run on version tags like v0.1.0, v1.0.0 etc.
+      - 'v*'     # publishing to PyPI happens only for tags like v0.1.0
+
+# allow pushing to GHCR
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-  build:
-    name: Build Python 3.9 Wheel
+  build-container:
+    name: Build & push container image
     runs-on: ubuntu-latest
-
+    # image name uses repository and current commit SHA
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository }}:${{ github.sha }}
+    outputs:
+      image: ${{ steps.set-output-img.outputs.image }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v5
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
         with:
-          python-version: "3.9"
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: container/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_NAME }}
+
+      - name: Expose built image name (job output)
+        id: set-output-img
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install build wheel
+          echo "image=${{ env.IMAGE_NAME }}" >> $GITHUB_OUTPUT
+
+  build-python-package:
+    name: Build Python wheel (uses the built image)
+    runs-on: ubuntu-latest
+    needs: build-container
+    # run the job inside the just-built image; authenticate to pull from GHCR
+    container:
+      image: ${{ needs.build-container.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Ensure Python 3.9 (best-effort)
+        run: |
+          # if python3.9 is already in the image this is a no-op; otherwise try to install
+          if command -v python3.9 >/dev/null 2>&1; then
+            python3.9 -V
+          elif command -v python3 >/dev/null 2>&1 && python3 -V | grep -q "3.9"; then
+            python3 -V
+          else
+            apt-get update && apt-get install -y python3.9 python3.9-dev python3-pip || true
+            # try to make python3 point to 3.9 if needed
+            if [ -f /usr/bin/python3.9 ]; then
+              update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 || true
+            fi
+          fi
+
+      - name: Install Python deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt || true
+          python3 -m pip install wheel
 
       - name: Build wheel
         run: |
-          python setup.py build_ext -j$(nproc) bdist_wheel
-          ls -lh dist/
+          # parallel compilation as in your GitLab CI
+          python3 setup.py build_ext -j64 bdist_wheel
+          ls -lh dist || true
 
-      - name: Upload artifact
+      - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
         with:
           name: wheel-dist
@@ -40,10 +98,9 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: build
     runs-on: ubuntu-latest
+    needs: build-python-package
     if: startsWith(github.ref, 'refs/tags/')
-
     steps:
       - name: Download wheel artifact
         uses: actions/download-artifact@v4
@@ -54,9 +111,9 @@ jobs:
       - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: '3.9'
 
-      - name: Install Twine
+      - name: Install twine
         run: python -m pip install --upgrade pip twine
 
       - name: Publish to PyPI
@@ -64,4 +121,4 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          twine upload dist/* --verbose
+          python -m twine upload dist/* --verbose
