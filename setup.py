@@ -223,7 +223,7 @@ print(cuda_sources)
 print(files)
 print(ext_modules)
 setup(
-    name="harpia",
+    name="harpia-sirius",
     #version=versioneer.get_version(),
     #   cmdclass=versioneer.get_cmdclass(),
     version=version['__version__'],
