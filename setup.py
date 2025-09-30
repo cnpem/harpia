@@ -228,7 +228,6 @@ setup(
     #   cmdclass=versioneer.get_cmdclass(),
     version=version['__version__'],
     description="CUDA extension for Python",
-    script_args=["build_ext", "--inplace", "bdist_wheel"],
     ext_modules=cythonize(
         ext_modules,
         compiler_directives=dict(
@@ -236,5 +235,8 @@ setup(
         ),
     ),
     cmdclass={"build_ext": custom_build_ext},
+    options={
+        "bdist_wheel": {"plat_name": "manylinux2014_x86_64"}
+    },
     zip_safe=False,
 )
