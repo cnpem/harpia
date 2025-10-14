@@ -228,7 +228,7 @@ void chunkedExecutorSuperpixelFeatures(Func func, int ncopies, const float safet
             printf("\nremaining:%d gpu:%d chunkNumber:%d\n", remaining, selectedDevice, chunkNumber);
         }
         
-        func(i_ref, s_ref, xsize, ysize, chunkSize, nsuperpixels, base_features,
+        func(i_ref, s_ref, xsize, ysize, remaining, nsuperpixels, base_features,
             h_count.data() + (size_t)chunkNumber * nsuperpixels * base_features,
             h_sum.data()   + (size_t)chunkNumber * nsuperpixels * base_features,
             h_min.data()   + (size_t)chunkNumber * nsuperpixels * base_features,
