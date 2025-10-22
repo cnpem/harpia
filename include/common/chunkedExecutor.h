@@ -120,6 +120,11 @@ void chunkedExecutorSuperpixelFeatures(Func func, int ncopies, const float safet
                              const int verbose, Args... args);
 
 
+template <typename Func, typename in_dtype, typename out_dtype, typename... Args>
+void chunkedExecutorWatershed(Func func, int ncopies, const float safetyMargin, int ngpus, 
+                              in_dtype* image, out_dtype* output, const int xsize, const int ysize, const int zsize, 
+                              const int verbose, Args... args);
+
                              
 // Includes the implementation to prevent linkage errors during compilation,  
 // similar to defining the function in the header.
@@ -129,6 +134,7 @@ void chunkedExecutorSuperpixelFeatures(Func func, int ncopies, const float safet
 #include "../../src/chunkedExecutor/chunkedExecutorFillHoles.cu"
 #include "../../src/chunkedExecutor/chunkedExecutorPixel.cu"
 #include "../../src/chunkedExecutor/chunkedExecutorSuperpixel.cu"
+#include "../../src/chunkedExecutor/chunkedExecutorWatershed.cu"
 
 #endif  // CHUNKED_EXECUTOR_H
 

@@ -11,6 +11,83 @@
 // ------------------------------------------------------------
 // Utilities
 // ------------------------------------------------------------
+// ------------------ GPU compact labels (no Thrust) ------------------
+// LUT-based compaction: map each distinct root index -> sequential id 1..K
+// Requires deviceLabels to contain root indices (after finalize/inline_Compress).
+
+__global__ void init_lut_kernel(int* lut, int N)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < N) lut[i] = 0;
+}
+
+// Try to claim lut[root] using atomicCAS. If we successfully set lut[root] from 0->-1,
+// then we are the first thread to see this root and we allocate an id using atomicAdd(next).
+// Finally we write the assigned id into lut[root] (replacing -1).
+__global__ void assign_labels_kernel(const int* labels, int* lut, int* next_label, int N)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= N) return;
+
+    int root = labels[i];
+    // bounds check (safety)
+    if (root < 0 || root >= N) return;
+
+    // Try to reserve this lut entry
+    int old = atomicCAS(&lut[root], 0, -1);
+    if (old == 0) {
+        // We are the first: assign a new id (atomicAdd returns old value)
+        int id = atomicAdd(next_label, 1); // returns previous value; we use that as id
+        // write actual id into lut[root]
+        lut[root] = id;
+    } else {
+        // someone else already reserved/assigned it: do nothing
+    }
+}
+
+// Remap each label -> lut[label]
+__global__ void remap_labels_kernel(int* labels, const int* lut, int N)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < N) {
+        int root = labels[i];
+        labels[i] = lut[root];
+    }
+}
+
+// Host wrapper: compact labels on device in-place (labels become 1..K)
+void compact_labels_device(int* d_labels, int N)
+{
+    int *d_lut = nullptr;
+    int *d_next = nullptr;
+
+    // allocate
+    cudaMalloc(&d_lut, N * sizeof(int));
+    cudaMalloc(&d_next, sizeof(int));
+
+    // init lut to 0
+    const int blockSize = 256;
+    const int gridSize = (N + blockSize - 1) / blockSize;
+    init_lut_kernel<<<gridSize, blockSize>>>(d_lut, N);
+    cudaDeviceSynchronize();
+
+    // initialize next_label = 1 (so first assigned id is 1)
+    int init_next = 1;
+    cudaMemcpy(d_next, &init_next, sizeof(int), cudaMemcpyHostToDevice);
+
+    // assign labels (may be many collisions, but atomicCAS+atomicAdd serializes per-root assignment)
+    assign_labels_kernel<<<gridSize, blockSize>>>(d_labels, d_lut, d_next, N);
+    cudaDeviceSynchronize();
+
+    // NOTE: It's possible some lut entries are still 0 for roots that were never present in labels.
+    // That's fine: remap accesses only existing roots. Now remap every label -> sequential id
+    remap_labels_kernel<<<gridSize, blockSize>>>(d_labels, d_lut, N);
+    cudaDeviceSynchronize();
+
+    // free
+    cudaFree(d_lut);
+    cudaFree(d_next);
+}
 __host__ __device__ __forceinline__
 int index3d(int x, int y, int z, int xsize, int ysize, int /*zsize*/) {
     // layout: (z, y, x) with x fastest
@@ -511,17 +588,21 @@ void hierarchicalWatershed_gpu_3d(const in_dtype* hostImage, int* hostLabels,
                             d_dx, d_dy, d_dz, nNbrs,
                             xsize, ysize, zsize, N);
     }
-
-    cudaMemcpy(hostLabels, deviceLabels, N * sizeof(int), cudaMemcpyDeviceToHost);
-
     cudaFree(deviceImage);
-    cudaFree(deviceLabels);
     cudaFree(deviceStates);
     cudaFree(d_changed);
     cudaFree(d_dx);
     cudaFree(d_dy);
     cudaFree(d_dz);
     cudaFree(d_newmin);
+
+    // compact labels on device -> sequential 1..K
+    compact_labels_device(deviceLabels, N);
+
+    cudaMemcpy(hostLabels, deviceLabels, N * sizeof(int), cudaMemcpyDeviceToHost);
+
+    cudaFree(deviceLabels);
+    
 }
 
 
@@ -575,7 +656,7 @@ void hierarchicalWatershedChunked(in_dtype* hostImage, int* hostLabels,
     else
     {
         int ncopies = 3;  // same as meanFilterChunked
-        chunkedExecutor(hierarchicalWatershed_gpu_3d<in_dtype>, ncopies, gpuMemory, ngpus,
+        chunkedExecutorWatershed(hierarchicalWatershed_gpu_3d<in_dtype>, ncopies, gpuMemory, ngpus,
                         hostImage, hostLabels, xsize, ysize, zsize,
                         flag_verbose, levels, neighborhood);
     }
