@@ -12,6 +12,7 @@ ctypedef fused numeric:
 # Define the fused type for integer types: float, int, unsigned int
 ctypedef fused integer:
     int
+    unsigned int
 
 # Extern declaration for the Watershed functions from C/C++ library
 cdef extern from "../../include/watershed/watershed.h":
@@ -173,3 +174,20 @@ def watershed_meyers_3d(np.ndarray[int, ndim=3] hostImage,
                                   &markers[0,0,0],
                                   background,
                                   xsize, ysize, zsize)
+
+
+cdef extern from "../../include/watershed/watershed_lines.h":
+    void compute_boundaries2d[integer](integer* labels, int* boundaries, int xsize, int ysize)
+
+
+def boundaries(np.ndarray[integer, ndim=2] labels,
+               np.ndarray[int, ndim=2] boundaries = None):
+
+    if boundaries is None:
+        boundaries = np.zeros_like(labels,dtype=np.int32)
+
+    isize = Size(labels)
+
+    compute_boundaries2d(&labels[0,0], &boundaries[0,0], isize.x, isize.y)
+
+    return boundaries
